@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="TOC{:toc}  SQLite是一款轻量、无服务器的、零配置的、事务性、关系型的数据库引擎，不需要在系统中配置就可以直接使用。 点命令可在命令行上输入.help列出所有sqlite支持的点命令。 数据类型每个存储在 SQLite 数据库中的值都具有以下存储类之一：    存储类 描述    NULL NULL 值。   INTEGER 有符号整数，根据值的大小存储在 1、2、3、4、6 或">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sqlite">
+<meta property="og:url" content="http://example.com/2022/06/07/sqlite/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="TOC{:toc}  SQLite是一款轻量、无服务器的、零配置的、事务性、关系型的数据库引擎，不需要在系统中配置就可以直接使用。 点命令可在命令行上输入.help列出所有sqlite支持的点命令。 数据类型每个存储在 SQLite 数据库中的值都具有以下存储类之一：    存储类 描述    NULL NULL 值。   INTEGER 有符号整数，根据值的大小存储在 1、2、3、4、6 或">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-06-07T08:05:44.643Z">
+<meta property="article:modified_time" content="2022-06-07T08:18:30.623Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2022/06/07/sqlite/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>sqlite | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/sqlite/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          sqlite
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:18:30" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/sqlite/" itemprop="url" rel="index"><span itemprop="name">sqlite</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <ul>
+<li>TOC<br>{:toc}</li>
+</ul>
+<p>SQLite是一款轻量、无服务器的、零配置的、事务性、关系型的数据库引擎，不需要在系统中配置就可以直接使用。</p>
+<h2 id="点命令"><a href="#点命令" class="headerlink" title="点命令"></a>点命令</h2><p>可在命令行上输入<code>.help</code>列出所有sqlite支持的点命令。</p>
+<h2 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h2><p>每个存储在 SQLite 数据库中的值都具有以下存储类之一：</p>
+<table>
+<thead>
+<tr>
+<th align="left">存储类</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">NULL</td>
+<td align="left">NULL 值。</td>
+</tr>
+<tr>
+<td align="left">INTEGER</td>
+<td align="left">有符号整数，根据值的大小存储在 1、2、3、4、6 或 8 字节中</td>
+</tr>
+<tr>
+<td align="left">REAL</td>
+<td align="left">浮点数</td>
+</tr>
+<tr>
+<td align="left">TEXT</td>
+<td align="left">文本字符串，使用数据库编码（UTF-8、UTF-16BE 或 UTF-16LE）存储</td>
+</tr>
+<tr>
+<td align="left">BLOB</td>
+<td align="left">值是一个 blob 数据，完全根据它的输入存储</td>
+</tr>
+</tbody></table>
+<p>SQLite通过值的表示来推理其类型：</p>
+<ul>
+<li>用单引号或双引号括起来的文字被指派为TEXT。</li>
+<li>未用引号括起来的数据，并且没有小数点和指数，被指派为INTEGER。</li>
+<li>未用引号括起来的数据，并且带有小数点或指数，被指派为REAL。</li>
+<li>用NULL说明的值被指派为NULL存储类。</li>
+<li>如果一个值的格式为X’ABCD’，其中ABCD为16进制数字，X前缀大小写皆可，则该值被指派为BLOB。</li>
+</ul>
+<p>SQLite支持列的亲和类型，列仍然可以存储任何类型的数据，当数据插入时，该字段的数据将会优先采用亲缘类型作为该值的存储方式。</p>
+<table>
+<thead>
+<tr>
+<th align="left">数据类型</th>
+<th align="left">亲和类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">INT、NTEGER、TINYINT、SMALLINT、MEDIUMINT、BIGINT、UNSIGNED BIG INT、INT2、INT8</td>
+<td align="left">INTEGER</td>
+</tr>
+<tr>
+<td align="left">CHARACTER(20)、VARCHAR(255)、VARYING CHARACTER(255)、NCHAR(55)、NATIVE CHARACTER(70)、NVARCHAR(100)、TEXT、CLOB</td>
+<td align="left">TEXT</td>
+</tr>
+<tr>
+<td align="left">BLOB、no datatype specified</td>
+<td align="left">NONE</td>
+</tr>
+<tr>
+<td align="left">REAL、DOUBLE、DOUBLE PRECISION、FLOAT</td>
+<td align="left">REAL</td>
+</tr>
+<tr>
+<td align="left">NUMERIC、DECIMAL(10,5)、BOOLEAN、DATE、DATETIME</td>
+<td align="left">NUMERIC<br/>可以包含使用所有五个存储类的值</td>
+</tr>
+</tbody></table>
+<p>SQLite 没有单独的 Boolean 存储类，布尔值被存储为整数 0和 1。</p>
+<p>SQLite 没有单独用于存储日期或时间的存储类，但 可以存储为 TEXT、REAL 或 INTEGER 值。</p>
+<table>
+<thead>
+<tr>
+<th align="left">存储类</th>
+<th align="left">日期格式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">TEXT</td>
+<td align="left">格式为 “YYYY-MM-DD HH:MM:SS.SSS” 的日期。</td>
+</tr>
+<tr>
+<td align="left">REAL</td>
+<td align="left">从公元前 4714 年 11 月 24 日格林尼治时间的正午开始算起的天数。</td>
+</tr>
+<tr>
+<td align="left">INTEGER</td>
+<td align="left">从 1970-01-01 00:00:00 UTC 算起的秒数。</td>
+</tr>
+</tbody></table>
+<h2 id="约束"><a href="#约束" class="headerlink" title="约束"></a>约束</h2><p>约束是在表或列上强制执行的规则，限制可以插入到表中的数据类型，以确保数据的准确性和可靠性。</p>
+<ul>
+<li>NOT NULL约束：确保某列不能是NULL值(未知的数据)。</li>
+<li>DEFAULT约束：当某列没有指定值时，为该列提供默认值。</li>
+<li>UNIQUE约束：确保某列中的所有值是不同的。</li>
+<li>PRIMARY Key约束：只能有一个主键唯一标识数据库表中的各行记录。</li>
+<li>CHECK约束：确保某列中的所有值满足一定条件。</li>
+</ul>
+<h2 id="Join"><a href="#Join" class="headerlink" title="Join"></a>Join</h2><p>Joins子句用于结合两个或多个数据库中表的记录。JOIN是一种通过共同值来结合两个表中字段的手段。</p>
+<p>交叉连接（CROSS JOIN）把第一个表的每一行与第二个表的每一行进行匹配。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> ... <span class="keyword">FROM</span> table1 <span class="keyword">CROSS</span> <span class="keyword">JOIN</span> table2 ...;</span><br></pre></td></tr></table></figure>
+
+<p>内连接（INNER JOIN）根据指定的连接条件结合两个表的列值来创建一个新的表。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--INNER 关键字是可选的</span></span><br><span class="line"><span class="keyword">SELECT</span> ... <span class="keyword">FROM</span> table1 [<span class="keyword">INNER</span>] <span class="keyword">JOIN</span> table2 <span class="keyword">ON</span> conditional_expression ...;</span><br><span class="line"></span><br><span class="line"><span class="comment">--可以使用USING表达式声明内连接条件，指定一个或多个列的列表</span></span><br><span class="line"><span class="keyword">SELECT</span> ... <span class="keyword">FROM</span> table1 <span class="keyword">JOIN</span> table2 <span class="keyword">USING</span> ( column1 ,... ) ...;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 自然连接会自动测试存在两个表中的每一列的值之间相等值</span></span><br><span class="line"><span class="keyword">SELECT</span> ... <span class="keyword">FROM</span> table1 <span class="keyword">NATURAL</span> <span class="keyword">JOIN</span> table2...;</span><br></pre></td></tr></table></figure>
+
+<p>外连接（OUTER JOIN）是内连接的扩展，不同的是会将未匹配条件的行使用NULL值，也附加到结果表中。虽然 SQL标准定义了三种类型的外连接：LEFT、RIGHT、FULL，但SQLite只支持左外连接（LEFT OUTER JOIN）。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> ... <span class="keyword">FROM</span> table1 <span class="keyword">LEFT</span> <span class="keyword">OUTER</span> <span class="keyword">JOIN</span> table2 <span class="keyword">ON</span> conditional_expression ...;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> ... <span class="keyword">FROM</span> table1 <span class="keyword">LEFT</span> <span class="keyword">OUTER</span> <span class="keyword">JOIN</span> table2 <span class="keyword">USING</span> ( column1 ,... ) ...;</span><br></pre></td></tr></table></figure>
+
+<h2 id="AS别名"><a href="#AS别名" class="headerlink" title="AS别名"></a>AS别名</h2><p>可以暂时把表或列重命名为另一个名字，重命名是临时的改变，在数据库中实际的表的名称不会改变。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 表别名</span></span><br><span class="line"><span class="keyword">SELECT</span> column1, ... columnN</span><br><span class="line"><span class="keyword">FROM</span> table_name <span class="keyword">AS</span> alias_name</span><br><span class="line"><span class="keyword">WHERE</span> [<span class="keyword">condition</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 列别名</span></span><br><span class="line"><span class="keyword">SELECT</span> column_name <span class="keyword">AS</span> alias_name</span><br><span class="line"><span class="keyword">FROM</span> table_name</span><br><span class="line"><span class="keyword">WHERE</span> [<span class="keyword">condition</span>];</span><br></pre></td></tr></table></figure>
+
+<h2 id="触发器"><a href="#触发器" class="headerlink" title="触发器"></a>触发器</h2><p>触发器(Trigger)是数据库的回调函数，它会在自动执行或指定的数据库事件发生时调用。</p>
+<ul>
+<li><p>SQLite的触发器可以指定在特定的数据库表发生DELETE、INSERT或UPDATE时触发，或在一个或多个指定表的列发生更新时触发。</p>
+</li>
+<li><p>SQLite只支持FOR EACH ROW触发器，没有FOR EACH STATEMENT触发器。</p>
+</li>
+<li><p>BEFORE或AFTER关键字决定何时执行触发器动作，决定是在关联行的插入、修改或删除之前或者之后执行触发器动作。</p>
+</li>
+<li><p>要修改的表必须存在于同一数据库中，作为触发器被附加的表或视图，且必须只使用tablename，而不是database.tablename。</p>
+</li>
+<li><p>当触发器相关联的表删除时，自动删除触发器。</p>
+</li>
+<li><p>RAISE()函数可用于触发器程序内抛出异常。</p>
+</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建触发器</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TRIGGER</span> trigger_name [BEFORE<span class="operator">|</span>AFTER] </span><br><span class="line"><span class="keyword">INSERT</span><span class="operator">|</span><span class="keyword">DELETE</span><span class="operator">|</span><span class="keyword">UPDATE</span></span><br><span class="line"><span class="keyword">ON</span> table_name </span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line"><span class="comment">-- Trigger logic goes here....</span></span><br><span class="line"><span class="keyword">END</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 列出触发器</span></span><br><span class="line"><span class="keyword">SELECT</span> name <span class="keyword">FROM</span> sqlite_master <span class="keyword">WHERE</span> type <span class="operator">=</span> <span class="string">&#x27;trigger&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 列出特定表上的触发器</span></span><br><span class="line"><span class="keyword">SELECT</span> name <span class="keyword">FROM</span> sqlite_master <span class="keyword">WHERE</span> type <span class="operator">=</span> <span class="string">&#x27;trigger&#x27;</span> <span class="keyword">AND</span> tbl_name <span class="operator">=</span> <span class="string">&#x27;table_name_xxx&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 删除触发器</span></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TRIGGER</span> trigger_name;</span><br></pre></td></tr></table></figure>
+
+<h2 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h2><p>索引(Index)是一种特殊的查找表，用来加快数据检索。索引是一个指向表中数据的指针，索引有助于加快SELECT查询和WHERE子句，但它会减慢使用UPDATE和INSERT语句时的数据输入。</p>
+<ul>
+<li>单列索引是一个只基于表的一个列上创建的索引。</li>
+<li>组合索引是基于一个表的两个或多个列上创建的索引。</li>
+<li>唯一索引不允许任何重复的值插入到表中，这是出于性能和数据完整性考虑。</li>
+<li>隐式索引是在创建对象时，由数据库服务器自动创建的索引，自动创建的索引为主键约束和唯一约束。</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建索引</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX index_name <span class="keyword">ON</span> table_name;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 创建单列索引</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX index_name <span class="keyword">ON</span> table_name (column_name);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 创建组合索引</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX index_name <span class="keyword">on</span> table_name (column1, column2);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 创建唯一索引</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">UNIQUE</span> INDEX index_name <span class="keyword">on</span> table_name (column_name);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 删除索引</span></span><br><span class="line"><span class="keyword">DROP</span> INDEX index_name;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查看索引</span></span><br><span class="line">.indices teamTable</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 列出数据库所有索引：</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> sqlite_master <span class="keyword">WHERE</span> type <span class="operator">=</span> <span class="string">&#x27;index&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Indexed-By关键字"><a href="#Indexed-By关键字" class="headerlink" title="Indexed By关键字"></a>Indexed By关键字</h3><p><code>INDEXED BY index-name</code>子句规定必须要指定的索引名来查找表中的值，如果索引名index-name不存在或不能用于查询，就会失败。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span><span class="operator">|</span><span class="keyword">DELETE</span><span class="operator">|</span><span class="keyword">UPDATE</span> column1, column2...</span><br><span class="line">INDEXED <span class="keyword">BY</span> (index_name)</span><br><span class="line">table_name</span><br><span class="line"><span class="keyword">WHERE</span> (<span class="keyword">CONDITION</span>);</span><br></pre></td></tr></table></figure>
+
+<p><code>NOT INDEXED</code>子句规定当访问的表（包括由UNIQUE和PRIMARY KEY约束创建的隐式索引）时，没有使用索引。</p>
+<h2 id="视图"><a href="#视图" class="headerlink" title="视图"></a>视图</h2><p>视图(View)是一个以预定义的SQLite查询形式存在的表的组合。视图可以包含一个表的所有行或从一个或多个表选定行，可以从一个单一的表、多个表或其他视图创建。。使用视图可以实现：</p>
+<ul>
+<li>用这种结构来查找数据更自然或直观。</li>
+<li>限制数据访问，只能看到有限的数据，而不是完整的表。</li>
+<li>汇总各种表中的数据，用于生成报告。</li>
+</ul>
+<p>SQLite视图是只读的，因此可能无法在视图上执行DELETE、INSERT或UPDATE语句。但是可以在视图上创建一个触发器，当尝试DELETE、INSERT或UPDATE视图时触发。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建视图</span></span><br><span class="line"><span class="keyword">CREATE</span> [TEMP <span class="operator">|</span> TEMPORARY] <span class="keyword">VIEW</span> view_name <span class="keyword">AS</span></span><br><span class="line"><span class="keyword">SELECT</span> column1, column2...</span><br><span class="line"><span class="keyword">FROM</span> table_name</span><br><span class="line"><span class="keyword">WHERE</span> [<span class="keyword">condition</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 删除视图</span></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">VIEW</span> view_name;</span><br></pre></td></tr></table></figure>
+
+<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p>事务（Transaction）是以逻辑顺序完成的工作单位或序列。事务具有四个属性：</p>
+<ul>
+<li>原子性：确保工作单位内的所有操作都成功完成，否则，事务会在出现故障时终止，之前的操作也会回滚到以前的状态。</li>
+<li>一致性：确保数据库在成功提交的事务上正确地改变状态。</li>
+<li>隔离性：使事务操作相互独立和透明。</li>
+<li>持久性：确保已提交事务的结果或效果在系统发生故障的情况下仍然存在。</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 启动事务</span></span><br><span class="line"><span class="keyword">BEGIN</span>;</span><br><span class="line"><span class="keyword">BEGIN</span> TRANSACTION;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 将事务调用的更改保存到数据库</span></span><br><span class="line"><span class="keyword">COMMIT</span>;</span><br><span class="line"><span class="keyword">END</span> TRANSACTION;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 撤消尚未保存到数据库的事务</span></span><br><span class="line"><span class="keyword">ROLLBACK</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h2><p>子查询是在WHERE子句中内嵌一个查询语句，使用子查询返回的数据将被用在主查询中作为条件，以进一步限制要检索的数据。子查询可以与SELECT、INSERT、UPDATE和DELETE语句一起使用。子查询必须遵循的几个规则：</p>
+<ul>
+<li>子查询必须用括号括起来。</li>
+<li>子查询在SELECT子句中只能有一个列，除非在主查询中有多列与子查询的所选列进行比较。</li>
+<li>ORDER BY不能用在子查询中，虽然主查询可以使用ORDER BY。</li>
+<li>子查询返回多于一行，只能与多值运算符一起使用，如IN运算符。</li>
+<li>BETWEEN运算符不能与子查询一起使用，但是BETWEEN可在子查询内使用。</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> teamTable <span class="keyword">WHERE</span> id <span class="keyword">IN</span> (<span class="keyword">SELECT</span> id <span class="keyword">FROM</span> teamTable <span class="keyword">WHERE</span> money <span class="operator">&gt;</span> <span class="number">4500</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> teamTable_bak <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> teamTable <span class="keyword">WHERE</span> id <span class="keyword">IN</span> (<span class="keyword">SELECT</span> id <span class="keyword">FROM</span> teamTable);</span><br><span class="line"><span class="keyword">UPDATE</span> teamTable <span class="keyword">SET</span> money <span class="operator">=</span> money <span class="operator">*</span> <span class="number">0.50</span> <span class="keyword">WHERE</span> age <span class="keyword">IN</span> (<span class="keyword">SELECT</span> age <span class="keyword">FROM</span> teamTable_bck <span class="keyword">WHERE</span> age <span class="operator">&gt;=</span> <span class="number">24</span>);</span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> teamTable <span class="keyword">WHERE</span> age <span class="keyword">IN</span> (<span class="keyword">SELECT</span> age <span class="keyword">FROM</span> teamTable_bck <span class="keyword">WHERE</span> age <span class="operator">&gt;</span> <span class="number">24</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="Autoincrement"><a href="#Autoincrement" class="headerlink" title="Autoincrement"></a>Autoincrement</h2><p>AUTOINCREMENT关键字用于表中的字段值自动递增，可以在创建表时在特定的列名称上使用AUTOINCREMENT关键字实现该字段值的自动增加，只能用于整型（INTEGER）字段。设置了AUTOINCREMENT后insert或者update时不需要指定值，自动从1开始递增。</p>
+<h2 id="SQL注入"><a href="#SQL注入" class="headerlink" title="SQL注入"></a>SQL注入</h2><p>允许用户通过网页输入，并将输入内容插入到SQLite数据库中，这时需要注意SQL注入的安全问题。</p>
+<h2 id="Explain"><a href="#Explain" class="headerlink" title="Explain"></a>Explain</h2><p><code>EXPLAIN</code>或<code>EXPLAIN QUERY PLAN</code>关键字用于描述表的细节，可用于表的交互式分析和排除故障。。</p>
+<p>EXPLAIN [SQLite Query]</p>
+<p>EXPLAIN  QUERY PLAN [SQLite Query]</p>
+<h2 id="PRAGMA"><a href="#PRAGMA" class="headerlink" title="PRAGMA"></a>PRAGMA</h2><p>SQLite的PRAGMA命令是一个特殊的命令，可以用在SQLite环境内控制各种环境变量和状态标志。PRAGMA值可以被读取和设置。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查询当前的PRAGMA值</span></span><br><span class="line">PRAGMA pragma_name;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 设置一个新的值</span></span><br><span class="line">PRAGMA pragma_name <span class="operator">=</span> <span class="keyword">value</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Vacuum"><a href="#Vacuum" class="headerlink" title="Vacuum"></a>Vacuum</h2><p>VACUUM 命令通过复制主数据库中的内容到一个临时数据库文件，然后清空主数据库，并从副本中重新载入原始的数据库文件。目的是整理数据库文件结构，消除空闲页，把表中的数据排列连续。</p>
+<p>如果表中没有明确的整型主键(INTEGER PRIMARY KEY)，VACUUM 命令可能会改变表中条目的行 ID(ROWID)。VACUUM 命令只适用于主数据库，附加的数据库文件是不能使用。如果有一个活动的事务，VACUUM 命令就会失败。由于 VACUUM 命令从头开始重新创建数据库文件，所以 VACUUM 也可以用于修改许多数据库特定的配置参数。</p>
+<hr>
+<p><a target="_blank" rel="noopener" href="https://www.sqlite.org/docs.html">https://www.sqlite.org/docs.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://runebook.dev/zh-CN/docs/sqlite/-index-">https://runebook.dev/zh-CN/docs/sqlite/-index-</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.runoob.com/sqlite/sqlite-tutorial.html">https://www.runoob.com/sqlite/sqlite-tutorial.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/HardWorkingAnt/article/details/70474107">https://blog.csdn.net/HardWorkingAnt/article/details/70474107</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/07/sql/" rel="prev" title="sqlite sql commands and clauses">
+      <i class="fa fa-chevron-left"></i> sqlite sql commands and clauses
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/07/sqlite_api/" rel="next" title="sqlite c++ api">
+      sqlite c++ api <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%82%B9%E5%91%BD%E4%BB%A4"><span class="nav-number">1.</span> <span class="nav-text">点命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">数据类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%A6%E6%9D%9F"><span class="nav-number">3.</span> <span class="nav-text">约束</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Join"><span class="nav-number">4.</span> <span class="nav-text">Join</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AS%E5%88%AB%E5%90%8D"><span class="nav-number">5.</span> <span class="nav-text">AS别名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A6%E5%8F%91%E5%99%A8"><span class="nav-number">6.</span> <span class="nav-text">触发器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95"><span class="nav-number">7.</span> <span class="nav-text">索引</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Indexed-By%E5%85%B3%E9%94%AE%E5%AD%97"><span class="nav-number">7.1.</span> <span class="nav-text">Indexed By关键字</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%86%E5%9B%BE"><span class="nav-number">8.</span> <span class="nav-text">视图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1"><span class="nav-number">9.</span> <span class="nav-text">事务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%90%E6%9F%A5%E8%AF%A2"><span class="nav-number">10.</span> <span class="nav-text">子查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Autoincrement"><span class="nav-number">11.</span> <span class="nav-text">Autoincrement</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SQL%E6%B3%A8%E5%85%A5"><span class="nav-number">12.</span> <span class="nav-text">SQL注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Explain"><span class="nav-number">13.</span> <span class="nav-text">Explain</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PRAGMA"><span class="nav-number">14.</span> <span class="nav-text">PRAGMA</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vacuum"><span class="nav-number">15.</span> <span class="nav-text">Vacuum</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">173</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

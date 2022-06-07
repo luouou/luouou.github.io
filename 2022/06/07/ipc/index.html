@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="TOC{:toc}  无名管道管道通常用于具有亲缘关系的父子进程或者兄弟进程间通信，是半双工的，数据只能往一个方向流动，先入先出。要想双向通信，需要建立两个管道。  123#include &lt;unistd.h&gt;int pipe(int pipefd[2]);  pipe创建的管道两端处于一个进程中，用于父子进程间的通信。管道建立时会创建两个文件描述符，pipefd[0]固定用于读管道">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux ipc">
+<meta property="og:url" content="http://example.com/2022/06/07/ipc/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="TOC{:toc}  无名管道管道通常用于具有亲缘关系的父子进程或者兄弟进程间通信，是半双工的，数据只能往一个方向流动，先入先出。要想双向通信，需要建立两个管道。  123#include &lt;unistd.h&gt;int pipe(int pipefd[2]);  pipe创建的管道两端处于一个进程中，用于父子进程间的通信。管道建立时会创建两个文件描述符，pipefd[0]固定用于读管道">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/linux/ipc/pipe.png">
+<meta property="og:image" content="http://example.com/images/linux/ipc/popen.png">
+<meta property="og:image" content="http://example.com/images/linux/ipc/sighandle_r.png">
+<meta property="article:published_time" content="2022-06-07T08:05:44.673Z">
+<meta property="article:modified_time" content="2022-06-07T08:18:30.635Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/linux/ipc/pipe.png">
+
+<link rel="canonical" href="http://example.com/2022/06/07/ipc/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>linux ipc | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/ipc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux ipc
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:18:30" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <ul>
+<li>TOC<br>{:toc}</li>
+</ul>
+<h2 id="无名管道"><a href="#无名管道" class="headerlink" title="无名管道"></a>无名管道</h2><p>管道通常用于具有亲缘关系的父子进程或者兄弟进程间通信，是半双工的，数据只能往一个方向流动，先入先出。要想双向通信，需要建立两个管道。</p>
+<p><img src="/images/linux/ipc/pipe.png" alt="pipe"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pipe</span><span class="params">(<span class="type">int</span> pipefd[<span class="number">2</span>])</span>;</span><br></pre></td></tr></table></figure>
+
+<p>pipe创建的管道两端处于一个进程中，用于父子进程间的通信。管道建立时会创建两个文件描述符，pipefd[0]固定用于读管道，而pipefd[1]固定用于写管道，构成一个半双工的通道。</p>
+<p>如果读一个写端已被关闭的管道，在所有数据都被读取后，read返回0指示达到了文件结束处。<br>如果写一个读端已被关闭的管道，则产生信号SIGPIPE。如果忽略该信号或者捕捉该信号并从其处理程序返回，则write出错返回，errno设置为EPIPE。</p>
+<h2 id="标准流管道"><a href="#标准流管道" class="headerlink" title="标准流管道"></a>标准流管道</h2><p><img src="/images/linux/ipc/popen.png" alt="popen"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">FILE *<span class="title function_">popen</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *command, <span class="type">const</span> <span class="type">char</span> *type)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pclose</span><span class="params">(FILE *stream)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>popen提供连接到另一个进程的标准输入或标准输出的一个单行管道，创建的管道必须使用标准I/O函数进行操作。popen先执行fork,然后调用exec以执行command，并且返回一个标准I/O文件指针。如果type是”r”，则文件指针连接到command的标准输出。如果type是”w”，则文件指针连接到command的标准输入。</p>
+<p>pclose用来关闭创建的管道流，返回由popen所执行的进程的终止状态。</p>
+<h2 id="命名管道"><a href="#命名管道" class="headerlink" title="命名管道"></a>命名管道</h2><p>命名管道在非父子、兄弟进程之间也可相互通信。FIFO遵循先进先出规则，对FIFO的读总是从开始处返回数据，写则把数据添加到末尾。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">mkfifo</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">mode_t</span> mode)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>mkfifo创建一个FIFO管道，对于读进程。若该管道是阻塞打开，且当前FIFO内没有数据，则对读进程而言将一直阻塞到有数据写入。若该管道是非阻塞打开，则不论FIFO 内是否有数据，读进程都会立即执行读操作。即如果FIFO内没有数据，则读函数将立刻返回 0。</p>
+<p>对于写进程。若该管道是阻塞打开，则写操作将一直阻塞到数据可以被写入。若该管道是非阻塞打开而不能写入全部数据，则读操作进行部分写入或者调用失败。</p>
+<ul>
+<li>O_RDONLY  读管道</li>
+<li>O_WRONLY  写管道</li>
+<li>O_RDWR  读写管道</li>
+<li>O_NONBLOCK  非阻塞</li>
+<li>O_CREAT  如果该文件不存在，那么就创建一个新的文件，并用第三个参数为其设置权限。</li>
+<li>O_EXCL  如果使用O_CREAT时文件存在，那么可返回错误消息。可测试文件是否存在。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>返回错误类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>EACCESS</td>
+<td>所指定的目录路径无可执行的权限</td>
+</tr>
+<tr>
+<td>EEXIST</td>
+<td>所指定的文件已存在</td>
+</tr>
+<tr>
+<td>ENAMETOOLONG</td>
+<td>的路径名称太长</td>
+</tr>
+<tr>
+<td>ENOENT</td>
+<td>包含的目录不存在</td>
+</tr>
+<tr>
+<td>ENOSPC</td>
+<td>文件系统的剩余空间不足</td>
+</tr>
+<tr>
+<td>ENOTDIR</td>
+<td>路径中的目录存在但却非真正的目录</td>
+</tr>
+<tr>
+<td>EROFS</td>
+<td>指定的文件存在于只读文件系统内</td>
+</tr>
+</tbody></table>
+<h2 id="信号"><a href="#信号" class="headerlink" title="信号"></a>信号</h2><p>号是软件中断，用于在多个进程之间传递异步信号。信号可以直接进行用户空间进程和内核进程之间的交互。<code>kill -l</code>命令可以查看系统支持的信号列表。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"> 1) SIGHUP       2) SIGINT       3) SIGQUIT      4) SIGILL       5) SIGTRAP</span><br><span class="line"> 6) SIGABRT      7) SIGBUS       8) SIGFPE       9) SIGKILL     10) SIGUSR1</span><br><span class="line">11) SIGSEGV     12) SIGUSR2     13) SIGPIPE     14) SIGALRM     15) SIGTERM</span><br><span class="line">16) SIGSTKFLT   17) SIGCHLD     18) SIGCONT     19) SIGSTOP     20) SIGTSTP</span><br><span class="line">21) SIGTTIN     22) SIGTTOU     23) SIGURG      24) SIGXCPU     25) SIGXFSZ</span><br><span class="line">26) SIGVTALRM   27) SIGPROF     28) SIGWINCH    29) SIGIO       30) SIGPWR</span><br><span class="line">31) SIGSYS      34) SIGRTMIN    35) SIGRTMIN+1  36) SIGRTMIN+2  37) SIGRTMIN+3</span><br><span class="line">38) SIGRTMIN+4  39) SIGRTMIN+5  40) SIGRTMIN+6  41) SIGRTMIN+7  42) SIGRTMIN+8</span><br><span class="line">43) SIGRTMIN+9  44) SIGRTMIN+10 45) SIGRTMIN+11 46) SIGRTMIN+12 47) SIGRTMIN+13</span><br><span class="line">48) SIGRTMIN+14 49) SIGRTMIN+15 50) SIGRTMAX-14 51) SIGRTMAX-13 52) SIGRTMAX-12</span><br><span class="line">53) SIGRTMAX-11 54) SIGRTMAX-10 55) SIGRTMAX-9  56) SIGRTMAX-8  57) SIGRTMAX-7</span><br><span class="line">58) SIGRTMAX-6  59) SIGRTMAX-5  60) SIGRTMAX-4  61) SIGRTMAX-3  62) SIGRTMAX-2</span><br><span class="line">63) SIGRTMAX-1  64) SIGRTMAX</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>SIGABRT 调用abort函数时产生此信号。进程异常终止。</li>
+<li>SIGALRM 超过用alarm函数设置的时间时产生此信号。由setitimer函数设置的间隔时间已经过时。</li>
+<li>SIGBUS 指示一个实现定义的硬件故障。</li>
+<li>SIGCHLD 在一个进程终止或停止时被送给其父进程。</li>
+<li>SIGCONT 此作业控制信号送给需要继续运行的处于停止状态的进程。如果接收到此信号的进程处于停止状态,则系统默认动作是使该进程继续运行，否则默认动作是忽略此信号。</li>
+<li>SIGEMT 指示一个实现定义的硬件故障。</li>
+<li>SIGFPE 此信号表示一个算术运算异常，例如除以0，浮点溢出等。</li>
+<li>SIGHUP 如果终端界面检测到一个连接断开，则将此信号送给与该终端相关的控制进程。</li>
+<li>SIGILL 此信号指示进程已执行一条非法硬件指令。</li>
+<li>SIGINT 当用户按中断键(Ctrl+C)时，此信号送至前台进程组中的每一个进程。</li>
+<li>SIGIO 此信号指示一个异步I/O事件。</li>
+<li>SIGIOT 这指示一个实现定义的硬件故障。</li>
+<li>SIGKILL  杀死任一进程。不能被捕捉或忽略。</li>
+<li>SIGPIPE 如果在读进程已终止时写管道，则产生此信号。当套接口的一端已经终止时，若进程写该套接口也产生此信号。</li>
+<li>SIGPOLL 在一个可轮询设备上发生一特定事件时产生此信号。</li>
+<li>SIGPROF 当setitimer函数设置的梗概统计间隔时间已经超过时产生此信号。</li>
+<li>SIGPWR 它主要用于具有不间断电源(UPS)的系统上。蓄电池电压过低时将信号发送给init进程，然后由init处理停机操作。</li>
+<li>SIGQUIT 当用户在终端上按退出键(Ctrl+)时，产生此信号，并送至前台进程组中的所有进程。终止前台进程组并产生core文件。</li>
+<li>SIGSEGV 指示进程进行了一次无效的存储访问。</li>
+<li>SIGSTOP 这是一个作业控制信号，它停止一个进程。不能被捕捉或忽略。</li>
+<li>SIGSYS 指示一个无效的系统调用。</li>
+<li>SIGTERM kill命令发送的系统默认终止信号。</li>
+<li>SIGTRAP 指示一个实现定义的硬件故障。</li>
+<li>SIGTSTP 交互停止信号，当用户在终端上按挂起键(Ctrl+Z)时，终端驱动程序产生此信号。</li>
+<li>SIGTTIN 当一个后台进程组进程试图读其控制终端时，终端驱动程序产生此信号。当读进程忽略或阻塞此信号，或读进程所属的进程组是孤儿进程组时不产生此信号，读操作出错并设置errno。</li>
+<li>SIGTTOU 当一个后台进程组进程试图写其控制终端时产生此信号。当写进程忽略或阻塞此信号，或写进程所属的进程组是孤儿进程组时不产生此信号，写操作出错并设置errno。</li>
+<li>SIGURG 此信号通知进程已经发生一个紧急情况。在网络连接上，接到非规定波特率的数据时，此信号可选择地产生。</li>
+<li>SIGUSR1 这是一个用户定义的信号，可用于应用程序。</li>
+<li>SIGUSR2 这是一个用户定义的信号，可用于应用程序。</li>
+<li>SIGVTALRM 当一个由setitimer函数设置的虚拟间隔时间已经超过时产生此信号。</li>
+<li>SIGWINCH 如果一个进程用ioctl设置窗口大小命令更改了窗口大小，则内核将信号送至前台进程组。</li>
+<li>SIGXCPU 如果进程超过了其软CPU时间限制，则产生此信号。</li>
+<li>SIGXFSZ 如果进程超过了其软文件长度限制产生此信号。</li>
+</ul>
+<h3 id="signal"><a href="#signal" class="headerlink" title="signal"></a>signal</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(*<span class="type">sighandler_t</span>)</span><span class="params">(<span class="type">int</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIG_ERR  ((__sighandler_t) -1) <span class="comment">/* Error return.  */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIG_DFL  ((__sighandler_t)  0) <span class="comment">/* Default action.  */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIG_IGN  ((__sighandler_t)  1) <span class="comment">/* Ignore signal.  */</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">sighandler_t</span> <span class="title function_">signal</span><span class="params">(<span class="type">int</span> signum, <span class="type">sighandler_t</span> handler)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>signal设置信号的处理方法，成功返回handler的值,若出错则为SIG_ERR。对于handler参数：</p>
+<ul>
+<li>SIG_IGN  表示忽略此信号。(SIGKILL和SIGSTOP不能忽略)</li>
+<li>SIG_DFL  表示执行系统默认动作。</li>
+<li>自定义的信号处理函数指针。</li>
+</ul>
+<p>信号处理函数应调用可重入的函数。<br><img src="/images/linux/ipc/sighandle_r.png" alt="sighandle_r"></p>
+<h3 id="raise-kill"><a href="#raise-kill" class="headerlink" title="raise kill"></a>raise kill</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">raise</span><span class="params">(<span class="type">int</span> sig)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>raise给进程本身发送信号。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">kill</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">int</span> sig)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>kill给一个进程发送信号，pid参数:</p>
+<ul>
+<li>pid&gt;0  将信号发送给进程ID为pid的进程。</li>
+<li>pid==0  将信号发送给与其进程组ID相等的进程。</li>
+<li>pid&lt;0  将信号发送给进程组ID等于pid绝对值的进程。</li>
+</ul>
+<p>进程将信号发送给其他进程需要许可权。对于非root用户，其规则是发送者的实际或有效用户ID必须等于接收者的实际或有效用户ID。</p>
+<h3 id="alarm"><a href="#alarm" class="headerlink" title="alarm"></a>alarm</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">alarm</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> seconds)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>alarm函数可以设置一个闹钟时间,超时后产生SIGALRM信号。如果不忽略或不捕捉此信号，则其默认动作是终止进程。</p>
+<p>每个进程只能有一个闹钟时间。如果在调用alarm时，以前已设置过闹钟时间，而且还没有超时，则该闹钟时间的余留值作为本次alarm函数调用的值返回。以前登记的闹钟时间则被新值代换。如果以前登记的尚未超过的闹钟时间，而且seconds值是0，则取消以前的闹钟时间，其余留值仍作为函数的返回值。</p>
+<h3 id="pause"><a href="#pause" class="headerlink" title="pause"></a>pause</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pause</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>只有执行了一个信号处理程序并从其返回时，pause才返回。在这种情况下，pause返回-1，errno设置为EINTR。</p>
+<h2 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h2><p>信号量用于进程同步，只有获得了信号量的进程才可以运行，没有获得信号量的进程则只能等待。</p>
+<p>信号量包括一个称为信号量的变量和在该信号量下等待资源的进程等待队列，以及对信号量进行的两个原子操作(PV操作)。其中信号量对应于某一种资源，取一个非负的整型值，信号量值指的是当前可用的该资源的数量，若它等于 0 则意味着目前没有可用的资源。PV原子操作的具体定义如下:</p>
+<ul>
+<li>P操作:如果有可用的资源(信号量&gt;0)。则占用一个资源(信号量-1，进入临界区代码);如果没有可用的资源(信号量等于0)。则被阻塞。直到系统将资源分配给该进程(进入等待队列。一直等到资源轮到该进程)。</li>
+<li>V操作:如果在该信号量的等待队列中有进程在等待资源。则唤醒一个阻塞进程。如果没有进程等待它。则释放一个资源(信号量+1)。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ipc.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">key_t</span> <span class="title function_">ftok</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">int</span> proj_id)</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ipc.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/sem.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">semget</span><span class="params">(<span class="type">key_t</span> key, <span class="type">int</span> nsems, <span class="type">int</span> semflg)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>semget创建信号量或获得在系统已存在的信号量，函数返回信号量标识符。</p>
+<p>key参数是信号量的键值，不同进程可通过使用同一个信号量键值来获得同一个信号量。其中有个特殊值 IPC_PRIVATE。它用于创建当前进程的私有信号量。</p>
+<p>nsems参数是需要创建的信号量数目。</p>
+<p>semflg参数同open函数的权限位，可以用八进制表示，使用IPC_CREAT 标志创建新的信号量，即使该信号量已经存在也不会出错。如果同时使用 IPC_EXCL 标志则创建一个新的的信号量，如果该信号量已经存在，该函数会返回出错。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ipc.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/sem.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">union</span> <span class="title">semun</span> &#123;</span></span><br><span class="line">  <span class="type">int</span> val;    <span class="comment">/* Value for SETVAL */</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">semid_ds</span> *<span class="title">buf</span>;</span>    <span class="comment">/* Buffer for IPC_STAT, IPC_SET */</span></span><br><span class="line">  <span class="type">unsigned</span> <span class="type">short</span> *<span class="built_in">array</span>;  <span class="comment">/* Array for GETALL, SETALL */</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">seminfo</span> *__<span class="title">buf</span>;</span>  <span class="comment">/* Buffer for IPC_INFO */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">semctl</span><span class="params">(<span class="type">int</span> semid, <span class="type">int</span> semnum, <span class="type">int</span> cmd, ... <span class="comment">/* union semun arg */</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>semctl初始化信号量。semid参数是信号量标识符。semnum参数是信号量编号,当使用信号量集时才会被用到。值为0就是单个信号量。</p>
+<p>cmd参数指定对信号量的操作, 若要传递参数，必须自定义semun联合体。对于单个信号量:</p>
+<ul>
+<li>IPC_STAT  获得该信号量的semid_ds结构,并存放在第4个参数arg的buf中。</li>
+<li>IPC_SETVAL  将信号量值设置为arg中的val值。</li>
+<li>IPC_GETVAL  返回信号量的当前值</li>
+<li>IPC_RMID  删除信号量</li>
+</ul>
+<p>对于信号量集合：</p>
+<ul>
+<li>GETVAL  返回semnum的信号量値。</li>
+<li>SETVAL  设置semnum的信号量値。该值由a rg . v a l指定。</li>
+<li>GETPID  返回semnum的信号量的sempid值。</li>
+<li>GETNCNT  返回semnum的信号量的semncnt值。</li>
+<li>GETZCNT  返回semnum的信号量的semzcnt值。</li>
+<li>GETALL  获取集合中所有信号量的值，并由arg.array返回。</li>
+<li>SETALL  按arg.array指向的数组设置集合中所有信号量。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">union</span> <span class="title">semun</span> &#123;</span></span><br><span class="line">  <span class="type">int</span> val;    <span class="comment">/* Value for SETVAL */</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">semid_ds</span> *<span class="title">buf</span>;</span>    <span class="comment">/* Buffer for IPC_STAT, IPC_SET */</span></span><br><span class="line">  <span class="type">unsigned</span> <span class="type">short</span> *<span class="built_in">array</span>;  <span class="comment">/* Array for GETALL, SETALL */</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">seminfo</span> *__<span class="title">buf</span>;</span>  <span class="comment">/* Buffer for IPC_INFO */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ipc.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/sem.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sembuf</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> sem_num; <span class="comment">/* semaphore number */</span></span><br><span class="line">  <span class="type">short</span> <span class="type">int</span> sem_op;  <span class="comment">/* semaphore operation */</span></span><br><span class="line">  <span class="type">short</span> <span class="type">int</span> sem_flg; <span class="comment">/* operation flag */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">semop</span><span class="params">(<span class="type">int</span> semid, <span class="keyword">struct</span> sembuf *sops, <span class="type">size_t</span> nsops)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>semop进行信号量的PV操作，若成功返回信号量标识符。操作已经被删除的信号量会出错。</p>
+<p>sops指向一个sembuf对象。其中sem_op是信号量操作:取值为-1，则表示P操作；取值为1，则表示V操作。sem_flg通常设置为SEM_UNDO，在进程没释放信号量而退出时，系统自动释放该进程中未释放的信号量。</p>
+<p>nsops是操作数组sops中的操作个数。</p>
+<h2 id="信号集"><a href="#信号集" class="headerlink" title="信号集"></a>信号集</h2><h2 id="共享内存"><a href="#共享内存" class="headerlink" title="共享内存"></a>共享内存</h2><p>共享内存允许两个或多个进程共享一给定的存储区，因为数据不需要在客户机和服务器之间复制，所以效率很高，常用于不同进程间进行大量数据传递。内核为每个共享存储段设置了一个shmid_ds结构。<code>ipcs -m</code>命令可以查看系统的共享内存。共享存储段紧靠在栈之下。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">shmid_ds</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ipc_perm</span> <span class="title">shm_perm</span>;</span>  <span class="comment">/* operation permission struct */</span></span><br><span class="line">    <span class="type">size_t</span> shm_segsz;   <span class="comment">/* size of segment in bytes */</span></span><br><span class="line">    <span class="type">__time_t</span> shm_atime;   <span class="comment">/* time of last shmat() */</span></span><br><span class="line">    <span class="type">__time_t</span> shm_dtime;   <span class="comment">/* time of last shmdt() */</span></span><br><span class="line">    <span class="type">__time_t</span> shm_ctime;   <span class="comment">/* time of last change by shmctl() */</span></span><br><span class="line">    <span class="type">__ipc_pid_t</span> shm_cpid;  <span class="comment">/* pid of creator */</span></span><br><span class="line">    <span class="type">__ipc_pid_t</span> shm_lpid;  <span class="comment">/* pid of last shmop */</span></span><br><span class="line">    <span class="type">shmatt_t</span> shm_nattch;  <span class="comment">/* number of current attaches */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> __shm_npages; <span class="comment">/* size of segment (pages) */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span> *__shm_pages; <span class="comment">/* array of ptrs to frames -&gt; SHMMAX */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> __<span class="title">vm_area_struct</span> *__<span class="title">attaches</span>;</span> <span class="comment">/* descriptors for attaches */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ipc.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/shm.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">shmget</span><span class="params">(<span class="type">key_t</span> key, <span class="type">size_t</span> size, <span class="type">int</span> shmflg)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>shmget创建共享内存，成功返回共享内存段标识符。</p>
+<p>key参数是共享内存的键值，多个进程可以通过它访问同一个共享内存,其中有个特殊值 IPC_PRIVATE。它用于创建当前进程的私有共享内存。</p>
+<p>size参数是共享内存区大小。shmflg参数同open函数的权限位，也可以用八进制表示法。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/shm.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> *<span class="title function_">shmat</span><span class="params">(<span class="type">int</span> shmid, <span class="type">const</span> <span class="type">void</span> *shmaddr, <span class="type">int</span> shmflg)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">shmdt</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *shmaddr)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>shmat映射共享内存，把这段创建的共享内存映射到具体的进程空间中。成功返回被映射的段地址，出错返回-1。</p>
+<p>shmaddr参数是共享内存映射的目的地址，若为0则表示系统自动分配地址。</p>
+<p>shmflg参数默认为0，表示共享内存可读写，若为SHM_RDONLY，则共享内存只读。</p>
+<p>shmdt撤销映射的地址。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ipc.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/shm.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">shmctl</span><span class="params">(<span class="type">int</span> shmid, <span class="type">int</span> cmd, <span class="keyword">struct</span> shmid_ds *buf)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>shmctl函数对共享存储段执行多种操作。cmd参数:</p>
+<ul>
+<li>IPC_STAT 对此段取shmid_ds结构,并存放在buf指向的结构中。</li>
+<li>IPC_SET  按buf指向的结构中的值设置与此段相关结构中的下列三个字段:shm_perm.uid、shm_perm.gid以及shm_perm.mode。此命令只能由下列两种进程执行：一种是其有效用户ID等于shm_perm.cuid或shm_perm.uid的进程;另一种是具有root特权的进程。</li>
+<li>IPC_RMID  删除共享存储段。删除后不能再用shmat与该段连接。此命令只能由下列两种进程执行：一种是其有效用户ID等于shm_perm.cuid或shm_perm.uid的进程;另一种是具有root特权的进程。</li>
+<li>SHM_LOCK 锁住共享存储段。此命令只能由root执行。</li>
+<li>SHM_UNLOCK 解锁共享存储段。此命令只能由root执行。</li>
+</ul>
+<p>/dev/zero的可映射为共享内存。设备/dev/zero在读时,是0字节的无限资源。此设备也接收写向它的任何数据，但忽略此数据。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/mman.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> *<span class="title function_">mmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length, <span class="type">int</span> prot, <span class="type">int</span> flags,<span class="type">int</span> fd, <span class="type">off_t</span> offset)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">munmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>mmap根据文件描述符创建一个存储区，其长度是参数length，将其取整为系统上的最近页长。存储区都初始化为0。flags指定MAP_SHARED标志，则此存储区可共享。</p>
+<h2 id="消息队列"><a href="#消息队列" class="headerlink" title="消息队列"></a>消息队列</h2><p>消息队列是消息的链接表，存放在内核中并由消息队列标识符标识，用户可以从消息队列中添加消息和读取消息等。消息队列具有一定的FIFO特性，但是也可以按消息的类型字段取消息，每个消息包含一个正长整型类型字段，一个非负长度以及实际数据字节，每个消息队列都有一个msqid_ds结构与其相关，规定了队列的当前状态。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">msqid_ds</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ipc_perm</span> <span class="title">msg_perm</span>;</span>     <span class="comment">/* Ownership and permissions */</span></span><br><span class="line">    <span class="type">time_t</span>          msg_stime;    <span class="comment">/* Time of last msgsnd(2) */</span></span><br><span class="line">    <span class="type">time_t</span>          msg_rtime;    <span class="comment">/* Time of last msgrcv(2) */</span></span><br><span class="line">    <span class="type">time_t</span>          msg_ctime;    <span class="comment">/* Time of last change */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>   __msg_cbytes; <span class="comment">/* Current number of bytes in</span></span><br><span class="line"><span class="comment">                                    queue (nonstandard) */</span></span><br><span class="line">    <span class="type">msgqnum_t</span>       msg_qnum;     <span class="comment">/* Current number of messages</span></span><br><span class="line"><span class="comment">                                    in queue */</span></span><br><span class="line">    <span class="type">msglen_t</span>        msg_qbytes;   <span class="comment">/* Maximum number of bytes</span></span><br><span class="line"><span class="comment">                                    allowed in queue */</span></span><br><span class="line">    <span class="type">pid_t</span>           msg_lspid;    <span class="comment">/* PID of last msgsnd(2) */</span></span><br><span class="line">    <span class="type">pid_t</span>           msg_lrpid;    <span class="comment">/* PID of last msgrcv(2) */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ipc_perm</span> &#123;</span></span><br><span class="line">    <span class="type">key_t</span>          __key;       <span class="comment">/* Key supplied to msgget(2) */</span></span><br><span class="line">    <span class="type">uid_t</span>          uid;         <span class="comment">/* Effective UID of owner */</span></span><br><span class="line">    <span class="type">gid_t</span>          gid;         <span class="comment">/* Effective GID of owner */</span></span><br><span class="line">    <span class="type">uid_t</span>          cuid;        <span class="comment">/* Effective UID of creator */</span></span><br><span class="line">    <span class="type">gid_t</span>          cgid;        <span class="comment">/* Effective GID of creator */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> mode;        <span class="comment">/* Permissions */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> __seq;       <span class="comment">/* Sequence number */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>msg-first和msg-last指针分别指向相应消息在内核中的存放位置，它们对用户进程<br>而言是无价效的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ipc.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/msg.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">msgget</span><span class="params">(<span class="type">key_t</span> key, <span class="type">int</span> msgflg)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>msgget创建或打开消息队列，这里创建的消息队列的数量会受到系统消息队列数量的限制。成功返回消息队列id。</p>
+<p>key参数是消息队列的键值，多个进程可以通过它访问同一个消息队列，其中有个特殊值 IPC_PRIVATE，用于创建当前进程的私有消息队列。</p>
+<p>msgflg参数是权限标志位。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ipc.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/msg.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">msgsnd</span><span class="params">(<span class="type">int</span> msqid, <span class="type">const</span> <span class="type">void</span> *msgp, <span class="type">size_t</span> msgsz, <span class="type">int</span> msgflg)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">msgrcv</span><span class="params">(<span class="type">int</span> msqid, <span class="type">void</span> *msgp, <span class="type">size_t</span> msgsz, <span class="type">long</span> msgtyp, <span class="type">int</span> msgflg)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>msgsnd把消息添加到已打开的消息队列末尾。<br>msgp指向消息缓冲区，该消息结构msgbuf通常为:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> BUFFER_SIZE 512</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">msgbuf</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">long</span> mtype; <span class="comment">/* 消息类型，该结构必须从这个域开始 */</span></span><br><span class="line">    <span class="type">char</span> mtext[BUFFER_SIZE];  <span class="comment">/* 消息正文 */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>msgsz参数是消息正文的字节数(不包括消息类型指针变量)。msgflg参数为IPC_NOWAIT，则不阻塞；为0则阻塞直到发送成功为止。</p>
+<p>msgrcv把消息从消息队列中取走，与FIFO不同的是，这里可以指定取走某一条消息。msgp指向消息缓冲区，msgsz是消息正文的字节数。<br>msgtyp参数：</p>
+<ul>
+<li>0  接收消息队列中第一个消息。</li>
+<li>大于0  接收消息队列中第一个类型为msgtyp的消息。</li>
+<li>小于0  接收消息队列中第一个类型值大于msgtyp绝对值且类型值最小的消息。</li>
+</ul>
+<p>msgflg参数：</p>
+<ul>
+<li>IPC_NOWAIT  则不阻塞。</li>
+<li>0  则阻塞直到发送成功为止。</li>
+<li>MSG_NOERROR  若返回的消息比msgsz字节多，则截短到msgsz字节。</li>
+</ul>
+<p>消息发送端进程和消息接收端进程之间不需要实现进程间的同步。一般发送端发送的消息类型设置为该进程的进程号，因此接收端根据消息类型确定消息发送者的进程号。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ipc.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/msg.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">msgctl</span><span class="params">(<span class="type">int</span> msqid, <span class="type">int</span> cmd, <span class="keyword">struct</span> msqid_ds *buf)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>msgctl用来控制消息队列。cmd命令参数：</p>
+<ul>
+<li>IPC_STAT  读取消息队列的数据结构 msqid_ds，并将其存储在buf中。</li>
+<li>IPC_SET  设置消息队列的数据结构 msqid_ds中的msg_perm的值(IPC操作权限)。</li>
+<li>IPC_RMID  从系统内核中删除消息队列。</li>
+</ul>
+<h2 id="Socket"><a href="#Socket" class="headerlink" title="Socket"></a>Socket</h2>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/07/iniparser/" rel="prev" title="iniparser">
+      <i class="fa fa-chevron-left"></i> iniparser
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/07/process/" rel="next" title="linux process in user">
+      linux process in user <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A0%E5%90%8D%E7%AE%A1%E9%81%93"><span class="nav-number">1.</span> <span class="nav-text">无名管道</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%87%E5%87%86%E6%B5%81%E7%AE%A1%E9%81%93"><span class="nav-number">2.</span> <span class="nav-text">标准流管道</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%BD%E5%90%8D%E7%AE%A1%E9%81%93"><span class="nav-number">3.</span> <span class="nav-text">命名管道</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7"><span class="nav-number">4.</span> <span class="nav-text">信号</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#signal"><span class="nav-number">4.1.</span> <span class="nav-text">signal</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#raise-kill"><span class="nav-number">4.2.</span> <span class="nav-text">raise kill</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#alarm"><span class="nav-number">4.3.</span> <span class="nav-text">alarm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pause"><span class="nav-number">4.4.</span> <span class="nav-text">pause</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F"><span class="nav-number">5.</span> <span class="nav-text">信号量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%9B%86"><span class="nav-number">6.</span> <span class="nav-text">信号集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98"><span class="nav-number">7.</span> <span class="nav-text">共享内存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97"><span class="nav-number">8.</span> <span class="nav-text">消息队列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Socket"><span class="nav-number">9.</span> <span class="nav-text">Socket</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">173</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="TOC{:toc}  可重入异步信号安全函数又被称为可重入函数，其定义源自单线程环境： 如果一个函数可以在执行期间的任意时刻被中断，并且可以在中断服务程序中再次被安全调用，以及在中断退出后还可以继续正确执行完函数的剩下部分内容，就称该函数为可重入函数。而不可重入的函数由于使用了全局资源、中断向量表等，在多线程的环境下，它如果被中断，或没有处理数据保护和互斥访问，就会发生错误。 重入即表示重复进入">
+<meta property="og:type" content="article">
+<meta property="og:title" content="可重入与线程安全">
+<meta property="og:url" content="http://example.com/2022/06/07/func_r/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="TOC{:toc}  可重入异步信号安全函数又被称为可重入函数，其定义源自单线程环境： 如果一个函数可以在执行期间的任意时刻被中断，并且可以在中断服务程序中再次被安全调用，以及在中断退出后还可以继续正确执行完函数的剩下部分内容，就称该函数为可重入函数。而不可重入的函数由于使用了全局资源、中断向量表等，在多线程的环境下，它如果被中断，或没有处理数据保护和互斥访问，就会发生错误。 重入即表示重复进入">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-06-07T08:05:44.541Z">
+<meta property="article:modified_time" content="2022-06-07T08:18:30.635Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2022/06/07/func_r/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>可重入与线程安全 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/func_r/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          可重入与线程安全
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:18:30" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <ul>
+<li>TOC<br>{:toc}</li>
+</ul>
+<h2 id="可重入"><a href="#可重入" class="headerlink" title="可重入"></a>可重入</h2><p>异步信号安全函数又被称为可重入函数，其定义源自单线程环境： 如果一个函数可以在执行期间的任意时刻被中断，并且可以在中断服务程序中再次被安全调用，以及在中断退出后还可以继续正确执行完函数的剩下部分内容，就称该函数为可重入函数。而不可重入的函数由于使用了全局资源、中断向量表等，在多线程的环境下，它如果被中断，或没有处理数据保护和互斥访问，就会发生错误。</p>
+<p>重入即表示重复进入，意味着函数可以被中断，它除了使用自己栈上的变量以外不依赖于任何环境，由于它们使用的是分离的栈，允许多个副本运行，所以互不干扰。</p>
+<p>不可重入函数通常会符合以下这些特征之一：</p>
+<ul>
+<li>使用了静态的数据结构，存在共享资源，可能会损坏；</li>
+<li>使用了malloc()或者free()函数；</li>
+<li>使用了标准I/O函数，不能在中断处理函数里调用printf(文件偏移是全局的)，printf()有重入和性能上的问题。</li>
+<li>函数中调用longjmp或siglongjmp：信号发生时程序正在修改一个数据结构，处理程序返回到另外一处，导致数据被部分更新。</li>
+</ul>
+<p>常用的可重入函数主要可以分为以下几类：</p>
+<ul>
+<li><p>所有套接字API，包括socket、connect、bind、accept、listen、select、pselect、poll、recv、recvfrom、recvmsg、send、sendto、sendmsg、setsockopt、getsockopt、socketpair</p>
+</li>
+<li><p>绝大部分非标准库文件I/O函数，包括read、write、open、openat、creat、close、lseek、dup、dup2、fsync、fdatasync(缺sync)、stat、fstat、fstatat、lstat、access、faccessat、umask、chmod、fchmod、fchmodat、chown、fchown、fchownat、link、linkat、unlink、unlinkat(缺remove)、futimens、utimensat、utimes、mkdir、mkdirat(缺rmdir)、chdir(缺fchdir)</p>
+</li>
+<li><p>所有进程信号API，包括signal、kill、raise、alarm、pause、sigprocmask、sigpending、sigaction、sigsuspend、abort、sleep(缺nanosleep和clock_nanosleep)、sigqueue</p>
+</li>
+<li><p>绝大部分进程控制API，包括fork(缺vfork)、_exit、_Exit(缺exit)、wait、waitpid、execl、execle、execv、execve、setuid、setgid、setsid、setpgid、getuid、geteuid、getgid、getegid、getpid、getppid</p>
+</li>
+<li><p>clock_gettime、time</p>
+</li>
+<li><p>POSIX函数 sem_post</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>accept</th>
+<th>fchmod</th>
+<th>lseek</th>
+<th>sendto</th>
+<th>stat</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>access</td>
+<td>fchown</td>
+<td>lstat</td>
+<td>setgid</td>
+<td>symlink</td>
+</tr>
+<tr>
+<td>aio_error</td>
+<td>fcntl</td>
+<td>mkdir</td>
+<td>setpgid</td>
+<td>sysconf</td>
+</tr>
+<tr>
+<td>aio_return</td>
+<td>fdatasync</td>
+<td>mkfifo</td>
+<td>setsid</td>
+<td>tcdrain</td>
+</tr>
+<tr>
+<td>aio_suspend</td>
+<td>fork</td>
+<td>open</td>
+<td>setsockopt</td>
+<td>tcflow</td>
+</tr>
+<tr>
+<td>alarm</td>
+<td>fpathconf</td>
+<td>pathconf</td>
+<td>setuid</td>
+<td>tcflush</td>
+</tr>
+<tr>
+<td>bind</td>
+<td>fstat</td>
+<td>pause</td>
+<td>shutdown</td>
+<td>tcgetattr</td>
+</tr>
+<tr>
+<td>cfgetispeed</td>
+<td>fsync</td>
+<td>pipe</td>
+<td>sigaction</td>
+<td>tcgetpgrp</td>
+</tr>
+<tr>
+<td>cfgetospeed</td>
+<td>ftruncate</td>
+<td>poll</td>
+<td>sigaddset</td>
+<td>tcsendbreak</td>
+</tr>
+<tr>
+<td>cfsetispeed</td>
+<td>getegid</td>
+<td>posix_trace_event</td>
+<td>sigdelset</td>
+<td>tcsetattr</td>
+</tr>
+<tr>
+<td>cfsetospeed</td>
+<td>geteuid</td>
+<td>pselect</td>
+<td>sigemptyset</td>
+<td>tcsetpgrp</td>
+</tr>
+<tr>
+<td>chdir</td>
+<td>getgid</td>
+<td>raise</td>
+<td>sigfillset</td>
+<td>time</td>
+</tr>
+<tr>
+<td>chmod</td>
+<td>getgroups</td>
+<td>read</td>
+<td>sigismenber</td>
+<td>timer_getoverrun</td>
+</tr>
+<tr>
+<td>chown</td>
+<td>getpeername</td>
+<td>readlink</td>
+<td>signal</td>
+<td>timer_gettime</td>
+</tr>
+<tr>
+<td>clock_gettime</td>
+<td>getpgrp</td>
+<td>recv</td>
+<td>sigpause</td>
+<td>timer_settime</td>
+</tr>
+<tr>
+<td>close</td>
+<td>getpid</td>
+<td>recvfrom</td>
+<td>sigpending</td>
+<td>times</td>
+</tr>
+<tr>
+<td>connect</td>
+<td>getppid</td>
+<td>recvmsg</td>
+<td>sigprocmask</td>
+<td>umask</td>
+</tr>
+<tr>
+<td>creat</td>
+<td>getsockname</td>
+<td>rename</td>
+<td>sigqueue</td>
+<td>uname</td>
+</tr>
+<tr>
+<td>dup</td>
+<td>getsockopt</td>
+<td>rmdir</td>
+<td>sigset</td>
+<td>unlink</td>
+</tr>
+<tr>
+<td>dup2</td>
+<td>getuid</td>
+<td>select</td>
+<td>sigsuspend</td>
+<td>utime</td>
+</tr>
+<tr>
+<td>execle</td>
+<td>kill</td>
+<td>sem_post</td>
+<td>sleep</td>
+<td>wait</td>
+</tr>
+<tr>
+<td>execve</td>
+<td>link</td>
+<td>send</td>
+<td>socket</td>
+<td>waitpid</td>
+</tr>
+<tr>
+<td>_Exit/_exit</td>
+<td>listen</td>
+<td>sendmsg</td>
+<td>socketpair</td>
+<td>write</td>
+</tr>
+</tbody></table>
+<h2 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h2><p>线程安全函数的定义来自多线程环境：如果一个函数在相同的时间点可以被多个线程安全的调用，就称该函数为线程安全函数。</p>
+<p>POSIX中大多数函数都是线程安全的，常用的非线程安全函数主要有以下这些：</p>
+<ul>
+<li>basename、dirname、readdir</li>
+<li>getenv、setenv、unsetenv、system</li>
+<li>gethostent、getnetbyaddr、getnetbyname、getnetent、getserverbyname、getserverbyport、getservent</li>
+<li>strok</li>
+<li>strerror、strsignal</li>
+<li>getopt</li>
+<li>localtime、gmtime</li>
+<li>rand</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在写函数时候尽量使用局部变量，对全局变量要用互斥手段加以保护，变得线程安全，对于返回值是存放在静态共享的函数可以通过自己传入地址的方式变得线程可重入。</p>
+<p>可重入和线程安全是不同的概念，其观察角度不同，可重入函数和线程安全函数之间也没有必然联系。线程可重入，也就是说是线程安全的，但并不是说对于信号处理函数也是可重入的，同样的也不是异步信号安全的。</p>
+<p>对于printf这类IO函数，它们使用了全局数据结构（iobuffer），所以不是线程安全的（多个线程同时访问共享资源），需要对输出缓冲区加锁，所以是不可重入的（有共享资源）。</p>
+<p>一个线程中只有一个errno 变量，信号处理函数中使用的可重入函数也有可能会修改errno。正确的做法是在信号处理函数开始时保存errno，在信号处 理函数退出的时候恢复errno。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/07/uboot/" rel="prev" title="uboot">
+      <i class="fa fa-chevron-left"></i> uboot
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/07/glog/" rel="next" title="glog源码分析">
+      glog源码分析 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E9%87%8D%E5%85%A5"><span class="nav-number">1.</span> <span class="nav-text">可重入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8"><span class="nav-number">2.</span> <span class="nav-text">线程安全</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">173</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

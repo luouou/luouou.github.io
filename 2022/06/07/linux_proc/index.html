@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="TOC{:toc}  &#x2F;proc文件系统是一种虚拟文件系统，以文件系统目录和文件形式，提供一个指向内核数据结构的接口，通过它能够查看和改变各种系统属性，proc目录通常情况下是由系统自动挂载在&#x2F;proc目录下，也可自行手动挂载。 1mount -t proc proc &#x2F;proc  &#x2F;proc&#x2F;pid&#x2F;这些文件和目录记录的都是pid对应进程的信息。  &#x2F;proc&#x2F;pid&#x2F;attr&#x2F;  提供了安全">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux &#x2F;proc&#x2F; directory">
+<meta property="og:url" content="http://example.com/2022/06/07/linux_proc/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="TOC{:toc}  &#x2F;proc文件系统是一种虚拟文件系统，以文件系统目录和文件形式，提供一个指向内核数据结构的接口，通过它能够查看和改变各种系统属性，proc目录通常情况下是由系统自动挂载在&#x2F;proc目录下，也可自行手动挂载。 1mount -t proc proc &#x2F;proc  &#x2F;proc&#x2F;pid&#x2F;这些文件和目录记录的都是pid对应进程的信息。  &#x2F;proc&#x2F;pid&#x2F;attr&#x2F;  提供了安全">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-06-07T08:05:44.656Z">
+<meta property="article:modified_time" content="2022-06-07T08:18:30.635Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2022/06/07/linux_proc/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>linux /proc/ directory | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/linux_proc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux /proc/ directory
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:18:30" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <ul>
+<li>TOC<br>{:toc}</li>
+</ul>
+<p>/proc文件系统是一种虚拟文件系统，以文件系统目录和文件形式，提供一个指向内核数据结构的接口，通过它能够查看和改变各种系统属性，proc目录通常情况下是由系统自动挂载在/proc目录下，也可自行手动挂载。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount -t proc proc /proc</span><br></pre></td></tr></table></figure>
+
+<h2 id="proc-pid"><a href="#proc-pid" class="headerlink" title="/proc/pid/"></a>/proc/pid/</h2><p>这些文件和目录记录的都是pid对应进程的信息。</p>
+<ul>
+<li><p>/proc/pid/attr/  提供了安全相关的属性，可读可写，以支持SELinux等安全模块，需配置CONFIG_SECURITY。</p>
+<ul>
+<li>/proc/pid/attr/current  当前的安全相关的属性。</li>
+<li>/proc/pid/attr/exec  执行命令execve时设置的安全相关的属性。</li>
+<li>/proc/pid/attr/fscreate  代表进程与文件有关的权限，包括open、mkdir、symlink、mknod。</li>
+<li>/proc/pid/attr/keycreate  执行命令add_key时设置的安全相关的属性。</li>
+<li>/proc/pid/attr/prev  最后一次执行命令execve时的安全相关的属性。</li>
+<li>/proc/pid/attr/sockcreate  创建socket时设置的安全相关的属性。</li>
+</ul>
+</li>
+<li><p>/proc/pid/auxv  ELF解释器信息，格式为一个unsigned long类型的ID加一个unsigned long类型的值，最后为两个0（man getauxval）。</p>
+</li>
+<li><p>/proc/pid/cgroup  进程所属的控制组，格式为冒号分隔的三个字段，分别是结构ID、子系统、控制组，需配置CONFIG_CGROUPS。</p>
+</li>
+<li><p>/proc/pid/clear_refs  只写，只用于进程的拥有者，清除用于估算内存使用量的PG_Referenced和ACCESSED/YOUNG，有四种策略，1表示清除相关的所有页，2表示清除相关的匿名页，3表示清除相关的映射文件的页，4表示清除相关的soft-dirty的页，需配置CONFIG_PROC_PAGE_MONITOR。</p>
+</li>
+<li><p>/proc/pid/cmdline  只读，保存启动进程的完整的命令行字符串，如果是僵尸进程，这个文件为空。</p>
+</li>
+<li><p>/proc/pid/comm  进程的命令名，不同的线程（man clone prctl pthread_setname_np）可能有不同的线程名，位置在“task/[tid]/comm”，名字长度超过TASK_COMM_LEN时会被截断。</p>
+</li>
+<li><p>/proc/pid/coredump_filter  coredump过滤器，如00000033（man core），不同的二进制位表示过滤不同的信息。</p>
+</li>
+<li><p>/proc/pid/cpuset  控制CPU和内存的节点（man cpuset）。</p>
+</li>
+<li><p>/proc/pid/cwd  符号链接到当前工作目录。</p>
+</li>
+<li><p>/proc/pid/environ  环境变量。</p>
+</li>
+<li><p>/proc/pid/exe  符号链接到启动进程的完整命令。</p>
+</li>
+<li><p>/proc/pid/fd / 包含当前的fd，这些fd符号链接到真正打开的文件。</p>
+</li>
+<li><p>/proc/pid/fdinfo / 包含当前fd的信息，不同类型的fd信息不同。</p>
+</li>
+<li><p>/proc/pid/io  IO信息。</p>
+</li>
+<li><p>/proc/pid/gid_map  从用户命名空间映射的组ID的信息（man user_namespaces）。</p>
+</li>
+<li><p>/proc/pid/limits  资源软、硬限制（man getrlimit）。</p>
+</li>
+<li><p>/proc/pid/map_files / 包括一些内存映射文件（man mmap），文件名格式为BeginAddress-EndAddress，符号链接到映射的文件，需要配置CONFIG_CHECKPOINT_RESTORE。</p>
+</li>
+<li><p>/proc/pid/maps  当前进程映射的内存区域以及访问权限。</p>
+</li>
+<li><p>/proc/pid/mem  可以通过open、read和lseek访问进程的内存页，不能被用户读取。</p>
+</li>
+<li><p>/proc/pid/mountinfo  挂载信息，格式为<code>36 35 98:0 /mnt1 /mnt2 rw,noatime master:1 - ext3 /dev/root rw,errors=continue</code>，以空格作为分隔符，从左到右各字段的意思分别是唯一挂载ID、父挂载ID、文件系统的设备主从号码、文件系统中挂载的根节点、相对于进程根节点的挂载点、挂载权限等挂载配置、可选配置、短横线表示前面可选配置的结束、文件系统类型、文件系统特有的挂载源或者为none、额外配置。</p>
+</li>
+<li><p>/proc/pid/mounts  挂载在当前进程的文件系统列表，格式参照（man fstab）。</p>
+</li>
+<li><p>/proc/pid/mountstats  挂载信息。</p>
+</li>
+<li><p>/proc/pid/ns / 保存了每个名字空间的入口，详见（man namespaces）。</p>
+</li>
+<li><p>/proc/pid/numa_maps  numa即Non Uniform Memory Access，详见（man numa）。</p>
+</li>
+<li><p>/proc/pid/oom_adj  调整OOM分数，OOM即Out Of Memory，发生OOM时OOM Killer根据OOM分数杀掉分数高的进程，默认值为0，会继承自父进程的设置。</p>
+</li>
+<li><p>/proc/pid/oom_score  OOM分数。</p>
+</li>
+<li><p>/proc/pid/oom_score_adj  OOM分值介于-1000到1000之间。</p>
+</li>
+<li><p>/proc/pid/pagemap  当前进程的虚拟内存页映射信息，需要配置CONFIG_PROC_PAGE_MONITOR。</p>
+</li>
+<li><p>/proc/pid/personality  进行执行域。</p>
+</li>
+<li><p>/proc/pid/root  链接到了当前进程的根目录。</p>
+</li>
+<li><p>/proc/pid/seccomp  seccomp模式下允许的系统调用只有read、write、_exit、sigreturn，Linux 2.6.23已弃用这个文件，由prctl替代。</p>
+</li>
+<li><p>/proc/pid/setgroups  详见（man user_namespaces）。</p>
+</li>
+<li><p>/proc/pid/smaps”  内存映射信息，类似于pmap命令，需要配置CONFIG_PROC_PAGE_MONITOR。</p>
+</li>
+<li><p>/proc/pid/stack  内核空间的函数调用堆栈，需要配置CONFIG_STACKTRACE。</p>
+</li>
+<li><p>/proc/pid/stat  进程状态信息，用于ps命令。</p>
+</li>
+<li><p>/proc/pid/statm  进程内存使用信息，以空格分隔的7个数字，从左到右分别表示程序总大小、常驻内存大小、共享内存页大小、text code、library、data + stack、dirty pages。</p>
+</li>
+<li><p>/proc/pid/status  可读性好的进程相关信息。</p>
+</li>
+<li><p>/proc/pid/syscall  系统调用相关信息，需要配置CONFIG_HAVE_ARCH_TRACEHOOK。</p>
+</li>
+<li><p>/proc/pid/task/  每个线程一个子目录，目录名为线程ID。</p>
+</li>
+<li><p>/proc/pid/timers  POSIT定时器列表，包括定时器ID、信号等信息。</p>
+</li>
+<li><p>/proc/pid/uid_map  用户ID映射信息，详见（man user_namespaces）。</p>
+</li>
+<li><p>/proc/pid/gid_map  组ID映射信息，详见（man user_namespaces）。</p>
+</li>
+<li><p>/proc/pid/wchan  进程休眠时内核中相应位置的符号表示，如do_wait。</p>
+</li>
+</ul>
+<h3 id="proc-pid-maps"><a href="#proc-pid-maps" class="headerlink" title="/proc/pid/maps"></a>/proc/pid/maps</h3><h3 id="proc-pid-status"><a href="#proc-pid-status" class="headerlink" title="/proc/pid/status"></a>/proc/pid/status</h3><h3 id="proc-pid-stat"><a href="#proc-pid-stat" class="headerlink" title="/proc/pid/stat"></a>/proc/pid/stat</h3><p>关于进程的状态信息，主要是用于 ps 命令展示，每一行的含义如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">1. pid %d 进程PID</span><br><span class="line">2. comm %s 可执行文件的文件名</span><br><span class="line">3. state %c 进程的状态,使用RSDZTW其中一个值表示.R表示正在运行,S表示因为中断休眠,D表示进程处于不可中断的睡眠, When a process will go to ‘D’ state?. Z表示僵尸进程,T表示正在被追踪或者停止,W表示现在正在进行叶交换.</span><br><span class="line">4. ppid %d 父进程PID</span><br><span class="line">5. grid %d 进程组ID</span><br><span class="line">6. session %d 进程的session id</span><br><span class="line">7. tty_nr %d 进程的控制终端</span><br><span class="line">8. tpgid %d 进程控制终端的前台进程id</span><br><span class="line">9. minflt %n 进程因为不需要从磁盘加载内存页而造成的次要故障数</span><br><span class="line">10. cminflt %u 进程等待子进程造成的次要故障数</span><br><span class="line">11. majflt %lu 进程需要从磁盘加载内存页造成的故障数</span><br><span class="line">12. cmajflt %lu 进程等待子进程造成的故障数</span><br><span class="line">13. utime %lu 进程在用户模式下被调度的时间</span><br><span class="line">14. stime %lu 进程在内核模式下被调度的时间</span><br><span class="line">15. cutime %ld 进程在用户模式下等待子进程的时间</span><br><span class="line">16. cstime %ld 进程在内核模式下等待子进程的时间</span><br><span class="line">17. nice %ld 参见 setpriority 位于19到-20之间.</span><br><span class="line">18. num_threads %ld 当前进程的线程数量</span><br><span class="line">19. vsize %lu 使用的虚拟内存</span><br><span class="line">20. rss %ld resident set szie的缩写,表示进程在实际内存中的页数,主要是包括了text,data,栈,不包括没有加载到内存中或者已经被换出去的内存大小</span><br><span class="line">21. rsslim %lu 进程rss的限制</span><br></pre></td></tr></table></figure>
+
+<h2 id="proc-net"><a href="#proc-net" class="headerlink" title="/proc/net/"></a>/proc/net/</h2><p>网络伪文件系统相关。</p>
+<ul>
+<li>/proc/net/arp   包含了用于地址解析的内核ARP表的信息。</li>
+<li>/proc/net/dev   dev虚拟文件系统显示网络状态的信息，包括发送和接受的数据包的数量，错误和冲突以及其他的统计信息，可通过ifconfig查看。</li>
+<li>/proc/net/raw   存储的是RAW套接字表的信息。</li>
+<li>/proc/net/snmp  保存的是SNMP代理的IP，ICMP以及UDP的管理信息。</li>
+<li>/proc/net/tcp   保存的是系统中的TCP表的信息。</li>
+<li>/proc/net/udp   保存的是系统中的UDP表的信息。</li>
+<li>/proc/net/unix  显示当前系统所有的UNIX domain socket以及它们的状态信息。</li>
+</ul>
+<h2 id="proc-sys"><a href="#proc-sys" class="headerlink" title="/proc/sys/"></a>/proc/sys/</h2><p>系统变量相关信息</p>
+<h2 id="proc-bus"><a href="#proc-bus" class="headerlink" title="/proc/bus/"></a>/proc/bus/</h2><p>已安装的总线</p>
+<h2 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h2><ul>
+<li>/proc/apm  高级电源管理（APM）版本信息及电池相关状态信息，通常由apm命令使用，需要配置CONFIG_APM。</li>
+<li>/proc/buddyinfo  用于诊断内存碎片问题。</li>
+<li>/proc/cmdline  系统启动时传递给Linux内核的参数，如lilo、grub等boot管理模块。</li>
+<li>/proc/config.gz  内核编译配置选项，需要配置CONFIG_IKCONFIG_PROC。</li>
+<li>/proc/crypto  内核加密API提供的加密列表。</li>
+<li>/proc/cpuinfo  CPU和系统架构信息，lscpu命令使用这个文件。</li>
+<li>/proc/devices  设备相关信息。</li>
+<li>/proc/diskstats  每块磁盘设备的磁盘I/O统计信息列表。</li>
+<li>/proc/dma  正在使用且注册的DMA通道信息列表。</li>
+<li>/proc/driver/rtc  系统运行时配置。</li>
+<li>/proc/execdomains  执行域列表。</li>
+<li>/proc/fb  帧缓冲设备列表文件，包含帧缓冲设备的设备号和相关驱动信息，需要配置CONFIG_FB。</li>
+<li>/proc/filesystems  内核支持的文件系统类型（man filesystems）。</li>
+<li>/proc/fs  挂载的文件系统信息。</li>
+<li>/proc/ide  用于IDE接口。</li>
+<li>/proc/interrupts  每个CPU每个IO的中断信息。</li>
+<li>/proc/iomem  IO内存映射信息。</li>
+<li>/proc/ioports  IO端口信息。</li>
+<li>/proc/kallsyms  用于动态链接和和模块绑定的符号定义。</li>
+<li>/proc/kcore  系统使用的物理内存，以ELF核心文件格式存储，其文件大小为已使用的物理内存加4KB；这个文件用来检查内核数据结构的当前状态，通常由GBD调试工具使用。</li>
+<li>/proc/kmsg  用来保存由内核输出的信息，dmsg命令使用这个文件。</li>
+<li>/proc/kpagecount  每个物理页帧映射的次数，需要配置CONFIG_PROC_PAGE_MONITOR。</li>
+<li>/proc/kpageflags  每个物理页帧的掩码，需要配置CONFIG_PROC_PAGE_MONITOR。</li>
+<li>/proc/ksyms  同kallsyms。</li>
+<li>/proc/loadavg  保存关于CPU和磁盘I/O的负载平均值。</li>
+<li>/proc/locks  保存当前由内核锁定的文件的相关信息。</li>
+<li>/proc/malloc  需要配置CONFIG_DEBUG_MALLOC。</li>
+<li>/proc/mdstat  保存RAID相关的多块磁盘的当前状态信息</li>
+<li>/proc/meminfo  系统内存使用统计，free命令使用了这个文件。</li>
+<li>/proc/modules  系统加载的模块信息，相关命令为lsmod。</li>
+<li>/proc/mounts  链接到了/self/mounts。</li>
+<li>/proc/mtrr  Memory Type Range Registers。</li>
+<li>/proc/partitions  分区信息。</li>
+<li>/proc/pci  PCI接口设备。</li>
+<li>/proc/profile  用于readprofile命令作性能分析。</li>
+<li>/proc/scsi  SCSI接口设备。</li>
+<li>/proc/scsi/scsi</li>
+<li>/proc/scsi/[drivername]</li>
+<li>/proc/self  链接到了当前进程所在的目录。</li>
+<li>/proc/slabinfo  内核缓存信息，需要配置CONFIG_SLAB。</li>
+<li>/proc/stat  系统信息统计。</li>
+<li>/proc/swaps  交换分区及其空间利用信息。</li>
+<li>/proc/sysrq-trigger  可写，触发系统调用。</li>
+<li>/proc/sysvipc  包括msg、sem、shm三个文件，为System V IPC对象。</li>
+<li>/proc/thread-self  链接到了当前进程下的task目录中的线程文件<code>/proc/self/task/tid</code>。</li>
+<li>/proc/timer_list  还在运行着的定时器列表。</li>
+<li>/proc/timer_stats  定时器状态。</li>
+<li>/proc/tty  tty设备相关。</li>
+<li>/proc/uptime  系统更新时间和进程空闲时间，单位是秒。</li>
+<li>/proc/version  内核版本信息。</li>
+<li>/proc/vmstat  虚拟内存统计信息，以键值对形式显示。</li>
+<li>/proc/zoneinfo  内存区块信息，用于分析虚拟内存的行为。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/07/gcc_warning/" rel="prev" title="gcc warning options">
+      <i class="fa fa-chevron-left"></i> gcc warning options
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/07/cpp_function/" rel="next" title="C++ bind and function">
+      C++ bind and function <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#proc-pid"><span class="nav-number">1.</span> <span class="nav-text">&#x2F;proc&#x2F;pid&#x2F;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#proc-pid-maps"><span class="nav-number">1.1.</span> <span class="nav-text">&#x2F;proc&#x2F;pid&#x2F;maps</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#proc-pid-status"><span class="nav-number">1.2.</span> <span class="nav-text">&#x2F;proc&#x2F;pid&#x2F;status</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#proc-pid-stat"><span class="nav-number">1.3.</span> <span class="nav-text">&#x2F;proc&#x2F;pid&#x2F;stat</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#proc-net"><span class="nav-number">2.</span> <span class="nav-text">&#x2F;proc&#x2F;net&#x2F;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#proc-sys"><span class="nav-number">3.</span> <span class="nav-text">&#x2F;proc&#x2F;sys&#x2F;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#proc-bus"><span class="nav-number">4.</span> <span class="nav-text">&#x2F;proc&#x2F;bus&#x2F;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E5%AE%83"><span class="nav-number">5.</span> <span class="nav-text">其它</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">173</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
