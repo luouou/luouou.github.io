@@ -179,7 +179,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:18:30" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:21:49" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -202,10 +202,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <ul>
-<li>TOC<br>{:toc}</li>
-</ul>
-<p><a target="_blank" rel="noopener" href="https://ftp.denx.de/pub/u-boot/">下载地址</a></p>
+          <p><a target="_blank" rel="noopener" href="https://ftp.denx.de/pub/u-boot/">下载地址</a></p>
 <h2 id="Boot-Loader"><a href="#Boot-Loader" class="headerlink" title="Boot Loader"></a>Boot Loader</h2><p>系统在上电或复位时通常都从地址0x00000000处开始执行，而在这个地址处安排的通常就是系统的Boot Loader程序。</p>
 <p>Boot Loader (引导加载程序)就是在操作系统内核运行之前运行的一段小程序。通过这段代码<br>实现硬件的初始化，建立内存空间的映射，为操作系统内核准备好硬件环境并引导内核的启动。</p>
 <p>Boot Loader的主要运行任务就是将内核镜像从硬盘(NAND flash or eMMC)上读到RAM中，然后跳转到内核的入口点去运行，即开始启动操作系统。Bootloader的启动过程可以分为单阶段(Single Stage)、多阶段(Multi-Stage)两种。</p>
@@ -400,7 +397,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:18:30" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:21:49" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -423,10 +420,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <ul>
-<li>TOC<br>{:toc}</li>
-</ul>
-<p>模块是可以随时装载入内核的代码，这样就可以定制内核的功能了。</p>
+          <p>模块是可以随时装载入内核的代码，这样就可以定制内核的功能了。</p>
 <p><code>insmod</code> 命令加载模块， <code>dmesg | tail</code> 命令可以查看打印信息。</p>
 <p><code>rmmod</code> 命令卸载模块。</p>
 <p><code>modprobe</code> 命令加载模块及其依赖模块。</p>
@@ -505,7 +499,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:18:30" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:21:49" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -528,10 +522,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <ul>
-<li>TOC<br>{:toc}</li>
-</ul>
-<p>编译一个模块需要内核源码（已经编译过的）和当前模块的Makefile文件。</p>
+          <p>编译一个模块需要内核源码（已经编译过的）和当前模块的Makefile文件。</p>
 <figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$(info KERNELRELEASE: <span class="variable">$(KERNELRELEASE)</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ifeq</span> (<span class="variable">$(KERNELRELEASE)</span>,)</span><br><span class="line">KERNEL_DIR ?= /lib/modules/<span class="variable">$(<span class="built_in">shell</span> uname -r)</span>/build</span><br><span class="line"></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">	obj-m += hello.o</span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"></span><br><span class="line"><span class="section">all:</span></span><br><span class="line">	<span class="variable">$(MAKE)</span> -C <span class="variable">$(KERNEL_DIR)</span> M=<span class="variable">$(PWD)</span> modules</span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	@find ./ \</span><br><span class="line">		\( -name &#x27;*.[oas]&#x27; -o -name &#x27;.*.cmd&#x27; -o -name &#x27;*.symvers&#x27;\</span><br><span class="line">		-o -name &#x27;.*.d&#x27; -o -name &#x27;.*.tmp&#x27; -o -name &#x27;*.mod.c&#x27; \</span><br><span class="line">		-o -name &#x27;*.symtypes&#x27; -o -name &#x27;modules.order&#x27; \</span><br><span class="line">		-o -name modules.builtin -o -name &#x27;.tmp_*.o.*&#x27; \</span><br><span class="line">		-o -name &#x27;*.gcno&#x27; -o -name tags -o -name &#x27;.tags*&#x27; \</span><br><span class="line">		 \) -type f -print | xargs rm -f</span><br><span class="line"></span><br><span class="line">	@find ./ \</span><br><span class="line">		\( -name .tmp_versions \) -type d -print | xargs rm -rf</span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="keyword">.PHONY</span>: clean all</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <ol>
@@ -589,7 +580,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:18:30" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:21:49" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -612,10 +603,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <ul>
-<li>TOC<br>{:toc}</li>
-</ul>
-<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>指定交叉工具和平台。</p>
+          <h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>指定交叉工具和平台。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm menuconfig</span><br></pre></td></tr></table></figure>
 
 <h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><ul>
@@ -696,7 +684,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:18:30" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:21:49" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -719,10 +707,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <ul>
-<li>TOC<br>{:toc}</li>
-</ul>
-<h2 id="linux系统结构"><a href="#linux系统结构" class="headerlink" title="linux系统结构"></a>linux系统结构</h2><img src="/images/kernel/kernel/linux_arch.jpeg" alt="Unix/Linux系统分层结构" style="zoom: 33%;" />
+          <h2 id="linux系统结构"><a href="#linux系统结构" class="headerlink" title="linux系统结构"></a>linux系统结构</h2><img src="/images/kernel/kernel/linux_arch.jpeg" alt="Unix/Linux系统分层结构" style="zoom: 33%;" />
 
 <p><img src="/images/kernel/kernel/linux-arch.webp" alt="Linux系统层次结构"></p>
 <p>最上面是用户空间，这是用户应用程序执行的地方。用户空间之下是内核空间，GNU C Library （glibc）也位于这里，它提供了连接内核的系统调用接口，还提供了在用户空间应用程序和内核之间进行转换的机制。</p>
@@ -993,7 +978,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:18:30" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:21:49" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
             </span>
 
           
@@ -1007,10 +992,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <ul>
-<li>TOC<br>{:toc}</li>
-</ul>
-<h3 id="LCD"><a href="#LCD" class="headerlink" title="LCD"></a>LCD</h3><p>液晶（Liquid Crystal）是一种介于液态与结晶态之间的一种物质状态的高分子材料。液晶具有双折射性，使得能对偏振光选择性透过。</p>
+          <h3 id="LCD"><a href="#LCD" class="headerlink" title="LCD"></a>LCD</h3><p>液晶（Liquid Crystal）是一种介于液态与结晶态之间的一种物质状态的高分子材料。液晶具有双折射性，使得能对偏振光选择性透过。</p>
 <p>LCD是英文Liquid Crystal Display 的简称，指的是液晶显示屏。主要有TFT、UFB、TFD、STN等几种类型。其构造包括塑料球、玻璃球、边框胶、玻璃基板、上偏光片、定向层、液晶、导电ITO图案、导通点、IPO电极和下偏光片。</p>
 <p><img src="/images/lcd/LCD-struct.jpeg" alt="TN"></p>
 <p>两块偏光板相互垂直时光线就完全无法通过，液晶显示器就是在上下两片栅栏之间互垂直的偏光板之间充满液晶，利用电场控制液晶分子产生扭曲，从而对穿越其中的光线进行有规则的折射，来改变光的行进方向，如此一来，不同的电场大小，就会形成不同颜色。</p>
@@ -1065,7 +1047,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:18:30" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:21:49" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1088,10 +1070,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <ul>
-<li>TOC<br>{:toc}</li>
-</ul>
-<p>MIPI (Mobile Industry Processor Interface) 是2003年由ARM, Nokia, ST ,TI等公司成立的一个联盟，目的是把手机内部的接口如摄像头、显示屏接口、射频/基带接口等标准化，从而减少手机设计的复杂程度和增加设计灵活性。</p>
+          <p>MIPI (Mobile Industry Processor Interface) 是2003年由ARM, Nokia, ST ,TI等公司成立的一个联盟，目的是把手机内部的接口如摄像头、显示屏接口、射频/基带接口等标准化，从而减少手机设计的复杂程度和增加设计灵活性。</p>
 <p>MIPI联盟下面有不同的WorkGroup，分别定义了一系列的手机内部接口标准，比如摄像头接口CSI、显示接口DSI、射频接口DigRF、麦克风 /喇叭接口SLIMbus等。统一接口标准的好处是手机厂商根据需要可以从市面上灵活选择不同的芯片和模组，更改设计和功能时更加快捷方便。下图是按照 MIPI的规划下一代智能手机的内部架构。</p>
 <p><img src="/images/mipi/MIPI-Protocol-865x1024.png" alt="img"></p>
 <h2 id="MIPI规范"><a href="#MIPI规范" class="headerlink" title="MIPI规范"></a>MIPI规范</h2><p>已经完成和正在计划中的规范如下:<br><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/MIPI#cite_note-Working_Groups:_Overview-1">https://zh.wikipedia.org/wiki/MIPI#cite_note-Working_Groups:_Overview-1</a></p>
@@ -1205,7 +1184,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:18:30" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:21:49" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1228,10 +1207,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <ul>
-<li>TOC<br>{:toc}</li>
-</ul>
-<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>Sensor 将从 lens 上传导过来的光线转换为电信号，再经过内部AD转换为数字信号。每个pixel像素点只能感受R、G、B中的一种，因此每个像素点中存放的数据是单色光，像素表示的就是有多少个感光点，每个感光点只能感应一种光，这些最原始的感光数据我们称为RAW Data。Raw Data数据要经过ISP的处理才能还原出三原色，也就是说如果一个像素点感应为R值，那么ISP会根据该感光点周围的G、B的值，通过插值和特效处理等，计算出该R点的G、B值，这样该点的RGB就被还原了。目前常用的sensor有两种，一种是CCD（电荷耦合）；一种是CMOS（金属氧化物导体）。</p>
+          <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>Sensor 将从 lens 上传导过来的光线转换为电信号，再经过内部AD转换为数字信号。每个pixel像素点只能感受R、G、B中的一种，因此每个像素点中存放的数据是单色光，像素表示的就是有多少个感光点，每个感光点只能感应一种光，这些最原始的感光数据我们称为RAW Data。Raw Data数据要经过ISP的处理才能还原出三原色，也就是说如果一个像素点感应为R值，那么ISP会根据该感光点周围的G、B的值，通过插值和特效处理等，计算出该R点的G、B值，这样该点的RGB就被还原了。目前常用的sensor有两种，一种是CCD（电荷耦合）；一种是CMOS（金属氧化物导体）。</p>
 <ul>
 <li>CCD（Charge Coupled Device），电荷耦合器件传感器：使用一种高感光度的半导体材料制成，能把光线转变成电荷，通过模数转换器芯片转换成电信号。CCD由许多独立的感光单位组成，通常以百万像素为单位。当CCD表面受到光照时，每个感光单位都会将电荷反映在组件上，所有的感光单位产生的信号加在一起，就构成了一幅完整的图像。CCD传感器以日本厂商为主导，全球市场上有90%被日本厂商垄断，索尼、松下、夏普是龙头。</li>
 <li>CMOS（Complementary Metal-Oxide Semiconductor），互补性氧化金属半导体：主要是利用硅和锗做成的半导体，使其在CMOS上共存着带N(-)和P(+)级的半导体，这两个互补效应所产生的电流可以被处理芯片记录并解读成影像。CMOS传感器主要以美国、韩国和中国台湾为主导，主要生产厂家是美国的OmnVison、Agilent、Micron，中国台湾的锐像、原相、泰视等，韩国的三星、现代。</li>
@@ -1327,7 +1303,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:18:30" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:21:49" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1350,10 +1326,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <ul>
-<li>TOC<br>{:toc}</li>
-</ul>
-<h2 id="计算机组成"><a href="#计算机组成" class="headerlink" title="计算机组成"></a>计算机组成</h2><p><strong>计算机由控制器、存储器、运算器、输入设备和输出设备5个部件组成</strong>。</p>
+          <h2 id="计算机组成"><a href="#计算机组成" class="headerlink" title="计算机组成"></a>计算机组成</h2><p><strong>计算机由控制器、存储器、运算器、输入设备和输出设备5个部件组成</strong>。</p>
 <p>度量计算机性能的指标有响应时间和吞吐率，<strong>响应时间</strong>是指完成一个任务所需的总时间，<strong>吞吐率</strong>表示单位时间内完成的任务数量。</p>
 <p>集成电路主要用的是CMOS，其主要能耗来源是晶体管开头过程中产生的动态能耗，其値取决于每个晶体管的负载电容和工作电压：能耗 = 负载电容 x 电压^2^ 。每个晶体管需要的功耗是一个翻转能耗和开头频率的乘积： 功耗 = 负载电容 x 电压^2^ x 开头频率。</p>
 <h2 id="计算机设计思想"><a href="#计算机设计思想" class="headerlink" title="计算机设计思想"></a>计算机设计思想</h2><ol>
@@ -1443,7 +1416,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:18:30" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+              <time title="Created: 2022-06-07 16:05:44 / Modified: 16:21:49" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1466,10 +1439,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <ul>
-<li>TOC<br>{:toc}</li>
-</ul>
-<p><img src="/images/cpu/cpu.jpg" alt="img"></p>
+          <p><img src="/images/cpu/cpu.jpg" alt="img"></p>
 <p>cpu内部由控制器、运算器、寄存器、时钟4部分组成。</p>
 <h2 id="处理器架构"><a href="#处理器架构" class="headerlink" title="处理器架构"></a>处理器架构</h2><h3 id="CISC"><a href="#CISC" class="headerlink" title="CISC"></a>CISC</h3><p>CISC（Complex Instruction Set Computer，复杂指令集计算机）是一种微处理器指令集架构（ISA），每个指令可执行若干低阶操作，诸如从内存读取、储存、和计算操作，全部集于单一指令之中。CISC特点：</p>
 <ul>
