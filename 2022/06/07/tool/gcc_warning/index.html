@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="告警开关-fsyntax-only  检查代码中的语法错误，但除此之外不要做任何事情。 -w  关闭所有警告消息。以-W开头开启特定的警告，以-Wno-开头关闭特定的警告。 -Werror  将所有的警告当成错误进行处理。-Werror&#x3D; 将指定的警告转换为错误。-Wno-error  取消编译选项-Werror。 -Wfatal-errors  在发生第一个错误时中止编译。 具体的选项优先于不特">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gcc warning options">
+<meta property="og:url" content="http://example.com/2022/06/07/tool/gcc_warning/index.html">
+<meta property="og:site_name" content="nullptr">
+<meta property="og:description" content="告警开关-fsyntax-only  检查代码中的语法错误，但除此之外不要做任何事情。 -w  关闭所有警告消息。以-W开头开启特定的警告，以-Wno-开头关闭特定的警告。 -Werror  将所有的警告当成错误进行处理。-Werror&#x3D; 将指定的警告转换为错误。-Wno-error  取消编译选项-Werror。 -Wfatal-errors  在发生第一个错误时中止编译。 具体的选项优先于不特">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-06-07T08:05:44.655Z">
+<meta property="article:modified_time" content="2022-06-08T07:23:17.809Z">
+<meta property="article:author" content="ubun2">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2022/06/07/tool/gcc_warning/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>gcc warning options | nullptr</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nullptr</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">吾生也有涯 而知也无涯</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/gcc_warning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          gcc warning options
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/gcc/" itemprop="url" rel="index"><span itemprop="name">gcc</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="告警开关"><a href="#告警开关" class="headerlink" title="告警开关"></a>告警开关</h2><p><code>-fsyntax-only</code>  检查代码中的语法错误，但除此之外不要做任何事情。</p>
+<p><code>-w</code>  关闭所有警告消息。以<code>-W</code>开头开启特定的警告，以<code>-Wno-</code>开头关闭特定的警告。</p>
+<p><code>-Werror</code>  将所有的警告当成错误进行处理。<code>-Werror=</code> 将指定的警告转换为错误。<code>-Wno-error</code>  取消编译选项-Werror。</p>
+<p><code>-Wfatal-errors</code>  在发生第一个错误时中止编译。</p>
+<p>具体的选项优先于不特定的选项，与命令行中的位置无关。对于相同特征的选项，最后一个生效。</p>
+<h2 id="Wall"><a href="#Wall" class="headerlink" title="-Wall"></a>-Wall</h2><p>该选项相当于同时使用了下列所有的选项：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">unused-function：遇到仅声明过但尚未定义的静态函数时发出警告。</span><br><span class="line">unused-label：遇到声明过但不使用的标号的警告。</span><br><span class="line">unused-parameter：从未用过的函数参数的警告。</span><br><span class="line">unused-variable：在本地声明但从未用过的变量的警告。</span><br><span class="line">unused-value：仅计算但从未用过的值得警告。</span><br><span class="line">Format：检查对printf和scanf等函数的调用，确认各个参数类型和格式串中的一致。</span><br><span class="line">implicit-int：警告没有规定类型的声明。</span><br><span class="line">implicit-function-：在函数在未经声明就使用时给予警告。</span><br><span class="line">char-subscripts：警告把char类型作为数组下标。这是常见错误，程序员经常忘记在某些机器上char有符号。</span><br><span class="line">missing-braces：聚合初始化两边缺少大括号。</span><br><span class="line">Parentheses：在某些情况下如果忽略了括号，编译器就发出警告。</span><br><span class="line">return-type：如果函数定义了返回类型，而默认类型是int型，编译器就发出警告。同时警告那些不带返回值的 return语句，如果他们所属的函数并非void类型。</span><br><span class="line">sequence-point：出现可疑的代码元素时，发出报警。</span><br><span class="line">Switch：如果某条switch语句的参数属于枚举类型，但是没有对应的case语句使用枚举元素，编译器就发出警告（在switch语句中使用default分支能够防止这个警告）。超出枚举范围的case语句同样会导致这个警告。</span><br><span class="line">strict-aliasing：对变量别名进行最严格的检查。</span><br><span class="line">unknown-pragmas：使用了不允许的#pragma。</span><br><span class="line">Uninitialized：在初始化之前就使用自动变量。</span><br></pre></td></tr></table></figure>
+
+<p>但是以下警告项并不会生效：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">cast-align：一旦某个指针类型强制转换时，会导致目标所需的地址对齐边界扩展，编译器就发出警告。例如，某些机器上只能在2或4字节边界上访问整数，如果在这种机型上把char *强制转换成int *类型， 编译器就发出警告。</span><br><span class="line">sign-compare：将有符号类型和无符号类型数据进行比较时发出警告。</span><br><span class="line">missing-prototypes ：如果没有预先声明函数原形就定义了全局函数，编译器就发出警告。即使函数定义自身提供了函数原形也会产生这个警告。这样做的目的是检查没有在头文件中声明的全局函数。</span><br><span class="line">Packed：当结构体带有packed属性但实际并没有出现紧缩式给出警告。</span><br><span class="line">Padded：如果结构体通过充填进行对齐则给出警告。</span><br><span class="line">unreachable-code：如果发现从未执行的代码时给出警告。</span><br><span class="line">Inline：如果某函数不能内嵌（inline），无论是声明为inline或者是指定了-finline-functions 选项，编译器都将发出警告。</span><br><span class="line">disabled-optimization：当需要太长时间或过多资源而导致不能完成某项优化时给出警告。</span><br></pre></td></tr></table></figure>
+
+<h2 id="Wextra"><a href="#Wextra" class="headerlink" title="-Wextra"></a>-Wextra</h2><p>启用一些额外警告标志。（此选项过去称为-W。）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">-Wclobbered  </span><br><span class="line">-Wcast-function-type  </span><br><span class="line">-Wempty-body  </span><br><span class="line">-Wignored-qualifiers</span><br><span class="line">-Wimplicit-fallthrough=3</span><br><span class="line">-Wmissing-field-initializers  </span><br><span class="line">-Wmissing-parameter-type (C only)  </span><br><span class="line">-Wold-style-declaration (C only)  </span><br><span class="line">-Woverride-init  </span><br><span class="line">-Wsign-compare (C only)</span><br><span class="line">-Wtype-limits  </span><br><span class="line">-Wuninitialized  </span><br><span class="line">-Wshift-negative-value (in C++03 and in C99 and newer)  </span><br><span class="line">-Wunused-parameter (only with -Wunused or -Wall)</span><br><span class="line">-Wunused-but-set-parameter (only with -Wunused or -Wall)</span><br></pre></td></tr></table></figure>
+
+<h2 id="其他告警项"><a href="#其他告警项" class="headerlink" title="其他告警项"></a>其他告警项</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">-Wfatal-errors 发生第一个错误时中止编译</span><br><span class="line"></span><br><span class="line">-Wchkp  警告由指针界限检查器（ -fcheck-pointer-bounds ）发现的无效内存访问。</span><br><span class="line"></span><br><span class="line">-Wno-coverage-mismatch  如果使用-fprofile-use选项时反馈配置文件不匹配，则警告 。 如果在使用-fprofile-gen编译和使用-fprofile-use编译时源文件发生更改，则具有配置文件反馈的文件可能无法与源文件匹配，并且GCC无法使用配置文件反馈信息。 默认情况下，此警告已启用并被视为错误。 -Wno-coverage-mismatch可用于禁用警告或-Wno-error = coverage-mismatch可用于禁用该错误。 禁用此警告的错误可能会导致代码质量不佳，并且仅在非常小的更改情况下才有用，例如修复现有代码库的错误。 不建议完全禁用该警告。</span><br><span class="line"></span><br><span class="line">-Wno-cpp 禁止`#warning`指令发出的警告消息。（仅限于Objective-C，C ++，Objective-C ++和Fortran）</span><br><span class="line"></span><br><span class="line">-Wshadow  当一个局部变量遮盖住了另一个局部变量，或者全局变量时，给出警告。很有用的选项，建议打开。 -Wall 并不会打开此项。</span><br><span class="line"></span><br><span class="line">-Wpointer-arith  对函数指针或者void *类型的指针进行算术操作时给出警告。也很有用。 -Wall 并不会打开此项。</span><br><span class="line"></span><br><span class="line">-Wcast-qual  当强制转化丢掉了类型修饰符时给出警告。 -Wall 并不会打开此项。</span><br><span class="line"></span><br><span class="line">-Waggregate-return  如果定义或调用了返回结构体或联合体的函数，编译器就发出警告。</span><br><span class="line"></span><br><span class="line">-Winline  无论是声明为 inline 或者是指定了-finline-functions 选项，如果某函数不能内联，编译器都将发出警告。如果你的代码含有很多 inline 函数的话，这是很有用的选项。</span><br><span class="line"></span><br><span class="line">-Wundef  当一个没有定义的符号出现在`#if`中时，给出警告。</span><br><span class="line"></span><br><span class="line">-Wredundant-decls  如果在同一个可见域内某定义多次声明，编译器就发出警告，即使这些重复声明有效并且毫无差别。</span><br><span class="line"></span><br><span class="line">-Wstrict-prototypes  如果函数的声明或定义没有指出参数类型，编译器就发出警告。很有用的警告。</span><br><span class="line"></span><br><span class="line">-Wctor-dtor-privacy （C++ only）当一个类没有用时给出警告。因为构造函数和析构函数会被当作私有的。</span><br><span class="line"></span><br><span class="line">-Wnon-virtual-dtor （C++ only）当一个类有多态性，而又没有虚析构函数时，发出警告。-Wall会开启这个选项。</span><br><span class="line"></span><br><span class="line">-Wreorder （C++ only）如果代码中的成员变量的初始化顺序和它们实际执行时初始化顺序不一致，给出警告。</span><br><span class="line"></span><br><span class="line">-Wno-deprecated（C++ only）使用过时的特性时不要给出警告。</span><br><span class="line"></span><br><span class="line">-Woverloaded-virtual（C++ only）如果函数的声明隐藏住了基类的虚函数，就给出警告。</span><br><span class="line"></span><br><span class="line">-Winit-self (C, C++, Objective-C and Objective-C++ only)警告使用自己初始化的未初始化变量。 请注意，此选项只能与-Wuninitialized选项一起使用。</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/07/c/time/" rel="prev" title="linux time function">
+      <i class="fa fa-chevron-left"></i> linux time function
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/07/linux/proc/" rel="next" title="linux /proc/ directory">
+      linux /proc/ directory <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%8A%E8%AD%A6%E5%BC%80%E5%85%B3"><span class="nav-number">1.</span> <span class="nav-text">告警开关</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Wall"><span class="nav-number">2.</span> <span class="nav-text">-Wall</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Wextra"><span class="nav-number">3.</span> <span class="nav-text">-Wextra</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E5%91%8A%E8%AD%A6%E9%A1%B9"><span class="nav-number">4.</span> <span class="nav-text">其他告警项</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ubun2</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">176</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ubun2</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

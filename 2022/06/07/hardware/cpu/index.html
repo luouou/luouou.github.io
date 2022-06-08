@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="cpu内部由控制器、运算器、寄存器、时钟4部分组成。 处理器架构CISCCISC（Complex Instruction Set Computer，复杂指令集计算机）是一种微处理器指令集架构（ISA），每个指令可执行若干低阶操作，诸如从内存读取、储存、和计算操作，全部集于单一指令之中。CISC特点：  指令系统庞大，指令功能复杂，指令格式、寻址方式多； 绝大多数指令需多个机器周期完成； 各种指令">
+<meta property="og:type" content="article">
+<meta property="og:title" content="各种处理器介绍">
+<meta property="og:url" content="http://example.com/2022/06/07/hardware/cpu/index.html">
+<meta property="og:site_name" content="nullptr">
+<meta property="og:description" content="cpu内部由控制器、运算器、寄存器、时钟4部分组成。 处理器架构CISCCISC（Complex Instruction Set Computer，复杂指令集计算机）是一种微处理器指令集架构（ISA），每个指令可执行若干低阶操作，诸如从内存读取、储存、和计算操作，全部集于单一指令之中。CISC特点：  指令系统庞大，指令功能复杂，指令格式、寻址方式多； 绝大多数指令需多个机器周期完成； 各种指令">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/cpu/cpu.jpg">
+<meta property="article:published_time" content="2022-06-07T08:05:44.523Z">
+<meta property="article:modified_time" content="2022-06-08T07:23:17.836Z">
+<meta property="article:author" content="ubun2">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/cpu/cpu.jpg">
+
+<link rel="canonical" href="http://example.com/2022/06/07/hardware/cpu/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>各种处理器介绍 | nullptr</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nullptr</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">吾生也有涯 而知也无涯</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/cpu/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          各种处理器介绍
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="/images/cpu/cpu.jpg" alt="img"></p>
+<p>cpu内部由控制器、运算器、寄存器、时钟4部分组成。</p>
+<h2 id="处理器架构"><a href="#处理器架构" class="headerlink" title="处理器架构"></a>处理器架构</h2><h3 id="CISC"><a href="#CISC" class="headerlink" title="CISC"></a>CISC</h3><p>CISC（Complex Instruction Set Computer，复杂指令集计算机）是一种微处理器指令集架构（ISA），每个指令可执行若干低阶操作，诸如从内存读取、储存、和计算操作，全部集于单一指令之中。CISC特点：</p>
+<ul>
+<li>指令系统庞大，指令功能复杂，指令格式、寻址方式多；</li>
+<li>绝大多数指令需多个机器周期完成；</li>
+<li>各种指令都可访问存储器；</li>
+<li>采用微程序控制；</li>
+<li>有专用寄存器，少量；</li>
+<li>难以用优化编译技术生成高效的目标代码程序；</li>
+</ul>
+<p>在CISC指令集的各种指令中，大约有20%的指令会被反复使用，占整个程序代码的80%。而余下的80%的指令却不经常使用，在程序设计中只占20%。</p>
+<h3 id="RISC"><a href="#RISC" class="headerlink" title="RISC"></a>RISC</h3><p>RISC（Reduced Instruction Set Computer，精简指令集计算机）对指令数目和寻址方式都做了精简，使其实现更容易，指令并行执行程度更好，编译器的效率更高。它能够以更快的速度执行操作。现在的RISC指令集也达到数百条，运行周期也不再固定。RISC设计的根本原则—针对流水线化的处理器优化。RISC特点：</p>
+<ul>
+<li>统一指令编码（例如，所有指令中的op-code永远位于同样的位元位置、等长指令），可快速解译；</li>
+<li>泛用的暂存器，所有暂存器可用于所有内容，以及编译器设计的单纯化（不过暂存器中区分了整数和浮点数）；</li>
+<li>单纯的寻址模式（复杂寻址模式以简单计算指令序列取代）；</li>
+<li>硬件中支援少数资料型别（例如，一些CISC电脑中存有处理字节字串的指令。这在RISC电脑中不太可能出现）。</li>
+<li>　所有计算都要在寄存器中完成。而寄存器和内存的通信则由单独的指令完成。</li>
+<li>有非常多的通用寄存器，并采用了重叠寄存器窗口和寄存器堆等技术使寄存器资源得到充分的利用。</li>
+</ul>
+<p>**[区别]**：</p>
+<p>CISC和RISC是当前CPU的两种架构。它们的区别在于不同的CPU设计理念和方法。早期的CPU全部是CISC架构，它的设计目的是用最少的机器语言指令来完成所需的计算任务。它们的差异主要有：</p>
+<ol>
+<li><p>指令系统：RISC设计者把主要精力放在那些经常使用的指令上，尽量使它们具有简单高效的特色。对不常用的功能，常通过组合指令来完成。因此，在RISC机器上实现特殊功能时，效率可能较低。但可以利用流水技术和超标量技术加以改进和弥补。而CISC计算机的指令系统比较丰富，有专用指令来完成特定的功能。因此，处理特殊任务效率较高。</p>
+</li>
+<li><p>存储器操作：RISC对存储器操作有限制，使控制简单化；而CISC机器的存储器操作指令多，操作直接。</p>
+</li>
+<li><p>程序：RISC汇编语言程序一般需要较大的内存空间，实现特殊功能时程序复杂，不易设计；而CISC汇编语言程序编程相对简单，科学计算及复杂操作的程序社设计相对容易，效率较高。</p>
+</li>
+<li><p>中断：RISC机器在一条指令执行的适当地方可以响应中断；而CISC机器是在一条指令执行结束后响应中断。</p>
+</li>
+<li><p>CPU：RISCCPU包含有较少的单元电路，因而面积小、功耗低；而CISCCPU包含有丰富的电路单元，因而功能强、面积大、功耗大。</p>
+</li>
+<li><p>设计周期：RISC微处理器结构简单，布局紧凑，设计周期短，且易于采用最新技术；CISC微处理器结构复杂，设计周期长。</p>
+</li>
+<li><p>用户使用：RISC微处理器结构简单，指令规整，性能容易把握，易学易用；CISC微处理器结构复杂，功能强大，实现特殊功能容易。</p>
+</li>
+<li><p>应用范围：由于RISC指令系统的确定与特定的应用领域有关，故RISC机器更适合于专用机；而CISC机器则更适合于通用机。</p>
+</li>
+</ol>
+<h3 id="x86"><a href="#x86" class="headerlink" title="x86"></a>x86</h3><p>x86或80x86是英特尔首先开发制造的一种微处理器体系结构的泛称。该系列较早期的处理器名称是以数字来表示，并以“86”作为结尾，包括Intel 8086、80186、80286、80386以及80486，因此其架构被称为“x86”。成为了个人电脑的标准平台</p>
+<p>x86架构于1978年推出的Intel 8086中央处理器中首度出现，它是从Intel 8008处理器中发展而来的，而8008则是发展自Intel 4004的。8086在三年后为IBM PC所选用，之后x86便，成为了历来最成功的CPU架构。</p>
+<p>8086是16位元处理器；直到1985年32位元的80386的开发，这个架构都维持是16位元。接着一系列的处理器表示了32位元架构的细微改进，推出了数种的扩充，直到2003年AMD对于这个架构发展了64位元的扩充，并命名为AMD64。后来Intel也推出了与之兼容的处理器，并命名为Intel 64。两者一般被统称为x86-64或x64，开创了x86的64位时代。</p>
+<p>x86架构是重要地可变指令长度的CISC。字组（word, 4字节）长度的内存存取允许不对齐内存位址，字组是以低位字节在前的顺序储存在内存中。向后相容性一直都是在x86架构的发展背后一股驱动力量。但在较新的微架构中，x86处理器会把x86指令转换为更像RISC的微指令再予执行，从而获得可与RISC比拟的超标量性能，而仍然保持向前兼容。</p>
+<p>X86指令集只有8个通用寄存器。所以，CISC的CPU执行是大多数时间是在访问存储器中的数据，而不是寄存器中的。这就拖慢了整个系统的速度。</p>
+<h3 id="ARM"><a href="#ARM" class="headerlink" title="ARM"></a>ARM</h3><p>ARM架构（进阶精简指令集机器（AdvancedRISC Machine），是一个32位RISC处理器架构，广泛地使用在许多嵌入式系统设计。由于节能的特点，ARM处理器非常适用于移动通讯领域，符合其主要设计目标为低耗电的特性。</p>
+<p>ARM采用的RISC体系最大特点是指令长度固定，指令格式种类少，寻址方式种类少，大多数是简单指令且都能在一个时钟周期内完成，易于设计超标量与流水线，寄存器数量多，大量操作在寄存器之间进行，因此有较快运行速度。</p>
+<p>ARM指令集的特点：</p>
+<ul>
+<li>体积小，低功耗，低成本，高性能；</li>
+<li>支持 Thumb（16位）/ARM（32位）双指令集，能很好的兼容8位/16位器件；</li>
+<li>大量使用寄存器，指令执行速度更快，大多数数据操作都在寄存器中完成；</li>
+<li>寻址方式灵活简单，执行效率高；</li>
+<li>指令长度固定，流水线处理方式</li>
+</ul>
+<h3 id="MIPS"><a href="#MIPS" class="headerlink" title="MIPS"></a>MIPS</h3><p>MIPS架构（无内部互锁流水级的微处理器，Microprocessorwithout Interlocked Pipeline Stages），是一种采取精简指令集的处理器架构，1981年出现，由MIPS科技公司开发并授权，广泛被使用在许多电子产品、网络设备、个人娱乐装置与商业装置上。其机制是尽量利用软件办法避免流水线中的数据相关问题。它最早是在80年代初期由斯坦福大学Hennessy教授领导的研究小组研制出来的。MIPS公司的R系列就是在此基础上开发的RISC工业产品的微处理器。这些系列产品为很多计算机公司采用构成各种工作站和计算机系统。</p>
+<p>MIPS是出现最早的商业RISC架构芯片之一。MIPS的系统结构及设计理念比较先进，强调软硬件协同提高性能，同时简化硬件设计。</p>
+<p>**[ARM与MIPS对比]**：</p>
+<p>MIPS架构的优势：</p>
+<ol>
+<li><p>MIPS支持64bit指令和操作，ARM目前只到32bit。</p>
+</li>
+<li><p>MIPS有专门的除法器，可以执行除法指令。</p>
+</li>
+<li><p>MIPS的内核寄存器比ARM多一倍，所以同样的性能下MIPS的功耗会比ARM更低，同样功耗下性能比ARM更高。</p>
+</li>
+<li><p>MIPS指令比ARM稍微多一点，稍微灵活一点。</p>
+</li>
+<li><p>ARM很昂贵，而且不能随意自行更改内核。而MIPS就要开放的多了。</p>
+</li>
+</ol>
+<p>MIPS架构的不足：</p>
+<ol>
+<li><p>MIPS的内存地址起始有问题，这导致了MIPS在内存和cache的支持方面都有限制，现在的MIPS处理器单内核面对高容量内存时有问题</p>
+</li>
+<li><p>MIPS今后的发展方向是并行线程，类似INTEL的超线程，而ARM未来的发展方向是物理多核，目前看来物理多核占优。由此来看，我国的龙芯向多核发展还是颇具远见的。</p>
+</li>
+<li><p>MIPS虽然结构更加简单，但是到现在还是顺序单发射，ARM已经进化到了乱序双发射，甚至NV的丹佛已经是乱序三发射了。</p>
+</li>
+</ol>
+<h2 id="各种处理器"><a href="#各种处理器" class="headerlink" title="各种处理器"></a>各种处理器</h2><p>DSP – Digital Signal Processor，是一种专用于数字信号处理的微处理器。内部采用程序和数据分开的哈佛结构，具有专门的硬件乘法器，广泛采用流水线操作，提供特殊的DSP指令，可以用来快速的实现各种数字信号处理算法。功耗更低。</p>
+<p>FPGA – Field－Programmable Gate Array，现场可编程门阵列。</p>
+<p>APU – Accelerated Processing Unit, 加速处理器，AMD公司推出加速图像处理芯片产品。</p>
+<p>BPU – Brain Processing Unit, 地平线公司主导的嵌入式处理器架构。</p>
+<p>CPU – Central Processing Unit，中央处理器。CPU主要包括控制器、运算器，其中还包括高速缓冲存储器及实现它们之间联系的数据、控制的总线。主要功能为处理指令、执行操作、控制时间、处理数据。</p>
+<p>DPU – Deep learning Processing Unit, 深度学习处理器，最早由国内深鉴科技提出；另说有Dataflow Processing Unit 数据流处理器， Wave Computing 公司提出的AI架构；Data storage Processing Unit，深圳大普微的智能固态硬盘处理器。</p>
+<p>FPU – Floating Processing Unit 浮点计算单元，通用处理器中的浮点运算模块。</p>
+<p>GPU – Graphics Processing Unit，图形处理单元，采用多线程SIMD架构，为图形处理而生。它是显卡的处理器，专为执行复杂的数学和几何计算而设计的，这些计算是图形渲染所必需的。</p>
+<p>HPU – Holographics Processing Unit 全息图像处理器， 微软出品的全息计算芯片与设备。</p>
+<p>IPU – Intelligence Processing Unit， Deep Mind投资的Graphcore公司出品的AI处理器产品。</p>
+<p>MCU – Microcontroller Unit，微控制单元，又称单片机，是把CPU的频率与规格做适当缩减，并将内存、计数器、USB、A/D转换、UART、PLC、DMA等周边接口，甚至LCD驱动电路都整合在单一芯片上，形成芯片级的计算机。</p>
+<p>NPU – Neural Network Processing Unit，神经网络处理单元，是基于神经网络算法与加速的新型处理器总称。</p>
+<p>RPU – Radio Processing Unit, 无线电处理器， Imagination Technologies 公司推出的集合集Wifi/蓝牙/FM/处理器为单片的处理器。</p>
+<p>TPU – Tensor Processing Unit 张量处理器， Google 公司推出的为机器学习而定制的芯片，经过了专门深度机器学习方面的训练，它有更高效能（每瓦计算能力）。目前一代TPU面向Inference，二代面向训练。</p>
+<p>VPU – Vector Processing Unit 矢量处理器，Intel收购的Movidius公司推出的图像处理与人工智能的专用芯片的加速计算核心。</p>
+<p>WPU – Wearable Processing Unit， 可穿戴处理器，Ineda Systems公司推出的可穿戴片上系统产品，包含GPU/MIPS CPU等IP。</p>
+<p>XPU – 百度与Xilinx公司在2017年Hotchips大会上发布的FPGA智能云加速，含256核。</p>
+<p>ZPU – Zylin Processing Unit, 由挪威Zylin 公司推出的一款32位开源处理器。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/07/hardware/memory/" rel="prev" title="memory and disk">
+      <i class="fa fa-chevron-left"></i> memory and disk
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/07/hardware/pc/" rel="next" title="计算机组成原理">
+      计算机组成原理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E5%99%A8%E6%9E%B6%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">处理器架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CISC"><span class="nav-number">1.1.</span> <span class="nav-text">CISC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RISC"><span class="nav-number">1.2.</span> <span class="nav-text">RISC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#x86"><span class="nav-number">1.3.</span> <span class="nav-text">x86</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ARM"><span class="nav-number">1.4.</span> <span class="nav-text">ARM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MIPS"><span class="nav-number">1.5.</span> <span class="nav-text">MIPS</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%84%E7%A7%8D%E5%A4%84%E7%90%86%E5%99%A8"><span class="nav-number">2.</span> <span class="nav-text">各种处理器</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ubun2</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">176</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ubun2</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

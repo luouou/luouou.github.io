@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="文件系统 Linux 下的文件是通过索引节点(inode)来识别文件，硬链接是一个指向文件索引节点的指针。 函数stat12345678910111213141516171819202122232425262728#include &lt;sys&#x2F;types.h&gt;#include &lt;sys&#x2F;stat.h&gt;#include &lt;unistd.h&gt;struct stat &amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux file manage function">
+<meta property="og:url" content="http://example.com/2022/06/07/c/filedir/index.html">
+<meta property="og:site_name" content="nullptr">
+<meta property="og:description" content="文件系统 Linux 下的文件是通过索引节点(inode)来识别文件，硬链接是一个指向文件索引节点的指针。 函数stat12345678910111213141516171819202122232425262728#include &lt;sys&#x2F;types.h&gt;#include &lt;sys&#x2F;stat.h&gt;#include &lt;unistd.h&gt;struct stat &amp;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/linux/filedir/file_fs.png">
+<meta property="og:image" content="http://example.com/images/linux/filedir/inode.png">
+<meta property="og:image" content="http://example.com/images/linux/filedir/file_time.png">
+<meta property="og:image" content="http://example.com/images/linux/filedir/time_effect_by_function.png">
+<meta property="og:image" content="http://example.com/images/linux/filedir/mode_t.png">
+<meta property="og:image" content="http://example.com/images/linux/filedir/link.png">
+<meta property="article:published_time" content="2022-06-07T08:05:44.668Z">
+<meta property="article:modified_time" content="2022-06-08T07:23:17.851Z">
+<meta property="article:author" content="ubun2">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/linux/filedir/file_fs.png">
+
+<link rel="canonical" href="http://example.com/2022/06/07/c/filedir/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>linux file manage function | nullptr</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nullptr</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">吾生也有涯 而知也无涯</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/filedir/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux file manage function
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="文件系统"><a href="#文件系统" class="headerlink" title="文件系统"></a>文件系统</h2><p><img src="/images/linux/filedir/file_fs.png" alt="文件系统"><br><img src="/images/linux/filedir/inode.png" alt="i节点"></p>
+<p>Linux 下的文件是通过索引节点(inode)来识别文件，硬链接是一个指向文件索引节点的指针。</p>
+<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><h3 id="stat"><a href="#stat" class="headerlink" title="stat"></a>stat</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span> &#123;</span></span><br><span class="line">    <span class="type">dev_t</span>     st_dev;         <span class="comment">/* ID of device containing file */</span></span><br><span class="line">    <span class="type">ino_t</span>     st_ino;         <span class="comment">/* inode number */</span></span><br><span class="line">    <span class="type">mode_t</span>    st_mode;        <span class="comment">/* protection */</span></span><br><span class="line">    <span class="type">nlink_t</span>   st_nlink;       <span class="comment">/* number of hard links */</span></span><br><span class="line">    <span class="type">uid_t</span>     st_uid;         <span class="comment">/* user ID of owner */</span></span><br><span class="line">    <span class="type">gid_t</span>     st_gid;         <span class="comment">/* group ID of owner */</span></span><br><span class="line">    <span class="type">dev_t</span>     st_rdev;        <span class="comment">/* device ID (if special file) */</span></span><br><span class="line">    <span class="type">off_t</span>     st_size;        <span class="comment">/* total size, in bytes */</span></span><br><span class="line">    <span class="type">blksize_t</span> st_blksize;     <span class="comment">/* blocksize for filesystem I/O */</span></span><br><span class="line">    <span class="type">blkcnt_t</span>  st_blocks;      <span class="comment">/* number of 512B blocks allocated */</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_atim</span>;</span>  <span class="comment">/* time of last access */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_mtim</span>;</span>  <span class="comment">/* time of last modification */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_ctim</span>;</span>  <span class="comment">/* time of last status change */</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> st_atime st_atim.tv_sec      <span class="comment">/* Backward compatibility */</span></span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> st_mtime st_mtim.tv_sec</span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> st_ctime st_ctim.tv_sec</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">stat</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="keyword">struct</span> stat *buf)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">fstat</span><span class="params">(<span class="type">int</span> fd, <span class="keyword">struct</span> stat *buf)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">lstat</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="keyword">struct</span> stat *buf)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>stat函数返回一个与此命名文件有关的信息结构， fstat函数获得已在描述符filedes上打开的文件的有关信息。lstat函数类似于stat，但是当命名的文件是一个符号连接时，lstat返回该符号连接的有关信息，而不是由该符号连接引用的文件的信息。</p>
+<p>软连接的长度是其所指向的文件名的长度。</p>
+<p>修改时间(st_mtime)是文件内容最后一次被修改的时间。更改状态时间(st_ctime)是该文件的i节点最后一次被修改的时间。很多操作影响到 i节点，但并没有更改文件的实际内容:文件的存取许可权、用户ID、连接数等等。因为i节点中的所有信息都是与文件的实际内容分开存放的，所以，除了文件数据修改时间以外，还需要更改状态时间。</p>
+<p><img src="/images/linux/filedir/file_time.png" alt="文件的时间"></p>
+<p>ls命令按这三个时间值中的一个排序进行显示。按系统默认 (用-l或-t选择项调用时 )，它按文件的修改时间的先后排序显示。 -u选择项使其用存取时间排序， -c选择项则使其用更改状态时间排序。</p>
+<p>表4-9中包含两列的原因，其中一列是与该文件(或目录)相关的三个时间，另一列是与所引用的文件(或目录)的父目录相关的三个时间。例如创建一个新文件影响到包含此新文件的目录，也影响该新文件的i节点。但读或写一个文件只影响该文件的i节点，而对父目录则无影响。</p>
+<p><img src="/images/linux/filedir/time_effect_by_function.png" alt="函数对文件时间的作用"></p>
+<h3 id="access"><a href="#access" class="headerlink" title="access"></a>access</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">access</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">int</span> mode)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>按实际用户ID和实际组ID进行存取许可权测试。成功返回0，失败返回-1。mode取值：</p>
+<ul>
+<li>R_OK 测试读许可权</li>
+<li>W_OK 测试写许可权</li>
+<li>X_OK 测试执行许可权</li>
+<li>F_OK 测试文件是否存在</li>
+</ul>
+<h3 id="umask"><a href="#umask" class="headerlink" title="umask"></a>umask</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">mode_t</span> <span class="title function_">umask</span><span class="params">(<span class="type">mode_t</span> mask)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>相对于系统umaks为0000来的，要把系统umask也算上。</p>
+<p><img src="/images/linux/filedir/mode_t.png" alt="mode_t"></p>
+<h3 id="chmod"><a href="#chmod" class="headerlink" title="chmod"></a>chmod</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">chmod</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">mode_t</span> mode)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">fchmod</span><span class="params">(<span class="type">int</span> fd, <span class="type">mode_t</span> mode)</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="truncate"><a href="#truncate" class="headerlink" title="truncate"></a>truncate</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">truncate</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">off_t</span> length)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">ftruncate</span><span class="params">(<span class="type">int</span> fd, <span class="type">off_t</span> length)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>将指定的文件的长度截短为length。如果该文件以前的长度大于length，则超过length以外的数据就不能存取。如果以前的长度短于length，则超过部分的数据将读作’\0’。</p>
+<h3 id="link"><a href="#link" class="headerlink" title="link"></a>link</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">link</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *oldpath, <span class="type">const</span> <span class="type">char</span> *newpath)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>创建硬连接，只有root用户才可以创建到目录的硬连接。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">unlink</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>解除硬连接，并将引用的文件的连接计数减1。可以用作删除文件，只有当文件的连接计数为0，没有被进程打开，文件才能删除。</p>
+<p>unlink的这种特性经常被程序用来确保即使是在程序崩溃时,它所创建的临时文件也不会遗留下来。进程用open或creat创建一个文件,然后立即调用unlink。因为该文件已经被打开了，所以不会将其内容删除。只有当进程关闭该文件或终止时，该文件的内容才被删除。</p>
+<h3 id="symlink-readlink"><a href="#symlink-readlink" class="headerlink" title="symlink readlink"></a>symlink readlink</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">symlink</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *target, <span class="type">const</span> <span class="type">char</span> *linkpath)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>创建软连接，不要求target已经存在，且target和linkpath不需要位于同一文件系统中。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">readlink</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">char</span> *buf, <span class="type">size_t</span> bufsiz)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>打开该连接本身，并读该连接中的名字，此函数组合了open,read和close的所有操作，如果此函数成功，则它返回读入buf的字节数，不包含终止符\0。</p>
+<p><img src="/images/linux/filedir/link.png" alt="link"></p>
+<h3 id="remove"><a href="#remove" class="headerlink" title="remove"></a>remove</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">remove</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname)</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="rename"><a href="#rename" class="headerlink" title="rename"></a>rename</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">rename</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *oldpath, <span class="type">const</span> <span class="type">char</span> *newpath)</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="utime"><a href="#utime" class="headerlink" title="utime"></a>utime</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;utime.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">utime</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="keyword">struct</span> utimbuf *times)</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">utimbuf</span> &#123;</span></span><br><span class="line">    <span class="type">time_t</span> actime;       <span class="comment">/* access time */</span></span><br><span class="line">    <span class="type">time_t</span> modtime;      <span class="comment">/* modification time */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>此函数的操作以及执行它所要求的优先权取决于times参数是否是NULL。</p>
+<ul>
+<li>如果times是一个空指针，则存取时间和修改时间两者都设置为当前时间。为了执行此操作必须满足下列两条件之一: (a)进程的有效用户ID必须等于该文件的所有者ID，(b)进程对该文件必须具有写许可权。</li>
+<li>如果times是非空指针，则存取时间和修改时间被设置为times所指向的结构中的值。此时进程的有效用户ID必须等于该文件的所有者ID，或者进程必须是一个超级用户进程。</li>
+</ul>
+<p>我们不能对更改状态时间st_ctime指定一个值，当调用utime函数时，此字段被自动更新。</p>
+<h3 id="mkdir-rmdir"><a href="#mkdir-rmdir" class="headerlink" title="mkdir rmdir"></a>mkdir rmdir</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">mkdir</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">mode_t</span> mode)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>创建一个新的空目录。 . 和.. 目录项是自动创建的。指定的文件存取许可权mode由进程的文件方式创建屏蔽字修改。至少要设置1个执行许可权位，以允许存取该目录中的文件名。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">rmdir</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>目录必须是空才能被删除。</p>
+<h3 id="opendir"><a href="#opendir" class="headerlink" title="opendir"></a>opendir</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;dirent.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">DIR *<span class="title function_">opendir</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"><span class="keyword">struct</span> dirent *<span class="title function_">readdir</span><span class="params">(DIR *dirp)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">closedir</span><span class="params">(DIR *dirp)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*resets the position of the directory stream dirp to the beginning of the directory.*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">rewinddir</span><span class="params">(DIR *dirp)</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">dirent</span> &#123;</span></span><br><span class="line">    <span class="type">ino_t</span>          d_ino;       <span class="comment">/* inode number */</span></span><br><span class="line">    <span class="type">off_t</span>          d_off;       <span class="comment">/* not an offset; see NOTES */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> d_reclen;    <span class="comment">/* length of this record */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span>  d_type;      <span class="comment">/* type of file; not supported</span></span><br><span class="line"><span class="comment">                                  by all filesystem types */</span></span><br><span class="line">    <span class="type">char</span>           d_name[<span class="number">256</span>]; <span class="comment">/* filename */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="chdir"><a href="#chdir" class="headerlink" title="chdir"></a>chdir</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">chdir</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">fchdir</span><span class="params">(<span class="type">int</span> fd)</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="sync"><a href="#sync" class="headerlink" title="sync"></a>sync</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">sync</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">syncfs</span><span class="params">(<span class="type">int</span> fd)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">fsync</span><span class="params">(<span class="type">int</span> fd)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>将缓存的数据同步到磁盘文件。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/07/c/stdio/" rel="prev" title="linux standard io">
+      <i class="fa fa-chevron-left"></i> linux standard io
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/07/linux/sysconf/" rel="next" title="linux sys conf function">
+      linux sys conf function <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.</span> <span class="nav-text">文件系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#stat"><span class="nav-number">2.1.</span> <span class="nav-text">stat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#access"><span class="nav-number">2.2.</span> <span class="nav-text">access</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#umask"><span class="nav-number">2.3.</span> <span class="nav-text">umask</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#chmod"><span class="nav-number">2.4.</span> <span class="nav-text">chmod</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#truncate"><span class="nav-number">2.5.</span> <span class="nav-text">truncate</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#link"><span class="nav-number">2.6.</span> <span class="nav-text">link</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#symlink-readlink"><span class="nav-number">2.7.</span> <span class="nav-text">symlink readlink</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#remove"><span class="nav-number">2.8.</span> <span class="nav-text">remove</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rename"><span class="nav-number">2.9.</span> <span class="nav-text">rename</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#utime"><span class="nav-number">2.10.</span> <span class="nav-text">utime</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mkdir-rmdir"><span class="nav-number">2.11.</span> <span class="nav-text">mkdir rmdir</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#opendir"><span class="nav-number">2.12.</span> <span class="nav-text">opendir</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#chdir"><span class="nav-number">2.13.</span> <span class="nav-text">chdir</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sync"><span class="nav-number">2.14.</span> <span class="nav-text">sync</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ubun2</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">176</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ubun2</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

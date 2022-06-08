@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="gpiolibgpiolib的作用是对所有的gpio实行统一管理，因为驱动在工作的时候，会出现好几个驱动共同使用同一个gpio的情况，这会造成混乱，所以内核提供了一些方法来管理gpio资源。代码实现在gpio&#x2F;gpiolib.c中。 gpio_desc123456789101112131415161718192021222324struct gpio_desc &amp;#123;    struct g">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gpio driver">
+<meta property="og:url" content="http://example.com/2022/06/07/kernel/gpiolib/index.html">
+<meta property="og:site_name" content="nullptr">
+<meta property="og:description" content="gpiolibgpiolib的作用是对所有的gpio实行统一管理，因为驱动在工作的时候，会出现好几个驱动共同使用同一个gpio的情况，这会造成混乱，所以内核提供了一些方法来管理gpio资源。代码实现在gpio&#x2F;gpiolib.c中。 gpio_desc123456789101112131415161718192021222324struct gpio_desc &amp;#123;    struct g">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-06-07T08:05:44.698Z">
+<meta property="article:modified_time" content="2022-06-08T07:23:17.836Z">
+<meta property="article:author" content="ubun2">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2022/06/07/kernel/gpiolib/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>gpio driver | nullptr</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nullptr</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">吾生也有涯 而知也无涯</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/gpiolib/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          gpio driver
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/dev/" itemprop="url" rel="index"><span itemprop="name">dev</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="gpiolib"><a href="#gpiolib" class="headerlink" title="gpiolib"></a>gpiolib</h2><p>gpiolib的作用是对所有的gpio实行统一管理，因为驱动在工作的时候，会出现好几个驱动共同使用同一个gpio的情况，这会造成混乱，所以内核提供了一些方法来管理gpio资源。代码实现在gpio/gpiolib.c中。</p>
+<h3 id="gpio-desc"><a href="#gpio-desc" class="headerlink" title="gpio_desc"></a>gpio_desc</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">gpio_desc</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gpio_chip</span>    *<span class="title">chip</span>;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>       flags;</span><br><span class="line"><span class="comment">/* flag symbols are bit numbers */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FLAG_REQUESTED  0</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FLAG_IS_OUT 1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FLAG_RESERVED   2</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FLAG_EXPORT 3   <span class="comment">/* protected by sysfs_lock */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FLAG_SYSFS  4   <span class="comment">/* exported via /sys/class/gpio/control */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FLAG_TRIG_FALL  5   <span class="comment">/* trigger on falling edge */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FLAG_TRIG_RISE  6   <span class="comment">/* trigger on rising edge */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FLAG_ACTIVE_LOW 7   <span class="comment">/* sysfs value has active low */</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ID_SHIFT    16  <span class="comment">/* add new flags before this one */</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> GPIO_FLAGS_MASK     ((1 &lt;&lt; ID_SHIFT) - 1)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> GPIO_TRIGGER_MASK   (BIT(FLAG_TRIG_FALL) | BIT(FLAG_TRIG_RISE))</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_DEBUG_FS</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>      *label;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">gpio_desc</span> <span class="title">gpio_desc</span>[<span class="title">ARCH_NR_GPIOS</span>];</span></span><br></pre></td></tr></table></figure>
+
+<p>定义了一个gpio_desc结构体数组。</p>
+<h3 id="gpio-chip"><a href="#gpio-chip" class="headerlink" title="gpio_chip"></a>gpio_chip</h3><p>gpio_chip 结构体包含了对gpio的各种操作方法，比如设置gpio的输入输出，设置gpio的输出值或者获取值等。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">gpio_chip</span> &#123;</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>      *label;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device</span>       *<span class="title">dev</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">module</span>       *<span class="title">owner</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span>         (*request)(<span class="keyword">struct</span> gpio_chip *chip,</span><br><span class="line">                        <span class="type">unsigned</span> offset);</span><br><span class="line">    <span class="type">void</span>            (*<span class="built_in">free</span>)(<span class="keyword">struct</span> gpio_chip *chip,</span><br><span class="line">                        <span class="type">unsigned</span> offset);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span>         (*direction_input)(<span class="keyword">struct</span> gpio_chip *chip,</span><br><span class="line">                        <span class="type">unsigned</span> offset);</span><br><span class="line">    <span class="type">int</span>         (*get)(<span class="keyword">struct</span> gpio_chip *chip,</span><br><span class="line">                        <span class="type">unsigned</span> offset);</span><br><span class="line">    <span class="type">int</span>         (*direction_output)(<span class="keyword">struct</span> gpio_chip *chip,</span><br><span class="line">                        <span class="type">unsigned</span> offset, <span class="type">int</span> value);</span><br><span class="line">    <span class="type">int</span>         (*set_debounce)(<span class="keyword">struct</span> gpio_chip *chip,</span><br><span class="line">                        <span class="type">unsigned</span> offset, <span class="type">unsigned</span> debounce);</span><br><span class="line"></span><br><span class="line">    <span class="type">void</span>            (*<span class="built_in">set</span>)(<span class="keyword">struct</span> gpio_chip *chip,</span><br><span class="line">                        <span class="type">unsigned</span> offset, <span class="type">int</span> value);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span>         (*to_irq)(<span class="keyword">struct</span> gpio_chip *chip,</span><br><span class="line">                        <span class="type">unsigned</span> offset);</span><br><span class="line"></span><br><span class="line">    <span class="type">void</span>            (*dbg_show)(<span class="keyword">struct</span> seq_file *s,</span><br><span class="line">                        <span class="keyword">struct</span> gpio_chip *chip);</span><br><span class="line">    <span class="type">int</span>         base;</span><br><span class="line">    u16         ngpio;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>      *<span class="type">const</span> *names;</span><br><span class="line">    <span class="type">unsigned</span>        can_sleep:<span class="number">1</span>;</span><br><span class="line">    <span class="type">unsigned</span>        exported:<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_OF_GPIO)</span></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * If CONFIG_OF is enabled, then all GPIO controllers described in the</span></span><br><span class="line"><span class="comment">     * device tree automatically may have an OF translation</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_node</span> *<span class="title">of_node</span>;</span></span><br><span class="line">    <span class="type">int</span> of_gpio_n_cells;</span><br><span class="line">    <span class="type">int</span> (*of_xlate)(<span class="keyword">struct</span> gpio_chip *gc, <span class="keyword">struct</span> device_node *np,</span><br><span class="line">                <span class="type">const</span> <span class="type">void</span> *gpio_spec, u32 *flags);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="gpiochip-add"><a href="#gpiochip-add" class="headerlink" title="gpiochip_add()"></a>gpiochip_add()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">gpiochip_add</span><span class="params">(<span class="keyword">struct</span> gpio_chip *chip)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>   flags;</span><br><span class="line">    <span class="type">int</span>     status = <span class="number">0</span>;</span><br><span class="line">    <span class="type">unsigned</span>    id;</span><br><span class="line">    <span class="type">int</span>     base = chip-&gt;base;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((!gpio_is_valid(base) || !gpio_is_valid(base + chip-&gt;ngpio - <span class="number">1</span>))</span><br><span class="line">            &amp;&amp; base &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">        status = -EINVAL;</span><br><span class="line">        <span class="keyword">goto</span> fail;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    spin_lock_irqsave(&amp;gpio_lock, flags);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (base &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        base = gpiochip_find_base(chip-&gt;ngpio);</span><br><span class="line">        <span class="keyword">if</span> (base &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            status = base;</span><br><span class="line">            <span class="keyword">goto</span> unlock;</span><br><span class="line">        &#125;</span><br><span class="line">        chip-&gt;base = base;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* these GPIO numbers must not be managed by another gpio_chip */</span></span><br><span class="line">    <span class="keyword">for</span> (id = base; id &lt; base + chip-&gt;ngpio; id++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (gpio_desc[id].chip != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            status = -EBUSY;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (status == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (id = base; id &lt; base + chip-&gt;ngpio; id++) &#123;</span><br><span class="line">            gpio_desc[id].chip = chip;</span><br><span class="line"></span><br><span class="line">            <span class="comment">/* REVISIT:  most hardware initializes GPIOs as</span></span><br><span class="line"><span class="comment">             * inputs (often with pullups enabled) so power</span></span><br><span class="line"><span class="comment">             * usage is minimized.  Linux code should set the</span></span><br><span class="line"><span class="comment">             * gpio direction first thing; but until it does,</span></span><br><span class="line"><span class="comment">             * we may expose the wrong direction in sysfs.</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            gpio_desc[id].flags = !chip-&gt;direction_input</span><br><span class="line">                ? (<span class="number">1</span> &lt;&lt; FLAG_IS_OUT)</span><br><span class="line">                : <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    of_gpiochip_add(chip);</span><br><span class="line"></span><br><span class="line">unlock:</span><br><span class="line">    spin_unlock_irqrestore(&amp;gpio_lock, flags);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (status)</span><br><span class="line">        <span class="keyword">goto</span> fail;</span><br><span class="line"></span><br><span class="line">    status = gpiochip_export(chip);</span><br><span class="line">    <span class="keyword">if</span> (status)</span><br><span class="line">        <span class="keyword">goto</span> fail;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="gpio-request"><a href="#gpio-request" class="headerlink" title="gpio_request()"></a>gpio_request()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">gpio_request</span><span class="params">(<span class="type">unsigned</span> gpio, <span class="type">const</span> <span class="type">char</span> *label)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gpio_desc</span>    *<span class="title">desc</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gpio_chip</span>    *<span class="title">chip</span>;</span></span><br><span class="line">    <span class="type">int</span>         status = -EINVAL;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>       flags;</span><br><span class="line"></span><br><span class="line">    spin_lock_irqsave(&amp;gpio_lock, flags);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!gpio_is_valid(gpio))</span><br><span class="line">        <span class="keyword">goto</span> done;</span><br><span class="line">    desc = &amp;gpio_desc[gpio];</span><br><span class="line">    chip = desc-&gt;chip;</span><br><span class="line">    <span class="keyword">if</span> (chip == <span class="literal">NULL</span>)</span><br><span class="line">        <span class="keyword">goto</span> done;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!try_module_get(chip-&gt;owner))</span><br><span class="line">        <span class="keyword">goto</span> done;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* <span class="doctag">NOTE:</span>  gpio_request() can be called in early boot,</span></span><br><span class="line"><span class="comment">     * before IRQs are enabled, for non-sleeping (SOC) GPIOs.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (test_and_set_bit(FLAG_REQUESTED, &amp;desc-&gt;flags) == <span class="number">0</span>) &#123;</span><br><span class="line">        desc_set_label(desc, label ? : <span class="string">&quot;?&quot;</span>);</span><br><span class="line">        status = <span class="number">0</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        status = -EBUSY;</span><br><span class="line">        module_put(chip-&gt;owner);</span><br><span class="line">        <span class="keyword">goto</span> done;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (chip-&gt;request) &#123;</span><br><span class="line">        <span class="comment">/* chip-&gt;request may sleep */</span></span><br><span class="line">        spin_unlock_irqrestore(&amp;gpio_lock, flags);</span><br><span class="line">        status = chip-&gt;request(chip, gpio - chip-&gt;base);</span><br><span class="line">        spin_lock_irqsave(&amp;gpio_lock, flags);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (status &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            desc_set_label(desc, <span class="literal">NULL</span>);</span><br><span class="line">            module_put(chip-&gt;owner);</span><br><span class="line">            clear_bit(FLAG_REQUESTED, &amp;desc-&gt;flags);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">done:</span><br><span class="line">    <span class="keyword">if</span> (status)</span><br><span class="line">        pr_debug(<span class="string">&quot;gpio_request: gpio-%d (%s) status %d\n&quot;</span>,</span><br><span class="line">            gpio, label ? : <span class="string">&quot;?&quot;</span>, status);</span><br><span class="line">    spin_unlock_irqrestore(&amp;gpio_lock, flags);</span><br><span class="line">    <span class="keyword">return</span> status;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="gpio-free"><a href="#gpio-free" class="headerlink" title="gpio_free()"></a>gpio_free()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">gpio_free</span><span class="params">(<span class="type">unsigned</span> gpio)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>       flags;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gpio_desc</span>    *<span class="title">desc</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gpio_chip</span>    *<span class="title">chip</span>;</span></span><br><span class="line"></span><br><span class="line">    might_sleep();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!gpio_is_valid(gpio)) &#123;</span><br><span class="line">        WARN_ON(extra_checks);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    gpio_unexport(gpio);</span><br><span class="line"></span><br><span class="line">    spin_lock_irqsave(&amp;gpio_lock, flags);</span><br><span class="line"></span><br><span class="line">    desc = &amp;gpio_desc[gpio];</span><br><span class="line">    chip = desc-&gt;chip;</span><br><span class="line">    <span class="keyword">if</span> (chip &amp;&amp; test_bit(FLAG_REQUESTED, &amp;desc-&gt;flags)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (chip-&gt;<span class="built_in">free</span>) &#123;</span><br><span class="line">            spin_unlock_irqrestore(&amp;gpio_lock, flags);</span><br><span class="line">            might_sleep_if(chip-&gt;can_sleep);</span><br><span class="line">            chip-&gt;<span class="built_in">free</span>(chip, gpio - chip-&gt;base);</span><br><span class="line">            spin_lock_irqsave(&amp;gpio_lock, flags);</span><br><span class="line">        &#125;</span><br><span class="line">        desc_set_label(desc, <span class="literal">NULL</span>);</span><br><span class="line">        module_put(desc-&gt;chip-&gt;owner);</span><br><span class="line">        clear_bit(FLAG_ACTIVE_LOW, &amp;desc-&gt;flags);</span><br><span class="line">        clear_bit(FLAG_REQUESTED, &amp;desc-&gt;flags);</span><br><span class="line">    &#125; <span class="keyword">else</span></span><br><span class="line">        WARN_ON(extra_checks);</span><br><span class="line"></span><br><span class="line">    spin_unlock_irqrestore(&amp;gpio_lock, flags);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="gpio-direction-input"><a href="#gpio-direction-input" class="headerlink" title="gpio_direction_input()"></a>gpio_direction_input()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">gpio_direction_input</span><span class="params">(<span class="type">unsigned</span> gpio)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>       flags;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gpio_chip</span>    *<span class="title">chip</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gpio_desc</span>    *<span class="title">desc</span> =</span> &amp;gpio_desc[gpio];</span><br><span class="line">    <span class="type">int</span>         status = -EINVAL;</span><br><span class="line"></span><br><span class="line">    spin_lock_irqsave(&amp;gpio_lock, flags);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!gpio_is_valid(gpio))</span><br><span class="line">        <span class="keyword">goto</span> fail;</span><br><span class="line">    chip = desc-&gt;chip;</span><br><span class="line">    <span class="keyword">if</span> (!chip || !chip-&gt;get || !chip-&gt;direction_input)</span><br><span class="line">        <span class="keyword">goto</span> fail;</span><br><span class="line">    gpio -= chip-&gt;base;</span><br><span class="line">    <span class="keyword">if</span> (gpio &gt;= chip-&gt;ngpio)</span><br><span class="line">        <span class="keyword">goto</span> fail;</span><br><span class="line">    status = gpio_ensure_requested(desc, gpio);</span><br><span class="line">    <span class="keyword">if</span> (status &lt; <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">goto</span> fail;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* now we know the gpio is valid and chip won&#x27;t vanish */</span></span><br><span class="line"></span><br><span class="line">    spin_unlock_irqrestore(&amp;gpio_lock, flags);</span><br><span class="line"></span><br><span class="line">    might_sleep_if(chip-&gt;can_sleep);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (status) &#123;</span><br><span class="line">        status = chip-&gt;request(chip, gpio);</span><br><span class="line">        <span class="keyword">if</span> (status &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            pr_debug(<span class="string">&quot;GPIO-%d: chip request fail, %d\n&quot;</span>,</span><br><span class="line">                chip-&gt;base + gpio, status);</span><br><span class="line">            <span class="comment">/* and it&#x27;s not available to anyone else ...</span></span><br><span class="line"><span class="comment">             * gpio_request() is the fully clean solution.</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            <span class="keyword">goto</span> lose;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    status = chip-&gt;direction_input(chip, gpio);</span><br><span class="line">    <span class="keyword">if</span> (status == <span class="number">0</span>)</span><br><span class="line">        clear_bit(FLAG_IS_OUT, &amp;desc-&gt;flags);</span><br><span class="line"></span><br><span class="line">    trace_gpio_direction(chip-&gt;base + gpio, <span class="number">1</span>, status);</span><br><span class="line">lose:</span><br><span class="line">    <span class="keyword">return</span> status;</span><br><span class="line">fail:</span><br><span class="line">    spin_unlock_irqrestore(&amp;gpio_lock, flags);</span><br><span class="line">    <span class="keyword">if</span> (status)</span><br><span class="line">        pr_debug(<span class="string">&quot;%s: gpio-%d status %d\n&quot;</span>,</span><br><span class="line">            __func__, gpio, status);</span><br><span class="line">    <span class="keyword">return</span> status;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="gpio-direction-output"><a href="#gpio-direction-output" class="headerlink" title="gpio_direction_output()"></a>gpio_direction_output()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">gpio_direction_output</span><span class="params">(<span class="type">unsigned</span> gpio, <span class="type">int</span> value)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>       flags;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gpio_chip</span>    *<span class="title">chip</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gpio_desc</span>    *<span class="title">desc</span> =</span> &amp;gpio_desc[gpio];</span><br><span class="line">    <span class="type">int</span>         status = -EINVAL;</span><br><span class="line"></span><br><span class="line">    spin_lock_irqsave(&amp;gpio_lock, flags);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!gpio_is_valid(gpio))</span><br><span class="line">        <span class="keyword">goto</span> fail;</span><br><span class="line">    chip = desc-&gt;chip;</span><br><span class="line">    <span class="keyword">if</span> (!chip || !chip-&gt;<span class="built_in">set</span> || !chip-&gt;direction_output)</span><br><span class="line">        <span class="keyword">goto</span> fail;</span><br><span class="line">    gpio -= chip-&gt;base;</span><br><span class="line">    <span class="keyword">if</span> (gpio &gt;= chip-&gt;ngpio)</span><br><span class="line">        <span class="keyword">goto</span> fail;</span><br><span class="line">    status = gpio_ensure_requested(desc, gpio);</span><br><span class="line">    <span class="keyword">if</span> (status &lt; <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">goto</span> fail;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* now we know the gpio is valid and chip won&#x27;t vanish */</span></span><br><span class="line"></span><br><span class="line">    spin_unlock_irqrestore(&amp;gpio_lock, flags);</span><br><span class="line"></span><br><span class="line">    might_sleep_if(chip-&gt;can_sleep);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (status) &#123;</span><br><span class="line">        status = chip-&gt;request(chip, gpio);</span><br><span class="line">        <span class="keyword">if</span> (status &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            pr_debug(<span class="string">&quot;GPIO-%d: chip request fail, %d\n&quot;</span>,</span><br><span class="line">                chip-&gt;base + gpio, status);</span><br><span class="line">            <span class="comment">/* and it&#x27;s not available to anyone else ...</span></span><br><span class="line"><span class="comment">             * gpio_request() is the fully clean solution.</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            <span class="keyword">goto</span> lose;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    status = chip-&gt;direction_output(chip, gpio, value);</span><br><span class="line">    <span class="keyword">if</span> (status == <span class="number">0</span>)</span><br><span class="line">        set_bit(FLAG_IS_OUT, &amp;desc-&gt;flags);</span><br><span class="line">    trace_gpio_value(chip-&gt;base + gpio, <span class="number">0</span>, value);</span><br><span class="line">    trace_gpio_direction(chip-&gt;base + gpio, <span class="number">0</span>, status);</span><br><span class="line">lose:</span><br><span class="line">    <span class="keyword">return</span> status;</span><br><span class="line">fail:</span><br><span class="line">    spin_unlock_irqrestore(&amp;gpio_lock, flags);</span><br><span class="line">    <span class="keyword">if</span> (status)</span><br><span class="line">        pr_debug(<span class="string">&quot;%s: gpio-%d status %d\n&quot;</span>,</span><br><span class="line">            __func__, gpio, status);</span><br><span class="line">    <span class="keyword">return</span> status;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="gpio-get-value"><a href="#gpio-get-value" class="headerlink" title="gpio_get_value()"></a>gpio_get_value()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">gpio_get_value</span><span class="params">(<span class="type">unsigned</span> gpio)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gpio_chip</span>    *<span class="title">chip</span>;</span></span><br><span class="line">    <span class="type">int</span> value;</span><br><span class="line"></span><br><span class="line">    chip = gpio_to_chip(gpio);</span><br><span class="line">    WARN_ON(chip-&gt;can_sleep);</span><br><span class="line">    value = chip-&gt;get ? chip-&gt;get(chip, gpio - chip-&gt;base) : <span class="number">0</span>;</span><br><span class="line">    trace_gpio_value(gpio, <span class="number">1</span>, value);</span><br><span class="line">    <span class="keyword">return</span> value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="gpio-set-value"><a href="#gpio-set-value" class="headerlink" title="gpio_set_value()"></a>gpio_set_value()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">gpio_set_value</span><span class="params">(<span class="type">unsigned</span> gpio, <span class="type">int</span> value)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gpio_chip</span>    *<span class="title">chip</span>;</span></span><br><span class="line"></span><br><span class="line">    chip = gpio_to_chip(gpio);</span><br><span class="line">    WARN_ON(chip-&gt;can_sleep);</span><br><span class="line">    trace_gpio_value(gpio, <span class="number">0</span>, value);</span><br><span class="line">    chip-&gt;<span class="built_in">set</span>(chip, gpio - chip-&gt;base, value);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="gpio注册"><a href="#gpio注册" class="headerlink" title="gpio注册"></a>gpio注册</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">s3c_gpio_chip</span> <span class="title">exynos4_gpio_common_4bit</span>[] =</span> &#123;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">    &#123;</span><br><span class="line">        .base   = S5P_VA_GPIO1,</span><br><span class="line">        .eint_offset = <span class="number">0x0</span>,</span><br><span class="line">        .group  = <span class="number">0</span>,</span><br><span class="line">        .chip   = &#123;</span><br><span class="line">            .base   = EXYNOS4_GPA0(<span class="number">0</span>),</span><br><span class="line">            .ngpio  = EXYNOS4_GPIO_A0_NR,</span><br><span class="line">            .label  = <span class="string">&quot;GPA0&quot;</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;, &#123;</span><br><span class="line">        .base   = (S5P_VA_GPIO1 + <span class="number">0x20</span>),</span><br><span class="line">        .eint_offset = <span class="number">0x4</span>,</span><br><span class="line">        .group  = <span class="number">1</span>,</span><br><span class="line">        .chip   = &#123;</span><br><span class="line">            .base   = EXYNOS4_GPA1(<span class="number">0</span>),</span><br><span class="line">            .ngpio  = EXYNOS4_GPIO_A1_NR,</span><br><span class="line">            .label  = <span class="string">&quot;GPA1&quot;</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> __init <span class="type">int</span> <span class="title function_">exynos4_gpiolib_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">s3c_gpio_chip</span> *<span class="title">chip</span>;</span></span><br><span class="line">    <span class="type">int</span> i;</span><br><span class="line">    <span class="type">int</span> nr_chips;</span><br><span class="line"></span><br><span class="line">    chip = exynos4_gpio_common_4bit;</span><br><span class="line">    nr_chips = ARRAY_SIZE(exynos4_gpio_common_4bit);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; nr_chips; i++, chip++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (chip-&gt;config == <span class="literal">NULL</span>)</span><br><span class="line">            chip-&gt;config = &amp;gpio_cfg;</span><br><span class="line">        <span class="keyword">if</span> (chip-&gt;base == <span class="literal">NULL</span>)</span><br><span class="line">            pr_err(<span class="string">&quot;No allocation of base address for [common gpio]&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    samsung_gpiolib_add_4bit_chips(exynos4_gpio_common_4bit, nr_chips);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">core_initcall(exynos4_gpiolib_init);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> __init <span class="title function_">samsung_gpiolib_add_4bit2_chips</span><span class="params">(<span class="keyword">struct</span> s3c_gpio_chip *chip,</span></span><br><span class="line"><span class="params">                        <span class="type">int</span> nr_chips)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (; nr_chips &gt; <span class="number">0</span>; nr_chips--, chip++) &#123;</span><br><span class="line">        samsung_gpiolib_add_4bit2(chip);</span><br><span class="line">        s3c_gpiolib_add(chip);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">__init <span class="type">void</span> <span class="title function_">s3c_gpiolib_add</span><span class="params">(<span class="keyword">struct</span> s3c_gpio_chip *chip)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gpio_chip</span> *<span class="title">gc</span> =</span> &amp;chip-&gt;chip;</span><br><span class="line"></span><br><span class="line">    spin_lock_init(&amp;chip-&gt;lock);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!gc-&gt;direction_input)</span><br><span class="line">        gc-&gt;direction_input = s3c_gpiolib_input;</span><br><span class="line">    <span class="keyword">if</span> (!gc-&gt;direction_output)</span><br><span class="line">        gc-&gt;direction_output = s3c_gpiolib_output;</span><br><span class="line">    <span class="keyword">if</span> (!gc-&gt;<span class="built_in">set</span>)</span><br><span class="line">        gc-&gt;<span class="built_in">set</span> = s3c_gpiolib_set;</span><br><span class="line">    <span class="keyword">if</span> (!gc-&gt;get)</span><br><span class="line">        gc-&gt;get = s3c_gpiolib_get;</span><br><span class="line"></span><br><span class="line">    gpiochip_add(gc);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>填充gpio_chip结构体，再用<a href="#gpiochip_add">gpiochip_add()</a>函数注册到内核。需要确定每组gpio的虚拟地址，其中物理地址和虚拟地址的映射平台已经做好了。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> S5P_VA_GPIO1        S3C_ADDR(0x02200000)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> S5P_VA_GPIO2        S3C_ADDR(0x02240000)</span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">map_desc</span> <span class="title">exynos4_iodesc</span>[] __<span class="title">initdata</span> =</span> &#123;</span><br><span class="line">    &#123;</span><br><span class="line">        .virtual    = (<span class="type">unsigned</span> <span class="type">long</span>)S5P_VA_GPIO1,</span><br><span class="line">        .pfn        = __phys_to_pfn(EXYNOS4_PA_GPIO1),</span><br><span class="line">        .length     = SZ_4K,</span><br><span class="line">        .type       = MT_DEVICE,</span><br><span class="line">    &#125;, &#123;</span><br><span class="line">        .virtual    = (<span class="type">unsigned</span> <span class="type">long</span>)S5P_VA_GPIO2,</span><br><span class="line">        .pfn        = __phys_to_pfn(EXYNOS4_PA_GPIO2),</span><br><span class="line">        .length     = SZ_4K,</span><br><span class="line">        .type       = MT_DEVICE,</span><br><span class="line">    &#125;, </span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> __init <span class="title function_">exynos4_map_io</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    iotable_init(exynos4_iodesc, ARRAY_SIZE(exynos4_iodesc));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="pinctrl"><a href="#pinctrl" class="headerlink" title="pinctrl"></a>pinctrl</h2>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/07/kernel/timer/" rel="prev" title="linux kernel timer">
+      <i class="fa fa-chevron-left"></i> linux kernel timer
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/07/kernel/pm/" rel="next" title="power manage">
+      power manage <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#gpiolib"><span class="nav-number">1.</span> <span class="nav-text">gpiolib</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#gpio-desc"><span class="nav-number">1.1.</span> <span class="nav-text">gpio_desc</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gpio-chip"><span class="nav-number">1.2.</span> <span class="nav-text">gpio_chip</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gpiochip-add"><span class="nav-number">1.3.</span> <span class="nav-text">gpiochip_add()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gpio-request"><span class="nav-number">1.4.</span> <span class="nav-text">gpio_request()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gpio-free"><span class="nav-number">1.5.</span> <span class="nav-text">gpio_free()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gpio-direction-input"><span class="nav-number">1.6.</span> <span class="nav-text">gpio_direction_input()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gpio-direction-output"><span class="nav-number">1.7.</span> <span class="nav-text">gpio_direction_output()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gpio-get-value"><span class="nav-number">1.8.</span> <span class="nav-text">gpio_get_value()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gpio-set-value"><span class="nav-number">1.9.</span> <span class="nav-text">gpio_set_value()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gpio%E6%B3%A8%E5%86%8C"><span class="nav-number">2.</span> <span class="nav-text">gpio注册</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pinctrl"><span class="nav-number">3.</span> <span class="nav-text">pinctrl</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ubun2</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">176</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ubun2</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

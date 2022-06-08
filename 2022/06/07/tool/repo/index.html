@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="repo是Google开发的用于管理Android版本库的一个工具。repo并不是用来取代Git，而是用Python对Git进行了一定的封装，简化了对多个Git版本库的管理。 Repo 分为两部分：第一部分是下载并安装的 repo 启动器。这是一个 Python 脚本，该脚本知道如何初始化检出，并可下载第二部分，即 Android 源代码检出中包含的完整 repo 工具。完整的 Repo 工具默认">
+<meta property="og:type" content="article">
+<meta property="og:title" content="repo">
+<meta property="og:url" content="http://example.com/2022/06/07/tool/repo/index.html">
+<meta property="og:site_name" content="nullptr">
+<meta property="og:description" content="repo是Google开发的用于管理Android版本库的一个工具。repo并不是用来取代Git，而是用Python对Git进行了一定的封装，简化了对多个Git版本库的管理。 Repo 分为两部分：第一部分是下载并安装的 repo 启动器。这是一个 Python 脚本，该脚本知道如何初始化检出，并可下载第二部分，即 Android 源代码检出中包含的完整 repo 工具。完整的 Repo 工具默认">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-06-07T08:00:17.026Z">
+<meta property="article:modified_time" content="2022-06-08T07:23:17.809Z">
+<meta property="article:author" content="ubun2">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2022/06/07/tool/repo/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>repo | nullptr</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nullptr</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">吾生也有涯 而知也无涯</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/repo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          repo
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:00:17" itemprop="dateCreated datePublished" datetime="2022-06-07T16:00:17+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/repo/" itemprop="url" rel="index"><span itemprop="name">repo</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>repo是Google开发的用于管理Android版本库的一个工具。repo并不是用来取代Git，而是用Python对Git进行了一定的封装，简化了对多个Git版本库的管理。</p>
+<p>Repo 分为两部分：第一部分是下载并安装的 repo 启动器。这是一个 Python 脚本，该脚本知道如何初始化检出，并可下载第二部分，即 Android 源代码检出中包含的完整 repo 工具。完整的 Repo 工具默认位于 <code>$SRCDIR/.repo/repo/</code> 中，它可以从下载的 Repo 启动器接收转发的命令。</p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install repo</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl https://storage.googleapis.com/git-repo-downloads/repo &gt; ~/.bin/repo</span><br><span class="line">chmod a+rx ~/.bin/repo</span><br></pre></td></tr></table></figure>
+
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repo init -u &lt;URL&gt; [&lt;OPTIONS&gt;]</span><br></pre></td></tr></table></figure>
+
+<p>在当前目录下安装 Repo。这会产生一个 .repo/ 目录，目录包括装 Repo 源代码和标准 Android 清单文件的 Git 仓库。.repo/ 目录还包括manifest.xml，是一个在.repo/manifests/目录选择清单的符号链接。</p>
+<p>选项：</p>
+<ul>
+<li>-u 指定manifest仓库地址（URL）。</li>
+<li>-m 选择仓库中某个manifest文件，如果没有设置，就使用default.xml。</li>
+<li>-b 指定一个分支或修正版本。</li>
+</ul>
+<h3 id="同步"><a href="#同步" class="headerlink" title="同步"></a>同步</h3><p>更新本地环境中的工作文件。如果不带参数，将同步所有项目的文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repo sync [&lt;PROJECT_LIST&gt;]</span><br></pre></td></tr></table></figure>
+
+<p>选项:</p>
+<ul>
+<li>-j <numbers>  多任务</li>
+<li>-c  只下载当前分支代码</li>
+<li>-d  让工程回退到manifest指定的版本</li>
+<li>-f  如果某个工程同步失败，继续同步</li>
+<li>-q  通过抑制状态消息来确保运行过程没有干扰。</li>
+<li>-s  同步到当前清单中的 manifest-server 元素指定的一个已知良好 build。</li>
+</ul>
+<h3 id="上传"><a href="#上传" class="headerlink" title="上传"></a>上传</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repo upload [&lt;PROJECT_LIST&gt;]</span><br></pre></td></tr></table></figure>
+
+<p>在指定的项目中，Repo 把本地分支的更新比作远程分支在最后一次 Repo 同步。Repo 会提示你选择一个或更多尚未上传审查的分支。</p>
+<h3 id="forall"><a href="#forall" class="headerlink" title="forall"></a>forall</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repo forall [&lt;PROJECT_LIST&gt;] -c &lt;COMMAND&gt;</span><br></pre></td></tr></table></figure>
+
+<p>在每个项目中被给予的 shell 命令。如下的附加环境变量是通过 repo forall 才变得有效的：</p>
+<ul>
+<li>REPO_PROJECT 设置项目唯一的名称。</li>
+<li>REPO_PATH 是相对于客户端 root 的路径。</li>
+<li>REPO_REMOTE 是清单中远程系统的名称。</li>
+<li>REPO_LREV 是清单中修订本的名字，翻译成一个本地跟踪分支。如果你需要通过清单修正去本地执行 git 命令的时候可以使用。</li>
+<li>REPO_RREV 是清单中修订本的名字，正如在清单中所写的那样。</li>
+</ul>
+<p>选项：</p>
+<ul>
+<li>-c  执行命令和参数。命令是通过 /bin/sh 评估的并且后面的任何参数就如 shell 位置的参数通过。</li>
+<li>-p  在指定命令的输出前显示项目标题。这是通过绑定管道到命令的stdin，stdout，和 sterr 流，并且用管道输送所有输出量到一个连续的流，显示在一个单一的页面调度会话中。</li>
+<li>-v  显示命令写到 sterr 的信息。</li>
+</ul>
+<h3 id="修改repo"><a href="#修改repo" class="headerlink" title="修改repo"></a>修改repo</h3><p>应该在 .repo/manifests 文件夹里面修改repo的结构，然后用git命令提交。manifest.xml 文件结构:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=<span class="string">&quot;1.0&quot;</span> encoding=<span class="string">&quot;UTF-8&quot;</span>?&gt;</span>  </span><br><span class="line"><span class="tag">&lt;<span class="name">manifest</span>&gt;</span>  </span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">remote</span>  <span class="attr">name</span>=<span class="string">&quot;shift&quot;</span>  </span></span><br><span class="line"><span class="tag">           <span class="attr">fetch</span>=<span class="string">&quot;git://git.mygit.com/&quot;</span> /&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">default</span> <span class="attr">revision</span>=<span class="string">&quot;kk-shift&quot;</span>  </span></span><br><span class="line"><span class="tag">           <span class="attr">remote</span>=<span class="string">&quot;shift&quot;</span>  </span></span><br><span class="line"><span class="tag">           <span class="attr">sync-j</span>=<span class="string">&quot;1&quot;</span> /&gt;</span>  </span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">project</span> <span class="attr">path</span>=<span class="string">&quot;packages/shift/VideoPlayer&quot;</span> <span class="attr">name</span>=<span class="string">&quot;platform/packages/shift/VideoPlayer&quot;</span> /&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">include</span> <span class="attr">name</span>=<span class="string">&quot;another_manifest.xml&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span>  </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>manifest<br> 这个是配置的顶层元素，即根标志。</li>
+<li>remote<br> name：在每一个.git/config文件的remote项中用到这个name，即表示每个git的远程服务器的名字(这个名字很关键，如果多个remote属性的话，default属性中需要指定default remote)。git pull、get fetch的时候会用到这个remote name。<br> alias ：可以覆盖之前定义的remote name，name必须是固定的，但是alias可以不同，可以用来指向不同的remote url<br> fetch ：所有git url真正路径的前缀，所有git 的project name加上这个前缀，就是git url的真正路径<br> review ：指定Gerrit的服务器名，用于repo upload操作。如果没有指定，则repo upload没有效果。</li>
+<li>default<br> 设定所有projects的默认属性值，如果在project元素里没有指定一个属性，则使用default元素的属性值。<br> remote ：远程服务器的名字（上面remote属性中提到过，多个remote的时候需要指定default remote，就是这里设置了）<br> revision ：所有git的默认branch，后面project没有特殊指出revision的话，就用这个branch<br> sync_j ： 在repo sync中默认并行的数目<br> sync_c ：如果设置为true，则只同步指定的分支(revision 属性指定)，而不是所有的ref内容<br> sync_s ： 如果设置为true，则会同步git的子项目。</li>
+<li>manifest-server<br> 它的url属性用于指定manifest服务的URL，通常是一个XML RPC 服务<br> 它要支持一下RPC方法：<br> GetApprovedManifest(branch, target) ：返回一个manifest用于指示所有projects的分支和编译目标。<br> target参数来自环境变量<code>TARGET_PRODUCT</code>和<code>TARGET_BUILD_VARIANT</code>，组成<code>$TARGET_PRODUCT-$TARGET_BUILD_VARIANT</code><br> GetManifest(tag) ：返回指定tag的manifest。</li>
+<li>project<br> 需要clone的单独git<br> name ：git 的名称，用于生成git url。URL格式是：${remote fetch}/${project name}.git 其中的 fetch就是上面提到的remote 中的fetch元素，name 就是此处的name<br> path ：clone到本地的git的工作目录，如果没有配置的话，跟name一样<br> remote ：定义remote name，如果没有定义的话就用default中定义的remote name<br> revision ：指定需要获取的git提交点，可以定义成固定的branch，或者是明确的commit 哈希值<br> groups ：列出project所属的组，以空格或者逗号分隔多个组名。所有的project都自动属于”all”组。每一个project自动属于<br> name:’name’ 和path:’path’组。例如<project name="monkeys" path="barrel-of"/>，它自动属于default, name:monkeys, and path:barrel-of组。如果一个project属于notdefault组，则，repo sync时不会下载<br> sync_c ：如果设置为true，则只同步指定的分支(revision 属性指定)，而不是所有的ref内容。<br> sync_s ： 如果设置为true，则会同步git的子项目<br> upstream ：在哪个git分支可以找到一个SHA1。用于同步revision锁定的manifest(-c 模式)。该模式可以避免同步整个ref空间<br> annotation ：可以有0个或多个annotation，格式是name-value，repo forall命令是会用来定义环境变量。</li>
+<li>include<br> 通过name属性可以引入另外一个manifest文件(路径相对与当前的manifest.xml 的路径)<br> name ：另一个需要导入的manifest文件名字<br> 可以在当前的路径下添加一个another_manifest.xml，这样可以在另一个xml中添加或删除project。</li>
+<li>remove-project<br> 从内部的manifest表中删除指定的project。经常用于本地的manifest文件，用户可以替换一个project的定义。</li>
+</ul>
+<h3 id="快照"><a href="#快照" class="headerlink" title="快照"></a>快照</h3><p>根据当前.repo的状态来创建一个配置文件，这个文件用来保存当前的工作状态。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repo manifest -o snapshot<span class="selector-class">.xml</span> -r</span><br></pre></td></tr></table></figure>
+
+<p>恢复一个快照，可以用下面的命令：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cp snapshot.xml .repo/manifests/</span><br><span class="line">repo init -m snapshot.xml</span><br><span class="line">repo <span class="keyword">sync</span> -d</span><br></pre></td></tr></table></figure>
+
+<p>注意：没有commit的修改不会恢复，已经commit的但是没有push的是可以恢复的，但只能从本地恢复。</p>
+<h3 id="status"><a href="#status" class="headerlink" title="status"></a>status</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repo status [project-list]</span><br></pre></td></tr></table></figure>
+
+<p>对于每个指定的项目，将工作树与临时区域（索引）以及此分支 (HEAD) 上的最近一次提交进行比较。针对这三种状态之间存在差异的每个文件，显示其摘要行。</p>
+<p>如需查看当前分支的状态，请运行 <code>repo status</code>。系统会按项目列出状态信息。对于项目中的每个文件，系统使用两个字母的代码来表示：</p>
+<p>在第一列中，大写字母表示临时区域与上次提交状态之间的不同之处。</p>
+<table>
+<thead>
+<tr>
+<th align="left">字母</th>
+<th align="left">含义</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">-</td>
+<td align="left">没有变化</td>
+<td align="left">在 HEAD 与索引中相同</td>
+</tr>
+<tr>
+<td align="left">A</td>
+<td align="left">已添加</td>
+<td align="left">不存在于 HEAD 中，但存在于索引中</td>
+</tr>
+<tr>
+<td align="left">M</td>
+<td align="left">已修改</td>
+<td align="left">存在于 HEAD 中，但索引中的文件已修改</td>
+</tr>
+<tr>
+<td align="left">D</td>
+<td align="left">已删除</td>
+<td align="left">存在于 HEAD 中，但不存在于索引中</td>
+</tr>
+<tr>
+<td align="left">R</td>
+<td align="left">已重命名</td>
+<td align="left">不存在于 HEAD 中，索引中文件的路径已更改</td>
+</tr>
+<tr>
+<td align="left">C</td>
+<td align="left">已复制</td>
+<td align="left">不存在于 HEAD 中，复制自索引中的另一个文件</td>
+</tr>
+<tr>
+<td align="left">T</td>
+<td align="left">模式已更改</td>
+<td align="left">HEAD 与索引中的内容相同，但模式已更改</td>
+</tr>
+<tr>
+<td align="left">U</td>
+<td align="left">未合并</td>
+<td align="left">HEAD 与索引之间存在冲突；需要加以解决</td>
+</tr>
+</tbody></table>
+<p>在第二列中，小写字母表示工作目录与索引之间的不同之处。</p>
+<table>
+<thead>
+<tr>
+<th align="left">字母</th>
+<th align="left">含义</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">-</td>
+<td align="left">新/未知</td>
+<td align="left">不存在于索引中，但存在于工作树中</td>
+</tr>
+<tr>
+<td align="left">m</td>
+<td align="left">已修改</td>
+<td align="left">存在于索引中，也存在于工作树中（但已修改）</td>
+</tr>
+<tr>
+<td align="left">d</td>
+<td align="left">已删除</td>
+<td align="left">存在于索引中，但不存在于工作树中</td>
+</tr>
+</tbody></table>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repo update[ project-list ]</span><br></pre></td></tr></table></figure>
+
+<p>上传修改的代码 ，如果你本地的代码有所修改，那么在运行 repo sync 的时候，会提示你上传修改的代码。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repo diff [ project-list ]</span><br></pre></td></tr></table></figure>
+
+<p>显示提交的代码和当前工作目录代码之间的差异。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repo download  target revision</span><br></pre></td></tr></table></figure>
+
+<p>下载特定的修改版本到本地， 例如:  repo download pltform/frameworks/base 1241 下载修改版本为 1241 的代码</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repo start branch-name [project-list]</span><br></pre></td></tr></table></figure>
+
+<p>从清单中指定的修订版本开始，创建一个新的分支进行开发。</p>
+<ul>
+<li><code>branch-name</code> 参数用于说明您尝试对项目进行的更改。如果您不知道，请考虑使用名称 <code>default</code>。</li>
+<li><code>project-list</code> 参数指定了将参与此主题分支的项目。</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repo prune [project list]</span><br></pre></td></tr></table></figure>
+
+<p>删除已经merge 的 project</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/07/tool/makefile/" rel="prev" title="makefile">
+      <i class="fa fa-chevron-left"></i> makefile
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/07/linux/linux_startup/" rel="next" title="linux startup">
+      linux startup <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">2.</span> <span class="nav-text">初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5"><span class="nav-number">3.</span> <span class="nav-text">同步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8A%E4%BC%A0"><span class="nav-number">4.</span> <span class="nav-text">上传</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#forall"><span class="nav-number">5.</span> <span class="nav-text">forall</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9repo"><span class="nav-number">6.</span> <span class="nav-text">修改repo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BF%AB%E7%85%A7"><span class="nav-number">7.</span> <span class="nav-text">快照</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#status"><span class="nav-number">8.</span> <span class="nav-text">status</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ubun2</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">176</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ubun2</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

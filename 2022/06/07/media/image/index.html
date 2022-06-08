@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="像素RGB在RGB 颜色空间上，当任何一个基色的亮度值为零时，即在原点处，就显示为黑色。当三种基色都达到最高亮度时，就表现为白色。在连接黑色与白色的对角线上，是亮度等量的三基色混合而成的灰色，该线称为灰色线。详细  RGB565格式每一个像素用16个bit来表示。 R, G, B分别用5， 6， 5个bit来表示。 RGB55格式每一个像素用16个bit，但是最高位不用，R, G, B分别用5个b">
+<meta property="og:type" content="article">
+<meta property="og:title" content="image">
+<meta property="og:url" content="http://example.com/2022/06/07/media/image/index.html">
+<meta property="og:site_name" content="nullptr">
+<meta property="og:description" content="像素RGB在RGB 颜色空间上，当任何一个基色的亮度值为零时，即在原点处，就显示为黑色。当三种基色都达到最高亮度时，就表现为白色。在连接黑色与白色的对角线上，是亮度等量的三基色混合而成的灰色，该线称为灰色线。详细  RGB565格式每一个像素用16个bit来表示。 R, G, B分别用5， 6， 5个bit来表示。 RGB55格式每一个像素用16个bit，但是最高位不用，R, G, B分别用5个b">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/media/image/yuv.jpg">
+<meta property="og:image" content="http://example.com/images/media/image/yuv_sample.webp">
+<meta property="og:image" content="http://example.com/images/media/image/UYVY422.webp">
+<meta property="og:image" content="http://example.com/images/media/image/YUV420.webp">
+<meta property="og:image" content="http://example.com/images/media/image/YUV422P.webp">
+<meta property="og:image" content="http://example.com/images/media/image/YUV420P.webp">
+<meta property="og:image" content="http://example.com/images/media/image/YUV422SP.webp">
+<meta property="og:image" content="http://example.com/images/media/image/YUV420SP.webp">
+<meta property="og:image" content="http://example.com/images/media/image/complementary.jpg">
+<meta property="article:published_time" content="2022-06-07T08:05:44.469Z">
+<meta property="article:modified_time" content="2022-06-08T07:23:17.810Z">
+<meta property="article:author" content="ubun2">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/media/image/yuv.jpg">
+
+<link rel="canonical" href="http://example.com/2022/06/07/media/image/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>image | nullptr</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nullptr</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">吾生也有涯 而知也无涯</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/media/image/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          image
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/image/" itemprop="url" rel="index"><span itemprop="name">image</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="像素"><a href="#像素" class="headerlink" title="像素"></a>像素</h2><h3 id="RGB"><a href="#RGB" class="headerlink" title="RGB"></a>RGB</h3><p>在RGB 颜色空间上，当任何一个基色的亮度值为零时，即在原点处，就显示为黑色。当三种基色都达到最高亮度时，就表现为白色。在连接黑色与白色的对角线上，是亮度等量的三基色混合而成的灰色，该线称为灰色线。<a target="_blank" rel="noopener" href="http://www.fourcc.org/rgb.php">详细</a></p>
+<ul>
+<li>RGB565格式每一个像素用16个bit来表示。 R, G, B分别用5， 6， 5个bit来表示。</li>
+<li>RGB55格式每一个像素用16个bit，但是最高位不用，R, G, B分别用5个bit来表示。</li>
+<li>RGB24每一个像素用24个bit来表示，R, G， B分量分别用8个bit来表示。</li>
+<li>RGB32每一个像素用32个bit表示，R, G, B分量分别用8个bit表示，存储顺序为B, G, R，最后8个字节保留。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">R = Y + <span class="number">1.402</span> (Cr<span class="number">-128</span>)</span><br><span class="line">G = Y * <span class="number">0.34414</span> (Cb<span class="number">-128</span>) * <span class="number">0.71414</span> (Cr<span class="number">-128</span>)</span><br><span class="line">B = Y + <span class="number">1.772</span> (Cb<span class="number">-128</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="YUV"><a href="#YUV" class="headerlink" title="YUV"></a>YUV</h3><p>YUV是一种颜色编码方法，主要用于电视系统以及模拟视频领域，它将亮度信息（Y）与色彩信息（UV）分离，没有UV信息一样可以显示完整的图像，只不过是黑白的，这样的设计很好地解决了彩色电视机与黑白电视的兼容问题。并且，YUV不像RGB那样要求三个独立的视频信号同时传输，YUV是数据总尺寸小于RGB格式（但用YUV444的话，和RGB888一样都是24bits），所以用YUV方式传送占用极少的频宽。</p>
+<p>YUV，分为三个分量，“Y”表示明亮度（Luminance或Luma），也就是灰度值；而“U”和“V” 表示的则是色度（Chrominance或Chroma），作用是描述影像色彩及饱和度，用于指定像素的颜色。</p>
+<p><img src="/images/media/image/yuv.jpg" alt="彩色，Y分量，V分量，U分量"></p>
+<p>YUV细分的话有Y’UV，YUV，YCbCr，YPbPr等类型，其中YCbCr主要用于数字信号。Y’CbCr也称为YUV，是YUV的压缩版本，不同之处在于Y’CbCr用于数字图像领域，YUV用于模拟信号领域，MPEG、DVD、摄像机中常说的YUV其实就是Y’CbCr。</p>
+<p>其中，Cr反映了RGB输入信号红色部分与RGB信号亮度值之间的差异，而Cb反映的是RGB输入信号蓝色部分与RGB信号亮度值之间的差异，此即所谓的色差信号。<a target="_blank" rel="noopener" href="http://www.fourcc.org/yuv.php">详细</a></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Y = <span class="number">0.30</span>R + <span class="number">0.59</span>G + <span class="number">0.11B</span></span><br><span class="line">U = <span class="number">0.493</span>(B-Y) = <span class="number">-0.15</span>R - <span class="number">0.29</span>G + <span class="number">0.44B</span></span><br><span class="line">V = <span class="number">0.877</span>(R-Y) = <span class="number">0.62</span>R - <span class="number">0.52</span>G - <span class="number">0.10B</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="采样方式"><a href="#采样方式" class="headerlink" title="采样方式"></a>采样方式</h4><p>YUV的采样有许多种，常用的有444，422，420，411等。用三个图来直观地表示采集的方式，以黑点表示采样该像素点的Y分量，以空心圆圈表示采用该像素点的UV分量。<br><img src="/images/media/image/yuv_sample.webp" alt="YUV常用采样"></p>
+<ul>
+<li>4:4:4采样，每一个Y对应一组UV分量，24 Bits per Pixel</li>
+<li>4:2:2采样，每两个Y共用一组UV分量，16 Bits per Pixel</li>
+<li>4:2:0采样，每四个Y共用一组UV分量，12 Bits per Pixel</li>
+</ul>
+<h4 id="存储格式"><a href="#存储格式" class="headerlink" title="存储格式"></a>存储格式</h4><p>对于packed的YUV格式，每个像素点的Y,U,V是连续交错存储的。</p>
+<ul>
+<li><p>UYVY422<br><img src="/images/media/image/UYVY422.webp" alt="img"></p>
+</li>
+<li><p>YUV420<br><img src="/images/media/image/YUV420.webp" alt="img"></p>
+</li>
+</ul>
+<p>对于planar的YUV格式，先连续存储所有像素点的Y，紧接着存储所有像素点的U，随后是所有像素点的V。</p>
+<ul>
+<li><p>YUV422P<br><img src="/images/media/image/YUV422P.webp" alt="img"></p>
+</li>
+<li><p>YUV420P<br><img src="/images/media/image/YUV420P.webp" alt="img"></p>
+</li>
+</ul>
+<p>对于SemiPlanar，则是先连续存储所有像素点的Y，再连续交错U和V。</p>
+<ul>
+<li><p>YUV422SP<br><img src="/images/media/image/YUV422SP.webp" alt="img"></p>
+</li>
+<li><p>YUV420SP<br><img src="/images/media/image/YUV420SP.webp" alt="img"></p>
+</li>
+</ul>
+<h3 id="OSD字模"><a href="#OSD字模" class="headerlink" title="OSD字模"></a>OSD字模</h3><ul>
+<li>单色字模，1个像素对应1bit，1个8×8的字模对应的是8个字节的数据。</li>
+<li>4色字模，1个像素对应2bit，1个8×8的字模对应的是8x2个字节的数据。</li>
+<li>16色字模，1个像素对应4bit，1个8×8的字模对应的是8x4个字节的数据。</li>
+</ul>
+<h2 id="图像处理"><a href="#图像处理" class="headerlink" title="图像处理"></a>图像处理</h2><p>在图像处理中，常见的颜色模型包括HSB（色相、饱和度、亮度）、RGB（红色、绿色、蓝色）、CMYK（青色、品红、黄色、黑色）和CIE L<em>a</em>b*等，因此，相应的颜色模式也就有RGB、CMYK、Lab等。在HSB颜色模型中，色相、饱和度、亮度是对图像属性的基本描述。</p>
+<p><strong>图象亮度</strong>（brightness）是指画面的明亮程度，单位是堪德拉每平米(cd/m2)或称nits。</p>
+<p><strong>对比度</strong>（contrast）指的是图像暗和亮的落差值，即图像最大灰度级和最小灰度级之间的差值。</p>
+<p><strong>饱和度</strong>（saturation）指的是图像颜色种类的多少， 上面提到图像的灰度级是[L<del>min</del>，L<del>max</del>]，则在L<del>min</del>、L<del>max</del> 的中间值越多，便代表图像的颜色种类多，饱和度也就更高，外观上看起来图像会更鲜艳，调整饱和度可以修正过度曝光或者未充分曝光的图片，使图像看上去更加自然。</p>
+<p><strong>色相</strong>（hue）是从物体反射或透过物体传播的颜色。在0°到360°的标准色轮上，按位置度量色相。</p>
+<p><strong>锐度</strong>（sharpness）是图像清晰度和图像边缘锐利程度。图像锐化是补偿图像的轮廓，增强图像的边缘及灰度跳变的部分，使图像变得清晰。在做图像平滑，图像滤波处理的时候经过会把丢失图像的边缘信息，通过图像锐化便能够增强突出图像的边缘轮廓。</p>
+<p><strong>灰度</strong>是图像上每个像素的颜色值，指黑白图像中点的颜色深度，范围一般从0到255，白色为255，黑色为0。</p>
+<ul>
+<li><p>最大值法：将彩色图像中的三分量亮度的最大值作为灰度图的灰度值，这种方法转换的灰度图亮度很高。</p>
+</li>
+<li><p>平均值法：将彩色图像中的三分量亮度求平均得到一个灰度值，这种方法产生的灰度图像比较柔和。</p>
+</li>
+<li><p>加权平均值法：以不同的权值对R，G，B的值加权平均，由于人眼对绿色最为敏感，对蓝色的敏感性最低，因此得到的灰度图像效果最好。$gray = 0.299<em>R + 0.578</em>G + 0.114*B$。</p>
+</li>
+</ul>
+<p><strong>灰阶</strong>（gray scale）在YUV空间，将UV分量丢弃，只保留Y分量，得到的黑白图像。</p>
+<p><strong>复古</strong>（绿，蓝）（sepia / sepiagreen / sepiablue）就是在灰阶的基础上，对UV值额外再做了一个offset，将灰度图转换成某种颜色的梯度图。为了获得蓝色效果，应该增加蓝色差信号，减小红色差信号，即增大U，减小V。</p>
+<p><strong>负片</strong>（Negative Film）就是将图像的颜色反转，看起来就像是在看胶片底片时的效果。在RGB空间，取其补色，就是用255分别减去RGB得到新的RGB值。<br><img src="/images/media/image/complementary.jpg" alt="img"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/07/c/charcode/" rel="prev" title="character encode">
+      <i class="fa fa-chevron-left"></i> character encode
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/07/media/video/" rel="next" title="video">
+      video <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%83%8F%E7%B4%A0"><span class="nav-number">1.</span> <span class="nav-text">像素</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RGB"><span class="nav-number">1.1.</span> <span class="nav-text">RGB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#YUV"><span class="nav-number">1.2.</span> <span class="nav-text">YUV</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%87%E6%A0%B7%E6%96%B9%E5%BC%8F"><span class="nav-number">1.2.1.</span> <span class="nav-text">采样方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.2.2.</span> <span class="nav-text">存储格式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OSD%E5%AD%97%E6%A8%A1"><span class="nav-number">1.3.</span> <span class="nav-text">OSD字模</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">图像处理</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ubun2</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">176</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ubun2</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

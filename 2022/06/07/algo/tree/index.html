@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="树的定义树是 n (n &gt;&#x3D; 0)个结点的有限集合，当n &#x3D; 0 时称为空树。在任意一棵非空树中都应满足：   有且仅有一个根结点。 当 n &gt; 1 时，其余结点可分为 m ( m &gt; 0)个互不相交的有限集合T1,T2,T3, …. Tm ，其中每一个集合本身又是一棵树，并且称为根结点的子树。    结点深度：对任意结点x，x结点的深度表示为根结点到x结点的路径长度。所以根结点">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据结构-树">
+<meta property="og:url" content="http://example.com/2022/06/07/algo/tree/index.html">
+<meta property="og:site_name" content="nullptr">
+<meta property="og:description" content="树的定义树是 n (n &gt;&#x3D; 0)个结点的有限集合，当n &#x3D; 0 时称为空树。在任意一棵非空树中都应满足：   有且仅有一个根结点。 当 n &gt; 1 时，其余结点可分为 m ( m &gt; 0)个互不相交的有限集合T1,T2,T3, …. Tm ，其中每一个集合本身又是一棵树，并且称为根结点的子树。    结点深度：对任意结点x，x结点的深度表示为根结点到x结点的路径长度。所以根结点">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/code/algo/tree/struct.png">
+<meta property="og:image" content="http://example.com/images/code/algo/tree/struct2.png">
+<meta property="og:image" content="http://example.com/images/code/algo/tree/list.jpg">
+<meta property="og:image" content="http://example.com/images/code/algo/tree/array2.jpg">
+<meta property="og:image" content="http://example.com/images/code/algo/tree/array.jpg">
+<meta property="og:image" content="http://example.com/images/code/algo/tree/foreach.jpg">
+<meta property="og:image" content="http://example.com/images/code/algo/tree/foreach2.png">
+<meta property="og:image" content="http://example.com/images/code/algo/tree/fulltree.png">
+<meta property="og:image" content="http://example.com/images/code/algo/tree/alltree.png">
+<meta property="article:published_time" content="2022-06-07T08:05:44.553Z">
+<meta property="article:modified_time" content="2022-06-08T07:23:17.857Z">
+<meta property="article:author" content="ubun2">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/code/algo/tree/struct.png">
+
+<link rel="canonical" href="http://example.com/2022/06/07/algo/tree/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>数据结构-树 | nullptr</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nullptr</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">吾生也有涯 而知也无涯</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/tree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据结构-树
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="树的定义"><a href="#树的定义" class="headerlink" title="树的定义"></a>树的定义</h2><p>树是 n (n &gt;= 0)个结点的有限集合，当n = 0 时称为空树。在任意一棵非空树中都应满足：</p>
+<blockquote>
+<ol>
+<li>有且仅有一个根结点。</li>
+<li>当 n &gt; 1 时，其余结点可分为 m ( m &gt; 0)个互不相交的有限集合T1,T2,T3, …. Tm ，其中每一个集合本身又是一棵树，并且称为根结点的子树。</li>
+</ol>
+</blockquote>
+<ul>
+<li>结点深度：对任意结点x，x结点的深度表示为根结点到x结点的路径长度。所以根结点深度为0，第二层结点深度为1，以此类推</li>
+<li>结点高度：对任意结点x，叶子结点到x结点的路径长度就是结点x的高度</li>
+<li>树的深度：一棵树中结点的最大深度就是树的深度，也称为高度</li>
+<li>父结点：若一个结点含有子结点，则这个结点称为其子结点的父结点</li>
+<li>子结点：一个结点含有的子树的根结点称为该结点的子结点</li>
+<li>结点的层次：从根结点开始，根结点为第一层，根的子结点为第二层，以此类推</li>
+<li>兄弟结点：拥有共同父结点的结点互称为兄弟结点</li>
+<li>度：结点的子树数目就是结点的度</li>
+<li>叶子结点：度为零的结点就是叶子结点</li>
+<li>祖先：对任意结点x，从根结点到结点x的所有结点都是x的祖先（结点x也是自己的祖先）</li>
+<li>后代：对任意结点x，从结点x到叶子结点的所有结点都是x的后代（结点x也是自己的后代）</li>
+<li>森林：m颗互不相交的树构成的集合就是森林</li>
+</ul>
+<p><img src="/images/code/algo/tree/struct.png" alt="树定义"><br><img src="/images/code/algo/tree/struct2.png" alt="树定义"></p>
+<h2 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h2><p>二叉树(Binary Tree)是 n (n &gt;= 0)个结点的有限集合，当n = 0 时称为空二叉树，或者由1个根结节和2棵互不相交的，分别称为左子树和右子树组成。</p>
+<ul>
+<li>每个结点至多包含两棵子树，度小于2。</li>
+<li>二叉树的第i层上至多有2^i-1^个结点(i&gt;=1)。</li>
+<li>深度为k的二叉树至多有2^k^-1个结点(k&gt;=1)。</li>
+<li>对任何一棵二叉树，如果其终端结点数为n<del>0</del>，度为2的结点数为n<del>2</del>，则n<del>0</del> = n<del>2</del> + 1。</li>
+<li>具有n个结点的完全二叉树的深度为|log2^n^|+1 (|x|表示不大于x的最大整数)。</li>
+</ul>
+<h3 id="树的存储结构"><a href="#树的存储结构" class="headerlink" title="树的存储结构"></a>树的存储结构</h3><p><img src="/images/code/algo/tree/list.jpg" alt="链式存储"><br><img src="/images/code/algo/tree/array2.jpg" alt="顺序存储"><br><img src="/images/code/algo/tree/array.jpg" alt="顺序存储"></p>
+<h3 id="二叉树的遍历"><a href="#二叉树的遍历" class="headerlink" title="二叉树的遍历"></a>二叉树的遍历</h3><p><img src="/images/code/algo/tree/foreach.jpg" alt="二叉树的遍历"></p>
+<p>前序遍历规则是若树为空，则空操作返回，否则先访问根结点，然后依次访问的左子树和右子树。</p>
+<p>中序遍历规则是若树为空，则空操作返回，否则从根结点开始，先遍历根结点的左子树，然后访问根结点，最后访问右子树。</p>
+<p>后序遍历规则是若树为空，则空操作返回，否则从左到右先叶子后结点的方式遍历访问左右子树，最后访问根结点。</p>
+<p>层序遍历规则是若树为空，则空操作返回，否则从树的第一层，也就是根结点开始访问，从上而下逐层遍历，在同一层中，按从左到右的顺序对结点逐个访问。</p>
+<p><img src="/images/code/algo/tree/foreach2.png" alt="二叉树的遍历"></p>
+<h3 id="满二叉树"><a href="#满二叉树" class="headerlink" title="满二叉树"></a>满二叉树</h3><p>叶子节点都在同一层并且除叶子节点外的所有节点都有两个子节点的二叉树。<br><img src="/images/code/algo/tree/fulltree.png" alt="满二叉树"></p>
+<h3 id="完全二叉树"><a href="#完全二叉树" class="headerlink" title="完全二叉树"></a>完全二叉树</h3><p>对于一颗二叉树，假设其深度为d（d&gt;1）。除第d层外的所有节点构成满二叉树，且第d层所有节点从左向右连续地紧密排列，这样的二叉树被称为完全二叉树。</p>
+<p>对一颗具有n个结点的二叉树按层序编号，如果编号为i(1 &lt;= i &lt;= n)的结点与同样深度的满二叉树中编号为i的结点在二叉树中位置完全相同，则棵二叉树称为完全二叉树。</p>
+<p><img src="/images/code/algo/tree/alltree.png" alt="完全二叉树"></p>
+<ol>
+<li>叶子结点只能出现在最下两层。</li>
+<li>最下层的叶子一定集中在左部连续位置。</li>
+<li>倒数二层，若有叶子结点，一定都在右部连续位置。</li>
+<li>如果结点度数为1,则该结点只有左子树，即不存在只有右子树的情况。</li>
+<li>同样结点数的二叉树，完全二叉树的深度最小。</li>
+</ol>
+<h3 id="平衡二叉树-AVL"><a href="#平衡二叉树-AVL" class="headerlink" title="平衡二叉树(AVL)"></a>平衡二叉树(AVL)</h3><p>它是一棵空树或它的左右两个子树的高度差的绝对值不超过1，并且左右两个子树都是一棵平衡二叉树，同时平衡二叉树必定是二叉搜索树。</p>
+<h3 id="二叉搜索树"><a href="#二叉搜索树" class="headerlink" title="二叉搜索树"></a>二叉搜索树</h3><ul>
+<li>若任意节点的左子树不空，则左子树上所有节点的值均小于它的根节点的值；</li>
+<li>若任意节点的右子树不空，则右子树上所有节点的值均大于它的根节点的值；</li>
+<li>任意节点的左、右子树也分别为二叉查找树；</li>
+<li>没有键值相等的节点。</li>
+</ul>
+<h3 id="霍夫曼树"><a href="#霍夫曼树" class="headerlink" title="霍夫曼树"></a>霍夫曼树</h3><p>带权路径最短的二叉树称为哈夫曼树或最优二叉树。</p>
+<h3 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h3><p>红黑树是一颗特殊的二叉查找树，除了二叉查找树的要求外，它还具有以下特性：</p>
+<ul>
+<li>每个节点或者是黑色，或者是红色。</li>
+<li>根节点是黑色。</li>
+<li>每个叶子节点是黑色。<br>如果一个节点是红色的，则它的子节点必须是黑色的。</li>
+<li>从一个节点到该节点的子孙节点的所有路径上包含相同数目的黑节点。</li>
+</ul>
+<h3 id="B-tree"><a href="#B-tree" class="headerlink" title="B-tree"></a>B-tree</h3><p>一颗m阶B树的特性：</p>
+<ul>
+<li>根结点至少有两个子女（如果B树只有一个根节点，这个根节点的key的数量可以为[1~m-1]）</li>
+<li>每个非根节点所包含的关键字个数 j 满足：⌈m/2⌉ - 1 &lt;= j &lt;= m - 1，节点的值按非降序方式存放，即从左到右依次增加</li>
+<li>除根结点以及叶子节点以外的所有结点的度数正好是关键字总数加1，故内部节点的子树个数 k 满足：⌈m/2⌉ &lt;= k &lt;= m</li>
+<li>所有的叶子结点都位于同一层</li>
+</ul>
+<h3 id="B-树"><a href="#B-树" class="headerlink" title="B+树"></a>B+树</h3><p>m阶B+树是m阶B-tree的变体，它的定义大致跟B-tree一致，不过有以下几点不同：</p>
+<ul>
+<li>有n棵子树的结点中含有n个关键字，每个关键字不保存数据，只用来索引，所有数据都保存在叶子节点，其中⌈m/2⌉ &lt;= n &lt;= m</li>
+<li>所有的叶子结点中包含了全部关键字的信息，及指向含这些关键字记录的指针，且叶子结点本身依关键字的大小自小而大顺序链接</li>
+<li>所有的非终端结点可以看成是索引部分，结点中仅含其子树（根结点）中的最大（或最小）关键字</li>
+<li>通常在B+树上有两个头指针，一个指向根结点，一个指向关键字最小的叶子结点</li>
+</ul>
+<h3 id="B-树-1"><a href="#B-树-1" class="headerlink" title="B*树"></a>B*树</h3><p>B*树是B+树的变体，除了B+树的要求之外，还有以下特性：</p>
+<ul>
+<li>⌈m*2/3⌉ &lt;= n &lt;=m 这里的n是除根节点之外的内部节点的键</li>
+<li>增加内部节点中兄弟节点的指针，由左边指向右边</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/07/algo/algo_binary/" rel="prev" title="二分法的标准写法">
+      <i class="fa fa-chevron-left"></i> 二分法的标准写法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/07/algo/graph/" rel="next" title="数据结构-图">
+      数据结构-图 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%91%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">1.</span> <span class="nav-text">树的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E5%8F%89%E6%A0%91"><span class="nav-number">2.</span> <span class="nav-text">二叉树</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%91%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84"><span class="nav-number">2.1.</span> <span class="nav-text">树的存储结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86"><span class="nav-number">2.2.</span> <span class="nav-text">二叉树的遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BB%A1%E4%BA%8C%E5%8F%89%E6%A0%91"><span class="nav-number">2.3.</span> <span class="nav-text">满二叉树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%8C%E5%85%A8%E4%BA%8C%E5%8F%89%E6%A0%91"><span class="nav-number">2.4.</span> <span class="nav-text">完全二叉树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91-AVL"><span class="nav-number">2.5.</span> <span class="nav-text">平衡二叉树(AVL)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91"><span class="nav-number">2.6.</span> <span class="nav-text">二叉搜索树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9C%8D%E5%A4%AB%E6%9B%BC%E6%A0%91"><span class="nav-number">2.7.</span> <span class="nav-text">霍夫曼树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%A2%E9%BB%91%E6%A0%91"><span class="nav-number">2.8.</span> <span class="nav-text">红黑树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#B-tree"><span class="nav-number">2.9.</span> <span class="nav-text">B-tree</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#B-%E6%A0%91"><span class="nav-number">2.10.</span> <span class="nav-text">B+树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#B-%E6%A0%91-1"><span class="nav-number">2.11.</span> <span class="nav-text">B*树</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ubun2</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">176</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ubun2</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
