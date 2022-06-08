@@ -176,6 +176,353 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/regex/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/tool/regex/" class="post-title-link" itemprop="url">Regex</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/tool/" itemprop="url" rel="index"><span itemprop="name">tool</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h2><table>
+<thead>
+<tr>
+<th align="center">字符</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">\</td>
+<td align="left">转义符</td>
+</tr>
+<tr>
+<td align="center">^</td>
+<td align="left">匹配输入字符串的开始位置</td>
+</tr>
+<tr>
+<td align="center">$</td>
+<td align="left">匹配输入字符串的结束位置</td>
+</tr>
+<tr>
+<td align="center">*</td>
+<td align="left">匹配前面的子表达式零次或多次</td>
+</tr>
+<tr>
+<td align="center">.</td>
+<td align="left">匹配除“<code>\n</code>之外的任何单个字符</td>
+</tr>
+<tr>
+<td align="center">+</td>
+<td align="left">匹配前面的子表达式一次或多次，等价于{1,}</td>
+</tr>
+<tr>
+<td align="center">?</td>
+<td align="left">匹配前面的子表达式零次或一次，等价于{0,1}</td>
+</tr>
+<tr>
+<td align="center">*?</td>
+<td align="left">匹配前面任意个表达式（尽可能少）</td>
+</tr>
+<tr>
+<td align="center">+?</td>
+<td align="left">匹配前面至少一个表达式（尽可能少）</td>
+</tr>
+<tr>
+<td align="center">(pattern)</td>
+<td align="left">匹配pattern并获取这一匹配，捕获并为括号内的字符隐式编号</td>
+</tr>
+<tr>
+<td align="center">[abc]</td>
+<td align="left">匹配集合中的任何字符</td>
+</tr>
+<tr>
+<td align="center">[a-z]</td>
+<td align="left">匹配范围中的任何字符</td>
+</tr>
+<tr>
+<td align="center">[^abc]</td>
+<td align="left">非字符集合，匹配未包含的任意字符</td>
+</tr>
+<tr>
+<td align="center">[^a-z]</td>
+<td align="left">非字符范围，匹配任何不在指定范围内的任意字符</td>
+</tr>
+<tr>
+<td align="center">|</td>
+<td align="left">两项之间匹配一个，使用时要加转义符</td>
+</tr>
+<tr>
+<td align="center">{n}</td>
+<td align="left">指定前一个字符出现次数</td>
+</tr>
+<tr>
+<td align="center">{<em>n</em>,}</td>
+<td align="left">其前面的字符出现不小于n次</td>
+</tr>
+<tr>
+<td align="center">{<em>n</em>,<em>m</em>}</td>
+<td align="left">其前面的字符至少出现n次，最多出现m次</td>
+</tr>
+<tr>
+<td align="center">\b</td>
+<td align="left">匹配一个单词边界，也就是指单词和空格间的位置。例如，“<code>er\b</code>”可以匹配“<code>never</code>”中的“<code>er</code>”，但不能匹配“<code>verb</code>”中的“<code>er</code>”。</td>
+</tr>
+<tr>
+<td align="center">\B</td>
+<td align="left">匹配非单词边界。“<code>er\B</code>”能匹配“<code>verb</code>”中的“<code>er</code>”，但不能匹配“<code>never</code>”中的“<code>er</code>”。</td>
+</tr>
+<tr>
+<td align="center">\cx</td>
+<td align="left">匹配由x指明的控制字符。例如，\cM匹配一个Control-M或回车符。x的值必须为A-Z或a-z之一。否则，将c视为一个原义的“<code>c</code>”字符。</td>
+</tr>
+<tr>
+<td align="center">\d</td>
+<td align="left">匹配十进制字符，等价于[0-9]。</td>
+</tr>
+<tr>
+<td align="center">\D</td>
+<td align="left">匹配一个非数字字符，等价于[^0-9]。</td>
+</tr>
+<tr>
+<td align="center">\f</td>
+<td align="left">匹配一个换页符，等价于\x0c和\cL。</td>
+</tr>
+<tr>
+<td align="center">\n</td>
+<td align="left">匹配一个换行符，等价于\x0a和\cJ。</td>
+</tr>
+<tr>
+<td align="center">\r</td>
+<td align="left">匹配一个回车符，等价于\x0d和\cM。</td>
+</tr>
+<tr>
+<td align="center">\s</td>
+<td align="left">匹配任何空白字符，包括空格、制表符、换页符等等，等价于[ \f\n\r\t\v]。</td>
+</tr>
+<tr>
+<td align="center">\S</td>
+<td align="left">匹配任何非空白字符，等价于[^ \f\n\r\t\v]。</td>
+</tr>
+<tr>
+<td align="center">\t</td>
+<td align="left">匹配一个制表符，等价于\x09和\cI。</td>
+</tr>
+<tr>
+<td align="center">\v</td>
+<td align="left">匹配一个垂直制表符，等价于\x0b和\cK。</td>
+</tr>
+<tr>
+<td align="center">\w</td>
+<td align="left">匹配包括下划线的任何文字字符，等价于<code>[A-Za-z0-9_]</code></td>
+</tr>
+<tr>
+<td align="center">\W</td>
+<td align="left">匹配任何非单词字符，等价于“<code>[^A-Za-z0-9_]</code>”</td>
+</tr>
+<tr>
+<td align="center">\u<em>n</em></td>
+<td align="left">匹配<em>n</em>，其中<em>n</em>是一个用四个十六进制数字表示的Unicode字符。例如，\u00A9匹配版权符号（©）。</td>
+</tr>
+<tr>
+<td align="center">\x<em>n</em></td>
+<td align="left">匹配<em>n</em>，其中<em>n</em>为十六进制转义值。十六进制转义值必须为确定的两个数字长。例如，“<code>\x41</code>”匹配“<code>A</code>”。“<code>\x041</code>”则等价于“<code>\x04&amp;1</code>”。正则表达式中可以使用ASCII编码。.</td>
+</tr>
+<tr>
+<td align="center">(?:pattern)</td>
+<td align="left">匹配pattern但不获取匹配结果，也就是说这是一个非获取匹配，不进行存储供以后使用。这在使用或字符“`(</td>
+</tr>
+<tr>
+<td align="center">(?=pattern)</td>
+<td align="left">正向肯定预查，在任何匹配pattern的字符串开始处匹配查找字符串。这是一个非获取匹配，也就是说，该匹配不需要获取供以后使用。例如，“`Windows(?=95</td>
+</tr>
+<tr>
+<td align="center">(?!pattern)</td>
+<td align="left">正向否定预查，在任何不匹配pattern的字符串开始处匹配查找字符串。这是一个非获取匹配，也就是说，该匹配不需要获取供以后使用。例如“`Windows(?!95</td>
+</tr>
+<tr>
+<td align="center">(?&lt;=pattern)</td>
+<td align="left">反向肯定预查，与正向肯定预查类拟，只是方向相反。例如，“`(?&lt;=95</td>
+</tr>
+<tr>
+<td align="center">(?&lt;!pattern)</td>
+<td align="left">反向否定预查，与正向否定预查类拟，只是方向相反。例如“`(?&lt;!95</td>
+</tr>
+<tr>
+<td align="center">*num*</td>
+<td align="left">匹配<em>num</em>，其中<em>num</em>是一个正整数。对所获取的匹配的引用。例如，“<code>(.)\1</code>”匹配两个连续的相同字符。</td>
+</tr>
+<tr>
+<td align="center">*n*</td>
+<td align="left">标识一个八进制转义值或一个向后引用。如果*n<em>之前至少</em>n<em>个获取的子表达式，则</em>n<em>为向后引用。否则，如果</em>n<em>为八进制数字（0-7），则</em>n*为一个八进制转义值。</td>
+</tr>
+<tr>
+<td align="center">*nm*</td>
+<td align="left">标识一个八进制转义值或一个向后引用。如果*nm<em>之前至少有</em>nm<em>个获得子表达式，则</em>nm<em>为向后引用。如果*nm</em>之前至少有<em>n</em>个获取，则<em>n</em>为一个后跟文字<em>m</em>的向后引用。如果前面的条件都不满足，若<em>n</em>和<em>m</em>均为八进制数字（0-7），则*nm<em>将匹配八进制转义值</em>nm*。</td>
+</tr>
+<tr>
+<td align="center">*nml*</td>
+<td align="left">如果<em>n</em>为八进制数字（0-3），且<em>m和l</em>均为八进制数字（0-7），则匹配八进制转义值<em>nm</em>l。</td>
+</tr>
+</tbody></table>
+<p><img src="/images/code/regexp-metachar.png" alt="img"></p>
+<h2 id="修饰符"><a href="#修饰符" class="headerlink" title="修饰符"></a>修饰符</h2><table>
+<thead>
+<tr>
+<th align="left">修饰符</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">i</td>
+<td align="left">ignore - 不区分大小写</td>
+</tr>
+<tr>
+<td align="left">g</td>
+<td align="left">global - 全局匹配</td>
+</tr>
+<tr>
+<td align="left">m</td>
+<td align="left">multi line - 多行匹配</td>
+</tr>
+<tr>
+<td align="left">s</td>
+<td align="left">默认情况下的圆点 <strong>.</strong> 是 匹配除换行符 <strong>\n</strong> 之外的任何字符，加上 s 之后, <strong>.</strong> 中包含换行符 <strong>\n</strong>。</td>
+</tr>
+</tbody></table>
+<h2 id="优先级"><a href="#优先级" class="headerlink" title="优先级"></a>优先级</h2><p>相同优先级的从左到右进行运算，不同优先级的运算先高后低。</p>
+<table>
+<thead>
+<tr>
+<th align="left">运算符</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">\</td>
+<td align="left">转义符</td>
+</tr>
+<tr>
+<td align="left">(), (?:), (?=), []</td>
+<td align="left">圆括号和方括号</td>
+</tr>
+<tr>
+<td align="left">*, +, ?, {n}, {n,}, {n,m}</td>
+<td align="left">限定符</td>
+</tr>
+<tr>
+<td align="left">^, $, \任何元字符、任何字符</td>
+<td align="left">定位点和序列（即：位置和顺序）</td>
+</tr>
+<tr>
+<td align="left">|</td>
+<td align="left">替换，”或”操作 字符具有高于替换运算符的优先级，使得”m|food”匹配”m”或”food”。若要匹配”mood”或”food”，请使用括号创建子表达式，从而产生”(m|f)ood”。</td>
+</tr>
+</tbody></table>
+<h2 id="常用正则表达式"><a href="#常用正则表达式" class="headerlink" title="常用正则表达式"></a>常用正则表达式</h2><table>
+<thead>
+<tr>
+<th align="center">用户名</th>
+<th>/^[a-z0-9_-]{3,16}$/</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">密码</td>
+<td>/^[a-z0-9_-]{6,18}$/</td>
+</tr>
+<tr>
+<td align="center">十六进制值</td>
+<td>/^#?([a-f0-9]{6}|[a-f0-9]{3})$/</td>
+</tr>
+<tr>
+<td align="center">电子邮箱</td>
+<td>/^([a-z0-9_.-]+)@([\da-z.-]+).([a-z.]{2,6})$/ /^[a-z\d]+(.[a-z\d]+)*@(<a href="-%5B%5Cda-z%5D">\da-z</a>?)+(.{1,2}[a-z]+)+$/</td>
+</tr>
+<tr>
+<td align="center">URL</td>
+<td>/^(https?://)?([\da-z.-]+).([a-z.]{2,6})([/\w .-]*)*/?$/</td>
+</tr>
+<tr>
+<td align="center">IP 地址</td>
+<td>/((2[0-4]\d|25[0-5]|[01]?\d\d?).){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)/ /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/</td>
+</tr>
+<tr>
+<td align="center">HTML 标签</td>
+<td>/^&lt;([a-z]+)([^&lt;]+)<em>(?:&gt;(.</em>)&lt;/\1&gt;|\s+/&gt;)$/</td>
+</tr>
+<tr>
+<td align="center">删除代码\注释</td>
+<td>(?&lt;!http:|\S)//.*$</td>
+</tr>
+<tr>
+<td align="center">Unicode编码中的汉字范围</td>
+<td>/^[\u2E80-\u9FFF]+$/</td>
+</tr>
+</tbody></table>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/cpp/thread/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -207,7 +554,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:31:26" itemprop="dateModified" datetime="2022-06-08T17:31:26+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -312,7 +659,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:31:26" itemprop="dateModified" datetime="2022-06-08T17:31:26+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -399,7 +746,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:29:02" itemprop="dateModified" datetime="2022-06-08T17:29:02+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -407,7 +754,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
                 </span>
             </span>
 
@@ -641,7 +988,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -729,7 +1076,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:29:02" itemprop="dateModified" datetime="2022-06-08T17:29:02+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -737,7 +1084,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
                 </span>
             </span>
 
@@ -856,7 +1203,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -929,7 +1276,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/c/exec/" class="post-title-link" itemprop="url">linux exec function</a>
+            <a href="/2022/06/07/c/exec/" class="post-title-link" itemprop="url">linux exec 函数集</a>
         </h1>
 
         <div class="post-meta">
@@ -946,7 +1293,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:29:02" itemprop="dateModified" datetime="2022-06-08T17:29:02+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -954,7 +1301,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
                 </span>
             </span>
 
@@ -1000,7 +1347,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/uml_sequence/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/uml/uml_sequence/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1014,7 +1361,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/code/design-patterns/uml_sequence/" class="post-title-link" itemprop="url">UML Sequence diagram</a>
+            <a href="/2022/06/07/code/uml/uml_sequence/" class="post-title-link" itemprop="url">UML Sequence diagram</a>
         </h1>
 
         <div class="post-meta">
@@ -1031,7 +1378,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:54" itemprop="dateModified" datetime="2022-06-08T17:21:54+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1054,88 +1401,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>时序图(Sequence Diagram)，又名序列图，是一种UML交互图，通过描述对象之间发送消息的时间顺序显示多个对象之间的动态协作，关注于多个生命线之间的消息交换。</p>
-<p><img src="/images/code/uml/sequence-diagram-overview.png" alt="Sequence diagram"></p>
-<p>画时序图时会涉及下面7种元素：</p>
-<p><strong>角色</strong>(Actor)可以是人或者其他系统和子系统。以一个小人图标表示。</p>
-<p><strong>对象</strong>(Object)位于时序图的顶部，以一个矩形表示。</p>
-<p><strong>生命线</strong>(LifeLine)代表时序图中每个对象的时间线，以一条垂直的虚线表示。</p>
-<p><strong>控制焦点</strong>(Activation)代表时序图中在对象时间线上某段时期执行的操作，以一个很窄的矩形表示。</p>
-<p><strong>消息</strong>(Message)表示对象之间发送的信息：</p>
-<ul>
-<li>同步消息(Synchronous Message)用一条实线和实心箭头表示。</li>
-<li>异步消息(Asynchronous Message)用一条实线和大于号表示。</li>
-<li>返回消息(Return Message)用小于号和虚线表示。</li>
-</ul>
-<p><strong>自关联消息</strong>表示调用自身的方法，用一个半闭合的长方形+下方实心剪头表示。</p>
-<p><strong>组合片段</strong><br>用来解决交互执行的条件和方式，它允许在序列图中直接表示逻辑组件，用于通过指定条件或子进程的应用区域，为任何生命线的任何部分定义特殊条件和子进程。</p>
-<table>
-<thead>
-<tr>
-<th>组合名称</th>
-<th>组合含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>alt抉择</td>
-<td>在一组行为中根据特定的条件选择某个交互，相当于if else</td>
-</tr>
-<tr>
-<td>opt选项</td>
-<td>表示一个可选的行为</td>
-</tr>
-<tr>
-<td>loop循环</td>
-<td>说明交互片段会被重复执行</td>
-</tr>
-<tr>
-<td>break中断</td>
-<td>和编程语言中的break类似的机制，放弃序列的其余部分</td>
-</tr>
-<tr>
-<td>par并行</td>
-<td>支持交互片段的并发执行</td>
-</tr>
-<tr>
-<td>strict强顺序</td>
-<td>明确定义了一组交互片段的执行顺序</td>
-</tr>
-<tr>
-<td>seq弱顺序</td>
-<td>同一生命线片段必须顺序执行，不同生命线可能会顺序执行</td>
-</tr>
-<tr>
-<td>critical关键</td>
-<td>用在Par或Seq片段中，指示此片段中的消息不得与其他消息交错</td>
-</tr>
-<tr>
-<td>ref</td>
-<td>引用其他地方定义的组合片段</td>
-</tr>
-<tr>
-<td>region</td>
-<td>标志在组合片段中先于其他交互片断发生的交互</td>
-</tr>
-<tr>
-<td>ignore忽略</td>
-<td>明确定义了交互片段不应该响应的消息</td>
-</tr>
-<tr>
-<td>consider考虑</td>
-<td>明确标志了应该被处理的消息</td>
-</tr>
-<tr>
-<td>assert断言</td>
-<td>标志了在交互片段中作为事件唯一的合法继续者的操作数，用在 Consider 或 Ignore 片段中</td>
-</tr>
-<tr>
-<td>neg否定</td>
-<td>用来标志不应该发生的交互，用在 Consider 或 Ignore 片段中</td>
-</tr>
-</tbody></table>
-<hr>
-<p><a target="_blank" rel="noopener" href="https://www.uml-diagrams.org/sequence-diagrams.html">https://www.uml-diagrams.org/sequence-diagrams.html</a></p>
-
+          <p>uml</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/06/07/code/uml/uml_sequence/">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1185,7 +1459,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1221,255 +1495,6 @@
 
 <hr>
 <p><a target="_blank" rel="noopener" href="https://www.beyondcompare.cc/jiqiao/">https://www.beyondcompare.cc/jiqiao/</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/sql/sqlite_api/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/sql/sqlite_api/" class="post-title-link" itemprop="url">sqlite c++ api</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/sqlite/" itemprop="url" rel="index"><span itemprop="name">sqlite</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="执行语句"><a href="#执行语句" class="headerlink" title="执行语句"></a>执行语句</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">sqlite3_open</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">  <span class="type">const</span> <span class="type">char</span> *filename,   <span class="comment">/* Database filename (UTF-8) */</span></span></span></span><br><span class="line"><span class="params"><span class="function">  sqlite3 **ppDb          <span class="comment">/* OUT: SQLite db handle */</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sqlite3_close</span><span class="params">(sqlite3*)</span></span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sqlite3_exec</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">  sqlite3*,                                  <span class="comment">/* An open database */</span></span></span></span><br><span class="line"><span class="params"><span class="function">  <span class="type">const</span> <span class="type">char</span> *sql,                           <span class="comment">/* SQL to be evaluated */</span></span></span></span><br><span class="line"><span class="params"><span class="function">  <span class="type">int</span> (*callback)(<span class="type">void</span>*,<span class="type">int</span>,<span class="type">char</span>**,<span class="type">char</span>**),  <span class="comment">/* Callback function */</span></span></span></span><br><span class="line"><span class="params"><span class="function">  <span class="type">void</span> *,                                    <span class="comment">/* 1st argument to callback */</span></span></span></span><br><span class="line"><span class="params"><span class="function">  <span class="type">char</span> **errmsg                              <span class="comment">/* Error msg written here */</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">callback</span><span class="params">(<span class="type">void</span> *data, <span class="type">int</span> argc, <span class="type">char</span> **argv, <span class="type">char</span> **colName)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   <span class="built_in">printf</span>(<span class="string">&quot;%s:\n&quot;</span>, (<span class="type">const</span> <span class="type">char</span>*)data);</span><br><span class="line">   <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; argc; i++) &#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">&quot;%s = %s\n&quot;</span>, colName[i], argv[i] ? argv[i] : <span class="string">&quot;NULL&quot;</span>);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    sqlite3 *db = <span class="literal">nullptr</span>;</span><br><span class="line">    <span class="type">int</span> ret = <span class="built_in">sqlite3_open</span>(argv[<span class="number">1</span>], &amp;db);</span><br><span class="line">    <span class="keyword">if</span> (ret || db == <span class="literal">nullptr</span>) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;db open fail.&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *errmsg = <span class="literal">nullptr</span>;</span><br><span class="line">    ret = <span class="built_in">sqlite3_exec</span>(db, argv[<span class="number">2</span>], callback, (<span class="type">void</span> *)<span class="string">&quot;callback&quot;</span>, &amp;errmsg);</span><br><span class="line">    <span class="keyword">if</span> (ret != SQLITE_OK) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;sql exec fail.&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="built_in">sqlite3_free</span>(errmsg);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">sqlite3_close</span>(db);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">sqlite3_backup *<span class="title">sqlite3_backup_init</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">  sqlite3 *pDest,                        <span class="comment">/* Destination database handle */</span></span></span></span><br><span class="line"><span class="params"><span class="function">  <span class="type">const</span> <span class="type">char</span> *zDestName,                 <span class="comment">/* Destination database name */</span></span></span></span><br><span class="line"><span class="params"><span class="function">  sqlite3 *pSource,                      <span class="comment">/* Source database handle */</span></span></span></span><br><span class="line"><span class="params"><span class="function">  <span class="type">const</span> <span class="type">char</span> *zSourceName                <span class="comment">/* Source database name */</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sqlite3_backup_step</span><span class="params">(sqlite3_backup *p, <span class="type">int</span> nPage)</span></span>;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sqlite3_backup_finish</span><span class="params">(sqlite3_backup *p)</span></span>;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sqlite3_backup_remaining</span><span class="params">(sqlite3_backup *p)</span></span>;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sqlite3_backup_pagecount</span><span class="params">(sqlite3_backup *p)</span></span>;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">sqlite3 *db = <span class="literal">NULL</span>;</span><br><span class="line"><span class="type">int</span> ret = <span class="built_in">sqlite3_open</span>(argv[<span class="number">1</span>], &amp;db);</span><br><span class="line"><span class="keyword">if</span> (ret || db == <span class="literal">NULL</span>) &#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;db open fail.&quot;</span> &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">sqlite3 *backupDb = <span class="literal">NULL</span>;</span><br><span class="line">ret = <span class="built_in">sqlite3_open</span>(argv[<span class="number">2</span>], &amp;backupDb);</span><br><span class="line"><span class="keyword">if</span> (ret || backupDb == <span class="literal">NULL</span>) &#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;backup db open fail.&quot;</span> &lt;&lt; endl;</span><br><span class="line">    <span class="built_in">sqlite3_close</span>(db);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">sqlite3_backup *pbak = <span class="built_in">sqlite3_backup_init</span>(backupDb, <span class="string">&quot;main&quot;</span>, db, <span class="string">&quot;main&quot;</span>);</span><br><span class="line"><span class="keyword">if</span> (pbak == <span class="literal">NULL</span>) &#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;backup init fail &quot;</span> &lt;&lt; <span class="built_in">sqlite3_errcode</span>(backupDb) &lt;&lt; endl;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    (<span class="type">void</span>)<span class="built_in">sqlite3_backup_step</span>(pbak, <span class="number">-1</span>);</span><br><span class="line">    ret = <span class="built_in">sqlite3_backup_finish</span>(pbak);</span><br><span class="line">    <span class="keyword">if</span> (ret != SQLITE_OK) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;backup db fail.&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">sqlite3_close</span>(db);</span><br><span class="line"><span class="built_in">sqlite3_close</span>(backupDb);</span><br></pre></td></tr></table></figure>
-
-<h2 id="错误码"><a href="#错误码" class="headerlink" title="错误码"></a>错误码</h2><table>
-<thead>
-<tr>
-<th align="left">宏</th>
-<th align="center">值</th>
-<th align="left">含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">SQLITE_OK</td>
-<td align="center">0</td>
-<td align="left">返回成功</td>
-</tr>
-<tr>
-<td align="left">SQLITE_ERROR</td>
-<td align="center">1</td>
-<td align="left">SQL错误或数据库不存在</td>
-</tr>
-<tr>
-<td align="left">SQLITE_INTERNAL</td>
-<td align="center">2</td>
-<td align="left">SQLite内部逻辑错误</td>
-</tr>
-<tr>
-<td align="left">SQLITE_PERM</td>
-<td align="center">3</td>
-<td align="left">拒绝访问</td>
-</tr>
-<tr>
-<td align="left">SQLITE_ABORT</td>
-<td align="center">4</td>
-<td align="left">回调函数请求中止</td>
-</tr>
-<tr>
-<td align="left">SQLITE_BUSY</td>
-<td align="center">5</td>
-<td align="left">数据库文件被锁</td>
-</tr>
-<tr>
-<td align="left">SQLITE_LOCKED</td>
-<td align="center">6</td>
-<td align="left">数据库中的一个表被锁</td>
-</tr>
-<tr>
-<td align="left">SQLITE_NOMEM</td>
-<td align="center">7</td>
-<td align="left">malloc()分配内存失败</td>
-</tr>
-<tr>
-<td align="left">SQLITE_READONLY</td>
-<td align="center">8</td>
-<td align="left">试图对只读数据库进行写操作</td>
-</tr>
-<tr>
-<td align="left">SQLITE_INTERRUPT</td>
-<td align="center">9</td>
-<td align="left">操作被sqlie3_interrupt()中止</td>
-</tr>
-<tr>
-<td align="left">SQLITE_IOERR</td>
-<td align="center">10</td>
-<td align="left">磁盘I/O发生错误</td>
-</tr>
-<tr>
-<td align="left">SQLITE_CORRUPT</td>
-<td align="center">11</td>
-<td align="left">数据库磁盘映像格式不正确</td>
-</tr>
-<tr>
-<td align="left">SQLITE_NOTFOUND</td>
-<td align="center">12</td>
-<td align="left">(Internal Only)表或记录不存在 未知操作码在sqlite3_file_control()</td>
-</tr>
-<tr>
-<td align="left">SQLITE_FULL</td>
-<td align="center">13</td>
-<td align="left">插入失败，数据库已满</td>
-</tr>
-<tr>
-<td align="left">SQLITE_CANTOPEN</td>
-<td align="center">14</td>
-<td align="left">不能打开数据库文件</td>
-</tr>
-<tr>
-<td align="left">SQLITE_PROTOCOL</td>
-<td align="center">15</td>
-<td align="left">数据库锁定协议错误</td>
-</tr>
-<tr>
-<td align="left">SQLITE_EMPTY</td>
-<td align="center">16</td>
-<td align="left">(Internal Only)数据库为空</td>
-</tr>
-<tr>
-<td align="left">SQLITE_SCHEMA</td>
-<td align="center">17</td>
-<td align="left">数据库模式改变</td>
-</tr>
-<tr>
-<td align="left">SQLITE_TOOBIG</td>
-<td align="center">18</td>
-<td align="left">单行数据过多(字符串或BLOB超过大小限制)</td>
-</tr>
-<tr>
-<td align="left">SQLITE_CONSTRAINT</td>
-<td align="center">19</td>
-<td align="left">由于约束冲突而中止</td>
-</tr>
-<tr>
-<td align="left">SQLITE_MISMATCH</td>
-<td align="center">20</td>
-<td align="left">数据类型不匹配</td>
-</tr>
-<tr>
-<td align="left">SQLITE_MISUSE</td>
-<td align="center">21</td>
-<td align="left">数据库错误使用</td>
-</tr>
-<tr>
-<td align="left">SQLITE_NOLFS</td>
-<td align="center">22</td>
-<td align="left">使用主机操作系统不支持的特性</td>
-</tr>
-<tr>
-<td align="left">SQLITE_AUTH</td>
-<td align="center">23</td>
-<td align="left">非法授权</td>
-</tr>
-<tr>
-<td align="left">SQLITE_FORMAT</td>
-<td align="center">24</td>
-<td align="left">辅助数据库格式错误</td>
-</tr>
-<tr>
-<td align="left">SQLITE_RANGE</td>
-<td align="center">25</td>
-<td align="left">sqlite_bind第二个参数超出范围</td>
-</tr>
-<tr>
-<td align="left">SQLITE_NOTADB</td>
-<td align="center">26</td>
-<td align="left">打开的不是一个数据库文件</td>
-</tr>
-<tr>
-<td align="left">SQLITE_NOTICE</td>
-<td align="center">27</td>
-<td align="left">来自sqlite3_log()的通知</td>
-</tr>
-<tr>
-<td align="left">SQLITE_WARNING</td>
-<td align="center">28</td>
-<td align="left">来自sqlite3_log()的警告</td>
-</tr>
-<tr>
-<td align="left">SQLITE_ROW</td>
-<td align="center">100</td>
-<td align="left">sqlite_step() 有另一行准备就绪</td>
-</tr>
-<tr>
-<td align="left">SQLITE_DONE</td>
-<td align="center">101</td>
-<td align="left">sqlite_step() 执行完成</td>
-</tr>
-</tbody></table>
-<hr>
-<p><a target="_blank" rel="noopener" href="https://sqlite.org/c3ref/funclist.html">https://sqlite.org/c3ref/funclist.html</a></p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/endv/p/12228344.html">https://www.cnblogs.com/endv/p/12228344.html</a></p>
-<p><a target="_blank" rel="noopener" href="https://sqlite.org/c3ref/backup_finish.html#sqlite3backupfinish">https://sqlite.org/c3ref/backup_finish.html#sqlite3backupfinish</a></p>
 
       
     </div>
@@ -1554,20 +1579,20 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">176</span>
+          <span class="site-state-item-count">177</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-count">21</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

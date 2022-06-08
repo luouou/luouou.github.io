@@ -176,7 +176,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/uml_class/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/c-object/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -190,7 +190,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/code/design-patterns/uml_class/" class="post-title-link" itemprop="url">UML class diagram</a>
+            <a href="/2022/06/07/code/design-patterns/c-object/" class="post-title-link" itemprop="url">c语言实现面向对象</a>
         </h1>
 
         <div class="post-meta">
@@ -207,7 +207,89 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>面向对象语言有三个最重要的特点，即继承、封装、多态，其中类可以用结构体实现。</p>
+<h2 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h2><p>把基类结构体作为派生类结构体的第一个成员，这样就可以对基类进行访问与强转。 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">parent</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">int</span> data_parent;</span><br><span class="line"> </span><br><span class="line">&#125;Parent;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">Child</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">parent</span> <span class="title">parent</span>;</span></span><br><span class="line">    <span class="type">int</span> data_child;</span><br><span class="line"> </span><br><span class="line">&#125;Child;</span><br></pre></td></tr></table></figure>
+
+<h2 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h2><p>封装的意义在于函数和数据是绑在一起的，其中将该对象结构体指针作为函数的参数，相当于类的this指针，这样就可以遍历类中的所有函数和成员。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">Data</span>;</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">typedef</span>  <span class="title function_">void</span> <span class="params">(*func)</span><span class="params">(<span class="keyword">struct</span> _Data* pData)</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">Data</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">int</span> value;</span><br><span class="line">    func pfunc;</span><br><span class="line">&#125;Data;</span><br></pre></td></tr></table></figure>
+
+<h2 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h2><p>多态就是实现同一接口处理不同的事情，可以用函数指针来实现，通过给函数指针赋于不同的値。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">Play</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">void</span>* pData;</span><br><span class="line">    <span class="type">void</span> (*start_play)(<span class="keyword">struct</span> _Play* pPlay);</span><br><span class="line">&#125;Play;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/uml/uml_class/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/uml/uml_class/" class="post-title-link" itemprop="url">UML class diagram</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:54" itemprop="dateModified" datetime="2022-06-08T17:21:54+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -230,52 +312,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>类图是UML结构图，在类和接口的层次上展现所设计系统的结构、特征、约束和关系。类图有以下几种关系: 泛化（Generalization）, 实现（Realization），关联（Association)，聚合（Aggregation），组合(Composition)，依赖(Dependency)。</p>
-<p><img src="/images/code/uml/uml.png" alt="类的表示"></p>
-<h2 id="类"><a href="#类" class="headerlink" title="类"></a>类</h2><p>类是具有相似结构、行为和关系的一组对象的描述符，是面向对象系统中最重要的构造块。</p>
-<p>如下图所示，就表示一个类：</p>
-<p><img src="/images/code/uml/class.png" alt="类的表示"></p>
-<p>三个格子从上至下分别表示：</p>
-<ul>
-<li>类名称（如果是接口，就使用斜体表示）</li>
-<li>类的特性（一般是类的字段和属性，可以没有）</li>
-<li>类的操作（一般是类的方法或行为）</li>
-</ul>
-<p>它们前边的符号有以下几种情况：</p>
-<ul>
-<li><code>+</code>表示public</li>
-<li><code>-</code>表示private</li>
-<li><code>#</code>表示protected</li>
-<li><code>~</code>表示default,也就是包权限</li>
-<li><code>_</code>下划线表示static</li>
-<li>斜体表示抽象</li>
-</ul>
-<h2 id="泛化"><a href="#泛化" class="headerlink" title="泛化"></a>泛化</h2><p>泛化是一种继承关系，它指定了子类如何特化父类的所有特征和行为，例如：鸟是动物的一种。用空心箭头+实线表示，箭头指向父类。</p>
-<p><img src="/images/code/uml/%E7%BB%A7%E6%89%BF.png" alt="继承"></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Bird</span> : <span class="keyword">public</span> Animal &#123;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>实现是一种类与接口的关系，表示类是接口所有特征和行为的实现。用空心箭头的虚线表示，箭头指向接口。</p>
-<p><img src="/images/code/uml/%E5%AE%9E%E7%8E%B0.png" alt="实现"><br><img src="/images/code/uml/%E5%AE%9E%E7%8E%B02.png" alt="实现"></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Bird</span> &#123;</span><br><span class="line">  <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">fly</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Goose</span> : <span class="keyword">public</span> Bird &#123;</span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">fly</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<h2 id="聚合"><a href="#聚合" class="headerlink" title="聚合"></a>聚合</h2><p>聚合是一种弱的整体拥有部分的关系，且部分可以离开整体而单独存在，有各自的生命周期。比如，雁群与大雁。<br>用空心的菱形+实线箭头表示，菱形指向整体。</p>
-<p><img src="/images/code/uml/%E8%81%9A%E5%90%88.png" alt="聚合"></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">GooseGroup</span> &#123;</span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">addGoose</span><span class="params">(Goose &amp;g)</span> </span>&#123;</span><br><span class="line">    vec.<span class="built_in">push_back</span>(g);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  vector&lt;Goose&gt; vec;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="组合"><a href="#组合" class="headerlink" title="组合"></a>组合</h2><p>组合是整体与部分的关系，但部分不能离开整体而单独存在，部分和整体的生命周期一样，如果整体不存在了，则部分也不存在了。比如，鸟与翅膀。<br>用实心的菱形+实线箭头表示，菱形指向整体。还可以使用连线两端的数字表示某一端有几个实例。</p>
-<p><img src="/images/code/uml/%E7%BB%84%E5%90%88.png" alt="组合"></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Bird</span> &#123;</span><br><span class="line">  <span class="built_in">Bird</span>() &#123;</span><br><span class="line">    <span class="keyword">this</span>-&gt;wind = <span class="keyword">new</span> <span class="built_in">Wind</span>();</span><br><span class="line">  &#125;</span><br><span class="line">  Wind *wind;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<h2 id="关联"><a href="#关联" class="headerlink" title="关联"></a>关联</h2><p>关联一种拥有的关系，它使一个类知道另一个类的属性和方法。关联可以是双向的，也可以是单向的，双向关联是指双方都拥有对方的引用，拥有者可以调用被拥有者的公共属性和方法。<br>用实线箭头表示，指向被拥有者，双向关联可以有两个箭头或者没有箭头，单向的关联只有一个箭头。</p>
-<p><img src="/images/code/uml/%E5%85%B3%E8%81%94.png" alt="关联"></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Bird</span> &#123;</span><br><span class="line">  Weather state;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<h2 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h2><p>依赖是一种使用的关系，不管是用作成员变量，还是参数、返回值、局部变量，都称它们有依赖关系。<br>用虚线箭头表示，指向被使用者。</p>
-<p><img src="/images/code/uml/%E4%BE%9D%E8%B5%96.png" alt="依赖"></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Animal</span> &#123;</span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">Eat</span><span class="params">(water &amp;w)</span> </span>&#123; w -= <span class="number">3</span>; &#125;</span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">breathe</span><span class="params">()</span> </span>&#123; content -= <span class="number">5</span>; &#125;</span><br><span class="line"></span><br><span class="line">  Oxygen content;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/wounler/article/details/119207742">https://blog.csdn.net/wounler/article/details/119207742</a></p>
-
+          <p>uml</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/06/07/code/uml/uml_class/">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -325,7 +370,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:54" itemprop="dateModified" datetime="2022-06-08T17:21:54+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -508,7 +553,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:54" itemprop="dateModified" datetime="2022-06-08T17:21:54+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -704,7 +749,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:54" itemprop="dateModified" datetime="2022-06-08T17:21:54+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -811,7 +856,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -966,7 +1011,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:54" itemprop="dateModified" datetime="2022-06-08T17:21:54+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1046,7 +1091,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1090,7 +1135,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/algo/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/algorithm/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1104,7 +1149,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/algo/algo/" class="post-title-link" itemprop="url">算法基础</a>
+            <a href="/2022/06/07/algo/algorithm/" class="post-title-link" itemprop="url">算法基础</a>
         </h1>
 
         <div class="post-meta">
@@ -1121,7 +1166,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:54" itemprop="dateModified" datetime="2022-06-08T17:21:54+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1237,7 +1282,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:29:02" itemprop="dateModified" datetime="2022-06-08T17:29:02+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1245,7 +1290,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
                 </span>
             </span>
 
@@ -1260,7 +1305,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>GCC 对C语言语法进行了扩展，这些扩展对优化、目标代码布局、更安全的检查等提供了很强的支持，其实这并不完全符合 ANSI C 标准。</p>
+          <p>GCC 对c语言语法进行了扩展，这些扩展对优化、目标代码布局、更安全的检查等提供了很强的支持，其实这并不完全符合 ANSI C 标准。</p>
 <p>gcc如果使用“-ansi –pedantic”编译选项，则不使用 GNU 扩展语法。</p>
 <h2 id="语句表达式"><a href="#语句表达式" class="headerlink" title="语句表达式"></a>语句表达式</h2><p>GCC把包含在括号中的复合语句看作是一个表达式，称为语句表达式，它允许在一个表达式内使用循环、跳转、局部变量，并可以出现在任何允许表达式出现的地方。位于括号中的复合语句的最后一句必需是一个以分号结尾的表达式，它的值将成为这个语句表达式的值。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MIN(x,y) (&#123; \</span></span><br><span class="line"><span class="meta">    const typeof(x) _x = (x); \</span></span><br><span class="line"><span class="meta">    const typeof(y) _y = (y); \</span></span><br><span class="line"><span class="meta">    (void) (&amp;_x == &amp;_y); \</span></span><br><span class="line"><span class="meta">    _x &lt; _y ? _x : _y; &#125;)</span></span><br></pre></td></tr></table></figure>
@@ -1403,116 +1448,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/jekyll/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/tool/jekyll/" class="post-title-link" itemprop="url">jekyll build blog</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/jekyll/" itemprop="url" rel="index"><span itemprop="name">jekyll</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Jekyll是一个简单的，博客感知的静态站点生成器。书写Markdown格式的博客，并将其放到文件夹中，然后使用Liquid HTML模板构建网站。Jekyll自动将博客和模板联系在一起，生成完全由静态资源组成的网站。Jekyll恰好是GitHub Pages的引擎，因此可以在GitHub的服务器上免费托管项目的Jekyll页面/博客/网站。</p>
-<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><ol>
-<li><p>安装Ruby，下载包含Ruby + DevKit 的安装包，下载地址：<a target="_blank" rel="noopener" href="http://rubyinstaller.org/downloads/">http://rubyinstaller.org/downloads/</a></p>
-</li>
-<li><p>更换gem的软件源</p>
-</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">gem -v</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看当前源</span></span><br><span class="line">gem sources -l</span><br><span class="line"></span><br><span class="line">删除默认源，因为它太慢了，替换成国内RubyGems镜像站点</span><br><span class="line">gem sources -r https://rubygems.org/</span><br><span class="line">gem sources -a http://gems.ruby-china.com</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li>安装jekyll</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install jekyll</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>ERROR: Could not find a valid gem ‘jekyll’ (&gt;= 0), here is why:<br>Unable to download data from <a target="_blank" rel="noopener" href="https://rubygems.org/">https://rubygems.org/</a> - SSL_connect returned=1 errno=0 state=SSLv3 read server certificate B: certificate verify failed (<a target="_blank" rel="noopener" href="https://api.rubygems.org/latest_spece.4.8.gz">https://api.rubygems.org/latest_spece.4.8.gz</a>)</p>
-</blockquote>
-<p>错误原因是因为证书问题，解决办法为：下载最新的证书：<a target="_blank" rel="noopener" href="http://curl.haxx.se/ca/cacert.pem">http://curl.haxx.se/ca/cacert.pem</a> 放到指定文件夹，并配置环境变量。</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> SSL_CERT_FILE=/c/APP/Ruby21-x64/cacert.pe</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>C:/APP/Ruby30-x64/lib/ruby/gems/3.0.0/gems/jekyll-4.2.2/lib/jekyll/commands/serve/servlet.rb:3:in `require’: cannot load such file – webrick (LoadError)</p>
-</blockquote>
-<p>因为版本过高，需要添加webrick</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gem install bundler</span><br><span class="line">bundle add webrick</span><br></pre></td></tr></table></figure>
-
-<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建一个新的Jekyll站</span></span><br><span class="line">jekyll new mylog</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">启动服务器</span></span><br><span class="line">jekyll serve</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">浏览器访问</span></span><br><span class="line">http://localhost:4000/</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>Deprecation: You appear to have pagination turned on, but you haven’t included the jekyll-paginate gem. Ensure you have plugins: [jekyll-paginate] in your configuration file.</p>
-</blockquote>
-<p>安装jekyll-paginate，并在 _config.yml 中增加插件。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gem install jekyll-paginate</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">plugins: </span><br><span class="line">    [jekyll-paginate]</span><br></pre></td></tr></table></figure>
-
-<h2 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h2><figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">├── _config.yml  存储配置数据，执行jekyll命令时会自动使用。</span><br><span class="line">├── _drafts   草稿是未发布的文章，这些文件的命名格式是没有日期的。</span><br><span class="line">├── _posts   存放你要发表的文章，格式YEAR-MONTH-DAY-title.MARKUP。</span><br><span class="line">├── _layouts  包装文章的模板，通过&#123;&#123; content &#125;&#125;包含_posts里面的文章。</span><br><span class="line">├── _includes</span><br><span class="line">├── _data  jekyll会自动加载这里的所有.jml或者.yaml结尾的文件。</span><br><span class="line">├── _site  存放生成的网站</span><br><span class="line">├── index.html</span><br><span class="line">├── feed.xml</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1582,20 +1517,20 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">176</span>
+          <span class="site-state-item-count">177</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-count">21</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

@@ -176,6 +176,107 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/opensource/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/opensource/" class="post-title-link" itemprop="url">开源库编译</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:52:15" itemprop="dateModified" datetime="2022-06-08T17:52:15+08:00">2022-06-08</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="lrzsz"><a href="#lrzsz" class="headerlink" title="lrzsz"></a>lrzsz</h2><p>Lrzsz是一款在linux里可代替ftp上传和下载的程序，提供 XMODEM，YMODEM ZMODEM文件传输协议的unix通信包 。只要输入一行简单的命令，就可以上传下载文件，无需打开 ftp 或者其他服务器文件管理软件。下载地址：<a target="_blank" rel="noopener" href="https://ohse.de/uwe/software/lrzsz.html">https://ohse.de/uwe/software/lrzsz.html</a></p>
+<ol>
+<li>修改<code>arm-linux.cache</code>，（可省略）</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ac_cv_prog_CC=$&#123;ac_cv_prog_CC=&#x27;arm-linux-gcc&#x27;&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>若没有cache file，则直接编译，CC参数放在configure前面。</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CC=/opt/arm-anykav200-crosstool/usr/bin/arm-anykav200-linux-uclibcgnueabi-gcc ./configure --prefix=/home/luoyou/home/arm/`</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<p>打开SecureCRT软件 -&gt; Options -&gt; session options -&gt; X/Y/Zmodem 下可以设置上传和下载的目录</p>
+<h2 id="libnl"><a href="#libnl" class="headerlink" title="libnl"></a>libnl</h2><p>下载地址：<a target="_blank" rel="noopener" href="http://www.infradead.org/~tgr/libnl/">http://www.infradead.org/~tgr/libnl/</a></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./configure --prefix=/home/luo_u/usr/hisi/libnl-3.4.0/ --host=arm-himix100-linux</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<h2 id="openssl"><a href="#openssl" class="headerlink" title="openssl"></a>openssl</h2><p>下载地址：<a target="_blank" rel="noopener" href="https://www.openssl.org/source/">https://www.openssl.org/source/</a></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./config no-asm shared no-async --prefix=/home/luo_u/usr/hisi/openssl-1.1.1 --cross-compile-prefix=arm-himix100-linux-</span><br></pre></td></tr></table></figure>
+
+<p>将生成的Makefile中将-m64选项全部删除掉，因为平台是在32位的系统上使用，如果是64位跳过这一步骤。</p>
+<blockquote>
+<p>sed -i “s/-m64//g” Makefile</p>
+</blockquote>
+<h2 id="expat"><a href="#expat" class="headerlink" title="expat"></a>expat</h2><p>下载地址：<a target="_blank" rel="noopener" href="https://libexpat.github.io/">https://libexpat.github.io/</a></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./configure --prefix=/home/luo_u/usr/hisi/expat-2.2.9 --host=arm-himix100-linux\</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<h2 id="dbus"><a href="#dbus" class="headerlink" title="dbus"></a>dbus</h2><p>下载地址：<a target="_blank" rel="noopener" href="https://dbus.freedesktop.org/releases/dbus/">https://dbus.freedesktop.org/releases/dbus/</a></p>
+<p>依赖expat库。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./configure --prefix=/home/luo_u/usr/anyka/dbus-1.12.10/ --host=arm-anykav200-linux CFLAGS=-I/home/luo_u/usr/anyka/expat-2.2.9/include LDFLAGS=-L/home/luo_u/usr/anyka/expat-2.2.9/lib CC=arm-anykav200-linux-uclibcgnueabi-gcc</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<h2 id="UPX"><a href="#UPX" class="headerlink" title="UPX"></a>UPX</h2><p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/upx/upx.git">https://github.com/upx/upx.git</a></p>
+<h2 id="liblzo"><a href="#liblzo" class="headerlink" title="liblzo"></a>liblzo</h2><p>下载地址：<a target="_blank" rel="noopener" href="http://www.linuxfromscratch.org/blfs/view/svn/general/lzo.html">http://www.linuxfromscratch.org/blfs/view/svn/general/lzo.html</a></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./configure -prefix=/home/luoyou/home/usr/x86_64/lzo-2.10 --enable-shared --disable-static</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<h2 id="libevent"><a href="#libevent" class="headerlink" title="libevent"></a>libevent</h2><p><a target="_blank" rel="noopener" href="https://libevent.org/">https://libevent.org/</a></p>
+<h2 id="libncurses"><a href="#libncurses" class="headerlink" title="libncurses"></a>libncurses</h2><p><a target="_blank" rel="noopener" href="http://ftp.gnu.org/pub/gnu/ncurses/">http://ftp.gnu.org/pub/gnu/ncurses/</a></p>
+<p>libncurses库用来在显示器上显示文本界面。典型例子就是Linux内核的make menuconfig配置界面。libform库用于 在ncurses中使用表格。libmenu库用于在ncurses中使用菜单。libpanel库用于在ncurses中使用面板。</p>
+<h2 id="libmodbus"><a href="#libmodbus" class="headerlink" title="libmodbus"></a>libmodbus</h2><p><a target="_blank" rel="noopener" href="https://www.libmodbus.org/">https://www.libmodbus.org/</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/linux/lib/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -207,7 +308,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:28:25" itemprop="dateModified" datetime="2022-06-08T17:28:25+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -334,7 +435,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 16:59:55" itemprop="dateModified" datetime="2022-06-08T16:59:55+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 18:01:30" itemprop="dateModified" datetime="2022-06-08T18:01:30+08:00">2022-06-08</time>
               </span>
 
           
@@ -399,7 +500,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -491,7 +592,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -568,7 +669,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 18:01:42" itemprop="dateModified" datetime="2022-06-08T18:01:42+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -844,7 +945,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -934,7 +1035,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1020,7 +1121,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1111,7 +1212,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1153,100 +1254,6 @@
 <p>增加新的具体命令类很容易，无须修改原有系统源代码。</p>
 <p>可以比较容易地设计一个命令队列或宏命令。</p>
 <p>为请求的撤销和恢复操作提供了一种设计和实现方案。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/State/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/code/design-patterns/State/" class="post-title-link" itemprop="url">状态模式</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="状态模式"><a href="#状态模式" class="headerlink" title="状态模式"></a>状态模式</h2><p>状态模式（State Pattern）将对象环境与其行为联系起来，允许对象根据其内部状态改变时改变它的行为，对象的行为应该受其状态的影响。</p>
-<p><img src="/images/code/design-pattern/State.jpg" alt="State"></p>
-<ul>
-<li><p>Context（上下文类）：环境类又称为上下文类，它是拥有多种状态的对象。在上下文类中，维护了一个抽象状态类的实例。上下文类的状态存在多样性，并且在不同的状态下，对象表现出不同的行为。</p>
-</li>
-<li><p>State（抽象状态类）：用于定义一个接口以封装与环境类的一个特定状态相关的行为。</p>
-</li>
-<li><p>ConcreteState（具体状态类）：抽象状态类的子类，每一个子类实现一个与环境类的一个状态相关的行为，每一个具体状态类对应环境的一个具体状态，不同的具体状态类其行为有所不同。</p>
-</li>
-</ul>
-<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Context</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">State</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Handle</span><span class="params">(Context *pContext)</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Context</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Context</span>(State* pState) &#123;</span><br><span class="line">        state_ = pState;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Request</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        state_-&gt;<span class="built_in">Handle</span>(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">ChangeState</span><span class="params">(State *pState)</span> </span>&#123;</span><br><span class="line">        state_ = pState;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    State *state_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteStateB</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteStateA</span> : <span class="keyword">public</span> State</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Handle</span><span class="params">(Context *pContext)</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteStateB</span> : <span class="keyword">public</span> State</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Handle</span><span class="params">(Context *pContext)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;state B&quot;</span> &lt;&lt; endl;</span><br><span class="line">        pContext-&gt;<span class="built_in">ChangeState</span>(<span class="keyword">new</span> <span class="built_in">ConcreteStateA</span>());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">ConcreteStateA::Handle</span><span class="params">(Context *pContext)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;state A&quot;</span> &lt;&lt; endl;</span><br><span class="line">    pContext-&gt;<span class="built_in">ChangeState</span>(<span class="keyword">new</span> <span class="built_in">ConcreteStateB</span>());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ConcreteStateA sa;</span><br><span class="line">    <span class="function">Context <span class="title">ctx</span><span class="params">(&amp;sa)</span></span>;</span><br><span class="line">    ctx.<span class="built_in">Request</span>();</span><br><span class="line">    ctx.<span class="built_in">Request</span>();</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;------------------------&quot;</span> &lt;&lt; endl;</span><br><span class="line">    ConcreteStateB sb;</span><br><span class="line">    ctx.<span class="built_in">ChangeState</span>(&amp;sb);</span><br><span class="line">    ctx.<span class="built_in">Request</span>();</span><br><span class="line">    ctx.<span class="built_in">Request</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>[优点]</strong></p>
-<p>封装了状态的转换规则，在状态模式中可以将状态的转换代码封装在环境类或者具体状态类中，可以对状态转换代码进行集中管理，而不是分散在一个个业务方法中。</p>
-<p>将所有与某个状态有关的行为放到一个类中，只需要注入一个不同的状态对象即可使环境对象拥有不同的行为。</p>
-<p>允许状态转换逻辑与状态对象合成一体，而不是提供一个巨大的条件语句块，状态模式可以让我们避免使用庞大的条件语句来将业务方法和状态转换代码交织在一起。</p>
-<p>可以让多个环境对象共享一个状态对象，从而减少系统中对象的个数。</p>
-<p><strong>[缺点]</strong></p>
-<p>状态模式的使用必然会增加系统中类和对象的个数，导致系统运行开销增大。</p>
-<p>状态模式的结构与实现都较为复杂，如果使用不当将导致程序结构和代码的混乱，增加系统设计的难度。</p>
-<p>状态模式对“开闭原则”的支持并不太好，增加新的状态类需要修改那些负责状态转换的源代码，否则无法转换到新增状态；而且修改某个状态类的行为也需修改对应类的源代码。</p>
 
       
     </div>
@@ -1331,20 +1338,20 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">176</span>
+          <span class="site-state-item-count">177</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-count">21</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

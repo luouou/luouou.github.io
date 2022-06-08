@@ -176,6 +176,129 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/net/socket/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/net/socket/" class="post-title-link" itemprop="url">socket</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 18:00:14" itemprop="dateModified" datetime="2022-06-08T18:00:14+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>套接字用一个相关描述{协议、本地地址、本地端口、远程地址、远程端口}来表示，套接字有3种类型：</p>
+<ul>
+<li>流式套接字，提供可靠的、面向连接的通信流，使用TCP协议，从而保证了数据传输的正确性和顺序性。</li>
+<li>数据报套接字，定义了一种无连接的服务，使用UDP协议，数据通过相互独立的报文进行传输，是无序的，并且不保证是可靠、无差错的。</li>
+<li>原始套接字，允许对底层协议如IP或ICMP进行直接访问。</li>
+</ul>
+<p>描述符是应用程序用来识别套接字的机制，IP 地址和端口号是客户端和服务器之间用来识别对方套接字的机制。</p>
+<h2 id="ip地址转换"><a href="#ip地址转换" class="headerlink" title="ip地址转换"></a>ip地址转换</h2><p>网络上数据以大端模式传输，因此需要对网络字节序和主机字节序进行相互转化。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">uint32_t</span> <span class="title function_">htonl</span><span class="params">(<span class="type">uint32_t</span> hostlong)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">htons</span><span class="params">(<span class="type">uint16_t</span> hostshort)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">uint32_t</span> <span class="title function_">ntohl</span><span class="params">(<span class="type">uint32_t</span> netlong)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">ntohs</span><span class="params">(<span class="type">uint16_t</span> netshort)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">inet_pton</span><span class="params">(<span class="type">int</span> ai_family, <span class="type">const</span> <span class="type">char</span> *src, <span class="type">void</span> *dst)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">char</span> *<span class="title function_">inet_ntop</span><span class="params">(<span class="type">int</span> ai_family, <span class="type">const</span> <span class="type">void</span> *src, <span class="type">char</span> *dst, <span class="type">socklen_t</span> size)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>inet_pton()函数是将点分十进制地址映射为二进制地址， inet_ntop()函数是将二进制地址映射为点分十进制地址。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">in_addr_t</span> <span class="title function_">inet_addr</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *cp)</span>;</span><br><span class="line"><span class="type">char</span> *<span class="title function_">inet_ntoa</span><span class="params">(<span class="keyword">struct</span> in_addr in)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>inet_addr 将IPv4点分十进制地址转化为二进制地址。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;netdb.h&gt;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">int</span> h_errno;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">hostent</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="type">char</span> *h_name;         <span class="comment">/* Official name of host.  */</span></span><br><span class="line">  <span class="type">char</span> **h_aliases;     <span class="comment">/* Alias list.  */</span></span><br><span class="line">  <span class="type">int</span> h_addrtype;       <span class="comment">/* Host address type.  */</span></span><br><span class="line">  <span class="type">int</span> h_length;         <span class="comment">/* Length of address.  */</span></span><br><span class="line">  <span class="type">char</span> **h_addr_list;       <span class="comment">/* List of addresses from name server.  */</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> __USE_MISC</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span>    h_addr  h_addr_list[0] <span class="comment">/* Address, for backward compatibility.*/</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> hostent *<span class="title function_">gethostbyname</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span>       <span class="comment">/* for AF_INET */</span></span></span><br><span class="line"><span class="keyword">struct</span> hostent *<span class="title function_">gethostbyaddr</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *addr,</span></span><br><span class="line"><span class="params">                             <span class="type">socklen_t</span> len, <span class="type">int</span> type)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>gethostbyname将主机名或域名转化为IP地址，gethostbyaddr 则将IP地址转化为主机名。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;netdb.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">addrinfo</span> &#123;</span></span><br><span class="line">    <span class="type">int</span>              ai_flags;</span><br><span class="line">    <span class="type">int</span>              ai_family;</span><br><span class="line">    <span class="type">int</span>              ai_socktype;</span><br><span class="line">    <span class="type">int</span>              ai_protocol;</span><br><span class="line">    <span class="type">socklen_t</span>        ai_addrlen;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span> *<span class="title">ai_addr</span>;</span></span><br><span class="line">    <span class="type">char</span>            *ai_canonname;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">addrinfo</span> *<span class="title">ai_next</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getaddrinfo</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *node, <span class="type">const</span> <span class="type">char</span> *service,</span></span><br><span class="line"><span class="params">               <span class="type">const</span> <span class="keyword">struct</span> addrinfo *hints, <span class="keyword">struct</span> addrinfo **res)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>getaddrinfo能实现自动识别IPv4和IPv6地址</p>
+<h2 id="socket创建"><a href="#socket创建" class="headerlink" title="socket创建"></a>socket创建</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span>       </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">socket</span><span class="params">(<span class="type">int</span> domain, <span class="type">int</span> type, <span class="type">int</span> protocol)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>socket建立一个socket连接。建立socket连接之后，可对sockaddr 或sockaddr_in结构进行初始化，以保存所建立的socket地址信息。<br>domain协议族：</p>
+<ul>
+<li>AF_INET:IPv4协议</li>
+<li>AF_INET6:IPv6协议</li>
+<li>AF_LOCAL:UNIX 域协议</li>
+<li>AF_ROUTE:路由套接字</li>
+<li>AF_KEY:密钥套接字</li>
+<li>AF_LINK:链路地址协议</li>
+</ul>
+<p>type套接字类型：</p>
+<ul>
+<li>SOCK_STREAM  流套接字</li>
+<li>SOCK_DGRAM  数据报套接字</li>
+<li>SOCK_RAW  原始套接字</li>
+</ul>
+<p>protocol为0，原始套接字除外。</p>
+<h2 id="socket连接"><a href="#socket连接" class="headerlink" title="socket连接"></a>socket连接</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span>     </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">short</span>  <span class="type">sa_family_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">sa_family_t</span> sa_family; <span class="comment">/*地址族*/</span></span><br><span class="line">    <span class="type">char</span> sa_data[<span class="number">14</span>]; <span class="comment">/*14 字节的协议地址,包含该 socket 的 IP 地址和端口号。*/</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> INADDR_ANY      ((in_addr_t) 0x00000000)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">uint32_t</span> <span class="type">in_addr_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">in_addr_t</span> s_addr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">short</span> <span class="type">int</span> sa_family; <span class="comment">/*地址族*/</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> sin_port; <span class="comment">/*端口号*/</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> <span class="title">sin_addr</span>;</span> <span class="comment">/*IP地址，为0表示允许任何地址*/</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> sin_zero[<span class="number">8</span>]; <span class="comment">/*填充 0 以保持与 struct sockaddr 同样大小*/</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">bind</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="keyword">struct</span> sockaddr *addr, <span class="type">socklen_t</span> addrlen)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">listen</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">int</span> backlog)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">accept</span><span class="params">(<span class="type">int</span> sockfd, <span class="keyword">struct</span> sockaddr *addr, <span class="type">socklen_t</span> *addrlen)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">connect</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="keyword">struct</span> sockaddr *addr, <span class="type">socklen_t</span> addrlen)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>sockaddr 和sockaddr_in结构体都是用来保存socket信息，两者数据类型等效，可以相互转化。服务端设置ip时， 用INADDR_ANY 会自动获取当前服务器的IP。</p>
+<p>bind将本地IP地址绑定到端口号。不能绑定其他IP 地址。它主要用于TCP 的连接，而在UDP连接则无必要。</p>
+<p>listen 创建一个等待队列，用来存放未处理的客户端连接请求。backlog参数指定请求队列中允许的最大请求数，默认为5。</p>
+<p>accept 函数从请求队列中取出第一个未处理的连接请求。</p>
+<p>connect函数在TCP中用于bind之后的client端与服务器端建立连接，而在UDP中由于没有bind函数，因此用 connect()有点类似 bind()函数的作用。</p>
+<h2 id="socket读写"><a href="#socket读写" class="headerlink" title="socket读写"></a>socket读写</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">iovec</span> &#123;</span>                    <span class="comment">/* Scatter/gather array items */</span></span><br><span class="line">   <span class="type">void</span>  *iov_base;              <span class="comment">/* Starting address */</span></span><br><span class="line">   <span class="type">size_t</span> iov_len;               <span class="comment">/* Number of bytes to transfer */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">msghdr</span> &#123;</span></span><br><span class="line">   <span class="type">void</span>         *msg_name;       <span class="comment">/* optional address */</span></span><br><span class="line">   <span class="type">socklen_t</span>     msg_namelen;    <span class="comment">/* size of address */</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">iovec</span> *<span class="title">msg_iov</span>;</span>        <span class="comment">/* scatter/gather array */</span></span><br><span class="line">   <span class="type">size_t</span>        msg_iovlen;     <span class="comment">/* # elements in msg_iov */</span></span><br><span class="line">   <span class="type">void</span>         *msg_control;    <span class="comment">/* ancillary data, see below */</span></span><br><span class="line">   <span class="type">size_t</span>        msg_controllen; <span class="comment">/* ancillary data buffer len */</span></span><br><span class="line">   <span class="type">int</span>           msg_flags;      <span class="comment">/* flags on received message */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">send</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> flags)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">sendto</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> flags,</span></span><br><span class="line"><span class="params">    <span class="type">const</span> <span class="keyword">struct</span> sockaddr *dest_addr, <span class="type">socklen_t</span> addrlen)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">sendmsg</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="keyword">struct</span> msghdr *msg, <span class="type">int</span> flags)</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">recv</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> flags)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">recv</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> flags)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">recvfrom</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> flags,</span></span><br><span class="line"><span class="params">    <span class="keyword">struct</span> sockaddr *src_addr, <span class="type">socklen_t</span> *addrlen)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">recvmsg</span><span class="params">(<span class="type">int</span> sockfd, <span class="keyword">struct</span> msghdr *msg, <span class="type">int</span> flags)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>send和recv分别用于发送和接收数据。</p>
+<p>sendto和recvfrom，当用在TCP时，后面的几个与地址有关参数不起作用，函数作用等同于send和recv。当用在UDP时，可以在之前没有使用connect的情况下，自动寻找指定地址并进行连接。</p>
+<p><img src="/images/net/tcpip/socket.png" alt="img"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/pthread/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -207,7 +330,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:28:26" itemprop="dateModified" datetime="2022-06-08T17:28:26+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -336,7 +459,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:28:26" itemprop="dateModified" datetime="2022-06-08T17:28:26+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -560,7 +683,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:28:43" itemprop="dateModified" datetime="2022-06-08T17:28:43+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -568,7 +691,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
                 </span>
             </span>
 
@@ -847,7 +970,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/c/iniparser/" class="post-title-link" itemprop="url">iniparser</a>
+            <a href="/2022/06/07/c/iniparser/" class="post-title-link" itemprop="url">iniparser 开源库</a>
         </h1>
 
         <div class="post-meta">
@@ -864,17 +987,8 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:28:24" itemprop="dateModified" datetime="2022-06-08T17:28:24+08:00">2022-06-08</time>
               </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
-                </span>
-            </span>
 
           
 
@@ -951,7 +1065,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:29:02" itemprop="dateModified" datetime="2022-06-08T17:29:02+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -959,7 +1073,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
                 </span>
             </span>
 
@@ -1066,7 +1180,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/c/filedir/" class="post-title-link" itemprop="url">linux file manage function</a>
+            <a href="/2022/06/07/c/filedir/" class="post-title-link" itemprop="url">linux 文件管理函数</a>
         </h1>
 
         <div class="post-meta">
@@ -1083,7 +1197,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:29:02" itemprop="dateModified" datetime="2022-06-08T17:29:02+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1091,7 +1205,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
                 </span>
             </span>
 
@@ -1224,7 +1338,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:29:02" itemprop="dateModified" datetime="2022-06-08T17:29:02+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1232,7 +1346,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
                 </span>
             </span>
 
@@ -1443,7 +1557,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/c/fileio/" class="post-title-link" itemprop="url">linux file io stream</a>
+            <a href="/2022/06/07/c/fileio/" class="post-title-link" itemprop="url">linux file io</a>
         </h1>
 
         <div class="post-meta">
@@ -1460,7 +1574,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:29:02" itemprop="dateModified" datetime="2022-06-08T17:29:02+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1468,7 +1582,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
                 </span>
             </span>
 
@@ -1618,7 +1732,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:28:25" itemprop="dateModified" datetime="2022-06-08T17:28:25+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1658,353 +1772,6 @@
 <p>软中断硬中断：/proc/softirqs、/proc/interrupts</p>
 <hr>
 <p><a target="_blank" rel="noopener" href="https://www.brendangregg.com/">https://www.brendangregg.com/</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/regex/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/tool/regex/" class="post-title-link" itemprop="url">Regex</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 15:23:17" itemprop="dateModified" datetime="2022-06-08T15:23:17+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/tool/" itemprop="url" rel="index"><span itemprop="name">tool</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h2><table>
-<thead>
-<tr>
-<th align="center">字符</th>
-<th align="left">描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">\</td>
-<td align="left">转义符</td>
-</tr>
-<tr>
-<td align="center">^</td>
-<td align="left">匹配输入字符串的开始位置</td>
-</tr>
-<tr>
-<td align="center">$</td>
-<td align="left">匹配输入字符串的结束位置</td>
-</tr>
-<tr>
-<td align="center">*</td>
-<td align="left">匹配前面的子表达式零次或多次</td>
-</tr>
-<tr>
-<td align="center">.</td>
-<td align="left">匹配除“<code>\n</code>之外的任何单个字符</td>
-</tr>
-<tr>
-<td align="center">+</td>
-<td align="left">匹配前面的子表达式一次或多次，等价于{1,}</td>
-</tr>
-<tr>
-<td align="center">?</td>
-<td align="left">匹配前面的子表达式零次或一次，等价于{0,1}</td>
-</tr>
-<tr>
-<td align="center">*?</td>
-<td align="left">匹配前面任意个表达式（尽可能少）</td>
-</tr>
-<tr>
-<td align="center">+?</td>
-<td align="left">匹配前面至少一个表达式（尽可能少）</td>
-</tr>
-<tr>
-<td align="center">(pattern)</td>
-<td align="left">匹配pattern并获取这一匹配，捕获并为括号内的字符隐式编号</td>
-</tr>
-<tr>
-<td align="center">[abc]</td>
-<td align="left">匹配集合中的任何字符</td>
-</tr>
-<tr>
-<td align="center">[a-z]</td>
-<td align="left">匹配范围中的任何字符</td>
-</tr>
-<tr>
-<td align="center">[^abc]</td>
-<td align="left">非字符集合，匹配未包含的任意字符</td>
-</tr>
-<tr>
-<td align="center">[^a-z]</td>
-<td align="left">非字符范围，匹配任何不在指定范围内的任意字符</td>
-</tr>
-<tr>
-<td align="center">|</td>
-<td align="left">两项之间匹配一个，使用时要加转义符</td>
-</tr>
-<tr>
-<td align="center">{n}</td>
-<td align="left">指定前一个字符出现次数</td>
-</tr>
-<tr>
-<td align="center">{<em>n</em>,}</td>
-<td align="left">其前面的字符出现不小于n次</td>
-</tr>
-<tr>
-<td align="center">{<em>n</em>,<em>m</em>}</td>
-<td align="left">其前面的字符至少出现n次，最多出现m次</td>
-</tr>
-<tr>
-<td align="center">\b</td>
-<td align="left">匹配一个单词边界，也就是指单词和空格间的位置。例如，“<code>er\b</code>”可以匹配“<code>never</code>”中的“<code>er</code>”，但不能匹配“<code>verb</code>”中的“<code>er</code>”。</td>
-</tr>
-<tr>
-<td align="center">\B</td>
-<td align="left">匹配非单词边界。“<code>er\B</code>”能匹配“<code>verb</code>”中的“<code>er</code>”，但不能匹配“<code>never</code>”中的“<code>er</code>”。</td>
-</tr>
-<tr>
-<td align="center">\cx</td>
-<td align="left">匹配由x指明的控制字符。例如，\cM匹配一个Control-M或回车符。x的值必须为A-Z或a-z之一。否则，将c视为一个原义的“<code>c</code>”字符。</td>
-</tr>
-<tr>
-<td align="center">\d</td>
-<td align="left">匹配十进制字符，等价于[0-9]。</td>
-</tr>
-<tr>
-<td align="center">\D</td>
-<td align="left">匹配一个非数字字符，等价于[^0-9]。</td>
-</tr>
-<tr>
-<td align="center">\f</td>
-<td align="left">匹配一个换页符，等价于\x0c和\cL。</td>
-</tr>
-<tr>
-<td align="center">\n</td>
-<td align="left">匹配一个换行符，等价于\x0a和\cJ。</td>
-</tr>
-<tr>
-<td align="center">\r</td>
-<td align="left">匹配一个回车符，等价于\x0d和\cM。</td>
-</tr>
-<tr>
-<td align="center">\s</td>
-<td align="left">匹配任何空白字符，包括空格、制表符、换页符等等，等价于[ \f\n\r\t\v]。</td>
-</tr>
-<tr>
-<td align="center">\S</td>
-<td align="left">匹配任何非空白字符，等价于[^ \f\n\r\t\v]。</td>
-</tr>
-<tr>
-<td align="center">\t</td>
-<td align="left">匹配一个制表符，等价于\x09和\cI。</td>
-</tr>
-<tr>
-<td align="center">\v</td>
-<td align="left">匹配一个垂直制表符，等价于\x0b和\cK。</td>
-</tr>
-<tr>
-<td align="center">\w</td>
-<td align="left">匹配包括下划线的任何文字字符，等价于<code>[A-Za-z0-9_]</code></td>
-</tr>
-<tr>
-<td align="center">\W</td>
-<td align="left">匹配任何非单词字符，等价于“<code>[^A-Za-z0-9_]</code>”</td>
-</tr>
-<tr>
-<td align="center">\u<em>n</em></td>
-<td align="left">匹配<em>n</em>，其中<em>n</em>是一个用四个十六进制数字表示的Unicode字符。例如，\u00A9匹配版权符号（©）。</td>
-</tr>
-<tr>
-<td align="center">\x<em>n</em></td>
-<td align="left">匹配<em>n</em>，其中<em>n</em>为十六进制转义值。十六进制转义值必须为确定的两个数字长。例如，“<code>\x41</code>”匹配“<code>A</code>”。“<code>\x041</code>”则等价于“<code>\x04&amp;1</code>”。正则表达式中可以使用ASCII编码。.</td>
-</tr>
-<tr>
-<td align="center">(?:pattern)</td>
-<td align="left">匹配pattern但不获取匹配结果，也就是说这是一个非获取匹配，不进行存储供以后使用。这在使用或字符“`(</td>
-</tr>
-<tr>
-<td align="center">(?=pattern)</td>
-<td align="left">正向肯定预查，在任何匹配pattern的字符串开始处匹配查找字符串。这是一个非获取匹配，也就是说，该匹配不需要获取供以后使用。例如，“`Windows(?=95</td>
-</tr>
-<tr>
-<td align="center">(?!pattern)</td>
-<td align="left">正向否定预查，在任何不匹配pattern的字符串开始处匹配查找字符串。这是一个非获取匹配，也就是说，该匹配不需要获取供以后使用。例如“`Windows(?!95</td>
-</tr>
-<tr>
-<td align="center">(?&lt;=pattern)</td>
-<td align="left">反向肯定预查，与正向肯定预查类拟，只是方向相反。例如，“`(?&lt;=95</td>
-</tr>
-<tr>
-<td align="center">(?&lt;!pattern)</td>
-<td align="left">反向否定预查，与正向否定预查类拟，只是方向相反。例如“`(?&lt;!95</td>
-</tr>
-<tr>
-<td align="center">*num*</td>
-<td align="left">匹配<em>num</em>，其中<em>num</em>是一个正整数。对所获取的匹配的引用。例如，“<code>(.)\1</code>”匹配两个连续的相同字符。</td>
-</tr>
-<tr>
-<td align="center">*n*</td>
-<td align="left">标识一个八进制转义值或一个向后引用。如果*n<em>之前至少</em>n<em>个获取的子表达式，则</em>n<em>为向后引用。否则，如果</em>n<em>为八进制数字（0-7），则</em>n*为一个八进制转义值。</td>
-</tr>
-<tr>
-<td align="center">*nm*</td>
-<td align="left">标识一个八进制转义值或一个向后引用。如果*nm<em>之前至少有</em>nm<em>个获得子表达式，则</em>nm<em>为向后引用。如果*nm</em>之前至少有<em>n</em>个获取，则<em>n</em>为一个后跟文字<em>m</em>的向后引用。如果前面的条件都不满足，若<em>n</em>和<em>m</em>均为八进制数字（0-7），则*nm<em>将匹配八进制转义值</em>nm*。</td>
-</tr>
-<tr>
-<td align="center">*nml*</td>
-<td align="left">如果<em>n</em>为八进制数字（0-3），且<em>m和l</em>均为八进制数字（0-7），则匹配八进制转义值<em>nm</em>l。</td>
-</tr>
-</tbody></table>
-<p><img src="/images/code/regexp-metachar.png" alt="img"></p>
-<h2 id="修饰符"><a href="#修饰符" class="headerlink" title="修饰符"></a>修饰符</h2><table>
-<thead>
-<tr>
-<th align="left">修饰符</th>
-<th align="left">含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">i</td>
-<td align="left">ignore - 不区分大小写</td>
-</tr>
-<tr>
-<td align="left">g</td>
-<td align="left">global - 全局匹配</td>
-</tr>
-<tr>
-<td align="left">m</td>
-<td align="left">multi line - 多行匹配</td>
-</tr>
-<tr>
-<td align="left">s</td>
-<td align="left">默认情况下的圆点 <strong>.</strong> 是 匹配除换行符 <strong>\n</strong> 之外的任何字符，加上 s 之后, <strong>.</strong> 中包含换行符 <strong>\n</strong>。</td>
-</tr>
-</tbody></table>
-<h2 id="优先级"><a href="#优先级" class="headerlink" title="优先级"></a>优先级</h2><p>相同优先级的从左到右进行运算，不同优先级的运算先高后低。</p>
-<table>
-<thead>
-<tr>
-<th align="left">运算符</th>
-<th align="left">描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">\</td>
-<td align="left">转义符</td>
-</tr>
-<tr>
-<td align="left">(), (?:), (?=), []</td>
-<td align="left">圆括号和方括号</td>
-</tr>
-<tr>
-<td align="left">*, +, ?, {n}, {n,}, {n,m}</td>
-<td align="left">限定符</td>
-</tr>
-<tr>
-<td align="left">^, $, \任何元字符、任何字符</td>
-<td align="left">定位点和序列（即：位置和顺序）</td>
-</tr>
-<tr>
-<td align="left">|</td>
-<td align="left">替换，”或”操作 字符具有高于替换运算符的优先级，使得”m|food”匹配”m”或”food”。若要匹配”mood”或”food”，请使用括号创建子表达式，从而产生”(m|f)ood”。</td>
-</tr>
-</tbody></table>
-<h2 id="常用正则表达式"><a href="#常用正则表达式" class="headerlink" title="常用正则表达式"></a>常用正则表达式</h2><table>
-<thead>
-<tr>
-<th align="center">用户名</th>
-<th>/^[a-z0-9_-]{3,16}$/</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">密码</td>
-<td>/^[a-z0-9_-]{6,18}$/</td>
-</tr>
-<tr>
-<td align="center">十六进制值</td>
-<td>/^#?([a-f0-9]{6}|[a-f0-9]{3})$/</td>
-</tr>
-<tr>
-<td align="center">电子邮箱</td>
-<td>/^([a-z0-9_.-]+)@([\da-z.-]+).([a-z.]{2,6})$/ /^[a-z\d]+(.[a-z\d]+)*@(<a href="-%5B%5Cda-z%5D">\da-z</a>?)+(.{1,2}[a-z]+)+$/</td>
-</tr>
-<tr>
-<td align="center">URL</td>
-<td>/^(https?://)?([\da-z.-]+).([a-z.]{2,6})([/\w .-]*)*/?$/</td>
-</tr>
-<tr>
-<td align="center">IP 地址</td>
-<td>/((2[0-4]\d|25[0-5]|[01]?\d\d?).){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)/ /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/</td>
-</tr>
-<tr>
-<td align="center">HTML 标签</td>
-<td>/^&lt;([a-z]+)([^&lt;]+)<em>(?:&gt;(.</em>)&lt;/\1&gt;|\s+/&gt;)$/</td>
-</tr>
-<tr>
-<td align="center">删除代码\注释</td>
-<td>(?&lt;!http:|\S)//.*$</td>
-</tr>
-<tr>
-<td align="center">Unicode编码中的汉字范围</td>
-<td>/^[\u2E80-\u9FFF]+$/</td>
-</tr>
-</tbody></table>
 
       
     </div>
@@ -2089,20 +1856,20 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">176</span>
+          <span class="site-state-item-count">177</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-count">21</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
