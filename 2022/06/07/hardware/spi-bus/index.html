@@ -20,19 +20,26 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="对于二分法，我们常用的取中位数的算法是这样的： 1mid &#x3D; (min + max) &#x2F; 2;  但当 min 和 max 很大的时候，会出现溢出的情况，从而导致数组访问出错。改进的办法是将加法变成减法。 1234567891011121314151617public static int binary(int[] arr, int data) &amp;#123;        int min &#x3D; 0;">
+  <meta name="description" content="简介SPI(Serial Peripheral Interface)串行外设接口是一种用于芯片通信的串行同步传输总线协议，最初由Motorola在2000年提出。  SPI允许传输单个bit数据，甚至允许暂停，因为SCK时钟线由主控设备控制，当没有时钟跳变时，从设备不采集或传送数据。  支持全双工通信，每个从设备需要独立的使能信号。  推挽输出的驱动性能相比开漏输出信号完整性更好，支持高速应用（1">
 <meta property="og:type" content="article">
-<meta property="og:title" content="二分法的标准写法">
-<meta property="og:url" content="http://example.com/2022/06/07/algo/algo_binary/index.html">
+<meta property="og:title" content="spi总线">
+<meta property="og:url" content="http://example.com/2022/06/07/hardware/spi-bus/index.html">
 <meta property="og:site_name" content="nullptr">
-<meta property="og:description" content="对于二分法，我们常用的取中位数的算法是这样的： 1mid &#x3D; (min + max) &#x2F; 2;  但当 min 和 max 很大的时候，会出现溢出的情况，从而导致数组访问出错。改进的办法是将加法变成减法。 1234567891011121314151617public static int binary(int[] arr, int data) &amp;#123;        int min &#x3D; 0;">
+<meta property="og:description" content="简介SPI(Serial Peripheral Interface)串行外设接口是一种用于芯片通信的串行同步传输总线协议，最初由Motorola在2000年提出。  SPI允许传输单个bit数据，甚至允许暂停，因为SCK时钟线由主控设备控制，当没有时钟跳变时，从设备不采集或传送数据。  支持全双工通信，每个从设备需要独立的使能信号。  推挽输出的驱动性能相比开漏输出信号完整性更好，支持高速应用（1">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-06-07T08:05:44.551Z">
-<meta property="article:modified_time" content="2022-06-08T09:21:54.342Z">
+<meta property="og:image" content="http://example.com/images/spi/spi_ms_mod_reg.png">
+<meta property="og:image" content="http://example.com/images/spi/4mode.png">
+<meta property="og:image" content="http://example.com/images/spi/timing_diagram.png">
+<meta property="og:image" content="http://example.com/images/spi/multiple-slaves.png">
+<meta property="og:image" content="http://example.com/images/spi/multiple-slaves2.png">
+<meta property="article:published_time" content="2022-06-07T08:05:44.515Z">
+<meta property="article:modified_time" content="2022-06-08T09:55:21.931Z">
 <meta property="article:author" content="ubun2">
+<meta property="article:tag" content="spi">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/spi/spi_ms_mod_reg.png">
 
-<link rel="canonical" href="http://example.com/2022/06/07/algo/algo_binary/">
+<link rel="canonical" href="http://example.com/2022/06/07/hardware/spi-bus/">
 
 
 <script id="page-configurations">
@@ -44,7 +51,7 @@
   };
 </script>
 
-  <title>二分法的标准写法 | nullptr</title>
+  <title>spi总线 | nullptr</title>
   
 
 
@@ -180,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/algo_binary/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/spi-bus/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -193,7 +200,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          二分法的标准写法
+          spi总线
         </h1>
 
         <div class="post-meta">
@@ -210,7 +217,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:54" itemprop="dateModified" datetime="2022-06-08T17:21:54+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:55:21" itemprop="dateModified" datetime="2022-06-08T17:55:21+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -218,7 +225,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
                 </span>
             </span>
 
@@ -240,14 +247,80 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>对于二分法，我们常用的取中位数的算法是这样的：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mid = (min + max) / <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>SPI(Serial Peripheral Interface)串行外设接口是一种用于芯片通信的串行同步传输总线协议，最初由Motorola在2000年提出。</p>
+<ul>
+<li><p>SPI允许传输单个bit数据，甚至允许暂停，因为SCK时钟线由主控设备控制，当没有时钟跳变时，从设备不采集或传送数据。</p>
+</li>
+<li><p>支持全双工通信，每个从设备需要独立的使能信号。</p>
+</li>
+<li><p>推挽输出的驱动性能相比开漏输出信号完整性更好，支持高速应用（100MHz以上）。</p>
+</li>
+<li><p>协议支持字长不限于8bits，可根据应用特点灵活选择消息字长。</p>
+</li>
+<li><p>相比I2C和SMbus节省上拉电阻，不需要仲裁机制。</p>
+</li>
+<li><p>没有寻址机制，只能靠设备片选选择不同从设备，故没有数据流控制和应答机制。</p>
+</li>
+<li><p>SPI没有规定最大传输速率，通常能达到10Mbps。</p>
+</li>
+</ul>
+<p><strong>Dual SPI</strong>是针对SPI Flash而言，不是针对所有SPI外设。对于SPI Flash，全双工并不常用，因此修改了mosi和miso的用法，使其工作在半双工，能够加倍传输数据。也就是说对于Dual SPI Flash，可以发送一个命令字节进入dual mode，这样mosi变成SIO0，mosi变成SIO1，这样一个时钟周期内就能传输2个bit数据。</p>
+<p><strong>Qual SPI</strong>也是针对SPI Flash，Qual SPI 在Dual SPI基础上增加了两根线（SIO2、SIO3），目的是一个时钟内能传输4个bit数据。</p>
+<h2 id="信号定义"><a href="#信号定义" class="headerlink" title="信号定义"></a>信号定义</h2><p><strong>MOSI</strong>：主设备数据输出，从设备数据输入。</p>
+<p><strong>MISO</strong>：主设备数据输入，从设备数据输出。</p>
+<p><strong>SCLK</strong>：时钟信号，由主设备产生。</p>
+<p><strong>CS/SS</strong>：片选，从设备使能信号，由主设备控制。</p>
+<p>SPI总线定义两个及以上设备间的数据传输，提供时钟的设备为主设备，接收时钟的设备为从设备。片选信号SS通常低电平有效。SPI数据传输原理是基于主从设备内部移位寄存器的数据交换。在主设备SCK的控制下，待传数据由各自设备的数据寄存器传输到移位寄存器，再通过MOSI和MISO信号线完成主从设备间的数据交换。</p>
+<p><img src="/images/spi/spi_ms_mod_reg.png" alt="spi框图"></p>
+<h2 id="传输模式"><a href="#传输模式" class="headerlink" title="传输模式"></a>传输模式</h2><p>SPI有4种操作模式，每种模式由一对参数决定，主从设备必须使用相同的工作参数，才能正常工作。</p>
+<p>CPOL时钟极性(clock polarity)，决定时钟空闲时的电平为高或低，对于SPI数据传输格式没有显著影响。</p>
+<ul>
+<li>0 : 时钟高电平时有效，空闲时为低。</li>
+<li>1 : 时钟低电平时有效，空闲时为高。</li>
+</ul>
+<p>CPHA时钟相位(clock phase)，定义时钟脉冲在哪条边沿转换输出信号，哪条边沿采样输入信号。</p>
+<ul>
+<li>0 : 数据采样发生在时钟奇数边沿。</li>
+<li>1 : 数据采样发生在时钟偶数边沿。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Mode 0</td>
+<td>SCLK 空闲是为低电平，数据在上升沿有效</td>
+</tr>
+<tr>
+<td>Mode 1</td>
+<td>SCLK 空闲是为低电平，数据在下降沿有效</td>
+</tr>
+<tr>
+<td>Mode 2</td>
+<td>SCLK 空闲是为高电平，数据在下降沿有效</td>
+</tr>
+<tr>
+<td>Mode 3</td>
+<td>SCLK 空闲是为高电平，数据在上升沿有效</td>
+</tr>
+</tbody></table>
+<p><img src="/images/spi/4mode.png" alt="4种模式"></p>
+<p><img src="/images/spi/timing_diagram.png" alt="时序"></p>
+<h2 id="多个从设备"><a href="#多个从设备" class="headerlink" title="多个从设备"></a>多个从设备</h2><ul>
+<li><strong>片选方式</strong></li>
+</ul>
+<p>每个从设备都需要单独的片选信号，主设备每次只能选择其中一个从设备进行通信。因为所有从设备的SCK、MOSI、MISO都是连在一起的，未被选中从设备的MISO要表现为高阻状态以避免数据传输错误。由于每个设备都需要单独的片选信号，如果需要的片选信号过多，可以使用译码器产生所有的片选信号。</p>
+<p><img src="/images/spi/multiple-slaves.png" alt="主设备以片选方式控制多个从设备"></p>
+<ul>
+<li><strong>菊花链方式</strong></li>
+</ul>
+<p>数据信号经过主从设备所有的移位寄存器构成闭环。数据通过主设备发送（绿色线）经过从设备返回（蓝色线）到主设备。在这种方式下，片选和时钟同时接到所有从设备。</p>
+<p>菊花链式连接常用于仅需主设备发送数据而不需要接收返回数据的场合，如LED驱动器。在这种应用下，主设备MISO可以不连。如果需要接收从设备的返回数据，则需要连接主设备的MISO形成闭环。同样地，切记要发送足够多的接收指令以确保数据移位送达主设备。</p>
+<p><img src="/images/spi/multiple-slaves2.png" alt="主设备以菊花链方式控制多个从设备"></p>
 
-<p>但当 min 和 max 很大的时候，会出现溢出的情况，从而导致数组访问出错。改进的办法是将加法变成减法。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="type">static</span> <span class="type">int</span> <span class="title">binary</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> data)</span> </span>&#123;</span><br><span class="line">        <span class="type">int</span> min = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> max = arr.length - <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> mid;</span><br><span class="line">        <span class="keyword">while</span> (min &lt;= max) &#123;</span><br><span class="line">            <span class="comment">// 防止溢出</span></span><br><span class="line">            mid =  min + (max - min) / <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span> (arr[mid] &gt; data) &#123;</span><br><span class="line">                max = mid - <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[mid] &lt; data) &#123;</span><br><span class="line">                min = mid + <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> mid;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
-
-<p>还有一种更高效的办法是使用位运算。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="type">static</span> <span class="type">int</span> <span class="title">binary</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> data)</span> </span>&#123;</span><br><span class="line">       <span class="type">int</span> min = <span class="number">0</span>;</span><br><span class="line">       <span class="type">int</span> max = arr.length - <span class="number">1</span>;</span><br><span class="line">       <span class="type">int</span> mid;</span><br><span class="line">       <span class="keyword">while</span> (min &lt;= max) &#123;</span><br><span class="line">           <span class="comment">// 无符号位运算符的优先级较低，先括起来</span></span><br><span class="line">           mid =  min + ((max - min) &gt;&gt;&gt; <span class="number">1</span>);</span><br><span class="line">           <span class="keyword">if</span> (arr[mid] &gt; data) &#123;</span><br><span class="line">               max = mid - <span class="number">1</span>;</span><br><span class="line">           &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[mid] &lt; data) &#123;</span><br><span class="line">               min = mid + <span class="number">1</span>;</span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               <span class="keyword">return</span> mid;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -255,6 +328,9 @@
     
 
       <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/spi/" rel="tag"># spi</a>
+          </div>
 
         
 
@@ -262,12 +338,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2022/06/07/algo/array/" rel="prev" title="线性表">
-      <i class="fa fa-chevron-left"></i> 线性表
+    <a href="/2022/06/07/hardware/i2c-bus/" rel="prev" title="i2c总线">
+      <i class="fa fa-chevron-left"></i> i2c总线
     </a></div>
       <div class="post-nav-item">
-    <a href="/2022/06/07/algo/tree/" rel="next" title="数据结构-树">
-      数据结构-树 <i class="fa fa-chevron-right"></i>
+    <a href="/2022/06/07/hardware/modbus/" rel="next" title="modbus协议">
+      modbus协议 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -328,6 +404,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E5%AE%9A%E4%B9%89"><span class="nav-number">2.</span> <span class="nav-text">信号定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%A0%E8%BE%93%E6%A8%A1%E5%BC%8F"><span class="nav-number">3.</span> <span class="nav-text">传输模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E4%B8%AA%E4%BB%8E%E8%AE%BE%E5%A4%87"><span class="nav-number">4.</span> <span class="nav-text">多个从设备</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -347,13 +424,13 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

@@ -207,7 +207,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:29:02" itemprop="dateModified" datetime="2022-06-08T17:29:02+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -322,7 +322,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:29:02" itemprop="dateModified" datetime="2022-06-08T17:29:02+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -440,7 +440,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:30:27" itemprop="dateModified" datetime="2022-06-08T17:30:27+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -785,7 +785,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:29:34" itemprop="dateModified" datetime="2022-06-08T17:29:34+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -933,7 +933,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/mem_manage/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/mem-manage/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -947,7 +947,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/c/mem_manage/" class="post-title-link" itemprop="url">c语言内存管理</a>
+            <a href="/2022/06/07/c/mem-manage/" class="post-title-link" itemprop="url">c语言内存管理</a>
         </h1>
 
         <div class="post-meta">
@@ -964,7 +964,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:29:22" itemprop="dateModified" datetime="2022-06-08T17:29:22+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1083,7 +1083,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:31:26" itemprop="dateModified" datetime="2022-06-08T17:31:26+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 20:31:32" itemprop="dateModified" datetime="2022-06-08T20:31:32+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1211,6 +1211,15 @@
 <li>双向迭代器:可对其执行递减操作,从而向后移动。通常用于双向链表。</li>
 <li>随机访问迭代器:可将其加减一个偏移量,还可将两个迭代器相减以得到集合中两个元素的相对距离。通常用于数组。</li>
 </ul>
+<p><strong>迭代器失效</strong>：</p>
+<ul>
+<li><p>数组型数据结构：该容器元素是分配在连续的内存中，insert和erase操作，都会使得删除点和插入点之后的元素挪位置，所以，插入点和删除掉之后的迭代器全部失效，也就是说<code>insert(*iter)</code>或<code>erase(*iter)</code>，然后在iter++，是没有意义的。解决方法：erase(*iter)的返回值是下一个有效迭代器的值。</p>
+</li>
+<li><p>链表型数据结构：对于list型的数据结构，使用了不连续分配的内存，删除运算使指向删除位置的迭代器失效，但是不会失效其他迭代器。解决办法两种，erase(*iter)会返回下一个有效迭代器的值，或者erase(iter++).</p>
+</li>
+<li><p>树形数据结构： 使用红黑树来存储数据，插入不会使得任何迭代器失效；删除运算使指向删除位置的迭代器失效，但是不会失效其他迭代器。erase迭代器只是被删元素的迭代器失效，但是返回值为void，所以要采用erase(iter++)的方式删除迭代器。</p>
+</li>
+</ul>
 <h2 id="algorithm"><a href="#algorithm" class="headerlink" title="algorithm"></a>algorithm</h2><p>STL提供了一套常用的算法，在实现上是一种函数模板。不改变容器中元素的顺序和内容的算法称为非变序算法，反之为变序算法。</p>
 <ul>
 <li>count() 在指定范围内查找值与指定值匹配的所有元素。</li>
@@ -1313,7 +1322,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:31:26" itemprop="dateModified" datetime="2022-06-08T17:31:26+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1476,7 +1485,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:31:26" itemprop="dateModified" datetime="2022-06-08T17:31:26+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1563,7 +1572,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:31:26" itemprop="dateModified" datetime="2022-06-08T17:31:26+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 20:23:51" itemprop="dateModified" datetime="2022-06-08T20:23:51+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1651,12 +1660,12 @@
 <h3 id="内部类"><a href="#内部类" class="headerlink" title="内部类"></a>内部类</h3><p>从外部类的角度来看，内部类只是多了一层作用域的限制而已，跟一个namespace中看一个类一样，外部类方法只能访问内部类中的public成员（前提是要有内部类的对象或者访问内部类中的static成员）。</p>
 <p>从内部类看外部类，因为内部类属于外部类的一个成员，所以对外部类的成员访问没有限制。因为内部类得不到外部类的对象，所以就无法访问外部类中非static成员，可以给内部类的方法传递一个外部类成员的对象。</p>
 <h3 id="类的大小"><a href="#类的大小" class="headerlink" title="类的大小"></a>类的大小</h3><ul>
-<li>因为空类同样可以实例化，所以编译器会为类添加一个隐藏字节，所以空类的size为1。</li>
+<li>因为空类同样可以实例化，不同对象实例地址不能相同，所以编译器会给空类添加一个隐藏字节，所以空类会占1个字节。</li>
 <li>虚函数会有一个指向虚函数表的指针，需要加上指针大小，多个虚函数等同于1个虚函数计算。</li>
 <li>静态数据成员不影响类的大小。</li>
 <li>类的大小只与数据成员有关，与构造函数、析构函数和其他成员函数无关，。</li>
 <li>子类就是基类的大小加上派生类自身成员的大小。虚拟继承时，派生类中会有一个指向虚基类表的指针，故要额外加上一个的指针大小。</li>
-<li>子类继承一个空类，自己也成为空类，size为1。</li>
+<li>子类继承空类，如果自己有数据成员，则空类的大小不会加到子类去。</li>
 <li>在多继承中，如果多个父类有虚函数，则会有多个虚函数表。子类自己定义的虚函数不会生成虚函数表（在单继承时并入父类的虚表，多继承时并入第一个父类）。</li>
 </ul>
 <h2 id="重载"><a href="#重载" class="headerlink" title="重载"></a>重载</h2><p>C++ 允许在同一作用域中（同一个类中）声明的函数或方法具有相同名称，但是它们的参数列表和实现不相同，分别称为函数重载和运算符重载。</p>
@@ -1843,7 +1852,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:31:26" itemprop="dateModified" datetime="2022-06-08T17:31:26+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -2108,13 +2117,13 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
