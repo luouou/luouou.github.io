@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Providers 类：std::promise, std::package_task Futures 类：std::future, std::shared_future. Providers 函数：std::async()">
+  <meta name="description" content="std::future123future() noexcept;future(const future&amp;) &#x3D; delete;future(future&amp;&amp; x) noexcept;  std::future 一般由 std::async, std::promise::get_future, std::packaged_task::get_future 创建， std::f">
 <meta property="og:type" content="article">
 <meta property="og:title" content="C++ atomic">
 <meta property="og:url" content="http://example.com/2022/06/11/cpp/future/index.html">
 <meta property="og:site_name" content="nullptr">
-<meta property="og:description" content="Providers 类：std::promise, std::package_task Futures 类：std::future, std::shared_future. Providers 函数：std::async()">
+<meta property="og:description" content="std::future123future() noexcept;future(const future&amp;) &#x3D; delete;future(future&amp;&amp; x) noexcept;  std::future 一般由 std::async, std::promise::get_future, std::packaged_task::get_future 创建， std::f">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-06-11T10:06:43.669Z">
-<meta property="article:modified_time" content="2022-06-11T10:07:49.784Z">
+<meta property="article:modified_time" content="2022-06-11T14:12:33.686Z">
 <meta property="article:author" content="ubun2">
 <meta property="article:tag" content="C++">
 <meta property="article:tag" content="thread">
@@ -206,7 +206,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2022-06-11 18:06:43 / 修改时间：18:07:49" itemprop="dateCreated datePublished" datetime="2022-06-11T18:06:43+08:00">2022-06-11</time>
+              <time title="创建时间：2022-06-11 18:06:43 / 修改时间：22:12:33" itemprop="dateCreated datePublished" datetime="2022-06-11T18:06:43+08:00">2022-06-11</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -236,11 +236,55 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <ol>
-<li>Providers 类：<code>std::promise</code>, <code>std::package_task</code></li>
-<li>Futures 类：<code>std::future</code>, <code>std::shared_future</code>.</li>
-<li>Providers 函数：<code>std::async()</code></li>
-</ol>
+        <h2 id="std-future"><a href="#std-future" class="headerlink" title="std::future"></a>std::future</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">future</span>() <span class="keyword">noexcept</span>;</span><br><span class="line"><span class="built_in">future</span>(<span class="type">const</span> future&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"><span class="built_in">future</span>(future&amp;&amp; x) <span class="keyword">noexcept</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>std::future</code> 一般由 <code>std::async</code>, <code>std::promise::get_future</code>, <code>std::packaged_task::get_future</code> 创建，</p>
+<p><code>std::future</code> 用来获取异步任务的结果，由某个 Provider(异步任务的提供者)，Provider 在某个线程中设置共享状态的值，与该共享状态相关联的 <code>std::future</code> 对象调用 <code>get()</code> 就可以获取该值，如果共享状态的标志不为 ready，则调用 <code>std::future::get()</code> 会阻塞当前的调用者，直到 Provider 设置了共享状态的值。</p>
+<ul>
+<li><code>get()</code>: 获取与该 std::future 对象相关联的共享状态的值或异常。</li>
+<li><code>valid()</code>: 有效性检查。</li>
+<li><code>wait()</code>: 等待与该 std::future 对象相关联的共享状态的标志变为 ready。</li>
+<li><code>wait_for()</code>: 等待一段时间与该 std::future 对象相关联的共享状态的标志变为 ready。</li>
+<li><code>wait_until()</code>: 等待一个时间点与该 std::future 对象相关联的共享状态的标志变为 ready。</li>
+<li><code>share()</code>: 返回一个 <code>std::shared_future</code> 对象，调用该函数之后，该 <code>std::future</code> 对象就不和任何共享状态相关联。</li>
+</ul>
+<p><strong>std::shared_future</strong></p>
+<p>std::shared_future 可以拷贝构造，多个 std::shared_future 可以共享某个共享状态的最终结果或异常。</p>
+<h2 id="std-promise"><a href="#std-promise" class="headerlink" title="std::promise"></a>std::promise</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">promise</span>();</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Alloc</span>&gt; </span><br><span class="line">    <span class="built_in">promise</span> (<span class="type">allocator_arg_t</span> aa, <span class="type">const</span> Alloc&amp; alloc);</span><br><span class="line"></span><br><span class="line"><span class="built_in">promise</span> (<span class="type">const</span> promise &amp;) = <span class="keyword">delete</span>;</span><br><span class="line"><span class="built_in">promise</span> (promise &amp;&amp;x) <span class="keyword">noexcept</span>;</span><br><span class="line"></span><br><span class="line"><span class="function">std::future&lt;R&gt; <span class="title">get_future</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>promise 对象是异步 Provider，它可以在某一时刻设置共享状态的值。future 对象可以异步返回共享状态的值，通过 <code>get_future()</code> 来获取与该 promise 对象相关联的 future 对象，或者在必要的情况下阻塞调用者并等待共享状态标志变为 ready，然后才能获取共享状态的值。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>       <span class="comment">// std::cout</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span>     <span class="comment">// std::ref</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span>         <span class="comment">// std::thread</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;future&gt;</span>         <span class="comment">// std::promise, std::future</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">print_int</span><span class="params">(std::future&lt;<span class="type">int</span>&gt;&amp; fut)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> x = fut.<span class="built_in">get</span>(); <span class="comment">// 获取共享状态的值.</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;value: &quot;</span> &lt;&lt; x &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span> <span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::promise&lt;<span class="type">int</span>&gt; prom; <span class="comment">// 生成一个 std::promise&lt;int&gt; 对象.</span></span><br><span class="line">    std::future&lt;<span class="type">int</span>&gt; fut = prom.<span class="built_in">get_future</span>(); <span class="comment">// 和 future 关联.</span></span><br><span class="line"></span><br><span class="line">    <span class="function">std::thread <span class="title">t</span><span class="params">(print_int, std::ref(fut))</span></span>; <span class="comment">// 将 future 交给另外一个线程.</span></span><br><span class="line">    </span><br><span class="line">    prom.<span class="built_in">set_value</span>(<span class="number">10</span>); <span class="comment">// 设置共享状态的值, 此处和线程保持同步.</span></span><br><span class="line"></span><br><span class="line">    t.<span class="built_in">join</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="std-packaged-task"><a href="#std-packaged-task" class="headerlink" title="std::packaged_task"></a>std::packaged_task</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">packaged_task</span>() <span class="keyword">noexcept</span>;</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">F</span>&gt;</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">packaged_task</span><span class="params">( F&amp;&amp; f )</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">F</span>, <span class="keyword">class</span> <span class="title class_">Allocator</span>&gt;</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">packaged_task</span><span class="params">( std::<span class="type">allocator_arg_t</span>, <span class="type">const</span> Allocator&amp; a, F&amp;&amp; f )</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">packaged_task</span>( <span class="type">const</span> packaged_task&amp; ) = <span class="keyword">delete</span>;</span><br><span class="line"><span class="built_in">packaged_task</span>( packaged_task&amp;&amp; rhs ) <span class="keyword">noexcept</span>;</span><br></pre></td></tr></table></figure>
+
+<p>packaged_task 包装一个可调用的对象，并且允许一个 future 对象异步获取该可调用对象产生的结果。packaged_task 对象内部包含了两个最基本元素:</p>
+<ul>
+<li>被包装的任务，任务是一个可调用的对象，如函数指针、成员函数指针或者函数对象。</li>
+<li>共享状态，用于保存任务的返回值，可以通过 future 对象来达到异步访问共享状态的效果。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用 lambda 表达式初始化一个 packaged_task 对象.</span></span><br><span class="line"><span class="function">std::packaged_task&lt;<span class="title">int</span><span class="params">(<span class="type">int</span>)</span>&gt; <span class="title">task</span><span class="params">([](<span class="type">int</span> x)&#123; <span class="keyword">return</span> x * x; &#125;)</span></span>;</span><br><span class="line"><span class="comment">// 获取与 packaged_task 共享状态相关联的 future 对象.</span></span><br><span class="line">std::future&lt;<span class="type">int</span>&gt; ret = task.<span class="built_in">get_future</span>();</span><br><span class="line"></span><br><span class="line">std::<span class="built_in">thread</span>(std::<span class="built_in">move</span>(task), <span class="number">10</span>).<span class="built_in">detach</span>(); <span class="comment">// 产生线程，调用被包装的任务.</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> value = ret.<span class="built_in">get</span>(); <span class="comment">// 等待任务完成并获取结果.</span></span><br><span class="line">std::cout &lt;&lt; <span class="string">&quot;value =  &quot;</span> &lt;&lt; value &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
+
+<h2 id="std-async"><a href="#std-async" class="headerlink" title="std::async()"></a>std::async()</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt; <span class="keyword">class</span> <span class="title class_">Function</span>, <span class="keyword">class</span>... Args &gt;</span><br><span class="line">    std::future&lt;<span class="keyword">typename</span> std::result_of&lt;<span class="keyword">typename</span> std::decay&lt;Function&gt;::<span class="built_in">type</span>(</span><br><span class="line">        <span class="keyword">typename</span> std::decay&lt;Args&gt;::type...)&gt;::type&gt; <span class="built_in">async</span>( Function&amp;&amp; f, Args&amp;&amp;... args );</span><br></pre></td></tr></table></figure>
+
+<p><code>std::async()</code> 的 fn 和 args 参数用来指定异步任务及其参数，其返回一个 <code>std::future</code> 对象，通过该对象可以获取异步任务的值或异常。</p>
+<p><code>std::launch</code>枚举类型用于设置异步任务的启动策略。</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>launch::async</code></td>
+<td>异步任务会在另外一个线程中调用</td>
+</tr>
+<tr>
+<td><code>launch::deferred</code></td>
+<td>异步任务将会在共享状态被访问时调用</td>
+</tr>
+</tbody></table>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">std::future&lt;<span class="type">int</span>&gt; fut = std::<span class="built_in">async</span>([](<span class="type">int</span> x)&#123; <span class="keyword">return</span> x * x; &#125;, <span class="number">10</span>);</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> value = fut.<span class="built_in">get</span>();</span><br><span class="line">std::cout &lt;&lt; <span class="string">&quot;value =  &quot;</span> &lt;&lt; value &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
 
     </div>
 
@@ -323,6 +367,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#std-future"><span class="nav-number">1.</span> <span class="nav-text">std::future</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-promise"><span class="nav-number">2.</span> <span class="nav-text">std::promise</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-packaged-task"><span class="nav-number">3.</span> <span class="nav-text">std::packaged_task</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#std-async"><span class="nav-number">4.</span> <span class="nav-text">std::async()</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

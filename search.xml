@@ -2541,7 +2541,7 @@
 <p><strong>浅拷贝</strong>：重新在堆上创建内存，拷贝前后对象的基本数据类型互不影响，但对指针和引用类型，其拷贝的是内存地址，当其中的一个对象析构了那个地址，另外一个也会销毁，这里再使用就会发现错误。</p>
 <p><strong>深拷贝</strong>：开辟一个新区域存放对象，对对象中的全部成员进行递归拷贝，拷贝前后的两个对象互不影响。</p>
 <h3 id="移动构造"><a href="#移动构造" class="headerlink" title="移动构造"></a>移动构造</h3><p>移动构造函数和移动赋值运算符可以将一个对象的成员转移到另一个对象，它只是将资源从源头移到目的地，而没有进行复制，对于指针成员被转移后，原对象中的指针成员要置NULL，防止其再被使用。</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Person</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Person</span>(<span class="type">const</span> Person &amp;&amp;p) &#123;</span><br><span class="line">        name_ = p.name;</span><br><span class="line">        ptr_ = p.ptr;</span><br><span class="line">        p.ptr = <span class="literal">nullptr</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Person &amp;<span class="keyword">operator</span>=(<span class="type">const</span> Person &amp;p) &#123;</span><br><span class="line">        name_ = p.name;</span><br><span class="line">        ptr_ = p.ptr;</span><br><span class="line">        p.ptr = <span class="literal">nullptr</span>;</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    string name_;</span><br><span class="line">    <span class="type">int</span> *ptr_;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Person</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Person</span>(<span class="type">const</span> Person &amp;&amp;p) &#123;</span><br><span class="line">        name_ = p.name;</span><br><span class="line">        ptr_ = p.ptr;</span><br><span class="line">        p.ptr = <span class="literal">nullptr</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Person &amp;<span class="keyword">operator</span>=(<span class="type">const</span> Person &amp;&amp;p) &#123;</span><br><span class="line">        name_ = p.name;</span><br><span class="line">        ptr_ = p.ptr;</span><br><span class="line">        p.ptr = <span class="literal">nullptr</span>;</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    string name_;</span><br><span class="line">    <span class="type">int</span> *ptr_;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h3 id="友元"><a href="#友元" class="headerlink" title="友元"></a>友元</h3><p><strong>友元类</strong></p>
 <figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">class</span> <span class="title class_">Other</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">int</span> num;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
@@ -2870,11 +2870,16 @@
 <h2 id="pair"><a href="#pair" class="headerlink" title="pair"></a>pair</h2><p>pair将一对值(T1和T2)组合成一个值。</p>
 <figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;utility&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;tuple&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">pair&lt;<span class="type">int</span>, string&gt; <span class="title">p1</span><span class="params">(<span class="number">3</span>, <span class="string">&quot;aaa&quot;</span>)</span></span>;</span><br><span class="line">    pair&lt;<span class="type">int</span>, string&gt; p2 = <span class="built_in">make_pair</span>(<span class="number">6</span>, <span class="string">&quot;nnn&quot;</span>);</span><br><span class="line">    pair&lt;<span class="type">int</span>, string&gt; p3;</span><br><span class="line"></span><br><span class="line">    p3.first = <span class="number">8</span>;</span><br><span class="line">    p3.second = <span class="string">&quot;rrr&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> num;</span><br><span class="line">    string name;</span><br><span class="line">    <span class="built_in">tie</span>(num, name) = p1;</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; p1.first &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; p1.second &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; p2.first &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; p2.second &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; p3.first &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; p3.second &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; num &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; name &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h2 id="原始字符串"><a href="#原始字符串" class="headerlink" title="原始字符串"></a>原始字符串</h2><h2 id="完美转发"><a href="#完美转发" class="headerlink" title="完美转发"></a>完美转发</h2><p><strong>引用折叠</strong></p>
+<h2 id="原始字符串"><a href="#原始字符串" class="headerlink" title="原始字符串"></a>原始字符串</h2><h2 id="完美转发"><a href="#完美转发" class="headerlink" title="完美转发"></a>完美转发</h2><p>函数模板里调用另一个函数模板时，最外层的函数模板参数通常是万能引用，传递一个右值到外层，再转给内层时参数变成了左值，原参数属性丢失了。</p>
+<p><strong>引用折叠</strong></p>
 <ul>
-<li><code>X&amp; &amp;</code>、<code>X&amp; &amp;&amp;</code>、<code>X&amp;&amp; &amp;</code> 可折叠成 <code>X&amp;</code></li>
-<li><code>X&amp;&amp; &amp;&amp;</code> 可折叠成 <code>X&amp;&amp;</code></li>
+<li>引用的引用折叠成左值引用(<code>X&amp; &amp;</code>、<code>X&amp; &amp;&amp;</code>、<code>X&amp;&amp; &amp;</code> 折叠成 <code>X&amp;</code>)</li>
+<li>右值引用的右值引用，折叠成右值引用(<code>X&amp;&amp; &amp;&amp;</code> 折叠成 <code>X&amp;&amp;</code>)</li>
 </ul>
+<p><strong>万能引用</strong></p>
+<p>即可以绑定到左值引用，也可以绑定到右值引用，并且不能保持左右值的const属性的函数模板参数。</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Func</span><span class="params">(T&amp;&amp; v)</span></span>;</span><br></pre></td></tr></table></figure>
+
 <h2 id="std-ref"><a href="#std-ref" class="headerlink" title="std::ref"></a>std::ref</h2><p>可以在模板传参时传入引用，对于std::bind 或 std::thread，可以显式通过std::ref来绑定引用进行传参。</p>
 ]]></content>
       <categories>
@@ -3529,7 +3534,7 @@
 <ol start="4">
 <li>lambda 函数</li>
 </ol>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function">std::thread <span class="title">t7</span><span class="params">([](T var1, T var2) &#123;</span></span></span><br><span class="line"><span class="params"><span class="function"></span></span></span><br><span class="line"><span class="params"><span class="function">&#125;, arg..)</span></span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function">std::thread <span class="title">t7</span><span class="params">([](T var1, T var2) &#123;&#125;, arg..)</span></span>;</span><br></pre></td></tr></table></figure>
 
 <h2 id="std-this-thread"><a href="#std-this-thread" class="headerlink" title="std::this_thread"></a>std::this_thread</h2><p><code>get_id()</code>: 获取线程 ID。<br><code>yield()</code>: 当前线程放弃时间片，操作系统调度另一线程继续执行。<br><code>sleep_until()</code>: 线程休眠至某个指定的时间点，该线程才被重新唤醒。<br><code>sleep_for()</code>: 线程休眠某个指定的时间片，该线程才被重新唤醒，不过由于线程调度等原因，实际休眠时间可能更长。</p>
 <h2 id="线程本地变量"><a href="#线程本地变量" class="headerlink" title="线程本地变量"></a>线程本地变量</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">thread_local</span> <span class="type">int</span> var = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">callback</span><span class="params">(<span class="type">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000</span>; ++i) &#123;</span><br><span class="line">        var++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;thread id [%d] var(%p) = %d\n&quot;</span>, std::this_thread::<span class="built_in">get_id</span>(), &amp;var, var); </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function">thread <span class="title">t1</span><span class="params">(callback)</span></span>;</span><br><span class="line">    <span class="function">thread <span class="title">t2</span><span class="params">(callback)</span></span>;</span><br><span class="line"></span><br><span class="line">    t1.<span class="built_in">join</span>();</span><br><span class="line">    t2.<span class="built_in">join</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -10846,19 +10851,19 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
 <li>配置用户名和邮箱</li>
 </ol>
 <blockquote>
-<p>git config –global  user.name “luo_u”<br>git config –global  user.email “<a href="mailto:&#108;&#117;&#111;&#95;&#x75;&#64;&#113;&#113;&#x2e;&#99;&#x6f;&#109;">&#108;&#117;&#111;&#95;&#x75;&#64;&#113;&#113;&#x2e;&#99;&#x6f;&#109;</a>“</p>
+<p>git config –global  user.name “luo_u”<br>git config –global  user.email “<a href="mailto:&#x6c;&#x75;&#x6f;&#95;&#117;&#64;&#x71;&#x71;&#46;&#99;&#x6f;&#x6d;">&#x6c;&#x75;&#x6f;&#95;&#117;&#64;&#x71;&#x71;&#46;&#99;&#x6f;&#x6d;</a>“</p>
 </blockquote>
 <ol start="2">
 <li>生成SSH，密钥保存在<code>~/.ssh/id_rsa.pub</code></li>
 </ol>
 <blockquote>
-<p>ssh-keygen -t rsa -C <a href="mailto:&#108;&#x75;&#111;&#95;&#x75;&#64;&#x71;&#x71;&#46;&#x63;&#111;&#109;">&#108;&#x75;&#111;&#95;&#x75;&#64;&#x71;&#x71;&#46;&#x63;&#111;&#109;</a></p>
+<p>ssh-keygen -t rsa -C <a href="mailto:&#108;&#117;&#x6f;&#x5f;&#x75;&#x40;&#x71;&#x71;&#x2e;&#x63;&#111;&#109;">&#108;&#117;&#x6f;&#x5f;&#x75;&#x40;&#x71;&#x71;&#x2e;&#x63;&#111;&#109;</a><br>ssh-keygen -t ed25519 -C “<a href="mailto:&#x6c;&#x75;&#x6f;&#95;&#117;&#64;&#113;&#x71;&#46;&#x63;&#111;&#109;">&#x6c;&#x75;&#x6f;&#95;&#117;&#64;&#113;&#x71;&#46;&#x63;&#111;&#109;</a>“</p>
 </blockquote>
 <ol>
 <li>测试是否连接</li>
 </ol>
 <blockquote>
-<p>ssh -T <a href="mailto:&#103;&#x69;&#x74;&#x40;&#101;&#x2e;&#x63;&#111;&#100;&#105;&#110;&#x67;&#x2e;&#110;&#x65;&#116;">&#103;&#x69;&#x74;&#x40;&#101;&#x2e;&#x63;&#111;&#100;&#105;&#110;&#x67;&#x2e;&#110;&#x65;&#116;</a></p>
+<p>ssh -T <a href="mailto:&#x67;&#105;&#x74;&#64;&#101;&#46;&#x63;&#x6f;&#100;&#105;&#x6e;&#103;&#x2e;&#110;&#x65;&#116;">&#x67;&#105;&#x74;&#64;&#101;&#46;&#x63;&#x6f;&#100;&#105;&#x6e;&#103;&#x2e;&#110;&#x65;&#116;</a></p>
 </blockquote>
 <p><strong>设置编辑器</strong></p>
 <blockquote>
@@ -24607,7 +24612,7 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
 
 <p><code>test_and_set()</code> 函数检查 <code>atomic_flag</code> 标志，如果之前没有被设置过，则设置 <code>atomic_flag</code> 的标志，并返回先前该对象是否被设置过，如果之前对象已被设置，则返回 true，否则返回 false。</p>
 <h2 id="atomic"><a href="#atomic" class="headerlink" title="atomic"></a>atomic</h2><p> <code>std::atomic</code> 提供了针对整形和指针类型的特化实现，分别定义如下：</p>
-<p><code>char</code>, <code>signed char</code>, <code>unsigned char</code>, <code>short</code>, <code>unsigned short</code>, <code>int</code>, <code>unsigned int</code>, <code>long</code>, <code>unsigned long</code>, <code>long long</code>, <code>unsigned long long</code>, <code>char16_t</code>, <code>char32_t</code>, <code>wchar_t</code></p>
+<p><code>char</code>, <code>signed char</code>, <code>unsigned char</code>, <code>short</code>, <code>unsigned short</code>, <code>int</code>, <code>unsigned int</code>, <code>long</code>, <code>unsigned long</code>, <code>long long</code>, <code>unsigned long long</code>, <code>char16_t</code>, <code>char32_t</code>, <code>wchar_t</code>。</p>
 ]]></content>
       <categories>
         <category>C++</category>
@@ -24620,11 +24625,55 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
   <entry>
     <title>C++ atomic</title>
     <url>/2022/06/11/cpp/future/</url>
-    <content><![CDATA[<ol>
-<li>Providers 类：<code>std::promise</code>, <code>std::package_task</code></li>
-<li>Futures 类：<code>std::future</code>, <code>std::shared_future</code>.</li>
-<li>Providers 函数：<code>std::async()</code></li>
-</ol>
+    <content><![CDATA[<h2 id="std-future"><a href="#std-future" class="headerlink" title="std::future"></a>std::future</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="built_in">future</span>() <span class="keyword">noexcept</span>;</span><br><span class="line"><span class="built_in">future</span>(<span class="type">const</span> future&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"><span class="built_in">future</span>(future&amp;&amp; x) <span class="keyword">noexcept</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>std::future</code> 一般由 <code>std::async</code>, <code>std::promise::get_future</code>, <code>std::packaged_task::get_future</code> 创建，</p>
+<p><code>std::future</code> 用来获取异步任务的结果，由某个 Provider(异步任务的提供者)，Provider 在某个线程中设置共享状态的值，与该共享状态相关联的 <code>std::future</code> 对象调用 <code>get()</code> 就可以获取该值，如果共享状态的标志不为 ready，则调用 <code>std::future::get()</code> 会阻塞当前的调用者，直到 Provider 设置了共享状态的值。</p>
+<ul>
+<li><code>get()</code>: 获取与该 std::future 对象相关联的共享状态的值或异常。</li>
+<li><code>valid()</code>: 有效性检查。</li>
+<li><code>wait()</code>: 等待与该 std::future 对象相关联的共享状态的标志变为 ready。</li>
+<li><code>wait_for()</code>: 等待一段时间与该 std::future 对象相关联的共享状态的标志变为 ready。</li>
+<li><code>wait_until()</code>: 等待一个时间点与该 std::future 对象相关联的共享状态的标志变为 ready。</li>
+<li><code>share()</code>: 返回一个 <code>std::shared_future</code> 对象，调用该函数之后，该 <code>std::future</code> 对象就不和任何共享状态相关联。</li>
+</ul>
+<p><strong>std::shared_future</strong></p>
+<p>std::shared_future 可以拷贝构造，多个 std::shared_future 可以共享某个共享状态的最终结果或异常。</p>
+<h2 id="std-promise"><a href="#std-promise" class="headerlink" title="std::promise"></a>std::promise</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="built_in">promise</span>();</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Alloc</span>&gt; </span><br><span class="line">    <span class="built_in">promise</span> (<span class="type">allocator_arg_t</span> aa, <span class="type">const</span> Alloc&amp; alloc);</span><br><span class="line"></span><br><span class="line"><span class="built_in">promise</span> (<span class="type">const</span> promise &amp;) = <span class="keyword">delete</span>;</span><br><span class="line"><span class="built_in">promise</span> (promise &amp;&amp;x) <span class="keyword">noexcept</span>;</span><br><span class="line"></span><br><span class="line"><span class="function">std::future&lt;R&gt; <span class="title">get_future</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>promise 对象是异步 Provider，它可以在某一时刻设置共享状态的值。future 对象可以异步返回共享状态的值，通过 <code>get_future()</code> 来获取与该 promise 对象相关联的 future 对象，或者在必要的情况下阻塞调用者并等待共享状态标志变为 ready，然后才能获取共享状态的值。</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>       <span class="comment">// std::cout</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span>     <span class="comment">// std::ref</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span>         <span class="comment">// std::thread</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;future&gt;</span>         <span class="comment">// std::promise, std::future</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">print_int</span><span class="params">(std::future&lt;<span class="type">int</span>&gt;&amp; fut)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> x = fut.<span class="built_in">get</span>(); <span class="comment">// 获取共享状态的值.</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;value: &quot;</span> &lt;&lt; x &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span> <span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::promise&lt;<span class="type">int</span>&gt; prom; <span class="comment">// 生成一个 std::promise&lt;int&gt; 对象.</span></span><br><span class="line">    std::future&lt;<span class="type">int</span>&gt; fut = prom.<span class="built_in">get_future</span>(); <span class="comment">// 和 future 关联.</span></span><br><span class="line"></span><br><span class="line">    <span class="function">std::thread <span class="title">t</span><span class="params">(print_int, std::ref(fut))</span></span>; <span class="comment">// 将 future 交给另外一个线程.</span></span><br><span class="line">    </span><br><span class="line">    prom.<span class="built_in">set_value</span>(<span class="number">10</span>); <span class="comment">// 设置共享状态的值, 此处和线程保持同步.</span></span><br><span class="line"></span><br><span class="line">    t.<span class="built_in">join</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="std-packaged-task"><a href="#std-packaged-task" class="headerlink" title="std::packaged_task"></a>std::packaged_task</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="built_in">packaged_task</span>() <span class="keyword">noexcept</span>;</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">F</span>&gt;</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">packaged_task</span><span class="params">( F&amp;&amp; f )</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">F</span>, <span class="keyword">class</span> <span class="title class_">Allocator</span>&gt;</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">packaged_task</span><span class="params">( std::<span class="type">allocator_arg_t</span>, <span class="type">const</span> Allocator&amp; a, F&amp;&amp; f )</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">packaged_task</span>( <span class="type">const</span> packaged_task&amp; ) = <span class="keyword">delete</span>;</span><br><span class="line"><span class="built_in">packaged_task</span>( packaged_task&amp;&amp; rhs ) <span class="keyword">noexcept</span>;</span><br></pre></td></tr></table></figure>
+
+<p>packaged_task 包装一个可调用的对象，并且允许一个 future 对象异步获取该可调用对象产生的结果。packaged_task 对象内部包含了两个最基本元素:</p>
+<ul>
+<li>被包装的任务，任务是一个可调用的对象，如函数指针、成员函数指针或者函数对象。</li>
+<li>共享状态，用于保存任务的返回值，可以通过 future 对象来达到异步访问共享状态的效果。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 使用 lambda 表达式初始化一个 packaged_task 对象.</span></span><br><span class="line"><span class="function">std::packaged_task&lt;<span class="title">int</span><span class="params">(<span class="type">int</span>)</span>&gt; <span class="title">task</span><span class="params">([](<span class="type">int</span> x)&#123; <span class="keyword">return</span> x * x; &#125;)</span></span>;</span><br><span class="line"><span class="comment">// 获取与 packaged_task 共享状态相关联的 future 对象.</span></span><br><span class="line">std::future&lt;<span class="type">int</span>&gt; ret = task.<span class="built_in">get_future</span>();</span><br><span class="line"></span><br><span class="line">std::<span class="built_in">thread</span>(std::<span class="built_in">move</span>(task), <span class="number">10</span>).<span class="built_in">detach</span>(); <span class="comment">// 产生线程，调用被包装的任务.</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> value = ret.<span class="built_in">get</span>(); <span class="comment">// 等待任务完成并获取结果.</span></span><br><span class="line">std::cout &lt;&lt; <span class="string">&quot;value =  &quot;</span> &lt;&lt; value &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
+
+<h2 id="std-async"><a href="#std-async" class="headerlink" title="std::async()"></a>std::async()</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt; <span class="keyword">class</span> <span class="title class_">Function</span>, <span class="keyword">class</span>... Args &gt;</span><br><span class="line">    std::future&lt;<span class="keyword">typename</span> std::result_of&lt;<span class="keyword">typename</span> std::decay&lt;Function&gt;::<span class="built_in">type</span>(</span><br><span class="line">        <span class="keyword">typename</span> std::decay&lt;Args&gt;::type...)&gt;::type&gt; <span class="built_in">async</span>( Function&amp;&amp; f, Args&amp;&amp;... args );</span><br></pre></td></tr></table></figure>
+
+<p><code>std::async()</code> 的 fn 和 args 参数用来指定异步任务及其参数，其返回一个 <code>std::future</code> 对象，通过该对象可以获取异步任务的值或异常。</p>
+<p><code>std::launch</code>枚举类型用于设置异步任务的启动策略。</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>launch::async</code></td>
+<td>异步任务会在另外一个线程中调用</td>
+</tr>
+<tr>
+<td><code>launch::deferred</code></td>
+<td>异步任务将会在共享状态被访问时调用</td>
+</tr>
+</tbody></table>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line">std::future&lt;<span class="type">int</span>&gt; fut = std::<span class="built_in">async</span>([](<span class="type">int</span> x)&#123; <span class="keyword">return</span> x * x; &#125;, <span class="number">10</span>);</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> value = fut.<span class="built_in">get</span>();</span><br><span class="line">std::cout &lt;&lt; <span class="string">&quot;value =  &quot;</span> &lt;&lt; value &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
         <category>C++</category>

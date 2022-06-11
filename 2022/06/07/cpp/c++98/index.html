@@ -28,7 +28,7 @@
 <meta property="og:description" content="命名空间名称空间是给代码限定使用空间，有助于降低命名冲突的风险。 1234567891011#include &lt;iostream&gt;using namespace std;using std::cout;using std::endl;int main()&amp;#123;    cout &lt;&lt; &quot;Hello World&quot; &lt;&lt; endl;    r">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-06-07T08:05:44.612Z">
-<meta property="article:modified_time" content="2022-06-09T11:51:44.937Z">
+<meta property="article:modified_time" content="2022-06-11T13:25:05.075Z">
 <meta property="article:author" content="ubun2">
 <meta property="article:tag" content="C++">
 <meta name="twitter:card" content="summary">
@@ -211,7 +211,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-09 19:51:44" itemprop="dateModified" datetime="2022-06-09T19:51:44+08:00">2022-06-09</time>
+                <time title="修改时间：2022-06-11 21:25:05" itemprop="dateModified" datetime="2022-06-11T21:25:05+08:00">2022-06-11</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -386,11 +386,16 @@
 <h2 id="pair"><a href="#pair" class="headerlink" title="pair"></a>pair</h2><p>pair将一对值(T1和T2)组合成一个值。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;utility&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;tuple&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">pair&lt;<span class="type">int</span>, string&gt; <span class="title">p1</span><span class="params">(<span class="number">3</span>, <span class="string">&quot;aaa&quot;</span>)</span></span>;</span><br><span class="line">    pair&lt;<span class="type">int</span>, string&gt; p2 = <span class="built_in">make_pair</span>(<span class="number">6</span>, <span class="string">&quot;nnn&quot;</span>);</span><br><span class="line">    pair&lt;<span class="type">int</span>, string&gt; p3;</span><br><span class="line"></span><br><span class="line">    p3.first = <span class="number">8</span>;</span><br><span class="line">    p3.second = <span class="string">&quot;rrr&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> num;</span><br><span class="line">    string name;</span><br><span class="line">    <span class="built_in">tie</span>(num, name) = p1;</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; p1.first &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; p1.second &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; p2.first &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; p2.second &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; p3.first &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; p3.second &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; num &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; name &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h2 id="原始字符串"><a href="#原始字符串" class="headerlink" title="原始字符串"></a>原始字符串</h2><h2 id="完美转发"><a href="#完美转发" class="headerlink" title="完美转发"></a>完美转发</h2><p><strong>引用折叠</strong></p>
+<h2 id="原始字符串"><a href="#原始字符串" class="headerlink" title="原始字符串"></a>原始字符串</h2><h2 id="完美转发"><a href="#完美转发" class="headerlink" title="完美转发"></a>完美转发</h2><p>函数模板里调用另一个函数模板时，最外层的函数模板参数通常是万能引用，传递一个右值到外层，再转给内层时参数变成了左值，原参数属性丢失了。</p>
+<p><strong>引用折叠</strong></p>
 <ul>
-<li><code>X&amp; &amp;</code>、<code>X&amp; &amp;&amp;</code>、<code>X&amp;&amp; &amp;</code> 可折叠成 <code>X&amp;</code></li>
-<li><code>X&amp;&amp; &amp;&amp;</code> 可折叠成 <code>X&amp;&amp;</code></li>
+<li>引用的引用折叠成左值引用(<code>X&amp; &amp;</code>、<code>X&amp; &amp;&amp;</code>、<code>X&amp;&amp; &amp;</code> 折叠成 <code>X&amp;</code>)</li>
+<li>右值引用的右值引用，折叠成右值引用(<code>X&amp;&amp; &amp;&amp;</code> 折叠成 <code>X&amp;&amp;</code>)</li>
 </ul>
+<p><strong>万能引用</strong></p>
+<p>即可以绑定到左值引用，也可以绑定到右值引用，并且不能保持左右值的const属性的函数模板参数。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Func</span><span class="params">(T&amp;&amp; v)</span></span>;</span><br></pre></td></tr></table></figure>
+
 <h2 id="std-ref"><a href="#std-ref" class="headerlink" title="std::ref"></a>std::ref</h2><p>可以在模板传参时传入引用，对于std::bind 或 std::thread，可以显式通过std::ref来绑定引用进行传参。</p>
 
     </div>
