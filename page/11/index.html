@@ -176,6 +176,262 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/Factory/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/design-patterns/Factory/" class="post-title-link" itemprop="url">工厂模式</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="工厂模式"><a href="#工厂模式" class="headerlink" title="工厂模式"></a>工厂模式</h2><p>工厂模式(Factory Pattern)，工厂父类负责定义创建产品对象的公共接口，由工厂子类来具体实现工厂方法，创建具体的产品对象。。公开创建对象的方法，允许子类控制实际的创建过程。</p>
+<p><img src="/images/code/design-pattern/%E5%B7%A5%E5%8E%82.jpg" alt="工厂方法"></p>
+<ul>
+<li>抽象工厂（AbstractFactory）：提供了创建产品的接口，调用者通过它访问具体工厂的工厂方法 newProduct() 来创建产品。</li>
+<li>具体工厂（ConcreteFactory）：主要是实现抽象工厂中的抽象方法，完成具体产品的创建。</li>
+<li>抽象产品（Product）：定义了产品的规范，描述了产品的主要特性和功能。</li>
+<li>具体产品（ConcreteProduct）：实现了抽象产品角色所定义的接口，由具体工厂来创建，它同具体工厂之间一一对应。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//抽象产品类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AbstractProduct</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//抽象方法：</span></span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="comment">//具体产品类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteProduct</span> :<span class="keyword">public</span> AbstractProduct</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//具体实现方法</span></span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="comment">//抽象工厂类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AbstractFactory</span> </span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//抽象方法生产产品：</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> AbstractProduct * <span class="title">createProduct</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="comment">//具体工厂类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteFactory</span> :<span class="keyword">public</span> AbstractFactory</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//具体工厂生产具体产品</span></span><br><span class="line">    </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>工厂方法和简单工厂有一些区别，简单工厂是由一个代工厂生产不同的产品，而工厂方法是对工厂进行抽象化，不同产品都由专门的具体工厂来生产。可口可乐工厂专门生产可口可乐，百事可乐工厂专门生产百事可乐。</p>
+<p><img src="/images/code/design-pattern/%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95.png" alt="工厂方法"></p>
+<h2 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 可乐抽象类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Cola</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">ShowLogo</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 可口可乐产品类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CocaCola</span> : <span class="keyword">public</span> Cola</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">ShowLogo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;CocaCola&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 百事可乐产品类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PesiCola</span> : <span class="keyword">public</span> Cola</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">ShowLogo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;PesiCola&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 工厂抽象类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Factory</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Cola *<span class="title">CreateColo</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 可口可乐工厂</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CocaFactory</span> : <span class="keyword">public</span> Factory</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Cola *<span class="title">CreateColo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">CocaCola</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 百事可乐工厂</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PesiFactory</span> : <span class="keyword">public</span> Factory</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Cola *<span class="title">CreateColo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">PesiCola</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    CocaFactory factory1;</span><br><span class="line">    Cola *cola = factory1.<span class="built_in">CreateColo</span>();</span><br><span class="line">    cola-&gt;<span class="built_in">ShowLogo</span>();</span><br><span class="line"></span><br><span class="line">    PesiFactory factory2;</span><br><span class="line">    cola = factory2.<span class="built_in">CreateColo</span>();</span><br><span class="line">    cola-&gt;<span class="built_in">ShowLogo</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> cola;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/AbstractFactory/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/design-patterns/AbstractFactory/" class="post-title-link" itemprop="url">抽象工厂模式</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="抽象工厂模式"><a href="#抽象工厂模式" class="headerlink" title="抽象工厂模式"></a>抽象工厂模式</h2><p>抽象工厂模式（Abstract Factory Pattern）是对工厂的抽象，生产一系列相关或相互依赖产品，考虑的是一类产品的生产，而无须指定它们具体的类。</p>
+<p><img src="/images/code/design-pattern/%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82.jpg" alt="抽象工厂"></p>
+<ul>
+<li>抽象工厂（AbstractFactory）：它声明了一组用于创建一族产品的方法，每一个方法对应一种产品。</li>
+<li>具体工厂（ConcreteFactory）：它实现了在抽象工厂中声明的创建产品的方法，生成一组具体产品，这些产品构成了一个产品族。</li>
+<li>抽象产品（AbstractProduct）：它为每种产品声明接口，在抽象产品中声明了产品所具有的业务方法。</li>
+<li>具体产品（ConcreteProduct）：它定义具体工厂生产的具体产品对象，实现抽象产品接口中声明的业务方法。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//抽象产品类A</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AbstractProductA</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//抽象方法：</span></span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="comment">//具体产品类A</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteProductA</span> :<span class="keyword">public</span> AbstractProductA</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//具体实现方法</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//抽象产品类B</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AbstractProductB</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//抽象方法：</span></span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="comment">//具体产品类B</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteProductB</span> :<span class="keyword">public</span> AbstractProductB</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//具体实现方法</span></span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="comment">//抽象工厂类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AbstractFactory</span> </span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//抽象方法生产产品A：</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> AbstractProductA *<span class="title">createProductA</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> AbstractProductB *<span class="title">createProductB</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="comment">//具体工厂类A</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteFactoryA</span> :<span class="keyword">public</span> AbstractFactory</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//具体工厂生产具体产品</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//具体工厂类B</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteFactoryB</span> :<span class="keyword">public</span> AbstractFactory</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//具体工厂生产具体产品</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>抽象工厂和工厂方法不同的地方在于，生产产品的工厂是抽象的。举例，可口可乐公司生产可乐的同时，也需要生产装可乐的瓶子和箱子，瓶子和箱子也是可口可乐专属定制的，同样百事可乐公司也会有这个需求。这个时候我们的工厂不仅仅是生产可乐饮料的工厂，还必须同时生产同一主题的瓶子和箱子，所以它是一个抽象的主题工厂，专门生产同一主题的不同商品。</p>
+<h2 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 可乐抽象类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Cola</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">What</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 可口可乐产品类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CocaCola</span> : <span class="keyword">public</span> Cola</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">What</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;CocaCola&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 百事可乐产品类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PesiCola</span> : <span class="keyword">public</span> Cola</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">What</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;PesiCola&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 瓶子抽象类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Buttle</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">What</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 可口可乐瓶子产品类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CocaColaButtle</span> : <span class="keyword">public</span> Buttle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">What</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;CocaCola Buttle&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 百事可乐瓶子产品类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PesiColaButtle</span> : <span class="keyword">public</span> Buttle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">What</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;PesiCola Buttle&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 工厂抽象类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Factory</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Cola *<span class="title">CreateColo</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Buttle *<span class="title">CreateButtle</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 可口可乐主题工厂</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CocaFactory</span> : <span class="keyword">public</span> Factory</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Cola *<span class="title">CreateColo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">CocaCola</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Buttle *<span class="title">CreateButtle</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">CocaColaButtle</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 百事可乐主题工厂</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PesiFactory</span> : <span class="keyword">public</span> Factory</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Cola *<span class="title">CreateColo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">PesiCola</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Buttle *<span class="title">CreateButtle</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">PesiColaButtle</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    CocaFactory factory1;</span><br><span class="line">    Cola *cola = factory1.<span class="built_in">CreateColo</span>();</span><br><span class="line">    cola-&gt;<span class="built_in">What</span>();</span><br><span class="line">    Buttle *buttle = factory1.<span class="built_in">CreateButtle</span>();</span><br><span class="line">    buttle-&gt;<span class="built_in">What</span>();</span><br><span class="line"></span><br><span class="line">    PesiFactory factory2;</span><br><span class="line">    cola = factory2.<span class="built_in">CreateColo</span>();</span><br><span class="line">    cola-&gt;<span class="built_in">What</span>();</span><br><span class="line">    buttle = factory1.<span class="built_in">CreateButtle</span>();</span><br><span class="line">    buttle-&gt;<span class="built_in">What</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> cola;</span><br><span class="line">    <span class="keyword">delete</span> buttle;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><p>具体产品在应用层代码隔离，不需要关心产品细节。只需要知道自己需要的产品是属于哪个工厂的即可，当一个产品族中的多个对象被设计成一起工作时，它能够保证客户端始终只使用同一个产品族中的对象。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/Singleton/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/design-patterns/Singleton/" class="post-title-link" itemprop="url">单例模式</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h2><p>单例模式（Singleton Pattern）确保在一个系统中只允许一个类的一个实例，定义一个getInstance()获取实例的静态方法来返回其所属类的一个相同实例，此方法必须是获取单例对象的唯一方式。</p>
+<p><img src="/images/code/design-pattern/Singleton.jpg" alt="单例"></p>
+<ul>
+<li>单例的构造析构函数必须对外隐藏，不能为public属性。</li>
+<li>禁用拷贝构造和赋値运算符。</li>
+<li>在多线程下要避免多次创建单例对象。</li>
+</ul>
+<h2 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">static</span> std::mutex mutex_;</span><br><span class="line">    <span class="built_in">Singleton</span>(<span class="type">const</span> Singleton &amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    Singleton &amp;<span class="keyword">operator</span>= (<span class="type">const</span> Singleton &amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="built_in">Singleton</span>() = <span class="keyword">default</span>;</span><br><span class="line">    ~<span class="built_in">Singleton</span>() = <span class="keyword">default</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton <span class="title">GetInstance</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="function">std::lock_guard&lt;std::mutex&gt; <span class="title">lock</span><span class="params">(mutex_)</span></span>;</span><br><span class="line">        <span class="type">static</span> Singleton ins &#123;&#125;;</span><br><span class="line">        <span class="keyword">return</span> ins;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><p>单例类提供了对唯一实例的受控访问，在系统内存中只存在一个对象，所以可以节约系统资源。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/c-object/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1056,398 +1312,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/array/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/algo/array/" class="post-title-link" itemprop="url">线性表</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><img src="/images/code/algo/sqlist.jpeg" alt="线性表"></p>
-<p>数组（Array）是一种线性表数据结构，用来存储一组具有相同类型的数据，它的内存空间是连续的，支持随机访问，但插入与删除操作需要移动大量结点，同时不能预先确定分配的空间大小，会造成空间的浪费。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/algorithm/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/algo/algorithm/" class="post-title-link" itemprop="url">算法基础</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="算法的特点"><a href="#算法的特点" class="headerlink" title="算法的特点"></a>算法的特点</h2><p>算法的特性:</p>
-<ul>
-<li>输入与输出，具有零个或多个输入，至少有一个或多个输出。</li>
-<li>有穷性，算法能在特定时间内完成，不会出现无限循环。</li>
-<li>确定性，算法相同的输入得到的输出也相同，不会出现二义性。</li>
-<li>可行性，算法的每一步都是可以用程序实现的。</li>
-</ul>
-<p>算法设计的要求：正确性、健壮性、可读性、时间效率高和存储量低。</p>
-<p><img src="/images/code/algo/datastruct_algo.jpeg" alt="数据结构与算法"></p>
-<h2 id="算法复杂度分析"><a href="#算法复杂度分析" class="headerlink" title="算法复杂度分析"></a>算法复杂度分析</h2><ol>
-<li>只关注循环执行次数最多的一段代码。</li>
-<li>加法法则：总复杂度等于量级最大的那段代码的复杂度。</li>
-<li>乘法法则：嵌套代码的复杂度等于嵌套内外代码复杂度的乘积。</li>
-<li>越高阶复杂度的算法，其执行效率越低，计算时只保留最高阶项。</li>
-</ol>
-<p>常见的时间复杂度所消耗的时间从小到大依次是：<br><code>O(1) &lt; O(logn) &lt; O(n) &lt; O(nlogn) &lt; O(n^2^) &lt; O(n^3^) &lt; O(2^n^) &lt; O(n!) &lt; O(n^n^)</code></p>
-<ul>
-<li>常数阶 Ο(1)</li>
-</ul>
-<p>只要算法中不存在循环语句、递归语句，即使有多少行的代码，其时间复杂度都是Ο(1)。</p>
-<ul>
-<li>线性阶 O(n)</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> a;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">    a = i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>将常数复杂度的语句循环n次，所以这段代码的时间复杂度就是 O(n)。</p>
-<ul>
-<li>平方阶 O(n^2^) O(n * m)</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> a;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; m; j++) &#123;</span><br><span class="line">        a = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>利用乘法法则将嵌套内外的代码复杂度相乘，所以这段代码的时间复杂度就是 O(n * m)，当n=m时，就是O(n^2^)。</p>
-<p>下面这段代码也是如此：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> a;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> j = i; j &lt; m; j++) &#123;</span><br><span class="line">        a = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>当i=0时，循环执行n次，当i=1时，循环执行n-1次，所以总执行次数为：n + (n-1) + (n-2) + … + 1 = n(n+1)/2 = n^2^/2 + n/2。去除常数，只保留最高阶，最终代码的时间复杂度为O(n^2^)。</p>
-<ul>
-<li>对数阶 O(logn) O(nlogn)</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> i=<span class="number">1</span>;</span><br><span class="line"><span class="keyword">while</span> (i &lt;= n) &#123;</span><br><span class="line">  i = i * <span class="number">2</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>变量 i 从 1 开始，每次循环乘以 2。当大于 n 时，循环结束。通过等式 2x=n，可以求得代码的循环次数x=log2n，所以这段代码的时间复杂度就是 O(log2n)。</p>
-<p>实际上，不管是以 2 为底、以 3 为底，还是以 10 为底，我们可以把所有对数阶的时间复杂度都记为 O(logn)。因为对数之间是可以互相转换的，log3n 就等于 log32 * log2n，所以 O(log3n) = O(C * log2n)，其中常数C可以忽略，即 O(Cf(n)) = O(f(n))。所以，O(log2n) 就等于 O(log3n)。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/gnu_c/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/c/gnu_c/" class="post-title-link" itemprop="url">GNU extend c syntax</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>GCC 对c语言语法进行了扩展，这些扩展对优化、目标代码布局、更安全的检查等提供了很强的支持，其实这并不完全符合 ANSI C 标准。</p>
-<p>gcc如果使用“-ansi –pedantic”编译选项，则不使用 GNU 扩展语法。</p>
-<h2 id="语句表达式"><a href="#语句表达式" class="headerlink" title="语句表达式"></a>语句表达式</h2><p>GCC把包含在括号中的复合语句看作是一个表达式，称为语句表达式，它允许在一个表达式内使用循环、跳转、局部变量，并可以出现在任何允许表达式出现的地方。位于括号中的复合语句的最后一句必需是一个以分号结尾的表达式，它的值将成为这个语句表达式的值。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MIN(x,y) (&#123; \</span></span><br><span class="line"><span class="meta">    const typeof(x) _x = (x); \</span></span><br><span class="line"><span class="meta">    const typeof(y) _y = (y); \</span></span><br><span class="line"><span class="meta">    (void) (&amp;_x == &amp;_y); \</span></span><br><span class="line"><span class="meta">    _x &lt; _y ? _x : _y; &#125;)</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="零长数组"><a href="#零长数组" class="headerlink" title="零长数组"></a>零长数组</h2><p>零长数组是长度为0的数组，也可以称之为可变长数组，它并不占用结构的空间，一般用作结构体最后一个成员，用于访问该结构体对象之后的一段内存，来看<a target="_blank" rel="noopener" href="https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html">GNU C官网</a>的一个例子：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">line</span> &#123;</span></span><br><span class="line">  <span class="type">int</span> length;</span><br><span class="line">  <span class="type">char</span> contents[<span class="number">0</span>];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">line</span> *<span class="title">thisline</span> =</span> (<span class="keyword">struct</span> line *)<span class="built_in">malloc</span> (<span class="keyword">sizeof</span> (<span class="keyword">struct</span> line) + this_length);</span><br><span class="line">thisline-&gt;length = this_length;</span><br></pre></td></tr></table></figure>
-
-<p>contents只是结构体之后一段内存的标记，使用时往后申请this_length大的内存，即可使用thisline-&gt;contents进行访问。</p>
-<h2 id="可变参数宏"><a href="#可变参数宏" class="headerlink" title="可变参数宏"></a>可变参数宏</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> debug(format, ...) fprintf(stderr, format, __VA_ARGS__)</span></span><br></pre></td></tr></table></figure>
-
-<p>其中的“…”表示可变参数，实际调用时，它们会替代宏体里的<code>__VA_ARGS__</code>。甚至还可以给可变参数取个名字。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> pr_info(fmt,arg...) printk(KERN_INFO fmt,##arg)</span></span><br></pre></td></tr></table></figure>
-
-<p>其中“##”主要针对参数为空的情况，既然称为可变参数，那传递空参数也是可以的。宏展开后，其中的字符串后面会多个多余的逗号，而“##”则会使预处理器去掉这个多余的逗号。</p>
-<h2 id="标号元素"><a href="#标号元素" class="headerlink" title="标号元素"></a>标号元素</h2><p>在标准 C 里，数组或结构变量的初始化值必须以固定的顺序出现，而在 GCC 中，通过指定索引或结构域名，则允许初始化值以任意顺序出现。</p>
-<p>指定数组索引的方法是在初始化值前写<code>[INDEX] =</code>，还可以使用<code>[FIRST ... LAST] =</code>的形式指定一个范围，比如:</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> num[SIZE] = &#123;</span><br><span class="line">    [<span class="number">0</span>] = <span class="number">0</span>,</span><br><span class="line">    [<span class="number">1</span> ... SIZE] = <span class="number">-1</span>,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>对于结构初始化，使用这种形式，当结构体的定义变化导致元素的偏移位置改变时，仍然可以确保已知元素的正确性。对于未出现在初始化中的元素，其初值为 0。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">misc_ops</span> =</span> </span><br><span class="line">&#123;</span><br><span class="line">    .owner = THIS_MODULE,</span><br><span class="line">    .open = gpio_drv_open,</span><br><span class="line">    .release = gpio_drv_release,</span><br><span class="line">    .unlocked_ioctl = gpio_drv_ioctl,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<h2 id="attribute-属性"><a href="#attribute-属性" class="headerlink" title="__attribute__属性"></a>__attribute__属性</h2><ul>
-<li><strong>format</strong></li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((format(<span class="built_in">printf</span>,m,n)))</span><br><span class="line">__attribute__((format(<span class="built_in">scanf</span>,m,n)))</span><br></pre></td></tr></table></figure>
-
-<p>编译器会检查格式化字符串与“…”的匹配情况，其中参数m与n的含义为：<br>    m 格式化字符串（format string）的位置（顺序从1开始）；<br>    n 参数“…”的位置（顺序从1开始）；</p>
-<ul>
-<li><strong>availability</strong></li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((availability(macosx,introduced=m,deprecated=n)))</span><br></pre></td></tr></table></figure>
-
-<p>指明API版本的变更。m 引入的版本；n 过时的版本</p>
-<ul>
-<li><strong>deprecated</strong></li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((deprecated))</span><br><span class="line">__attribute__((deprecated(s)))</span><br></pre></td></tr></table></figure>
-
-<p>使编译会给出过时的警告。</p>
-<ul>
-<li><strong>unavailable</strong></li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((unavailable))</span><br></pre></td></tr></table></figure>
-
-<p>告诉编译器该方法不可用，如果强行调用编译器会提示错误。比如某个类在构造的时候不想直接通过init来初始化，只能通过特定的初始化方法，就可以将init方法标记为unavailable。</p>
-<ul>
-<li><strong>const</strong></li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((<span class="type">const</span>))</span><br></pre></td></tr></table></figure>
-
-<p>用于带有数值类型参数的函数上。当重复调用带有数值参数的函数时，由于返回值是相同的，所以此时编译器可以进行优化处理，除第一次需要运算外， 其它只需要返回第一次的结果就可以了，进而可以提高效率。该属性主要适用于没有静态状态和副作用的一些函数，并且返回值仅仅依赖输入的参数。（const参数不能用在带有指针类型参数的函数中，因为该属性不但影响函数的参数值，同样也影响到了参数指向的数据，它可能会对代码本身产生严重甚至是不可恢复的严重后果）。</p>
-<ul>
-<li><strong>cleanup</strong></li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((cleanup(...)))</span><br></pre></td></tr></table></figure>
-
-<p>离开作用域之后执行指定的方法。实际应用中可以在作用域结束之后做一些特定的工作，比如清理。</p>
-<ul>
-<li><strong>constructor / destructor</strong></li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((constructor))</span><br><span class="line">__attribute__((destructor))</span><br><span class="line">__attribute__((constructor(PRIORITY)))</span><br><span class="line">__attribute__((destructor(PRIORITY)))</span><br></pre></td></tr></table></figure>
-
-<p>constructor标志的函数和全局变量对象（或静态变量）的构造函数在main函数之前调用。destructor标志的函数和全局变量对象（或静态变量）的析构函数在main函数之后调用。PRIORITY 为优先级。main函数之前的，数值越小,越先调用；main函数之后的数值越大，越先调用。（可用于动态库注入的Hook）</p>
-<ul>
-<li><strong>noreturn</strong></li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((<span class="keyword">noreturn</span>))</span><br></pre></td></tr></table></figure>
-
-<p>定义有返回值的函数时，而实际情况有可能没有返回值，避免编译器产生警告信息。</p>
-<ul>
-<li><strong>unused</strong></li>
-</ul>
-<p>表示该函数或变量可能并不使用,这个属性能够避免编译器产生警告信息。</p>
-<ul>
-<li><strong>nonnull</strong></li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((nonnull(...)))</span><br></pre></td></tr></table></figure>
-
-<p>编译器对函数参数进行NULL的检查</p>
-<ul>
-<li><strong>aligned</strong></li>
-<li><strong>packed</strong></li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((aligned (m)))</span><br><span class="line">__attribute__((aligned))</span><br><span class="line">__attribute__((packed))</span><br></pre></td></tr></table></figure>
-
-<p>aligned(m) 将强制编译器尽其所能地确保变量在分配空间时采用m字节对齐方式。packed该属性对struct 或者union 类型进行定义，设定其类型的每个变量按1字节对齐,这个常用于与协议有关的网络传输中，当用在enum 类型定义时，暗示了应该使用最小完整的类型。aligned 属性使被设置的对象占用更多的空间，使用packed 可以减小对象占用的空间。</p>
-<ul>
-<li><strong>overloadable</strong></li>
-</ul>
-<p>用于c语言函数,可以定义若干个函数名相同，但参数不同的方法，调用时编译器会自动根据参数选择函数原型。</p>
-<h2 id="builtin函数"><a href="#builtin函数" class="headerlink" title="__builtin函数"></a>__builtin函数</h2><p>GNU C 提供了大量的内建函数，其中大部分是标准 C 库函数的内建版本，不属于库函数的其他内建函数通常以__builtin 开始命名。</p>
-<blockquote>
-<p>__builtin_return_address(LEVEL)</p>
-</blockquote>
-<p>返回当前函数或其调用者的返回地址，参数LEVEL 指定调用栈的级数，如 0表 示当前函数的返回地址，1 表示当前函数的调用者的返回地址。</p>
-<blockquote>
-<p>__builtin_constant_p(EXP)</p>
-</blockquote>
-<p>用于判断一个值是否为编译时常数，如果参数 EXP的值是常数，函数返回 1，否则返回 0。</p>
-<blockquote>
-<p>__builtin_expect(long exp, long c)</p>
-</blockquote>
-<p>这个内建函数的意思就是exp的预期值为c，用于为编译器提供分支预测信息，其返回值是整数表达式exp的值，c的值必须是编译时常数。内核的likely函数就是利用这个实现的：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> likely(x)    __builtin_expect(!!(x), 1)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> unlikely(x)  __builtin_expect(!!(x), 0)</span></span><br></pre></td></tr></table></figure>
-
-<p>likely和unlikely主要用于if语句中，当条件被认为是非常有可能满足时，则使用likely()宏，而条件很难满足时，则使用unlikely()宏。好让编译器对这个条件判断进行优化，生成了高效的汇编码。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __builtin_types_compatible_p(type_a, type_b);</span><br></pre></td></tr></table></figure>
-
-<p>此函数为GNU扩展，用来判断两个类型是否相同，如果type_a与 type_b相同的话，就会返回1，否则的话，返回0。</p>
-<p>1.　限定符会被忽略，例如const long和long的类型是相同的。<br>2.　用typedef定义的类型，当且它们定义的类型是相同的时候，它们才是相同的。<br>3.　两个enum类型是不相同的。</p>
-<h2 id="weak"><a href="#weak" class="headerlink" title="__weak"></a>__weak</h2><p>在include\linux\compiler-gcc.h中__weak是这样定义的：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> __weak              __attribute__((weak))</span></span><br></pre></td></tr></table></figure>
-
-<p>GCC通过<code>__attribute__((weak))</code>指令定义的函数或变量称为弱符号，实际上这个指令大部分时候都是用来定义函数，很少用于定义变量。编译器默认函数和初始化了的全局变量为强符号，未初始化的全局变量为弱符号。规则如下：</p>
-<ol>
-<li>当两者都为强符号时，报错：redefinition of ‘xxx’</li>
-<li>当两者为一强一弱时，选取强符号的值</li>
-<li>当两者同时为弱时，选择其中占用空间较大的符号，保证至少不会造成诸如溢出、越界等严重后果。</li>
-</ol>
-<h2 id="case"><a href="#case" class="headerlink" title="case"></a>case</h2><p>GNU C支持 case x…y 这样的语法，区间[x,y]的数都会满足这个case的条件。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span> (num) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">0</span> ... <span class="number">4</span> :</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;0 - 4\n&quot;</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> <span class="number">5</span> ... <span class="number">8</span> :</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;5 - 8\n&quot;</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>switch类型必须是一个整型或枚举类型，因为可以隐式转换，所以char short也是可以的。</p>
-<h2 id="typeof-x"><a href="#typeof-x" class="headerlink" title="typeof(x)"></a>typeof(x)</h2><p>typeof(x)语句可以获得x的类型：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> min(x,y) (&#123; \</span></span><br><span class="line"><span class="meta">    const typeof(x) _x = (x); \</span></span><br><span class="line"><span class="meta">    const typeof(y) _y = (y); \</span></span><br><span class="line"><span class="meta">    (void) (&amp;_x == &amp;_y); \</span></span><br><span class="line"><span class="meta">    _x &lt; _y ? _x : _y; &#125;)</span></span><br></pre></td></tr></table></figure>
-
-<p><code>(void) (&amp;_x == &amp;_y);</code>检查_x 和_y 的类型是否一致。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1517,7 +1381,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">177</span>
+          <span class="site-state-item-count">180</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1530,7 +1394,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

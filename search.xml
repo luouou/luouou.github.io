@@ -2371,6 +2371,9 @@
       <categories>
         <category>C++</category>
       </categories>
+      <tags>
+        <tag>C++</tag>
+      </tags>
   </entry>
   <entry>
     <title>c语言运算符</title>
@@ -2497,6 +2500,9 @@
       <categories>
         <category>C++</category>
       </categories>
+      <tags>
+        <tag>C++</tag>
+      </tags>
   </entry>
   <entry>
     <title>C++ class and object</title>
@@ -2712,6 +2718,9 @@
       <categories>
         <category>C++</category>
       </categories>
+      <tags>
+        <tag>C++</tag>
+      </tags>
   </entry>
   <entry>
     <title>C++98</title>
@@ -2871,6 +2880,9 @@
       <categories>
         <category>C++</category>
       </categories>
+      <tags>
+        <tag>C++</tag>
+      </tags>
   </entry>
   <entry>
     <title>C++ bind and function</title>
@@ -2893,15 +2905,42 @@
       <categories>
         <category>C++</category>
       </categories>
+      <tags>
+        <tag>C++</tag>
+      </tags>
   </entry>
   <entry>
     <title>condition_variable</title>
     <url>/2022/06/07/cpp/condition_variable/</url>
-    <content><![CDATA[<p>condition_variable 通过wait 和 notify 来达到线程间的同步。要配合lock 使用是因为，要保证等待跟唤醒这2部分代码的原子性，并不是为了保护内部资源。wait传入锁不是为了加锁，而是为了解锁，进入睡眠状态后释放锁，被唤醒后加锁。</p>
+    <content><![CDATA[<h1 id="condition-variable"><a href="#condition-variable" class="headerlink" title="condition_variable"></a>condition_variable</h1><p>condition_variable 条件变量用于线程间的同步，先阻塞调用的线程，直到被通知唤醒为止。当 condition_variable 对象的 wait 函数被调用的时候，它使用 mutex 锁住当前的线程，当前的线程会被系统调入阻塞队列，进入睡眠，直到有其他的线程在同一个 condition_variable 对象上调用 notify 函数来唤醒它。在此阻塞过程中，wait 会释放所在线程持有的 mutex 锁。</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;condition_variable&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;mutex&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line">std::mutex              mtx;</span><br><span class="line">std::condition_variable cv;</span><br><span class="line"><span class="type">bool</span>                    ready = <span class="literal">false</span>; <span class="comment">// 全局标志位</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">printId</span><span class="params">(<span class="type">int</span> id)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">std::unique_lock&lt;std::mutex&gt; <span class="title">lck</span><span class="params">(mtx)</span></span>;</span><br><span class="line">    <span class="comment">// 如果标志位不为true，则等待</span></span><br><span class="line">    <span class="keyword">while</span> (!ready) &#123;</span><br><span class="line">        <span class="comment">// 线程被阻塞，直到标志位变为true，此时 mtx 被释放，go</span></span><br><span class="line">        <span class="comment">// 线程能够获取到锁。</span></span><br><span class="line">        cv.<span class="built_in">wait</span>(lck);</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;thread: &quot;</span> &lt;&lt; std::this_thread::<span class="built_in">get_id</span>() &lt;&lt; <span class="string">&quot; id: &quot;</span> &lt;&lt; id &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">go</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">std::unique_lock&lt;std::mutex&gt; <span class="title">lck</span><span class="params">(mtx)</span></span>;</span><br><span class="line">    <span class="comment">// 改变全局标志位</span></span><br><span class="line">    ready = <span class="literal">true</span>;</span><br><span class="line">    <span class="comment">// 唤醒所有线程</span></span><br><span class="line">    cv.<span class="built_in">notify_all</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::thread threads[<span class="number">10</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; ++i) &#123;</span><br><span class="line">        threads[i] = std::<span class="built_in">thread</span>(printId, i);</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;create threads done.\n&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">go</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> &amp;t : threads) &#123;</span><br><span class="line">        t.<span class="built_in">join</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;thread join done.\n&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>condition_variable 要和 lock 配合使用，是保证阻塞跟唤醒这两部分代码的原子性，并不是为了保护内部资源。wait传入锁不是为了加锁，而是为了解锁，进入睡眠状态后释放锁，被唤醒后加锁。</p>
+<h2 id="wait"><a href="#wait" class="headerlink" title="wait()"></a>wait()</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">wait</span> <span class="params">(unique_lock&lt;mutex&gt;&amp; lck)</span></span>;</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Predicate</span>&gt;</span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">wait</span> <span class="params">(unique_lock&lt;mutex&gt;&amp; lck, Predicate pred)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Rep</span>, <span class="keyword">class</span> <span class="title class_">Period</span>&gt;</span><br><span class="line">  <span class="function">cv_status <span class="title">wait_for</span> <span class="params">(unique_lock&lt;mutex&gt;&amp; lck, <span class="type">const</span> chrono::duration&lt;Rep,Period&gt;&amp; rel_time)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Rep</span>, <span class="keyword">class</span> <span class="title class_">Period</span>, <span class="keyword">class</span> <span class="title class_">Predicate</span>&gt;</span><br><span class="line">       <span class="function"><span class="type">bool</span> <span class="title">wait_for</span> <span class="params">(unique_lock&lt;mutex&gt;&amp; lck,</span></span></span><br><span class="line"><span class="params"><span class="function">                      <span class="type">const</span> chrono::duration&lt;Rep,Period&gt;&amp; rel_time, Predicate pred)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Clock</span>, <span class="keyword">class</span> <span class="title class_">Duration</span>&gt;</span><br><span class="line">  <span class="function">cv_status <span class="title">wait_until</span> <span class="params">(unique_lock&lt;mutex&gt;&amp; lck,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="type">const</span> chrono::time_point&lt;Clock,Duration&gt;&amp; abs_time)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Clock</span>, <span class="keyword">class</span> <span class="title class_">Duration</span>, <span class="keyword">class</span> <span class="title class_">Predicate</span>&gt;</span><br><span class="line">       <span class="function"><span class="type">bool</span> <span class="title">wait_until</span> <span class="params">(unique_lock&lt;mutex&gt;&amp; lck,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="type">const</span> chrono::time_point&lt;Clock,Duration&gt;&amp; abs_time, Predicate pred)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>在线程被阻塞时，该函数会自动调用 <code>lck.unlock()</code> 释放锁，使得其他被阻塞在锁竞争上的线程得以继续执行。另外，一旦当前线程获得通知，wait 函数也是自动调用 <code>lck.lock()</code>，使得 lck 的状态和 wait 函数被调用时相同。</p>
+<p>设置了 Predicate，只有当 pred 条件为 false 时调用 wait() 才会阻塞当前线程，并且在收到其他线程的通知后，只有当 pred 为 true 时才会被解除阻塞。这种情况类似以下代码：</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">while</span> (!<span class="built_in">pred</span>())</span><br><span class="line">    <span class="built_in">wait</span>(lck);</span><br></pre></td></tr></table></figure>
+
+<p>wait_for可以指定一个时间段，而wait_until可以指定一个时间点，在线程收到唤醒通知或者时间超时之前，该线程都会处于阻塞状态，当收到唤醒通知或者时间超时，才会返回。</p>
+<h2 id="notify"><a href="#notify" class="headerlink" title="notify()"></a>notify()</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">notify_one</span><span class="params">()</span> <span class="keyword">noexcept</span></span>; <span class="comment">// 唤醒某个等待线程，如果同时存在多个等待线程，则唤醒某个线程是不确定的</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">notify_all</span><span class="params">()</span> <span class="keyword">noexcept</span></span>; <span class="comment">// 唤醒所有的等待线程</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="condition-variable-any"><a href="#condition-variable-any" class="headerlink" title="condition_variable_any"></a>condition_variable_any</h2><p>std::condition_variable_any 的 wait 函数可以接受任何 lock，使用方式和 condition_variable 完全一样。</p>
+<h2 id="cv-status"><a href="#cv-status" class="headerlink" title="cv_status"></a>cv_status</h2><ul>
+<li><code>cv_status::no_timeout</code> wait_for 或 wait_until 没有超时，即在规定的时间段内线程收到了通知。</li>
+<li><code>cv_status::timeout</code> wait_for 或 wait_until 超时。</li>
+</ul>
+<h2 id="notify-all-at-thread-exit"><a href="#notify-all-at-thread-exit" class="headerlink" title="notify_all_at_thread_exit"></a>notify_all_at_thread_exit</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">notify_all_at_thread_exit</span> <span class="params">(condition_variable&amp; cond, unique_lock&lt;mutex&gt; lck)</span></span>; <span class="comment">// lck 参数是右值</span></span><br></pre></td></tr></table></figure>
+
+<p>当调用该函数的线程退出时，所有件变量上等待的线程都会收到通知，一般为了防止误唤醒，我们和之前一样，通过一个全局标志位进行判断操作。</p>
 ]]></content>
       <categories>
         <category>C++</category>
       </categories>
+      <tags>
+        <tag>C++</tag>
+        <tag>thread</tag>
+      </tags>
   </entry>
   <entry>
     <title>C++ exception</title>
@@ -3000,6 +3039,9 @@
       <categories>
         <category>C++</category>
       </categories>
+      <tags>
+        <tag>C++</tag>
+      </tags>
   </entry>
   <entry>
     <title>glog源码分析</title>
@@ -3093,6 +3135,9 @@
       <categories>
         <category>C++</category>
       </categories>
+      <tags>
+        <tag>C++</tag>
+      </tags>
   </entry>
   <entry>
     <title>JsonCpp</title>
@@ -3127,6 +3172,9 @@
       <categories>
         <category>C++</category>
       </categories>
+      <tags>
+        <tag>C++</tag>
+      </tags>
   </entry>
   <entry>
     <title>C++ 智能指针</title>
@@ -3269,6 +3317,9 @@
       <categories>
         <category>C++</category>
       </categories>
+      <tags>
+        <tag>C++</tag>
+      </tags>
   </entry>
   <entry>
     <title>C++ STL</title>
@@ -3443,22 +3494,26 @@
       <categories>
         <category>C++</category>
       </categories>
+      <tags>
+        <tag>C++</tag>
+      </tags>
   </entry>
   <entry>
     <title>C++ thread</title>
     <url>/2022/06/07/cpp/thread/</url>
-    <content><![CDATA[<h2 id="std-thread"><a href="#std-thread" class="headerlink" title="std::thread"></a>std::thread</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="built_in">thread</span>() <span class="keyword">noexcept</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Fn</span>, <span class="keyword">class</span>... Args&gt;</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">thread</span><span class="params">(Fn&amp;&amp; fn, Args&amp;&amp;... args)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">thread</span>(<span class="type">const</span> thread&amp;) = <span class="keyword">delete</span>; <span class="comment">// disable</span></span><br><span class="line"><span class="built_in">thread</span>(thread&amp;&amp; x) <span class="keyword">noexcept</span>;</span><br></pre></td></tr></table></figure>
+    <content><![CDATA[<h2 id="std-thread"><a href="#std-thread" class="headerlink" title="std::thread"></a>std::thread</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="built_in">thread</span>() <span class="keyword">noexcept</span>;</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Fn</span>, <span class="keyword">class</span>... Args&gt;</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">thread</span><span class="params">(Fn&amp;&amp; fn, Args&amp;&amp;... args)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">thread</span>(<span class="type">const</span> thread&amp;) = <span class="keyword">delete</span>; <span class="comment">// 拷贝构造被禁用</span></span><br><span class="line"><span class="built_in">thread</span>(thread&amp;&amp; x) <span class="keyword">noexcept</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">swap</span><span class="params">(thread&amp;)</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">joinable</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">join</span><span class="params">()</span></span>;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">detach</span><span class="params">()</span></span>;</span><br><span class="line"><span class="function">id <span class="title">get_id</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line"><span class="function">native_handle_type <span class="title">native_handle</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
 
-<p>线程有会合和分离2种状态：</p>
-<ul>
-<li>joinable状态：当线程自己返回或pthread_exit时都不会释放线程堆栈和描述符，只有join后，这些资源才会被释放。</li>
-<li>detached状态：将当前线程对象的执行实例与该线程对象分离，使其可以单独执行。此时<code>*this</code>不再代表任何的线程执行实例，<code>joinable() == false</code>，<br><code>get_id() == std::thread::id()</code>。分离的线程不能被其他线程回收或杀死，它的资源由系统释放。</li>
-</ul>
+<p><code>get_id()</code>: 获取线程 ID。<br><code>swap()</code>: 交换两个线程对象所代表的底层句柄。<br><code>native_handle()</code>: 返回线程句柄，与 Posix 标准的pthread函数配合使用。<br><code>joinable()</code>: 检查线程是否可被 join，活动的线程是可以被 join 的，由默认构造函数创建的线程是不能被 join 的。<br><code>join()</code>: 阻塞当前线程，直到由 <code>*this</code> 所标示的线程执行完毕才返回。当线程自己返回或pthread_exit时都不会释放线程堆栈和描述符，只有join后，这些资源才会被释放。<br><code>detach()</code>: 将当前线程对象所代表的执行实例与该线程对象分离，使得线程的执行可以单独进行。分离的线程不能被其他线程回收或杀死，它的资源由系统释放。调用 detach 函数之后：</p>
+<ol>
+<li><code>*this</code> 不再代表任何的线程执行实例。</li>
+<li><code>joinable() == false</code>，会抛出 <code>std::system_error</code>异常。</li>
+<li><code>get_id() == std::thread::id()</code></li>
+</ol>
 <p>std::thread 线程执行体可以是任何可调用的对象：</p>
 <ol>
 <li>普通函数</li>
 </ol>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">callback</span><span class="params">()</span> <span class="comment">//不带参数 </span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">callback</span><span class="params">(std::string arg)</span> <span class="comment">//带参数 </span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">std::thread <span class="title">t1</span><span class="params">(callback)</span></span>; </span><br><span class="line"><span class="function">std::thread <span class="title">t2</span><span class="params">(callback, <span class="string">&quot;test&quot;</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">callback</span><span class="params">()</span> <span class="comment">//不带参数 </span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">callback</span><span class="params">(std::string arg)</span> <span class="comment">//带参数 </span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">std::thread <span class="title">t1</span><span class="params">(callback)</span></span>; </span><br><span class="line"><span class="function">std::thread <span class="title">t2</span><span class="params">(callback, <span class="string">&quot;test&quot;</span>)</span></span>;</span><br></pre></td></tr></table></figure>
 
 <ol start="2">
 <li>函数对象</li>
@@ -3476,6 +3531,7 @@
 </ol>
 <figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function">std::thread <span class="title">t7</span><span class="params">([](T var1, T var2) &#123;</span></span></span><br><span class="line"><span class="params"><span class="function"></span></span></span><br><span class="line"><span class="params"><span class="function">&#125;, arg..)</span></span>;</span><br></pre></td></tr></table></figure>
 
+<h2 id="std-this-thread"><a href="#std-this-thread" class="headerlink" title="std::this_thread"></a>std::this_thread</h2><p><code>get_id()</code>: 获取线程 ID。<br><code>yield()</code>: 当前线程放弃时间片，操作系统调度另一线程继续执行。<br><code>sleep_until()</code>: 线程休眠至某个指定的时间点，该线程才被重新唤醒。<br><code>sleep_for()</code>: 线程休眠某个指定的时间片，该线程才被重新唤醒，不过由于线程调度等原因，实际休眠时间可能更长。</p>
 <h2 id="线程本地变量"><a href="#线程本地变量" class="headerlink" title="线程本地变量"></a>线程本地变量</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">thread_local</span> <span class="type">int</span> var = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">callback</span><span class="params">(<span class="type">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000</span>; ++i) &#123;</span><br><span class="line">        var++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;thread id [%d] var(%p) = %d\n&quot;</span>, std::this_thread::<span class="built_in">get_id</span>(), &amp;var, var); </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function">thread <span class="title">t1</span><span class="params">(callback)</span></span>;</span><br><span class="line">    <span class="function">thread <span class="title">t2</span><span class="params">(callback)</span></span>;</span><br><span class="line"></span><br><span class="line">    t1.<span class="built_in">join</span>();</span><br><span class="line">    t2.<span class="built_in">join</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>系统线程库使用<code>__thread</code>关键字来声明线程本地变量。</p>
@@ -3483,6 +3539,10 @@
       <categories>
         <category>C++</category>
       </categories>
+      <tags>
+        <tag>C++</tag>
+        <tag>thread</tag>
+      </tags>
   </entry>
   <entry>
     <title>C++ stream and string</title>
@@ -3526,6 +3586,9 @@
       <categories>
         <category>C++</category>
       </categories>
+      <tags>
+        <tag>C++</tag>
+      </tags>
   </entry>
   <entry>
     <title>C++ Template</title>
@@ -3548,6 +3611,9 @@
       <categories>
         <category>C++</category>
       </categories>
+      <tags>
+        <tag>C++</tag>
+      </tags>
   </entry>
   <entry>
     <title>Radio Frequency</title>
@@ -5934,7 +6000,7 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
 </li>
 <li><p>使用 input_register_device() 函数注册 input_dev</p>
 </li>
-<li><p>当有事件发生时，在处理函数里调用 input_event() 函数上报事件</p>
+<li><p>当有事件发生时，在处理函数里调用 input_report_key() 函数上报事件，然后使用 input_sync() 函数将收集的事件发给用户空间。</p>
 </li>
 </ol>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">input_dev</span> *<span class="title">input</span> =</span> input_allocate_device();</span><br><span class="line"></span><br><span class="line">input-&gt;name = pdev-&gt;name;</span><br><span class="line">input-&gt;phys = <span class="string">&quot;gpio-keys/input0&quot;</span>;</span><br><span class="line">input-&gt;dev.parent = &amp;pdev-&gt;dev;</span><br><span class="line"></span><br><span class="line">input-&gt;id.bustype = BUS_HOST;</span><br><span class="line">input-&gt;id.vendor = <span class="number">0x0001</span>;</span><br><span class="line">input-&gt;id.product = <span class="number">0x0001</span>;</span><br><span class="line">input-&gt;id.version = <span class="number">0x0100</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Enable auto repeat feature of Linux input subsystem */</span></span><br><span class="line"><span class="keyword">if</span> (pdata-&gt;rep)</span><br><span class="line">    __set_bit(EV_REP, input-&gt;evbit);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; pdata-&gt;nbuttons; i++) &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gpio_keys_button</span> *<span class="title">button</span> =</span> &amp;pdata-&gt;buttons[i];</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> type = button-&gt;type ?: EV_KEY;</span><br><span class="line"></span><br><span class="line">    input_set_capability(input, type, button-&gt;code);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">error = input_register_device(input);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* get current state of buttons */</span></span><br><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; pdata-&gt;nbuttons; i++)</span><br><span class="line">    gpio_keys_report_event(&amp;ddata-&gt;data[i]);</span><br><span class="line">input_sync(input);</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
@@ -24503,5 +24569,69 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
       <categories>
         <category>设计模式</category>
       </categories>
+  </entry>
+  <entry>
+    <title>C++ Mutex and Lock</title>
+    <url>/2022/06/11/cpp/lock/</url>
+    <content><![CDATA[<h2 id="std-mutex"><a href="#std-mutex" class="headerlink" title="std::mutex"></a>std::mutex</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">mutex</span> &#123;</span><br><span class="line">        <span class="keyword">public</span>:</span><br><span class="line">            <span class="function"><span class="keyword">constexpr</span> <span class="title">mutex</span><span class="params">()</span></span>;</span><br><span class="line">            ~<span class="built_in">mutex</span>();</span><br><span class="line">            <span class="built_in">mutex</span>(<span class="type">const</span> mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            mutex&amp; <span class="keyword">operator</span>=(<span class="type">const</span> mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">typedef</span> implementation-defined native_handle_type;</span><br><span class="line">            <span class="function">native_handle_type <span class="title">native_handle</span><span class="params">()</span></span>;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>std::mutex</code>不允许拷贝构造，也不允许 move 拷贝。</p>
+<h2 id="timed-mutex"><a href="#timed-mutex" class="headerlink" title="timed_mutex"></a>timed_mutex</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">timed_mutex</span> &#123;</span><br><span class="line">        <span class="keyword">public</span>:</span><br><span class="line">            <span class="built_in">timed_mutex</span>();</span><br><span class="line">            ~<span class="built_in">timed_mutex</span>();</span><br><span class="line">            <span class="built_in">timed_mutex</span>(<span class="type">const</span> timed_mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            timed_mutex&amp; <span class="keyword">operator</span>=(<span class="type">const</span> timed_mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Rep</span>, <span class="keyword">class</span> <span class="title class_">Period</span>&gt;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock_for</span><span class="params">(<span class="type">const</span> chrono::duration&lt;Rep, Period&gt;&amp; rel_time)</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Clock</span>, <span class="keyword">class</span> <span class="title class_">Duration</span>&gt;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock_until</span><span class="params">(<span class="type">const</span> chrono::time_point&lt;Clock, Duration&gt;&amp; abs_time)</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">typedef</span> implementation-defined native_handle_type; </span><br><span class="line">            <span class="function">native_handle_type <span class="title">native_handle</span><span class="params">()</span></span>;    </span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>std::time_mutex</code>比 <code>std::mutex</code> 多了两个成员函数：<code>try_lock_for()</code>，<code>try_lock_until()</code>。<code>try_lock_for()</code> 函数接受一个时间范围，在这一段时间范围之内，如果没有获得锁则被阻塞住，如果超时没有获得锁，则返回 false。<code>try_lock_until()</code> 函数则接受一个时间点作为参数，在指定时间点未到来之前，如果没有获得锁则被阻塞住，如果超时，则返回 false。</p>
+<h2 id="recursive-mutex"><a href="#recursive-mutex" class="headerlink" title="recursive_mutex"></a>recursive_mutex</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">recursive_mutex</span> &#123;</span><br><span class="line">        <span class="keyword">public</span>:</span><br><span class="line">            <span class="built_in">recursive_mutex</span>();</span><br><span class="line">            ~<span class="built_in">recursive_mutex</span>();</span><br><span class="line">            <span class="built_in">recursive_mutex</span>(<span class="type">const</span> recursive_mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            recursive_mutex&amp; <span class="keyword">operator</span>=(<span class="type">const</span> recursive_mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">typedef</span> implementation-defined native_handle_type;</span><br><span class="line">            <span class="function">native_handle_type <span class="title">native_handle</span><span class="params">()</span></span>;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>std::recursive_mutex</code> 允许递归上锁来获得对互斥量对象的多层所有权，重复对该互斥量进行上锁操作不会产生死锁，但必须保证上锁和解锁的次数相同。。</p>
+<h2 id="lock-guard"><a href="#lock-guard" class="headerlink" title="lock_guard"></a>lock_guard</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Mutex</span>&gt;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">lock_guard</span> &#123;</span><br><span class="line">        <span class="keyword">public</span>:</span><br><span class="line">            <span class="keyword">typedef</span> Mutex mutex_type;</span><br><span class="line">            <span class="function"><span class="keyword">explicit</span> <span class="title">lock_guard</span><span class="params">(mutex_type&amp; m)</span></span>;</span><br><span class="line">            <span class="built_in">lock_guard</span>(mutex_type&amp; m, <span class="type">adopt_lock_t</span>) <span class="keyword">noexcept</span>;</span><br><span class="line">            ~<span class="built_in">lock_guard</span>();</span><br><span class="line">            <span class="built_in">lock_guard</span>(lock_guard <span class="type">const</span>&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            lock_guard&amp; <span class="keyword">operator</span>=(lock_guard <span class="type">const</span>&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">        <span class="keyword">private</span>:</span><br><span class="line">            mutex_type&amp; pm; <span class="comment">// exposition only</span></span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>lock_guard</code> 对象并不负责管理 Mutex 对象的生命周期，只是简化了 Mutex 对象的上锁和解锁操作，在 <code>lock_guard</code> 对象构造时，传入的 Mutex 对象会被当前线程锁住。在<code>lock_guard</code> 对象被析构时，它所管理的 Mutex 对象会自动解锁。</p>
+<h2 id="unique-lock"><a href="#unique-lock" class="headerlink" title="unique_lock"></a>unique_lock</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Mutex</span>&gt;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">unique_lock</span> &#123;</span><br><span class="line">        <span class="keyword">public</span>:</span><br><span class="line">            <span class="keyword">typedef</span> Mutex mutex_type;</span><br><span class="line">            <span class="comment">// 构造/拷贝/析构:</span></span><br><span class="line">            <span class="built_in">unique_lock</span>() <span class="keyword">noexcept</span>;</span><br><span class="line">            <span class="function"><span class="keyword">explicit</span> <span class="title">unique_lock</span><span class="params">(mutex_type&amp; m)</span></span>;</span><br><span class="line">            <span class="built_in">unique_lock</span>(mutex_type&amp; m, <span class="type">defer_lock_t</span>) <span class="keyword">noexcept</span>;</span><br><span class="line">            <span class="built_in">unique_lock</span>(mutex_type&amp; m, <span class="type">try_to_lock_t</span>) <span class="keyword">noexcept</span>;</span><br><span class="line">            <span class="built_in">unique_lock</span>(mutex_type&amp; m, <span class="type">adopt_lock_t</span>) <span class="keyword">noexcept</span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Clock</span>, <span class="keyword">class</span> <span class="title class_">Duration</span>&gt;</span><br><span class="line">            <span class="built_in">unique_lock</span>(mutex_type&amp; m, <span class="type">const</span> chrono::time_point&lt;Clock, Duration&gt;&amp; abs_time) <span class="keyword">noexcept</span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Rep</span>, <span class="keyword">class</span> <span class="title class_">Period</span>&gt;</span><br><span class="line">            <span class="built_in">unique_lock</span>(mutex_type&amp; m, <span class="type">const</span> chrono::duration&lt;Rep, Period&gt;&amp; rel_time) <span class="keyword">noexcept</span>;</span><br><span class="line">            ~<span class="built_in">unique_lock</span>();</span><br><span class="line">            <span class="built_in">unique_lock</span>(unique_lock <span class="type">const</span>&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            unique_lock&amp; <span class="keyword">operator</span>=(unique_lock <span class="type">const</span>&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            <span class="built_in">unique_lock</span>(unique    _lock&amp;&amp; u) <span class="keyword">noexcept</span>;</span><br><span class="line">            unique_lock&amp; <span class="keyword">operator</span>=(unique_lock&amp;&amp; u) <span class="keyword">noexcept</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 上锁操作:</span></span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Rep</span>, <span class="keyword">class</span> <span class="title class_">Period</span>&gt;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock_for</span><span class="params">(<span class="type">const</span> chrono::duration&lt;Rep, Period&gt;&amp; rel_time)</span></span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Clock</span>, <span class="keyword">class</span> <span class="title class_">Duration</span>&gt;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock_until</span><span class="params">(<span class="type">const</span> chrono::time_point&lt;Clock, Duration&gt;&amp; abs_time)</span></span>;</span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 修改操作</span></span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">swap</span><span class="params">(unique_lock&amp; u)</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function">mutex_type *<span class="title">release</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// observers:</span></span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">owns_lock</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function"><span class="keyword">explicit</span> <span class="keyword">operator</span> <span class="title">bool</span> <span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function">mutex_type* <span class="title">mutex</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">        <span class="keyword">private</span>:</span><br><span class="line">            mutex_type *pm; <span class="comment">// exposition only</span></span><br><span class="line">            <span class="type">bool</span> owns; <span class="comment">// exposition only</span></span><br><span class="line">    &#125;;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Mutex</span>&gt;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">swap</span><span class="params">(unique_lock&lt;Mutex&gt;&amp; x, unique_lock&lt;Mutex&gt;&amp; y)</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>unique_lock</code> 对象以独占所有权的方式管理 mutex 对象，也会自动上锁和解锁操作，提供了更多的操作函数。</p>
+]]></content>
+      <categories>
+        <category>C++</category>
+      </categories>
+      <tags>
+        <tag>C++</tag>
+        <tag>thread</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>C++ atomic</title>
+    <url>/2022/06/11/cpp/atomic/</url>
+    <content><![CDATA[<h2 id="atomic-flag"><a href="#atomic-flag" class="headerlink" title="atomic_flag"></a>atomic_flag</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="built_in">atomic_flag</span>() <span class="keyword">noexcept</span> = <span class="keyword">default</span>;</span><br><span class="line"><span class="built_in">atomic_flag</span> (<span class="type">const</span> atomic_flag&amp;T) = <span class="keyword">delete</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>std::atomic_flag</code> 只有默认构造函数，拷贝构造函数已被禁用。如果创建时没有初始化，那么对象的状态是未指定的，初始化时应该赋值为<code>ATOMIC_FLAG_INIT</code>，保证该对象在创建时处于 clear 状态。</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line">std::atomic_flag flag = ATOMIC_FLAG_INIT;</span><br></pre></td></tr></table></figure>
+
+<p><code>test_and_set()</code> 函数检查 <code>atomic_flag</code> 标志，如果之前没有被设置过，则设置 <code>atomic_flag</code> 的标志，并返回先前该对象是否被设置过，如果之前对象已被设置，则返回 true，否则返回 false。</p>
+<h2 id="atomic"><a href="#atomic" class="headerlink" title="atomic"></a>atomic</h2><p> <code>std::atomic</code> 提供了针对整形和指针类型的特化实现，分别定义如下：</p>
+<p><code>char</code>, <code>signed char</code>, <code>unsigned char</code>, <code>short</code>, <code>unsigned short</code>, <code>int</code>, <code>unsigned int</code>, <code>long</code>, <code>unsigned long</code>, <code>long long</code>, <code>unsigned long long</code>, <code>char16_t</code>, <code>char32_t</code>, <code>wchar_t</code></p>
+]]></content>
+      <categories>
+        <category>C++</category>
+      </categories>
+      <tags>
+        <tag>C++</tag>
+        <tag>thread</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>C++ atomic</title>
+    <url>/2022/06/11/cpp/future/</url>
+    <content><![CDATA[<ol>
+<li>Providers 类：<code>std::promise</code>, <code>std::package_task</code></li>
+<li>Futures 类：<code>std::future</code>, <code>std::shared_future</code>.</li>
+<li>Providers 函数：<code>std::async()</code></li>
+</ol>
+]]></content>
+      <categories>
+        <category>C++</category>
+      </categories>
+      <tags>
+        <tag>C++</tag>
+        <tag>thread</tag>
+      </tags>
   </entry>
 </search>

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="std::mutex12345678910111213141516namespace std &amp;#123;    class mutex &amp;#123;        public:            constexpr mutex();            ~mutex();            mutex(const mutex&amp;) &#x3D; delete;            mu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ Mutex and Lock">
+<meta property="og:url" content="http://example.com/2022/06/11/cpp/lock/index.html">
+<meta property="og:site_name" content="nullptr">
+<meta property="og:description" content="std::mutex12345678910111213141516namespace std &amp;#123;    class mutex &amp;#123;        public:            constexpr mutex();            ~mutex();            mutex(const mutex&amp;) &#x3D; delete;            mu">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-06-11T09:23:19.706Z">
+<meta property="article:modified_time" content="2022-06-11T09:53:37.522Z">
+<meta property="article:author" content="ubun2">
+<meta property="article:tag" content="C++">
+<meta property="article:tag" content="thread">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2022/06/11/cpp/lock/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>C++ Mutex and Lock | nullptr</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nullptr</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">吾生也有涯 而知也无涯</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/11/cpp/lock/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++ Mutex and Lock
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-06-11 17:23:19 / 修改时间：17:53:37" itemprop="dateCreated datePublished" datetime="2022-06-11T17:23:19+08:00">2022-06-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="std-mutex"><a href="#std-mutex" class="headerlink" title="std::mutex"></a>std::mutex</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">mutex</span> &#123;</span><br><span class="line">        <span class="keyword">public</span>:</span><br><span class="line">            <span class="function"><span class="keyword">constexpr</span> <span class="title">mutex</span><span class="params">()</span></span>;</span><br><span class="line">            ~<span class="built_in">mutex</span>();</span><br><span class="line">            <span class="built_in">mutex</span>(<span class="type">const</span> mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            mutex&amp; <span class="keyword">operator</span>=(<span class="type">const</span> mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">typedef</span> implementation-defined native_handle_type;</span><br><span class="line">            <span class="function">native_handle_type <span class="title">native_handle</span><span class="params">()</span></span>;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>std::mutex</code>不允许拷贝构造，也不允许 move 拷贝。</p>
+<h2 id="timed-mutex"><a href="#timed-mutex" class="headerlink" title="timed_mutex"></a>timed_mutex</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">timed_mutex</span> &#123;</span><br><span class="line">        <span class="keyword">public</span>:</span><br><span class="line">            <span class="built_in">timed_mutex</span>();</span><br><span class="line">            ~<span class="built_in">timed_mutex</span>();</span><br><span class="line">            <span class="built_in">timed_mutex</span>(<span class="type">const</span> timed_mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            timed_mutex&amp; <span class="keyword">operator</span>=(<span class="type">const</span> timed_mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Rep</span>, <span class="keyword">class</span> <span class="title class_">Period</span>&gt;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock_for</span><span class="params">(<span class="type">const</span> chrono::duration&lt;Rep, Period&gt;&amp; rel_time)</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Clock</span>, <span class="keyword">class</span> <span class="title class_">Duration</span>&gt;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock_until</span><span class="params">(<span class="type">const</span> chrono::time_point&lt;Clock, Duration&gt;&amp; abs_time)</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">typedef</span> implementation-defined native_handle_type; </span><br><span class="line">            <span class="function">native_handle_type <span class="title">native_handle</span><span class="params">()</span></span>;    </span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>std::time_mutex</code>比 <code>std::mutex</code> 多了两个成员函数：<code>try_lock_for()</code>，<code>try_lock_until()</code>。<code>try_lock_for()</code> 函数接受一个时间范围，在这一段时间范围之内，如果没有获得锁则被阻塞住，如果超时没有获得锁，则返回 false。<code>try_lock_until()</code> 函数则接受一个时间点作为参数，在指定时间点未到来之前，如果没有获得锁则被阻塞住，如果超时，则返回 false。</p>
+<h2 id="recursive-mutex"><a href="#recursive-mutex" class="headerlink" title="recursive_mutex"></a>recursive_mutex</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">recursive_mutex</span> &#123;</span><br><span class="line">        <span class="keyword">public</span>:</span><br><span class="line">            <span class="built_in">recursive_mutex</span>();</span><br><span class="line">            ~<span class="built_in">recursive_mutex</span>();</span><br><span class="line">            <span class="built_in">recursive_mutex</span>(<span class="type">const</span> recursive_mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            recursive_mutex&amp; <span class="keyword">operator</span>=(<span class="type">const</span> recursive_mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">typedef</span> implementation-defined native_handle_type;</span><br><span class="line">            <span class="function">native_handle_type <span class="title">native_handle</span><span class="params">()</span></span>;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>std::recursive_mutex</code> 允许递归上锁来获得对互斥量对象的多层所有权，重复对该互斥量进行上锁操作不会产生死锁，但必须保证上锁和解锁的次数相同。。</p>
+<h2 id="lock-guard"><a href="#lock-guard" class="headerlink" title="lock_guard"></a>lock_guard</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Mutex</span>&gt;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">lock_guard</span> &#123;</span><br><span class="line">        <span class="keyword">public</span>:</span><br><span class="line">            <span class="keyword">typedef</span> Mutex mutex_type;</span><br><span class="line">            <span class="function"><span class="keyword">explicit</span> <span class="title">lock_guard</span><span class="params">(mutex_type&amp; m)</span></span>;</span><br><span class="line">            <span class="built_in">lock_guard</span>(mutex_type&amp; m, <span class="type">adopt_lock_t</span>) <span class="keyword">noexcept</span>;</span><br><span class="line">            ~<span class="built_in">lock_guard</span>();</span><br><span class="line">            <span class="built_in">lock_guard</span>(lock_guard <span class="type">const</span>&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            lock_guard&amp; <span class="keyword">operator</span>=(lock_guard <span class="type">const</span>&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">        <span class="keyword">private</span>:</span><br><span class="line">            mutex_type&amp; pm; <span class="comment">// exposition only</span></span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>lock_guard</code> 对象并不负责管理 Mutex 对象的生命周期，只是简化了 Mutex 对象的上锁和解锁操作，在 <code>lock_guard</code> 对象构造时，传入的 Mutex 对象会被当前线程锁住。在<code>lock_guard</code> 对象被析构时，它所管理的 Mutex 对象会自动解锁。</p>
+<h2 id="unique-lock"><a href="#unique-lock" class="headerlink" title="unique_lock"></a>unique_lock</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Mutex</span>&gt;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">unique_lock</span> &#123;</span><br><span class="line">        <span class="keyword">public</span>:</span><br><span class="line">            <span class="keyword">typedef</span> Mutex mutex_type;</span><br><span class="line">            <span class="comment">// 构造/拷贝/析构:</span></span><br><span class="line">            <span class="built_in">unique_lock</span>() <span class="keyword">noexcept</span>;</span><br><span class="line">            <span class="function"><span class="keyword">explicit</span> <span class="title">unique_lock</span><span class="params">(mutex_type&amp; m)</span></span>;</span><br><span class="line">            <span class="built_in">unique_lock</span>(mutex_type&amp; m, <span class="type">defer_lock_t</span>) <span class="keyword">noexcept</span>;</span><br><span class="line">            <span class="built_in">unique_lock</span>(mutex_type&amp; m, <span class="type">try_to_lock_t</span>) <span class="keyword">noexcept</span>;</span><br><span class="line">            <span class="built_in">unique_lock</span>(mutex_type&amp; m, <span class="type">adopt_lock_t</span>) <span class="keyword">noexcept</span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Clock</span>, <span class="keyword">class</span> <span class="title class_">Duration</span>&gt;</span><br><span class="line">            <span class="built_in">unique_lock</span>(mutex_type&amp; m, <span class="type">const</span> chrono::time_point&lt;Clock, Duration&gt;&amp; abs_time) <span class="keyword">noexcept</span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Rep</span>, <span class="keyword">class</span> <span class="title class_">Period</span>&gt;</span><br><span class="line">            <span class="built_in">unique_lock</span>(mutex_type&amp; m, <span class="type">const</span> chrono::duration&lt;Rep, Period&gt;&amp; rel_time) <span class="keyword">noexcept</span>;</span><br><span class="line">            ~<span class="built_in">unique_lock</span>();</span><br><span class="line">            <span class="built_in">unique_lock</span>(unique_lock <span class="type">const</span>&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            unique_lock&amp; <span class="keyword">operator</span>=(unique_lock <span class="type">const</span>&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            <span class="built_in">unique_lock</span>(unique    _lock&amp;&amp; u) <span class="keyword">noexcept</span>;</span><br><span class="line">            unique_lock&amp; <span class="keyword">operator</span>=(unique_lock&amp;&amp; u) <span class="keyword">noexcept</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 上锁操作:</span></span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Rep</span>, <span class="keyword">class</span> <span class="title class_">Period</span>&gt;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock_for</span><span class="params">(<span class="type">const</span> chrono::duration&lt;Rep, Period&gt;&amp; rel_time)</span></span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Clock</span>, <span class="keyword">class</span> <span class="title class_">Duration</span>&gt;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock_until</span><span class="params">(<span class="type">const</span> chrono::time_point&lt;Clock, Duration&gt;&amp; abs_time)</span></span>;</span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 修改操作</span></span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">swap</span><span class="params">(unique_lock&amp; u)</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function">mutex_type *<span class="title">release</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// observers:</span></span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">owns_lock</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function"><span class="keyword">explicit</span> <span class="keyword">operator</span> <span class="title">bool</span> <span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function">mutex_type* <span class="title">mutex</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">        <span class="keyword">private</span>:</span><br><span class="line">            mutex_type *pm; <span class="comment">// exposition only</span></span><br><span class="line">            <span class="type">bool</span> owns; <span class="comment">// exposition only</span></span><br><span class="line">    &#125;;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Mutex</span>&gt;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">swap</span><span class="params">(unique_lock&lt;Mutex&gt;&amp; x, unique_lock&lt;Mutex&gt;&amp; y)</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>unique_lock</code> 对象以独占所有权的方式管理 mutex 对象，也会自动上锁和解锁操作，提供了更多的操作函数。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/C/" rel="tag"># C++</a>
+              <a href="/tags/thread/" rel="tag"># thread</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/08/code/opensource-license/" rel="prev" title="开源协议">
+      <i class="fa fa-chevron-left"></i> 开源协议
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/11/cpp/atomic/" rel="next" title="C++ atomic">
+      C++ atomic <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#std-mutex"><span class="nav-number">1.</span> <span class="nav-text">std::mutex</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#timed-mutex"><span class="nav-number">2.</span> <span class="nav-text">timed_mutex</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#recursive-mutex"><span class="nav-number">3.</span> <span class="nav-text">recursive_mutex</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lock-guard"><span class="nav-number">4.</span> <span class="nav-text">lock_guard</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#unique-lock"><span class="nav-number">5.</span> <span class="nav-text">unique_lock</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ubun2</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">180</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ubun2</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

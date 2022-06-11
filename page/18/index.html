@@ -176,6 +176,469 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/makefile/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/tool/makefile/" class="post-title-link" itemprop="url">makefile</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:00:16" itemprop="dateCreated datePublished" datetime="2022-06-07T16:00:16+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/makefile/" itemprop="url" rel="index"><span itemprop="name">makefile</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>下载地址：<a target="_blank" rel="noopener" href="http://ftp.gnu.org/gnu/make/">http://ftp.gnu.org/gnu/make/</a></p>
+<h2 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h2><p><strong>makefile预定义变量</strong></p>
+<table>
+<thead>
+<tr>
+<th align="center">预定义变量</th>
+<th align="center">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">AR</td>
+<td align="center">库文件维护程序的名称，默认为ar</td>
+</tr>
+<tr>
+<td align="center">AS</td>
+<td align="center">汇编程序的名称，默认为as</td>
+</tr>
+<tr>
+<td align="center">CC</td>
+<td align="center">c编译器的名称，默认为cc</td>
+</tr>
+<tr>
+<td align="center">CXX</td>
+<td align="center">c++编译器的名称，默认为g++</td>
+</tr>
+<tr>
+<td align="center">ARFLAGS</td>
+<td align="center">库文件维护程序选项，无默认值</td>
+</tr>
+<tr>
+<td align="center">ASFLAGS</td>
+<td align="center">汇编程序选项，无默认值</td>
+</tr>
+<tr>
+<td align="center">CFLAGS</td>
+<td align="center">c编译器选项，无默认值</td>
+</tr>
+<tr>
+<td align="center">CXXFLAGS</td>
+<td align="center">c++编译器选项，无默认值</td>
+</tr>
+</tbody></table>
+<h3 id="makefile自动变量"><a href="#makefile自动变量" class="headerlink" title="makefile自动变量"></a>makefile自动变量</h3><table>
+<thead>
+<tr>
+<th align="center">自动变量</th>
+<th align="center">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">$*</td>
+<td align="center">不包含扩展名的目标文件名称</td>
+</tr>
+<tr>
+<td align="center">$&lt;</td>
+<td align="center">第一个依赖文件名称</td>
+</tr>
+<tr>
+<td align="center">$?</td>
+<td align="center">所有时间戳比目标文件晚的依赖文件</td>
+</tr>
+<tr>
+<td align="center">$@</td>
+<td align="center">目标文件的完整名称</td>
+</tr>
+<tr>
+<td align="center">$^</td>
+<td align="center">所有不重复的依赖文件</td>
+</tr>
+</tbody></table>
+<h3 id="自动变量"><a href="#自动变量" class="headerlink" title="自动变量"></a>自动变量</h3><p><code>$@</code>表示规则中的目标文件集。在模式规则中，如果有多个目标，那么就是匹配于目标中模式定义的集合。</p>
+<p><code>$%</code>仅当目标是函数库文件时，表示规则中的目标成员名，如果目标不是函数库文件（Unix 下是 .a ， Windows下是 .lib ），那么其值为空。</p>
+<p><code>$?</code>所有更新过的依赖目标的集合。以空格分隔。</p>
+<p><code>$^</code>所有的依赖目标的集合。以空格分隔。如果在依赖目标中有多个重复的，那个这个变量会去除重复的依赖目标，只保留一份。</p>
+<p><code>$&lt;</code>依赖目标中的第一个目标名字。如果依赖目标是以模式（即 % ）定义的，那么 $&lt; 将是符合模式的一系列的文件集。注意，其是一个一个取出来的。</p>
+<p><code>$+</code>所有依赖目标的集合，不去除重复的依赖目标。</p>
+<p><code>$*</code> 就是除了后缀的那一部分。如果目标中的后缀是make 所不能识别的，那么 $* 就是空值。</p>
+<h4 id="PHONY"><a href="#PHONY" class="headerlink" title=".PHONY"></a>.PHONY</h4><p>伪目标意思是这个目标本身不代表一个文件，执行这个目标不是为了得到某个文件或者东西，而是单纯为了执行这个目标下面的命令。</p>
+<h3 id="subst"><a href="#subst" class="headerlink" title="subst"></a>subst</h3><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$(<span class="built_in">subst</span> 要被替换的字符串,用来替换的字符串,被处理的字符串)</span></span><br></pre></td></tr></table></figure>
+
+<p><code>$(subst .c,.o,test1.c test2.c)</code>意思是用.o替换test1.c test2.c中的.c，最终得到test1.o test2.o。</p>
+<h3 id="wildcard"><a href="#wildcard" class="headerlink" title="wildcard"></a>wildcard</h3><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$(<span class="built_in">wildcard</span> 寻找的文件)</span></span><br></pre></td></tr></table></figure>
+
+<p>在系统中寻找文件，<code>$(wildcard *.c)</code>就等于找到系统中所有后缀为.c的文件，返回成以空格隔开的一整行字符。</p>
+<h3 id="basename"><a href="#basename" class="headerlink" title="basename"></a>basename</h3><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$(<span class="built_in">basename</span> 文件名)</span></span><br></pre></td></tr></table></figure>
+
+<p>取得文件的名字（去掉后缀的意思），<code>$(basename test1.c)</code>就会取得test1。</p>
+<h2 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h2><p>在makefile中使用shell命令，$var：将Makefile中的变量var展开，将其值传给shell命令。$$var：访问shell命令中定义的变量var，而非makefile的变量，如果某规则有多个shell命令行构成，而相互之间没有用’;’和’&#39;连接起来的话，就是没有关联，相互之间也不能变量共享。</p>
+<ul>
+<li>error: unused variable ‘a’ [-Werror=unused-variable]<br> 去掉编译配置的 -Werror<blockquote>
+<p>LOCAL_CFLAGS += -Werror</p>
+</blockquote>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/git/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/tool/git/" class="post-title-link" itemprop="url">git操作大全</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 15:46:32" itemprop="dateCreated datePublished" datetime="2022-06-07T15:46:32+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:59:47" itemprop="dateModified" datetime="2022-06-08T17:59:47+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/git/" itemprop="url" rel="index"><span itemprop="name">git</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="/images/git/lifecycle.png" alt="img"></p>
+<p><img src="/images/git/git2.png" alt="img"></p>
+<p><img src="/images/git/git1.jpg" alt="img"></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/jaywcjlove/git-tips">https://github.com/jaywcjlove/git-tips</a></p>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>使用<code>git config --list</code>命令列出配置信息。</p>
+<p><strong>生成SSH公钥</strong></p>
+<ol>
+<li>配置用户名和邮箱</li>
+</ol>
+<blockquote>
+<p>git config –global  user.name “luo_u”<br>git config –global  user.email “<a href="mailto:&#108;&#117;&#111;&#95;&#x75;&#64;&#113;&#113;&#x2e;&#99;&#x6f;&#109;">&#108;&#117;&#111;&#95;&#x75;&#64;&#113;&#113;&#x2e;&#99;&#x6f;&#109;</a>“</p>
+</blockquote>
+<ol start="2">
+<li>生成SSH，密钥保存在<code>~/.ssh/id_rsa.pub</code></li>
+</ol>
+<blockquote>
+<p>ssh-keygen -t rsa -C <a href="mailto:&#108;&#x75;&#111;&#95;&#x75;&#64;&#x71;&#x71;&#46;&#x63;&#111;&#109;">&#108;&#x75;&#111;&#95;&#x75;&#64;&#x71;&#x71;&#46;&#x63;&#111;&#109;</a></p>
+</blockquote>
+<ol>
+<li>测试是否连接</li>
+</ol>
+<blockquote>
+<p>ssh -T <a href="mailto:&#103;&#x69;&#x74;&#x40;&#101;&#x2e;&#x63;&#111;&#100;&#105;&#110;&#x67;&#x2e;&#110;&#x65;&#116;">&#103;&#x69;&#x74;&#x40;&#101;&#x2e;&#x63;&#111;&#100;&#105;&#110;&#x67;&#x2e;&#110;&#x65;&#116;</a></p>
+</blockquote>
+<p><strong>设置编辑器</strong></p>
+<blockquote>
+<p>git config –global core.editor vim</p>
+</blockquote>
+<p><strong>git status 显示中文</strong></p>
+<blockquote>
+<p>git config –global core.quotepath false</p>
+</blockquote>
+<h2 id="增加-删除文件"><a href="#增加-删除文件" class="headerlink" title="增加/删除文件"></a>增加/删除文件</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">添加指定文件到暂存区</span></span><br><span class="line">git add &lt;file&gt;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">添加指定目录到暂存区，包括子目录</span></span><br><span class="line">git add &lt;dir&gt;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">添加当前目录的所有文件到暂存区</span></span><br><span class="line">git add .</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">添加每个变化前，都会要求确认</span></span><br><span class="line">git add -p</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">删除工作区文件，并且将这次删除放入暂存区</span></span><br><span class="line">git rm &lt;file&gt;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">停止追踪指定文件，但该文件会保留在工作区</span></span><br><span class="line">git rm --cached &lt;file&gt;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">强制删除</span></span><br><span class="line">git rm -f &lt;filename&gt; </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">文件改名</span></span><br><span class="line">git mv &lt;old-name&gt; &lt;new-name&gt; </span><br></pre></td></tr></table></figure>
+
+<h2 id="提交"><a href="#提交" class="headerlink" title="提交"></a>提交</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">提交暂存区到仓库区</span></span><br><span class="line">git commit -m [message]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">提交暂存区的指定文件到仓库区</span></span><br><span class="line">git commit [file1] [file2] ... -m [message]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">把所有已经跟踪过的文件暂存起来一并提交</span></span><br><span class="line">git commit -a</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">提交时显示所有diff信息</span></span><br><span class="line">git commit -v</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">使用一次新的commit，替代上一次提交，如果代码没有任何新变化，则用来改写上一次commit的提交信息</span></span><br><span class="line">git commit --amend -m [message]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">重做上一次commit，并包括指定文件的新变化</span></span><br><span class="line">git commit --amend [file1] [file2] ...</span><br></pre></td></tr></table></figure>
+
+<h2 id="分支"><a href="#分支" class="headerlink" title="分支"></a>分支</h2><p><code>master</code> 默认开发分支</p>
+<p><code>HEAD</code> 当前开发分支</p>
+<p><code>HEAD^([n])</code> HEAD的第n次父提交提交, ^相当于^1</p>
+<p><code>HEAD~([n])</code> HEAD的第n个祖先提交</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">git branch # 查看分支</span><br><span class="line"></span><br><span class="line">git branch -r #查看远程分支</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">此命令将显示包含特定提交的所有分支。</span></span><br><span class="line">git branch --contains &lt;commit&gt;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">列出所有本地分支和远程分支</span></span><br><span class="line">git branch -a</span><br><span class="line"></span><br><span class="line">git branch &lt;name&gt; # 创建分支</span><br><span class="line"></span><br><span class="line">git checkout &lt;name&gt; # 切换分支</span><br><span class="line"></span><br><span class="line">git checkout -b &lt;name&gt; # 创建 + 切换分支</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">重命名本地分支</span></span><br><span class="line">git branch -m &lt;old-name&gt; &lt;new-name&gt;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">重命名刚切换的新分支</span></span><br><span class="line">git branch -m &lt;new-name&gt;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">新建一个分支，指向指定commit</span></span><br><span class="line">git branch [branch] [commit]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">新建一个分支，与指定的远程分支建立追踪关系</span></span><br><span class="line">git branch --track [branch] [remote-branch]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">重命名远程分支： 一旦在本地重命名了分支，您需要先远程删除该分支，然后再次推送重命名的分支。</span></span><br><span class="line">git push origin :&lt;old-name&gt;</span><br><span class="line">git push origin &lt;new-name&gt;</span><br><span class="line"></span><br><span class="line">git merge &lt;name&gt; # 合并某分支到当前分支</span><br><span class="line"></span><br><span class="line">git branch -d &lt;name&gt; # 删除分支</span><br><span class="line"></span><br><span class="line">git branch -D &lt;name&gt; # 强制删除分支</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">切换到上一个分支</span></span><br><span class="line">git checkout -</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">建立追踪关系，在现有分支与指定的远程分支之间</span></span><br><span class="line">git branch --set-upstream [branch] [remote-branch]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">合并指定分支到当前分支</span></span><br><span class="line">git merge [branch]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">选择一个commit，合并进当前分支</span></span><br><span class="line">git cherry-pick [commit]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">删除远程分支</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git push origin --delete [branch-name]</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git branch -dr [remote/branch]</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">删除远程分支(先在本地删除该分支)，原理是把一个空分支push到server上，相当于删除该分支。</span></span><br><span class="line">git push origin :&lt;name&gt;</span><br><span class="line">git push origin --delete [branch-name]</span><br><span class="line">git branch -dr [remote/branch]</span><br><span class="line"></span><br><span class="line">git cherry-pick [commitid]</span><br><span class="line">git cherry-pick [[branch]]</span><br></pre></td></tr></table></figure>
+
+<p><code>checkout</code>只会移动<code>HEAD</code>指针，<code>reset</code>会改变<code>HEAD</code>的引用值</p>
+<h2 id="查看信息"><a href="#查看信息" class="headerlink" title="查看信息"></a>查看信息</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看状态</span></span><br><span class="line">git status</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">显示所有被忽略的文件</span></span><br><span class="line">git status --ignored </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看修改内容</span></span><br><span class="line">git diff &lt;filename&gt; </span><br><span class="line"></span><br><span class="line">git diff &lt;first_branch&gt;..&lt;second_branch&gt; # 显示两次提交之间的差异</span><br><span class="line"></span><br><span class="line">git diff --shortstat &quot;@&#123;n day ago&#125;&quot; # 显示n天的代码数量</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">显示暂存区和上一个commit的差异</span></span><br><span class="line">git diff --cached [file]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">显示工作区与当前分支最新commit之间的差异</span></span><br><span class="line">git diff HEAD</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">将差异文件打包，使用 --name-only 参数只显示文件名</span></span><br><span class="line">git diff &lt;commit1&gt; &lt;commit2&gt; --name-only | xargs tar -czvf ../update.tar.gz</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">复制出差异文件</span></span><br><span class="line">git diff &lt;commit1&gt; &lt;commit2&gt; --name-only | xargs -t -i&#123;&#125; cp --parents &#123;&#125; ../update</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">显示某次提交的元数据和内容变化</span></span><br><span class="line">git show [commit]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">显示某次提交时，某个文件的内容</span></span><br><span class="line">git show [commit]:[filename]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">显示某次提交发生变化的文件</span></span><br><span class="line">git show --name-only [commit]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">显示当前分支的最近几次提交</span></span><br><span class="line">git reflog</span><br><span class="line"></span><br><span class="line">git blame &lt;filename&gt; # 显示指定文件修改信息</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">显示当前分支的版本历史</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git <span class="built_in">log</span></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">显示commit历史，以及每次commit发生变更的文件</span></span><br><span class="line">git log --stat</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">搜索提交历史，根据关键词</span></span><br><span class="line">git log -S [keyword]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">显示某个commit之后的所有变动，每个commit占据一行</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git <span class="built_in">log</span> [tag] HEAD --pretty=format:%s</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">显示某个commit之后的所有变动，其<span class="string">&quot;提交说明&quot;</span>必须符合搜索条件</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git <span class="built_in">log</span> [tag] HEAD --grep feature</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">显示某个文件的版本历史，包括文件改名</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git <span class="built_in">log</span> --follow [file]</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git whatchanged [file]</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">显示指定文件相关的每一次diff</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git <span class="built_in">log</span> -p [file]</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">显示过去5次提交</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git <span class="built_in">log</span> -5 --pretty --oneline</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">显示所有提交过的用户，按提交次数排序</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git shortlog -sn</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">显示指定文件是什么人在什么时间修改过</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">git blame [file]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="撤销-版本回滚"><a href="#撤销-版本回滚" class="headerlink" title="撤销/版本回滚"></a>撤销/版本回滚</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">git reset --hard HEAD # 撤销工作目录中暂存的所有未提交文件的修改内容</span><br><span class="line"></span><br><span class="line">git reset --keep [commit] # 重置当前HEAD为指定commit，但保持暂存区和工作区不变</span><br><span class="line"></span><br><span class="line">git commit --amend # 将暂存区中的文件提交</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">恢复暂存区的指定文件到工作区</span></span><br><span class="line">git checkout [file]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">恢复某个commit的指定文件到暂存区和工作区</span></span><br><span class="line">git checkout [commit] [file]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">恢复暂存区的所有文件到工作区</span></span><br><span class="line">git checkout .</span><br><span class="line"></span><br><span class="line">git checkout HEAD &lt;filename&gt; # 取消指定未提交文件的修改内容</span><br><span class="line"></span><br><span class="line">git checkout --patch &lt;filename&gt; # 撤消对文件的修改</span><br><span class="line"></span><br><span class="line">git revert &lt;commit_id&gt; # 撤销指定提交</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">重置暂存区的指定文件，与上一次commit保持一致，但工作区不变</span></span><br><span class="line">git reset [file]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">重置暂存区与工作区，与上一次commit保持一致</span></span><br><span class="line">git reset --hard</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">重置当前分支的指针为指定commit，同时重置暂存区，但工作区不变</span></span><br><span class="line">git reset [commit]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">重置当前分支的HEAD为指定commit，同时重置暂存区和工作区，与指定commit一致</span></span><br><span class="line">git reset --hard [commit]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">重置当前HEAD为指定commit，但保持暂存区和工作区不变</span></span><br><span class="line">git reset --keep [commit]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">新建一个commit，用来撤销指定commit</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">后者的所有变化都将被前者抵消，并且应用到当前分支，用于修改远程仓库</span></span><br><span class="line">git revert [commit]</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">暂时将未提交的变化移除，稍后再移入</span></span><br><span class="line">git stash</span><br><span class="line">git stash pop</span><br></pre></td></tr></table></figure>
+
+<h2 id="提交历史"><a href="#提交历史" class="headerlink" title="提交历史"></a>提交历史</h2><p><a target="_blank" rel="noopener" href="https://git-scm.com/book/zh/v2/Git-%E5%9F%BA%E7%A1%80-%E6%9F%A5%E7%9C%8B%E6%8F%90%E4%BA%A4%E5%8E%86%E5%8F%B2#rlog_options">常见参数选项</a>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">`-p`: 显示每次提交的内容差异。</span><br><span class="line"></span><br><span class="line">`—stat`: 显示每次更新的文件修改统计信息。</span><br><span class="line"></span><br><span class="line">`—shortstat`: 只显示 `—stat` 中最后的行数修改添加移除统计。</span><br><span class="line"></span><br><span class="line">`--name-only` 仅在提交信息后显示已修改的文件清单。</span><br><span class="line"></span><br><span class="line">`--name-status` 显示新增、修改、删除的文件清单。</span><br><span class="line"></span><br><span class="line">`--abbrev-commit`: 仅显示 `SHA-1` 的前几个字符，而非所有的 40 个字符。</span><br><span class="line"></span><br><span class="line">`--relative-date`: 使用较短的相对时间显示（比如，`2 weeks ago`）。</span><br><span class="line"></span><br><span class="line">`--graph`: 显示 `ASCII` 图形表示的分支合并历史。</span><br><span class="line"></span><br><span class="line">`—pretty=(oneline,short,medium(默认值),full,fuller,email,raw,format)`： 这个选项可以指定使用不同于默认格式的方式展示提交历史。 这个选项有一些内建的子选项供你使用。</span><br><span class="line"></span><br><span class="line">- `oneline`: 将每个提交放在一行显示，查看的提交数很大时非常有用。</span><br><span class="line">- [`format`](https://git-scm.com/book/zh/v2/Git-基础-查看提交历史#rpretty_format): 列出了常用的格式占位符写法及其代表的意义。</span><br></pre></td></tr></table></figure>
+
+<p><code>—oneline</code>: <code>--pretty=oneline --abbrev-commit</code> 的简化用法。</p>
+<p><code>--date= (relative|local|default|iso|rfc|short|raw)</code>：定制出现日期格式。</p>
+<p><a target="_blank" rel="noopener" href="https://git-scm.com/book/zh/v2/Git-%E5%9F%BA%E7%A1%80-%E6%9F%A5%E7%9C%8B%E6%8F%90%E4%BA%A4%E5%8E%86%E5%8F%B2#rlimit_options">常见输出参数</a>:</p>
+<p><code>-n</code>: 仅显示最近的 n 条提交</p>
+<p><code>—since</code>, <code>—after</code>: 仅显示指定时间之后的提交</p>
+<p><code>--until</code>, <code>—before</code>: 仅显示指定作者相关的提交。</p>
+<p><code>—author</code>: 仅显示指定提交者相关的提交。</p>
+<p><code>—grep</code>: 仅显示含指定关键字的提交</p>
+<p><code>-S</code>: 仅显示添加或移除了某个关键字的提交</p>
+<p>默认不用任何参数的话，<code>git log</code> 会按提交时间列出所有的更新，最近的更新排在最上面。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">log</span> <span class="comment"># 查看所有提交历史</span></span><br><span class="line"></span><br><span class="line">git <span class="built_in">log</span> -p -n <span class="comment"># 查看最近提交的n条历史</span></span><br><span class="line"></span><br><span class="line">git <span class="built_in">log</span> -p -n &lt;filename&gt; <span class="comment"># 查看指定文件最近提交的n条历史</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="标签"><a href="#标签" class="headerlink" title="标签"></a>标签</h2><p>Git可以给历史中的某一个提交打上标签，以示重要。</p>
+<p>Git使用两种主要类型的标签：轻量标签(lightweight)与附注标签(annotated)。</p>
+<p>轻量标签: 很像一个不会改变的分支 - 它只是一个特定提交的引用。它本质上是将提交校验和存储到一个文件中 - 没有保存任何其他信息。</p>
+<p>附注标签是存储在 Git 数据库中的一个完整对象。 它们是可以被校验的；其中包含打标签者的名字、电子邮件地址、日期时间；还有一个标签信息；并且可以使用 GNU Privacy Guard(GPG)签名与验证。 通常建议创建附注标签，这样你可以拥有以上所有信息；但是如果你只是想用一个临时的标签，或者因为某些原因不想要保存那些信息，轻量标签也是可用的。</p>
+<p>-a: 创建附注标签</p>
+<p>-m: 选项指定了一条将会存储在标签中的信息。 如果没有为附注标签指定一条信息，Git 会运行编辑器要求你输入信息。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">git tag # 列出已有的标签</span><br><span class="line"></span><br><span class="line">git tag &lt;tagname&gt; # 创建标签，-a 创建附注标签</span><br><span class="line"></span><br><span class="line">git tag -d &lt;tagname&gt; # 删除掉你本地仓库上的标签</span><br><span class="line"></span><br><span class="line">git show &lt;tagname&gt; # 查看标签信息与对应的提交信息</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">删除远程tag</span></span><br><span class="line">git push origin :refs/tags/[tagName]</span><br><span class="line"></span><br><span class="line">git push origin &lt;tagname&gt; # 推送标签到远程仓库服务器上</span><br><span class="line"></span><br><span class="line">git push origin --tags # 一次性推送所有不在远程仓库服务器上的标签</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">新建一个分支，指向某个tag</span></span><br><span class="line">git checkout -b [branch] [tag]</span><br></pre></td></tr></table></figure>
+
+<h2 id="储藏与清理"><a href="#储藏与清理" class="headerlink" title="储藏与清理"></a>储藏与清理</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">git add . &amp;&amp; git stash # 将新的储藏推送到栈上</span><br><span class="line"></span><br><span class="line">git stash save &#x27;message&#x27; # 储藏修改，并留下stash信息</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-p（或-patch）允许交互选择要提交的每个跟踪文件的各个部分。 这样每个提交只包含相关的更改。</span></span><br><span class="line">git stash -p</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">默认情况下，当存储时，不包括未跟踪的文件。 为了更改该行为并包含这些文件，您需要使用-u参数。 还有-a（-all）可以完全存储未跟踪和忽略的文件，这可能是您通常不需要的东西。</span></span><br><span class="line">git stash -u</span><br><span class="line"></span><br><span class="line">git stash list # 查看栈中所有暂存</span><br><span class="line"></span><br><span class="line">git stash apply &lt;stash_id&gt; # 恢复复对应编号暂存到工作区，如果不指定编号为栈顶的，注意：这些暂存还在栈中</span><br><span class="line"></span><br><span class="line">git stash pop &lt;stash_id&gt; #将栈顶的暂存，恢复到工作区，并从栈中弹出，注意：这些暂存不在栈中</span><br><span class="line"></span><br><span class="line">git stash drop &lt;stash_id&gt; # 移除的储藏在栈中的东西</span><br><span class="line"></span><br><span class="line">git stash clear #清空暂存栈</span><br><span class="line"></span><br><span class="line">git stash branch &lt;branch_name&gt; # 从储藏创建一个分支</span><br></pre></td></tr></table></figure>
+
+<h2 id="远程操作"><a href="#远程操作" class="headerlink" title="远程操作"></a>远程操作</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看远程仓库及其URL</span></span><br><span class="line">git remote -v </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看远程仓库的信息</span></span><br><span class="line">git remote show &lt;remote-name&gt; </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">添加一个新的远程仓库</span></span><br><span class="line">git remote add &lt;shortname&gt; &lt;url&gt; </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">移除远程仓库</span></span><br><span class="line">git remote rm &lt;name&gt; </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">重命名远程仓库</span></span><br><span class="line">git remote rename &lt;oldname&gt; &lt;newname&gt;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">从远程仓库中拉取数据</span></span><br><span class="line">git fetch &lt;remote-name&gt; </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">下载代码及快速合并</span></span><br><span class="line">git pull &lt;remote-name&gt; &lt;branch-name&gt;</span><br><span class="line"></span><br><span class="line">git pull --rebase</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">第一次推送到远程仓库，--set-upstream可简写为-u</span></span><br><span class="line">git push --set-upstream &lt;remote-name&gt; &lt;branch-name&gt;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">推送到远程仓库</span></span><br><span class="line">git push &lt;remote&gt; &lt;branch-name&gt;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">强行推送当前分支到远程仓库</span></span><br><span class="line">git push [remote] --force </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">推送所有分支到远程仓库</span></span><br><span class="line">git push [remote] --all </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">删除远程分支或标签</span></span><br><span class="line">git push &lt;remote&gt; :&lt;branch-name/tag-name&gt; </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">上传所有标签</span></span><br><span class="line">git push --tag </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">git push origin &lt;source&gt;:&lt;destination&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="克隆部分文件"><a href="#克隆部分文件" class="headerlink" title="克隆部分文件"></a>克隆部分文件</h3><p>配置需要下载代码的路径到 <code>.git/info/sparse-checkout</code> 文件，每个一行只能书写一个路径。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;some/dir/&quot; &gt;&gt; .git/info/sparse-checkout</span><br><span class="line">echo &quot;another/sub/tree&quot; &gt;&gt; .git/info/sparse-checkout</span><br></pre></td></tr></table></figure>
+
+<p>如果后续想增删路径，直接编辑 <code>.git/info/sparse-checkout</code> 文件，然后执行 <code>git read-tree -mu HEAD</code> 或<code>git read-tree --dry-run HEAD</code>。</p>
+<h2 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">生成一个可供发布的压缩包</span></span><br><span class="line">git archive</span><br></pre></td></tr></table></figure>
+
+<h2 id="GitHub"><a href="#GitHub" class="headerlink" title="GitHub"></a>GitHub</h2><h3 id="精准搜索"><a href="#精准搜索" class="headerlink" title="精准搜索"></a>精准搜索</h3><ul>
+<li>in:name xxx // 按照项目名搜索</li>
+<li>in:readme xxx // 按照README搜索</li>
+<li>in:description xxx // 按照description搜索</li>
+<li>stars:&gt;xxx // stars数大于xxx</li>
+<li>forks:&gt;3000 // forks数大于xxx</li>
+<li>language:xxx // 编程语言是xxx</li>
+<li>pushed:&gt;YYYY-MM-DD // 最后更新时间大于YYYY-MM-DD</li>
+</ul>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li><a target="_blank" rel="noopener" href="http://git-scm.com/">Git官网</a></li>
+<li><a target="_blank" rel="noopener" href="http://gitref.org/zh/index.html">Git参考手册</a></li>
+<li><a target="_blank" rel="noopener" href="http://www-cs-students.stanford.edu/~blynn/gitmagic/intl/zh_cn/">Git Magic</a></li>
+<li><a target="_blank" rel="noopener" href="http://gitbook.liuhui998.com/index.html">Git Community Book 中文版</a></li>
+<li><a target="_blank" rel="noopener" href="http://git-scm.com/book/en/v2">Pro Git</a></li>
+<li><a target="_blank" rel="noopener" href="http://marklodato.github.io/visual-git-guide/index-zh-cn.html">图解Git</a></li>
+<li><a target="_blank" rel="noopener" href="http://rogerdudler.github.io/git-guide/index.zh.html">git-简明指南</a></li>
+<li><a target="_blank" rel="noopener" href="http://rogerdudler.github.io/git-guide/index.zh.html">初级教程</a> </li>
+<li><a target="_blank" rel="noopener" href="http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000">廖雪峰的Git教程</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.worldhello.net/gotgithub/">蒋鑫老师将带你入github的大门</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.open-open.com/lib/view/open1328069609436.html">git详解</a></li>
+<li><a target="_blank" rel="noopener" href="http://git.oschina.net/progit/">oschina教程</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/blog/2019-how-to-undo-almost-anything-with-git">How to undo (almost) anything with Git撤销一切，汇总各种回滚撤销的场景，加强学习。</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.runoob.com/git/git-tutorial.html">Git 教程 | 菜鸟教程runoob.com</a></li>
+<li><a target="_blank" rel="noopener" href="https://gold.xitu.io/post/5842f9b861ff4b005889ade6">Git 本地仓库和裸仓库</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.kancloud.cn/kancloud/igit/46710">沉浸式学 Git</a><br><a target="_blank" rel="noopener" href="https://learngitbranching.js.org/">https://learngitbranching.js.org/</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/vscode/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/tool/vscode/" class="post-title-link" itemprop="url">vscode插件与配置</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 15:46:32" itemprop="dateCreated datePublished" datetime="2022-06-07T15:46:32+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:43:34" itemprop="dateModified" datetime="2022-06-08T17:43:34+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/tool/" itemprop="url" rel="index"><span itemprop="name">tool</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>官网：<a target="_blank" rel="noopener" href="https://code.visualstudio.com/">https://code.visualstudio.com/</a><br>使用指南：<a target="_blank" rel="noopener" href="https://code.visualstudio.com/docs">https://code.visualstudio.com/docs</a></p>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;files.exclude&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;**/.tags*&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/cmake_install.cmake&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/CMakeCache.txt&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/CMakeFiles&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.srctrlprj&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.srctrldb&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.srctrlbm&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.o&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.cmd&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.ko&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.a&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.so&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.mod.c&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.symvers&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.order&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/.gitignore&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/.jekyll-cache&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/_site/&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/obj/&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/libs/&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*_test&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/.tmp_*/&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;files.autoSave&quot;</span><span class="punctuation">:</span> <span class="string">&quot;onWindowChange&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;workbench.colorTheme&quot;</span><span class="punctuation">:</span> <span class="string">&quot;One Dark Vivid&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;terminal.integrated.fontSize&quot;</span><span class="punctuation">:</span> <span class="number">14</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;todo-tree.tree.showScanModeButton&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;terminal.integrated.rightClickCopyPaste&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.fontFamily&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&#x27;JetBrains Mono&#x27;, Consolas, &#x27;Courier New&#x27;, monospace&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.fontLigatures&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.fontSize&quot;</span><span class="punctuation">:</span> <span class="number">20</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.detectIndentation&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.multiCursorModifier&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ctrlCmd&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.occurrencesHighlight&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.selectionHighlight&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.tokenColorCustomizations&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;textMateRules&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">            <span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;One Dark italic&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;scope&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">                    <span class="string">&quot;comment&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;entity.other.attribute-name&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;keyword&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;markup.underline.link&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.modifier&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.type&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;string.url&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;variable.language.super&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;variable.language.this&quot;</span></span><br><span class="line">                <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;settings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">                    <span class="attr">&quot;fontStyle&quot;</span><span class="punctuation">:</span> <span class="string">&quot;italic&quot;</span></span><br><span class="line">                <span class="punctuation">&#125;</span></span><br><span class="line">            <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;One Dark italic reset&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;scope&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">                    <span class="string">&quot;keyword.operator&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;keyword.other.type&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.modifier.import&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.modifier.package&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.type.built-in&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.type.function.arrow&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.type.generic&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.type.java&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.type.primitive&quot;</span></span><br><span class="line">                <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;settings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">                    <span class="attr">&quot;fontStyle&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span></span><br><span class="line">                <span class="punctuation">&#125;</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;fileheader.configObj&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;createFileTime&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;autoAdd&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;annotationStr&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;head&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/*&quot;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;middle&quot;</span><span class="punctuation">:</span> <span class="string">&quot; * @&quot;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;end&quot;</span><span class="punctuation">:</span> <span class="string">&quot; */&quot;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;use&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;headInsertLine&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;php&quot;</span><span class="punctuation">:</span> <span class="number">2</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;fileheader.cursorMode&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;brief&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;param&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;return&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;fileheader.customMade&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;Description&quot;</span><span class="punctuation">:</span><span class="string">&quot;&quot;</span> <span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;Author&quot;</span><span class="punctuation">:</span><span class="string">&quot;luo_u&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;Date&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Do not edit&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;LastEditTime&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Do not edit&quot;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;highlightwords.colors&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#b3d9ff&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="string">&quot;cyan&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#e6ffb3&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="string">&quot;pink&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#b3b3ff&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="string">&quot;lightgreen&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#ffd9b3&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="string">&quot;magenta&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#ffb3ff&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="string">&quot;cornflowerblue&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#b3ffb3&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="string">&quot;orange&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#ffff80&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="string">&quot;green&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#d1e0e0&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="string">&quot;red&quot;</span> <span class="punctuation">&#125;</span>                                        </span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;highlightwords.box&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;[cpp]&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;editor.defaultFormatter&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ms-vscode.cpptools&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;C_Cpp.clang_format_style&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&#123; BasedOnStyle: LLVM, UseTab: Never, IndentWidth: 4, TabWidth: 4, AccessModifierOffset: -4, AlignConsecutiveAssignments: AcrossEmptyLines, AlignConsecutiveBitFields: Consecutive, AlignConsecutiveDeclarations: AcrossEmptyLines, AlignTrailingComments: true, PointerAlignment: Right, SpaceAroundPointerQualifiers: Before&#125;&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;bracket-pair-colorizer-2.depreciation-notice&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;git.enabled&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;git.autorefresh&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;search.followSymlinks&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="插件"><a href="#插件" class="headerlink" title="插件"></a>插件</h2><ul>
+<li>Bracket Pair Colorizer</li>
+<li>C/C++</li>
+<li>Bracket Pair Colorizer</li>
+<li>CMake</li>
+<li>Color Highlight</li>
+<li>Filter Line</li>
+<li>Foam</li>
+<li>highlight-words</li>
+<li>Image preview</li>
+<li>koroFileHeader</li>
+<li>Filter Line</li>
+<li>Markdown All in One</li>
+<li>markdownlint</li>
+<li>Markdown Image</li>
+<li>Markdown Preview Enhanced</li>
+<li>vscode-icons</li>
+<li>Todo Tree</li>
+<li>vimStyle</li>
+<li>Sublime Text Keymap and Settings Importer</li>
+<li>highlight-words</li>
+<li>hightlight-selections-vscode</li>
+<li>One Dark Theme</li>
+</ul>
+<h2 id="Filter-Line"><a href="#Filter-Line" class="headerlink" title="Filter Line"></a>Filter Line</h2><ol>
+<li>打开log文件。</li>
+<li>运行 <code>command+shift+p</code> ，输入 filter line，选择 Filter Line By Config File。</li>
+<li>回车就生成了新的文件.log.filterline.log ，这就是过滤、翻译好的日志。</li>
+</ol>
+<p>配置文件格式：</p>
+<ul>
+<li>type general，指通用类型。</li>
+<li>prefix 匹配前缀的正则表达式。这里就是为了匹配每一行的时间、线程等信息。</li>
+<li>rules 过滤、翻译（替换）的规则。</li>
+<li>src 匹配的正则。dest是要替换成什么的字符串。</li>
+<li>tag 匹配到时，输出中增加的前缀。某些特殊行，例如闪退，可以明显的加个emoji图标。</li>
+<li>flag 全局的标记。例如app进入后台，则在所有行都加个标记，会前台时取消这个标记。</li>
+<li>until 匹配到某行时，后面紧跟的几行连续输出原始内容，直到某一行匹配正则表达式。</li>
+</ul>
+<p>更多信息可以参考 <a target="_blank" rel="noopener" href="https://github.com/everettjf/vscode-filter-line">https://github.com/everettjf/vscode-filter-line</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/sublime/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -610,7 +1073,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-09 20:39:53" itemprop="dateModified" datetime="2022-06-09T20:39:53+08:00">2022-06-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -657,7 +1120,7 @@
 </li>
 <li><p>使用 input_register_device() 函数注册 input_dev</p>
 </li>
-<li><p>当有事件发生时，在处理函数里调用 input_event() 函数上报事件</p>
+<li><p>当有事件发生时，在处理函数里调用 input_report_key() 函数上报事件，然后使用 input_sync() 函数将收集的事件发给用户空间。</p>
 </li>
 </ol>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">input_dev</span> *<span class="title">input</span> =</span> input_allocate_device();</span><br><span class="line"></span><br><span class="line">input-&gt;name = pdev-&gt;name;</span><br><span class="line">input-&gt;phys = <span class="string">&quot;gpio-keys/input0&quot;</span>;</span><br><span class="line">input-&gt;dev.parent = &amp;pdev-&gt;dev;</span><br><span class="line"></span><br><span class="line">input-&gt;id.bustype = BUS_HOST;</span><br><span class="line">input-&gt;id.vendor = <span class="number">0x0001</span>;</span><br><span class="line">input-&gt;id.product = <span class="number">0x0001</span>;</span><br><span class="line">input-&gt;id.version = <span class="number">0x0100</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Enable auto repeat feature of Linux input subsystem */</span></span><br><span class="line"><span class="keyword">if</span> (pdata-&gt;rep)</span><br><span class="line">    __set_bit(EV_REP, input-&gt;evbit);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; pdata-&gt;nbuttons; i++) &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gpio_keys_button</span> *<span class="title">button</span> =</span> &amp;pdata-&gt;buttons[i];</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> type = button-&gt;type ?: EV_KEY;</span><br><span class="line"></span><br><span class="line">    input_set_capability(input, type, button-&gt;code);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">error = input_register_device(input);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* get current state of buttons */</span></span><br><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; pdata-&gt;nbuttons; i++)</span><br><span class="line">    gpio_keys_report_event(&amp;ddata-&gt;data[i]);</span><br><span class="line">input_sync(input);</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
@@ -1083,7 +1546,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">177</span>
+          <span class="site-state-item-count">180</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1096,7 +1559,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

@@ -176,6 +176,494 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/rootfs/buildroot/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/rootfs/buildroot/" class="post-title-link" itemprop="url">buildroot</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/rootfs/" itemprop="url" rel="index"><span itemprop="name">rootfs</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>下载地址：　<a target="_blank" rel="noopener" href="https://buildroot.org/">https://buildroot.org/</a></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">├── arch: 存放CPU架构相关的配置脚本</span><br><span class="line">├── board</span><br><span class="line">├── boot</span><br><span class="line">├── CHANGES</span><br><span class="line">├── Config.in</span><br><span class="line">├── Config.in.legacy</span><br><span class="line">├── configs: 放置开发板的一些配置参数. </span><br><span class="line">├── COPYING</span><br><span class="line">├── DEVELOPERS</span><br><span class="line">├── dl: 存放下载的源代码及应用软件的压缩包. </span><br><span class="line">├── docs: 存放相关的参考文档. </span><br><span class="line">├── fs: 放各种文件系统的源代码. </span><br><span class="line">├── linux: 存放着Linux kernel的自动构建脚本. </span><br><span class="line">├── Makefile</span><br><span class="line">├── Makefile.legacy</span><br><span class="line">├── output: 是编译出来的输出文件夹. </span><br><span class="line">│   ├── build: 存放解压后的各种软件包编译完成后的现场.</span><br><span class="line">│   ├── host: 存放着制作好的编译工具链，如gcc、arm-linux-gcc等工具.</span><br><span class="line">│   ├── images: 存放着编译好的uboot.bin, zImage, rootfs等镜像文件，可烧写到板子里, 让linux系统跑起来.</span><br><span class="line">│   ├── staging</span><br><span class="line">│   └── target: 存放Linux系统基本的目录结构，以及编译好的应用库和bin可执行文件</span><br><span class="line">├── package：下面放着应用软件的配置文件，每个应用软件的配置文件有Config.in和soft_name.mk。</span><br><span class="line">├── README</span><br><span class="line">├── support</span><br><span class="line">├── system</span><br><span class="line">└── toolchain</span><br></pre></td></tr></table></figure>
+
+<p> Buildroot提供了构建流程的框架。开发者按照格式写脚本，提供必要的构建细节，配置整个系统，最后自动构建出你的系统。</p>
+<p> package/pkg-generic.mk中通过调用同目录下的pkg-download.mk、pkg-utils.mk文件，已经帮你自动实现了下载、解压、依赖包下载编译等一系列流程。你只要需要按照格式写Makefile脚app_pkg.mk，填充下载地址，链接依赖库的名字等一些特有的构建细节即可。</p>
+<p><img src="/images/rootfs/build.png" alt="构建流程框架"></p>
+<p>Buildroot代码仓库默认只包含一个编译框架，真正构建rootfs需要的各种代码包是根据配置选项，在编译的时候才开始下载的。</p>
+<p>通过<code>make help</code>可以看到buildroot下make的使用细节，包括对package、uclibc、busybox、linux以及文档生成等配置。</p>
+<p>执行命令<code>make list-defconfigs</code>查看buildroot中支持的开发板</p>
+<p>设置 toolchain 的版本和内核头文件的内核的版本</p>
+<p>System configuration-&gt;Run a getty(login prompt) after boot选项中配置 TTY Port 为 ttyAMA0。否则文件系统挂载后无法进入控制台。</p>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p><strong>Target options</strong>：目标板的配置</p>
+<ul>
+<li><p>Target Architecture：目标架构，这里选择 ARM(little endian)，ARM小端模式</p>
+</li>
+<li><p>Target Binary Format：二进制格式，为 ELF</p>
+</li>
+<li><p>Target Architecture Variant：架构变体为 arm920t，内核类型</p>
+</li>
+<li><p>Target ABI：应用程序二进制接口，为EABI</p>
+</li>
+<li><p>Floating point strategy：浮点数的策略，选择为 Soft float</p>
+</li>
+<li><p>ARM instruction set：arm 汇编指令集，选择  ARM</p>
+</li>
+<li><p><strong>Build　options</strong></p>
+</li>
+</ul>
+<p>主要是一些编译时用到的选项，比如dl的路径，下载代码包使用的路径，同时运行多个编译的上限，是否使能编译器缓冲区等。</p>
+<p><strong>Toolchain</strong>：工具链选项</p>
+<ul>
+<li>Toolchain type：Buildroot提供两种方式使用toolchain<ul>
+<li>external toolthain：非Buildroot提供的交叉编译器</li>
+<li>Buildroot toolchain：Buildroot本身编译生成的Buildroot toolchain</li>
+</ul>
+</li>
+<li>custom toolchain vendor name：填上S3C2440</li>
+<li>C library：C库选择，选择 glibc</li>
+<li>Kernel Headers：内核头文件，Linux 4.9.x kernel headers</li>
+<li>glibc version：glibc版本选择，2.24</li>
+<li>Binutils Version：binutils版本：2.27</li>
+<li>Additional binutils options：附加的 binutils 选择，不填即可</li>
+<li>GCC compiler Version：GCC版本选择，gcc 6.x</li>
+<li>Additional gcc options：附件的GCC选项</li>
+<li>Enable C++ support：使能C++支持，选上</li>
+<li>Enable Fortran support：使能Fortran语言支持，不选</li>
+<li>Enable compiler link-time-optimization support：是否支持LTO，不选</li>
+<li>Enable compiler OpenMP support：是否支持OpenMP，OpenMP用于共享内存并行系统的多处理器程序设计，<br>不适合需要复杂的线程间同步和互斥的场合，OpenMp的另一个缺点是不能在非共享内存系统如计算机集群上使用。不选择</li>
+<li>Enable graphite support ：是否支持graphite。Graphite是应用WEB应用的一套开源的编程接口。不选择。</li>
+<li>Build cross gdb for the host：主机上运行gdb进行调试，不选</li>
+<li>Copy gconv libraries：拷贝 gconv库，gconv库用于在不同字符集之间进行转换。默认不选</li>
+<li>Enable MMU support：使能 MMU，S3C2440支持MMU，选上</li>
+<li>Target Optimizations：不选</li>
+<li>Target linker options：不选</li>
+<li>Register toolchain within Eclipse Buildroot plug-in：eclipse插件支持，不选</li>
+</ul>
+<p><strong>System configuration</strong>：系统配置</p>
+<ul>
+<li>Root FS skeleton：</li>
+<li>System hostname：填写JZ2440</li>
+<li>System banner</li>
+<li>Passwords encoding</li>
+<li>Init system：系统初始化，选择 BusyBox</li>
+<li>/dev management：设备文件管理，选择Dynamic using devtmpfs + mdev，即使用mdev动态加载设备节点的方式</li>
+<li>Path to the permission tables：设备节点的配置表设置，一定要选择system/device_table_dev.txt，否则后面在dev目录下将不会生成各种设备节点。当然我们也可以手动的配置该文件，添加必要的节点或删除不需要的节点。</li>
+<li>support extended attributes in device tables</li>
+<li>Use symlinks to /usr for /bin, /sbin and /lib</li>
+<li>Enable root login with password</li>
+<li>Root password：进入linux控制台终端后的密码，为空则登录时不需要密码，默认登录用户名为root。</li>
+<li>/bin/sh (busybox’ default shell)</li>
+<li>Run a getty (login prompt) after boot：保持默认，默认为选中。<ul>
+<li>TTY port：控制台打印串口</li>
+<li>Baudrate ：波特率，配置为 115200</li>
+<li>TERM environment variable：默认即可</li>
+<li>other options to pass to getty：默认即可</li>
+</ul>
+</li>
+<li>remount root filesystem read-write during boot</li>
+<li>Network interface to configure through DHCP</li>
+<li>Purge unwanted locales</li>
+<li>Locales to keep</li>
+<li>Generate locale data</li>
+<li>Install timezone info</li>
+<li>Path to the users tables</li>
+<li>Root filesystem overlay directories：</li>
+<li>Custom scripts to run before creating filesystem images</li>
+<li>Custom scripts to run inside the fakeroot environment</li>
+<li>Custom scripts to run after creating filesystem images</li>
+</ul>
+<p><strong>Kernel</strong>：内核配置</p>
+<ul>
+<li><p>Kernel version：内核版本，选择用户自定义Custom version</p>
+</li>
+<li><p>Kernel version：填上自己所需要的版本，4.14.12</p>
+</li>
+<li><p>Custom kernel patches：自定义的内核补丁</p>
+</li>
+<li><p>Kernel configuration：内核配置，选择 Using an in-tree defconfig file</p>
+</li>
+<li><p>Defconfig name：填写为 mini2440</p>
+</li>
+<li><p>Additional configuration fragment files：暂且不填写</p>
+</li>
+<li><p>Kernel binary format：内核二进制文件格式，zImage</p>
+</li>
+<li><p>Kernel compression format：内核压缩格式，选择gzip</p>
+</li>
+<li><p>Build a Device Tree Blob：设备树？暂且不填写</p>
+</li>
+<li><p>Install kernel image to /boot in target：暂且不填</p>
+</li>
+<li><p>Linux Kernel Extensions：内核扩展，默认不选择</p>
+</li>
+<li><p>Linux Kernel Tools：内核工具，默认不选择</p>
+</li>
+<li><p><strong>Target packages</strong></p>
+</li>
+<li><p>Filesystem images：文件系统选择，选择 yaffs2 root filesystem</p>
+</li>
+<li><p><strong>Bootloaders</strong></p>
+</li>
+<li><p>Build system：u-boot系统选择为Kconfig</p>
+<ul>
+<li>legacy：若是选择2015.04之前的u-boot 选择此项</li>
+<li>Kconfig：2015.04之后的 u-boot 选择此项，勾选此项　　</li>
+</ul>
+</li>
+<li><p>U-boot Version：U-boot版本，默认为 2017.01，选择为Custom version</p>
+</li>
+<li><p>U-Boot version：填写为2017.11</p>
+</li>
+<li><p>Custom U-boot patches：U-boot补丁，不添加</p>
+</li>
+<li><p>U-Boot configuration：U-boot配置，暂时还没有U-BOOT，所以选择为：Using an in-tree board defconfig file</p>
+</li>
+<li><p>Board defconfig：板子的配置，选择与架构一样的板子的默认文件，mini2440。后期再修改</p>
+</li>
+<li><p>U-boot needs dtc：是否需要设备树，默认，后期调试</p>
+</li>
+<li><p>U-boot needs OpenSSL：是否需要 OpenSSL，默认，后期调试修改</p>
+</li>
+<li><p>U-boot binary format：二进制文件，选择 .bin文件</p>
+</li>
+<li><p>produce a .ift signed image：默认</p>
+</li>
+<li><p>Install U-boot SPL binary image：默认</p>
+</li>
+<li><p>Environment image：默认</p>
+</li>
+<li><p><strong>Host utilities</strong></p>
+</li>
+<li><p><strong>Legacy config options</strong></p>
+</li>
+</ul>
+<h2 id="编译性能"><a href="#编译性能" class="headerlink" title="编译性能"></a>编译性能</h2><p>buildroot还提供了一些命令，用于分析buildroot编译过程中耗时、依赖关系、文件系统尺寸等。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Documentation:</span><br><span class="line">  manual               　 * build manual in all formats</span><br><span class="line">  manual-html          　 * build manual in HTML</span><br><span class="line">  manual-split-html      * build manual in split HTML</span><br><span class="line">  manual-pdf             * build manual in PDF</span><br><span class="line">  manual-text            * build manual in text</span><br><span class="line">  manual-epub            * build manual in ePub</span><br><span class="line">  graph-build            * generate graphs of the build times</span><br><span class="line">  graph-depends          * generate graph of the dependency tree</span><br><span class="line">  graph-size             * generate stats of the filesystem size</span><br><span class="line">  list-defconfigs        * list all defconfigs (pre-configured minimal systems)</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/rootfs/busybox/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/rootfs/busybox/" class="post-title-link" itemprop="url">BusyBox</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/rootfs/" itemprop="url" rel="index"><span itemprop="name">rootfs</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a target="_blank" rel="noopener" href="https://busybox.net/downloads/">下载地址</a></p>
+<p><a target="_blank" rel="noopener" href="https://salsa.debian.org/installer-team/busybox">https://salsa.debian.org/installer-team/busybox</a></p>
+<p>修改顶层Makefile，修改交叉编译器和芯片平台：</p>
+<blockquote>
+<p>CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm</p>
+</blockquote>
+<p><code>make defconfig</code>，busybox提供了3种配置：defconfig (缺省配置)、allyesconfig（最大配置）、 allnoconfig（最小配置）。</p>
+<p><code>make menuconfig</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Busybox Settings  ---&gt;</span><br><span class="line">    Build Options  ---&gt;</span><br><span class="line">        [*]Build shared libbusybox</span><br><span class="line">        [ ] Build BusyBox as a static binary (no shared libs) (NEW)</span><br><span class="line"></span><br><span class="line">    (arm-anykav200-linux-uclibcgnueabi-) Cross compiler prefix 　//设置编译器</span><br><span class="line">        </span><br><span class="line">    Installation Options (&quot;make install&quot; behavior)  ---&gt;</span><br><span class="line">        (../rootfs) Destination path for &#x27;make install&#x27;   // 设置编译生成文件的存放路径</span><br><span class="line">        What kind of applet links to install (as soft-links)  ---&gt;　//设置生成后的命令是指向busybox的软链接</span><br><span class="line">  </span><br><span class="line">  Busybox Library Tuning  ---&gt;</span><br><span class="line">      (255) History size </span><br><span class="line">      [*]   History saving (NEW)   // 支持历史记录</span><br><span class="line">      [*]   Tab completion (NEW)   // 支持Tab补全操作</span><br></pre></td></tr></table></figure>
+
+<p><code>make; make install</code></p>
+<p>添加相应的库，用<code>readelf -d busybox</code>，查看依赖的库，将交叉编译环境下sysroot/lib目录下库拷贝到/lib。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/datatype/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/c/datatype/" class="post-title-link" itemprop="url">c语言数据类型</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <table>
+<thead>
+<tr>
+<th align="center">Data Type</th>
+<th align="center">ILP32</th>
+<th align="center">LP32</th>
+<th align="center">ILP64</th>
+<th align="center">LP64</th>
+<th align="center">LLP64</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">宏定义</td>
+<td align="center">_</td>
+<td align="center">_</td>
+<td align="center">_</td>
+<td align="center"><strong>LP64</strong></td>
+<td align="center"><strong>LLP64</strong></td>
+</tr>
+<tr>
+<td align="center">平台</td>
+<td align="center">Win32 API  / Unix 和 Unix 类的系统 （Linux，Mac OS X）</td>
+<td align="center">Win16 API</td>
+<td align="center"></td>
+<td align="center">Unix 和 Unix 类的系统 （Linux，Mac OS X)</td>
+<td align="center">Win64 API</td>
+</tr>
+<tr>
+<td align="center">char</td>
+<td align="center">8</td>
+<td align="center">8</td>
+<td align="center">8</td>
+<td align="center">8</td>
+<td align="center">8</td>
+</tr>
+<tr>
+<td align="center">short</td>
+<td align="center">16</td>
+<td align="center">16</td>
+<td align="center">16</td>
+<td align="center">16</td>
+<td align="center">16</td>
+</tr>
+<tr>
+<td align="center">int</td>
+<td align="center">32</td>
+<td align="center">16</td>
+<td align="center">64</td>
+<td align="center">32</td>
+<td align="center">32</td>
+</tr>
+<tr>
+<td align="center">long</td>
+<td align="center">32</td>
+<td align="center">32</td>
+<td align="center">64</td>
+<td align="center">64</td>
+<td align="center">32</td>
+</tr>
+<tr>
+<td align="center">long long</td>
+<td align="center">64</td>
+<td align="center">64</td>
+<td align="center">64</td>
+<td align="center">64</td>
+<td align="center">64</td>
+</tr>
+<tr>
+<td align="center">pointer</td>
+<td align="center">32</td>
+<td align="center">32</td>
+<td align="center">64</td>
+<td align="center">64</td>
+<td align="center">64</td>
+</tr>
+<tr>
+<td align="center">float</td>
+<td align="center">32</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">32</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">double</td>
+<td align="center">64</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">64</td>
+<td align="center"></td>
+</tr>
+</tbody></table>
+<ol>
+<li>格式化打印，long使用%ld或%lx，指针使用%p</li>
+<li>对于long类型，常量要加L，如：long a = 1L&lt;&lt;32</li>
+<li>ssize_t在32位机器上等同与int，在64位机器上等同与long，size_t是无符号型的ssize_t。</li>
+<li>指针大小在32位机器上是4字节，64位是8字节。指针p+1 = p + sizeof(p指向的数据类型)。</li>
+<li>int, short, long都是signed的，char可能是signed的，也可能是unsigned的，由编译器决定，一般x86上是有符号，arm上是无符号的。</li>
+</ol>
+<p>stdint.h 里定义了一些数据类型的别名和范围。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">signed</span> <span class="type">char</span>    <span class="type">int8_t</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">short</span> <span class="type">int</span>      <span class="type">int16_t</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">int</span>            <span class="type">int32_t</span>;</span><br><span class="line"><span class="meta"># <span class="keyword">if</span> __WORDSIZE == 64</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">int</span>       <span class="type">int64_t</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">__extension__</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> <span class="type">int</span>    <span class="type">int64_t</span>;</span><br><span class="line"><span class="meta"># <span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* Unsigned.  */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">char</span>        <span class="type">uint8_t</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span>   <span class="type">uint16_t</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">int</span>         <span class="type">uint32_t</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> __WORDSIZE == 64</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span>   <span class="type">uint64_t</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">__extension__</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span> <span class="type">int</span>  <span class="type">uint64_t</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* Types for `void *&#x27; pointers.  */</span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> __WORDSIZE == 64</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">int</span>            <span class="type">intptr_t</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span>   <span class="type">uintptr_t</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">int</span>                 <span class="type">ntptr_t</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">int</span>        <span class="type">uintptr_t</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* Limits of integral types.  */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* Minimum of signed integral types.  */</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> INT8_MIN        (-128)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> INT16_MIN       (-32767-1)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> INT32_MIN       (-2147483647-1)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> INT64_MIN       (-__INT64_C(9223372036854775807)-1)</span></span><br><span class="line"><span class="comment">/* Maximum of signed integral types.  */</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> INT8_MAX        (127)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> INT16_MAX       (32767)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> INT32_MAX       (2147483647)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> INT64_MAX       (__INT64_C(9223372036854775807))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* Maximum of unsigned integral types.  */</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> UINT8_MAX        (255)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> UINT16_MAX       (65535)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> UINT32_MAX       (4294967295U)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> UINT64_MAX       (__UINT64_C(18446744073709551615))</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/media/audio/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -12677,331 +13165,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/linux/etc/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/linux/etc/" class="post-title-link" itemprop="url">linux /etc/passwd config</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="etc-passwd"><a href="#etc-passwd" class="headerlink" title="/etc/passwd"></a>/etc/passwd</h2><p>/etc/passwd该文件对所有用户可读。文件中的每个用户都有一个对应的记录行，记录着这个用户的一下基本属性，每行记录又被冒号(:)分隔为7个字段，其格式和具体含义如下：</p>
-<p><strong>用户名:口令:用户标识号:组标识号:注释性描述:主目录:登录Shell</strong></p>
-<ul>
-<li>用户名(login_name):是代表用户账号的字符串。通常长度不超过8个字符，并且由大小写字母和/或数字组成。登录名中不能有冒号(:)，因为冒号在这里是分隔符。为了兼容起见，登录名中最好不要包含点字符(.)，并且不使用连字符(-)和加号(+)打头。</li>
-<li>口令(passwd):一些系统中，存放着加密后的用户口令字。虽然这个字段存放的只是用户口令的加密串，不是明文，但是由于/etc/passwd文件对所有用户都可读，所以这仍是一个安全隐患。因此，现在许多Linux系统（如SVR4）都使用了shadow技术，把真正的加密后的用户口令字存放到/etc/shadow文件中，而在/etc/passwd文件的口令字段中只存放一个特殊的字符，例如“x”或者“*”。</li>
-<li>用户标识号(UID):是一个整数，系统内部用它来标识用户。一般情况下它与用户名是一一对应的。如果几个用户名对应的用户标识号是一样的，系统内部将把它们视为同一个用户，但是它们可以有不同的口令、不同的主目录以及不同的登录Shell等。取值范围是0-65535。0是超级用户root的标识号，1-99由系统保留，作为管理账号，普通用户的标识号从100开始。在Linux系统中，这个界限是500。</li>
-<li>组标识号(GID):字段记录的是用户所属的用户组。它对应着/etc/group文件中的一条记录。</li>
-<li>注释性描述(users):字段记录着用户的一些个人情况，例如用户的真实姓名、电话、地址等，这个字段并没有什么实际的用途。在不同的Linux系统中，这个字段的格式并没有统一。在许多Linux系统中，这个字段存放的是一段任意的注释性描述文字，用做finger命令的输出。</li>
-<li>主目录(home_directory):也就是用户的起始工作目录，它是用户在登录到系统之后所处的目录。在大多数系统中，各用户的主目录都被组织在同一个特定的目录下，而用户主目录的名称就是该用户的登录名。各用户对自己的主目录有读、写、执行（搜索）权限，其他用户对此目录的访问权限则根据具体情况设置。</li>
-<li>登录Shell(Shell):用户登录后，要启动一个进程，负责将用户的操作传给内核，这个进程是用户登录到系统后运行的命令解释器或某个特定的程序，即Shell。Shell是用户与Linux系统之间的接口。系统管理员可以根据系统情况和用户习惯为用户指定某个Shell。如果不指定Shell，那么系统使用sh为默认的登录Shell，即这个字段的值为/bin/sh。</li>
-</ul>
-<h2 id="etc-shadow"><a href="#etc-shadow" class="headerlink" title="/etc/shadow"></a>/etc/shadow</h2><p>/etc/shadow文件中的记录行与/etc/passwd中的一一对应，是passwd文件的一个影子。它由pwconv命令根据/etc/passwd中的数据自动产生。但是/etc/shadow文件只有系统管理员才能够进行修改和查看。</p>
-<p><strong>登录名:加密口令:最后一次修改时间:最小时间间隔:最大时间间隔:警告时间:不活动时间:失效时间:标志</strong></p>
-<ol>
-<li>“登录名”是与/etc/passwd文件中的登录名相一致的用户账号</li>
-<li>“口令”字段存放的是加密后的用户口令字，格式为<code>$id$salt$hashed</code>，则表示该用户密码正常。其中<code>$id$</code>的id表示密码的加密算法，<code>$salt$</code>是加密时使用的salt，hashed才是真正的密码部分。</li>
-</ol>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">如果为空，则对应用户没有口令，登录时不需要口令；</span><br><span class="line">* 代表帐号被锁定；</span><br><span class="line">!! 表示这个密码已经过期了；</span><br><span class="line">$1$ 是用MD5加密；</span><br><span class="line">$2a$ 是用Blowfish加密；</span><br><span class="line">$2y$ 是另一算法长度的Blowfish</span><br><span class="line">$5$ 是用 SHA-256加密；</span><br><span class="line">$6$ 表示SHA-512算法</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li>“最后一次修改时间”表示的是从某个时刻起，到用户最后一次修改口令时的天数。时间起点对不同的系统可能不一样。例如在SCOLinux中，这个时间起点是1970年1月1日。</li>
-<li>“最小时间间隔”指的是两次修改口令之间所需的最小天数。</li>
-<li>“最大时间间隔”指的是口令保持有效的最大天数。</li>
-<li>“警告时间”字段表示的是从系统开始警告用户到用户密码正式失效之间的天数。</li>
-<li>“不活动时间”表示的是用户没有登录活动但账号仍能保持有效的最大天数。</li>
-<li>“失效时间”字段给出的是一个绝对的天数，如果使用了这个字段，那么就给出相应账号的生存期。期满后，该账号就不再是一个合法的账号，也就不能再用来登录了。</li>
-</ol>
-<h2 id="etc-group"><a href="#etc-group" class="headerlink" title="/etc/group"></a>/etc/group</h2><ul>
-<li>组名：组的名称，可以将其视为与数值型组标识符相对应的人类可读(符号)标识符。</li>
-<li>组密码：这里的 “x” 仅仅是密码标识，真正加密后的组密码默认保存在 /etc/gshadow 文件中。</li>
-<li>组 ID (GID)：该组的数值型 ID。正常情况下,对应于组 ID 号 0，只定义一个名为 root的组。</li>
-<li>用户列表：属于该组的用户名列表,之间以逗号分隔。</li>
-</ul>
-<h2 id="省略密码验证"><a href="#省略密码验证" class="headerlink" title="省略密码验证"></a>省略密码验证</h2><p>把/etc/passwd中的<code>root:x:0:0:root:/root:/bin/bash</code>，改为<code>root::0:0:root:/root:/bin/bash</code>，就可以了，就是去掉了里面的x，这样root用户就不用密码了。其他用户也一样。</p>
-<h2 id="省略输入用户名"><a href="#省略输入用户名" class="headerlink" title="省略输入用户名"></a>省略输入用户名</h2><p>修改/etc/inittab</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1:2345:respawn:/sbin/agetty tty1 9600</span><br><span class="line">2:2345:respawn:/sbin/agetty tty2 9600</span><br><span class="line">3:2345:respawn:/sbin/agetty tty3 9600</span><br><span class="line">4:2345:respawn:/sbin/agetty tty4 9600</span><br><span class="line">5:2345:respawn:/sbin/agetty tty5 9600</span><br><span class="line">6:2345:respawn:/sbin/agetty tty6 9600</span><br></pre></td></tr></table></figure>
-
-<p>表示系统可以有六个控制台，可以用ALT+(F1~F6)来切换。而/sbin/agetty就是一个登陆验证程序，执行它，会提示用户输入用户名和密码，然后启动一个指定的shell（在passwd文件中指定的）。所以，我们只需将其修改为不执行agettty，而是执行自己编写的一个脚本，就可以跳过用户名和密码的输入。修改如下：</p>
-<blockquote>
-<p>1:2345:respawn:/bin/autologin tty1 9600</p>
-</blockquote>
-<p>autologin脚本内容：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/sh</span></span><br><span class="line">/bin/login -f root</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/waitqueue/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/kernel/waitqueue/" class="post-title-link" itemprop="url">waitqueue</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>阻塞操作是指在执行设备操作时，若不能获得资源，则挂起的进程进入休眠状态，直到等待的条件被满足，而非阻塞操作是直接返回，并不挂起。</p>
-<p>等待队列用来同步对系统资源的访问，可实现进程阻塞。</p>
-<h2 id="waitqueue"><a href="#waitqueue" class="headerlink" title="waitqueue"></a>waitqueue</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">wait_queue_head</span> &#123;</span></span><br><span class="line">    <span class="type">spinlock_t</span> lock;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">task_list</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> __<span class="title">wait_queue_head</span> <span class="title">wait_queue_head_t</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">wait_queue</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> flags;</span><br><span class="line">    <span class="type">void</span> *private;</span><br><span class="line">    <span class="type">wait_queue_func_t</span> func;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">task_list</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> __<span class="title">wait_queue</span> <span class="title">wait_queue_t</span>;</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>定义等待队列头</strong></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">init_waitqueue_head(&amp;<span class="built_in">queue</span>);</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DECLARE_WAIT_QUEUE_HEAD(name) \</span></span><br><span class="line"><span class="meta">    wait_queue_head_t name = __WAIT_QUEUE_HEAD_INITIALIZER(name)</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>定义等待队列</strong></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> DECLARE_WAITQUEUE(name, tsk)                    \</span></span><br><span class="line"><span class="meta">    wait_queue_t name = __WAITQUEUE_INITIALIZER(name, tsk)</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>添加/移除等待队列到等待队列头</strong></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> fastcall <span class="title function_">add_wait_queue</span><span class="params">(<span class="type">wait_queue_head_t</span> *q, <span class="type">wait_queue_t</span> *wait)</span>;</span><br><span class="line"><span class="type">void</span> fastcall <span class="title function_">remove_wait_queue</span><span class="params">(<span class="type">wait_queue_head_t</span> *q, <span class="type">wait_queue_t</span> *wait)</span>;</span><br></pre></td></tr></table></figure>
-
-<p><strong>等待事件</strong></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*有条件等待*/</span></span><br><span class="line">wait_event(<span class="built_in">queue</span>, condition)</span><br><span class="line">wait_event_interruptible(<span class="built_in">queue</span>, condition)</span><br><span class="line">wait_event_timeout(<span class="built_in">queue</span>, condition, timeout)</span><br><span class="line">wait_event_interruptible_timeout(<span class="built_in">queue</span>, condition, timeout)</span><br><span class="line"></span><br><span class="line"><span class="comment">/*无条件等待 */</span></span><br><span class="line"><span class="type">void</span> __sched <span class="title function_">sleep_on</span><span class="params">(<span class="type">wait_queue_head_t</span> *q)</span>;</span><br><span class="line"><span class="type">void</span> __sched <span class="title function_">interruptible_sleep_on</span><span class="params">(<span class="type">wait_queue_head_t</span> *q)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>sleep_on()函数将目前进程的状态置成 TASK_UNINTERRUPTIBLE，并定义一个等待队列，之后把它附属到等待队列头 q，直到资源可获得，q引导的等待队列被唤醒。</p>
-<p>interruptible_sleep_on()将进程的状态置成TASK_INTERRUPTIBLE，能被等待队列或者信号唤醒。</p>
-<p><strong>唤醒队列</strong></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">wake_up</span><span class="params">(<span class="type">wait_queue_head_t</span> *<span class="built_in">queue</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">wake_up_interruptible</span><span class="params">(<span class="type">wait_queue_head_t</span> *<span class="built_in">queue</span>)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>wake_up()应该与 wait_event()或 wait_event_timeout()成对使用，而 wake_up_interruptible()则应与 wait_event_interruptible()或 wait_event_interruptible_timeout()成对使用。</p>
-<p>wake_up()可唤醒处于 TASK_INTERRUPTIBLE 和 TASK_UNINTERRUPTIBLE 的进程，而 wake_up_interruptible()只能唤醒处于 TASK_INTERRUPTIBLE 的进程。</p>
-<p><strong>进程状态切换</strong></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> TASK_RUNNING        0</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TASK_INTERRUPTIBLE  1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TASK_UNINTERRUPTIBLE    2</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __set_current_state(state_value)            \</span></span><br><span class="line"><span class="meta">    do &#123; current-&gt;state = (state_value); &#125; while (0)</span></span><br><span class="line">    </span><br><span class="line"><span class="meta">#<span class="keyword">define</span> set_current_state(state_value)      \</span></span><br><span class="line"><span class="meta">    set_mb(current-&gt;state, (state_value))</span></span><br></pre></td></tr></table></figure>
-
-<p>内核中使用<code>set_current_state()</code>函数或<code>__add_current_state()</code>函数来实现目前进程状态的改变，直接采用<code>current-&gt;state = TASK_UNINTERRUPTIBLE</code>类似的赋值语句也行。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 改变进程状态为睡眠 */</span></span><br><span class="line">__set_current_state(TASK_INTERRUPTIBLE);</span><br><span class="line"></span><br><span class="line">schedule(); </span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (signal_pending(current)) <span class="comment">//如果是被信号唤醒</span></span><br><span class="line">&#123;</span><br><span class="line">    ret = -ERESTARTSYS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>如果是非阻塞访问，设备忙时，直接返回-EAGAIN。如果是阻塞访问，需要进行状态切换，通过调用schedule()函数来调度其他进程执行。唤醒后，需通过 signal_pending(current) 判断是否是信号唤醒，如果是则返回-ERESTARTSYS。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/lock/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/kernel/lock/" class="post-title-link" itemprop="url">atomic mutex_lock semaphore</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="原子变量"><a href="#原子变量" class="headerlink" title="原子变量"></a>原子变量</h2><p>原子操作是一种不可以被打断的操作，需要硬件的支持。</p>
-<p><strong>原子整形操作</strong></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="keyword">volatile</span> <span class="type">int</span> counter;</span><br><span class="line">&#125; <span class="type">atomic_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 定义原子变量, 并初始化 */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">atomic_set</span><span class="params">(<span class="type">atomic_t</span> *v, <span class="type">int</span> i)</span>;</span><br><span class="line"><span class="type">atomic_t</span> v = ATOMIC_INIT(<span class="number">0</span>); </span><br><span class="line"></span><br><span class="line"><span class="type">atomic_read</span>(<span class="type">atomic_t</span> *v);  <span class="comment">// 获取原子变量的值</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*原子变量进行加减操作,并返回新的值*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">atomic_add_return</span><span class="params">(<span class="type">int</span> i, <span class="type">atomic_t</span> *v)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">atomic_sub_return</span><span class="params">(<span class="type">int</span> i, <span class="type">atomic_t</span> *v)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*原子变量自增/自减*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> atomic_inc(v)     (void) atomic_add_return(1, v)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> atomic_dec(v)     (void) atomic_sub_return(1, v)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 原子变量增加减少 i */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> atomic_add(i, v)  (void) atomic_add_return(i, v)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> atomic_sub(i, v)  (void) atomic_sub_return(i, v)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*原子变量执行自增、自减和减操作，测试其是否为0，为0返回true，否则返回 false*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> atomic_inc_and_test(v)  (atomic_add_return(1, v) == 0)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> atomic_dec_and_test(v)  (atomic_sub_return(1, v) == 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*原子变量自增自减操作,并返回新的值*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> atomic_inc_return(v)    (atomic_add_return(1, v))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> atomic_dec_return(v)    (atomic_sub_return(1, v))</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>原子位操作</strong></p>
-<p>原子位操作，可对数据的每一位进行操作。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*设置addr地址的第nr位*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">set_bit</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> nr, <span class="type">const</span> volatil <span class="type">void</span> *addr)</span>;  </span><br><span class="line"></span><br><span class="line"><span class="comment">/*清除addr地址的第nr位*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">clear_bit</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> nr, <span class="type">const</span> volatil <span class="type">void</span> *addr)</span>;  </span><br><span class="line"></span><br><span class="line"><span class="comment">/*对addr地址的第nr位进行反置*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">change_bit</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> nr, <span class="type">const</span> volatil <span class="type">void</span> *addr)</span>;  </span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回addr地址的第nr位*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">test_bit</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> nr, <span class="type">const</span> volatil <span class="type">void</span> *addr)</span>;  </span><br><span class="line"></span><br><span class="line"><span class="comment">/*先返回addr地址的第nr位，再执行相应bit操作*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">test_and_set_bit</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> nr, <span class="type">const</span> volatil <span class="type">void</span> *addr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">test_and_clear_bit</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> nr, <span class="type">const</span> volatil <span class="type">void</span> *addr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">test_and_change_bit</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> nr, <span class="type">const</span> volatil <span class="type">void</span> *addr)</span>;</span><br></pre></td></tr></table></figure>
-
-<h2 id="自旋锁"><a href="#自旋锁" class="headerlink" title="自旋锁"></a>自旋锁</h2><p>自旋锁(spin lock)是一种对临界资源进行互斥访问的手段。自旋锁主要针对SMP或单CPU但内核可抢占的情况，可以保证临界区不受别的CPU和本CPU 内的抢占进程打扰，但受到中断和底半部的影响。</p>
-<p>自旋锁是一种<strong>忙等待</strong>，如果得不到锁，则会自旋在那里，不会引起调用者睡眠，因此只有在占用锁的时间极短的情况下，使用自旋锁才是合理的。自旋锁锁定期间不能调用可能引起进程调度的函数，也不能递归使用，只允许一个持有者。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">spinlock</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">raw_spinlock</span> <span class="title">rlock</span>;</span></span><br><span class="line">    &#125;;</span><br><span class="line">&#125; <span class="type">spinlock_t</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/*初始化自旋锁*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">spin_lock_init</span><span class="params">(<span class="type">spinlock_t</span> *lock)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*获得自旋锁*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">spin_lock</span><span class="params">(<span class="type">spinlock_t</span> *lock)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*尝试获得自旋锁，如果能立即获得锁，它获得锁并返回真；否则立即返回假，不再自旋*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">spin_trylock</span><span class="params">(<span class="type">spinlock_t</span> *lock)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*释放自旋锁*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">spin_unlock</span><span class="params">(<span class="type">spinlock_t</span> *lock)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*上锁并关中断*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">spin_lock_irq</span><span class="params">(<span class="type">spinlock_t</span> *lock)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*解锁并开中断*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">spin_unlock_irq</span><span class="params">(<span class="type">spinlock_t</span> *lock)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*上锁并关底半部*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">spin_lock_bh</span><span class="params">(<span class="type">spinlock_t</span> *lock)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*解锁并开底半部*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">spin_unlock_bh</span><span class="params">(<span class="type">spinlock_t</span> *lock)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>自旋锁一般这样被使用:</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*定义一个自旋锁，然后初始化*/</span></span><br><span class="line"><span class="type">spinlock_t</span> lock;</span><br><span class="line">spin_lock_init(&amp;lock);</span><br><span class="line"></span><br><span class="line">spin_lock (&amp;lock); </span><br><span class="line">    <span class="comment">/* 临界区*/</span></span><br><span class="line">spin_unlock (&amp;lock); </span><br></pre></td></tr></table></figure>
-
-<h3 id="读写自旋锁"><a href="#读写自旋锁" class="headerlink" title="读写自旋锁"></a>读写自旋锁</h3><p>读写自旋锁(rwlock)只能有1个写操作，但允许并发读。</p>
-<h3 id="顺序锁"><a href="#顺序锁" class="headerlink" title="顺序锁"></a>顺序锁</h3><p>顺序锁(seqlock)是对读写锁的一种优化，读执行单元不必等待写执行单元完成写操作，写执行单元也不需要等待所有读执行单元完成读操作，写执行单元与写执行单元之间仍然是互斥的。如果读执行单元在读操作期间，写执行单元已经发生了写操作，那么读执行单元必须重新读取数据，以便确保得到的数据是完整的。</p>
-<p>顺序锁要求被保护的共享资源不含有指针，因为写执行单元可能使得指针失效，但读执行单元如果正要访问该指针，将导致oops。</p>
-<h2 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h2><p>信号量(semaphore)是一种用于保护临界区的方法，只有得到信号量的进程才能执行临界区代码。当获取不到信号量时，进程会将自身加入一个等待队列中去<strong>睡眠</strong>，当信号量释放后才被唤醒。</p>
-<p>信号量的实现依赖于自旋锁和等待队列，为了保证信号量结构存取的原子性，在多CPU中需要自旋锁来互斥。</p>
-<p>信号量是进程级的，会导致进程睡眠，睡眠需要进程上下文切换，开销也很大，因此只有当进程占用资源时间较长时，用信号量比较好。在中断或软中断情况下，因为不能被睡眠，所以不能用信号量。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">semaphore</span> &#123;</span></span><br><span class="line">    <span class="type">spinlock_t</span>      lock;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>        count;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>    <span class="title">wait_list</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*初始化信号量，一般为1*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">sema_init</span><span class="params">(<span class="keyword">struct</span> semaphore *sem, <span class="type">int</span> val)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*获得信号量，它会导致睡眠,因此不能在中断上下文使用*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">down</span><span class="params">(<span class="keyword">struct</span> semaphore *sem)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*能被信号打断，信号会导致该函数返回非0*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">down_interruptible</span><span class="params">(<span class="keyword">struct</span> semaphore *sem)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*尝试获得信号量，如果能够立刻获得，它就获得该信号量并返回0,否则返回非0值。它不会导致调用者睡眠，可以在中断上下文使用*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">down_trylock</span><span class="params">(<span class="keyword">struct</span> semaphore *sem)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*释放信号量*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">up</span><span class="params">(<span class="keyword">struct</span> semaphore *sem)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>信号量根据count的値，设定可以允许有多少个进程持有这个信号量，一个持有者的信号量叫互斥信号量，多个持有者的信号量叫计数信号量。</p>
-<p>使用down_interruptible()获取信号量时，要对返回值进行检查，如果非0要立即返回-ERESTARTSYS。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (down_interruptible(&amp;sem)) </span><br><span class="line">    <span class="keyword">return</span> -ERESTARTSYS;</span><br></pre></td></tr></table></figure>
-
-<h3 id="读写信号量"><a href="#读写信号量" class="headerlink" title="读写信号量"></a>读写信号量</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">rw_semaphore</span> &#123;</span></span><br><span class="line">    __s32           activity;</span><br><span class="line">    <span class="type">spinlock_t</span>      wait_lock;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>    <span class="title">wait_list</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*初始化读写信号量*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">init_rwsem</span><span class="params">(<span class="keyword">struct</span> rw_semaphore *sem)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*读信号量获取*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">down_read</span><span class="params">(<span class="keyword">struct</span> rw_semaphore *sem)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">down_read_trylock</span><span class="params">(<span class="keyword">struct</span> rw_semaphore *sem)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*读信号量释放*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">up_read</span><span class="params">(<span class="keyword">struct</span> rw_semaphore *sem)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*写信号量获取*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">down_write</span><span class="params">(<span class="keyword">struct</span> rw_semaphore *sem)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">down_write_trylock</span><span class="params">(<span class="keyword">struct</span> rw_semaphore *sem)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*写信号量释放*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">up_write</span><span class="params">(<span class="keyword">struct</span> rw_semaphore *sem)</span>;</span><br></pre></td></tr></table></figure>
-
-<h2 id="完成量"><a href="#完成量" class="headerlink" title="完成量"></a>完成量</h2><p>完成量用于内核线程间的同步。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">completion</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> done;</span><br><span class="line">    <span class="type">wait_queue_head_t</span> wait;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*初始化完成量*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">init_completion</span><span class="params">(<span class="keyword">struct</span> completion *x)</span>;</span><br><span class="line">DECLARE_COMPLETION(x)</span><br><span class="line"></span><br><span class="line"><span class="comment">/*等待完成量被唤醒*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">wait_for_completion</span><span class="params">(<span class="keyword">struct</span> completion *c)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*唤醒完成量*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">complete</span><span class="params">(<span class="keyword">struct</span> completion *c)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">complete_all</span><span class="params">(<span class="keyword">struct</span> completion *c)</span>;</span><br></pre></td></tr></table></figure>
-
-<h2 id="互斥锁"><a href="#互斥锁" class="headerlink" title="互斥锁"></a>互斥锁</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">mutex</span> &#123;</span></span><br><span class="line">    <span class="type">atomic_t</span>        count; <span class="comment">/* 1: unlocked, 0: locked, negative: locked, possible waiters */</span></span><br><span class="line">    <span class="type">spinlock_t</span>      wait_lock;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>    <span class="title">wait_list</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_DEBUG_MUTEXES) || defined(CONFIG_SMP)</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span>  *<span class="title">owner</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_DEBUG_MUTEXES</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>      *name;</span><br><span class="line">    <span class="type">void</span>            *magic;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_DEBUG_LOCK_ALLOC</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">lockdep_map</span>  <span class="title">dep_map</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*互斥体并初始化*/</span></span><br><span class="line">mutex_init(&amp;mutex);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*获取互斥体*/</span></span><br><span class="line"><span class="type">void</span> __sched <span class="title function_">mutex_lock</span><span class="params">(<span class="keyword">struct</span> mutex *lock)</span>;</span><br><span class="line"><span class="type">int</span> __sched <span class="title function_">mutex_lock_interruptible</span><span class="params">(<span class="keyword">struct</span> mutex *lock)</span>;</span><br><span class="line"><span class="type">int</span> __sched <span class="title function_">mutex_trylock</span><span class="params">(<span class="keyword">struct</span> mutex *lock)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*释放互斥体*/</span></span><br><span class="line"><span class="type">void</span> __sched <span class="title function_">mutex_unlock</span><span class="params">(<span class="keyword">struct</span> mutex *lock)</span>;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -13071,7 +13234,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">177</span>
+          <span class="site-state-item-count">180</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -13084,7 +13247,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
