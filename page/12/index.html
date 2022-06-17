@@ -176,6 +176,241 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/tree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/algo/tree/" class="post-title-link" itemprop="url">数据结构-树</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="树的定义"><a href="#树的定义" class="headerlink" title="树的定义"></a>树的定义</h2><p>树是 n (n &gt;= 0)个结点的有限集合，当n = 0 时称为空树。在任意一棵非空树中都应满足：</p>
+<blockquote>
+<ol>
+<li>有且仅有一个根结点。</li>
+<li>当 n &gt; 1 时，其余结点可分为 m ( m &gt; 0)个互不相交的有限集合T1,T2,T3, …. Tm ，其中每一个集合本身又是一棵树，并且称为根结点的子树。</li>
+</ol>
+</blockquote>
+<ul>
+<li>结点深度：对任意结点x，x结点的深度表示为根结点到x结点的路径长度。所以根结点深度为0，第二层结点深度为1，以此类推</li>
+<li>结点高度：对任意结点x，叶子结点到x结点的路径长度就是结点x的高度</li>
+<li>树的深度：一棵树中结点的最大深度就是树的深度，也称为高度</li>
+<li>父结点：若一个结点含有子结点，则这个结点称为其子结点的父结点</li>
+<li>子结点：一个结点含有的子树的根结点称为该结点的子结点</li>
+<li>结点的层次：从根结点开始，根结点为第一层，根的子结点为第二层，以此类推</li>
+<li>兄弟结点：拥有共同父结点的结点互称为兄弟结点</li>
+<li>度：结点的子树数目就是结点的度</li>
+<li>叶子结点：度为零的结点就是叶子结点</li>
+<li>祖先：对任意结点x，从根结点到结点x的所有结点都是x的祖先（结点x也是自己的祖先）</li>
+<li>后代：对任意结点x，从结点x到叶子结点的所有结点都是x的后代（结点x也是自己的后代）</li>
+<li>森林：m颗互不相交的树构成的集合就是森林</li>
+</ul>
+<p><img src="/images/code/algo/tree/struct.png" alt="树定义"><br><img src="/images/code/algo/tree/struct2.png" alt="树定义"></p>
+<h2 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h2><p>二叉树(Binary Tree)是 n (n &gt;= 0)个结点的有限集合，当n = 0 时称为空二叉树，或者由1个根结节和2棵互不相交的，分别称为左子树和右子树组成。</p>
+<ul>
+<li>每个结点至多包含两棵子树，度小于2。</li>
+<li>二叉树的第i层上至多有2^i-1^个结点(i&gt;=1)。</li>
+<li>深度为k的二叉树至多有2^k^-1个结点(k&gt;=1)。</li>
+<li>对任何一棵二叉树，如果其终端结点数为n<del>0</del>，度为2的结点数为n<del>2</del>，则n<del>0</del> = n<del>2</del> + 1。</li>
+<li>具有n个结点的完全二叉树的深度为|log2^n^|+1 (|x|表示不大于x的最大整数)。</li>
+</ul>
+<h3 id="树的存储结构"><a href="#树的存储结构" class="headerlink" title="树的存储结构"></a>树的存储结构</h3><p><img src="/images/code/algo/tree/list.jpg" alt="链式存储"><br><img src="/images/code/algo/tree/array2.jpg" alt="顺序存储"><br><img src="/images/code/algo/tree/array.jpg" alt="顺序存储"></p>
+<h3 id="二叉树的遍历"><a href="#二叉树的遍历" class="headerlink" title="二叉树的遍历"></a>二叉树的遍历</h3><p><img src="/images/code/algo/tree/foreach.jpg" alt="二叉树的遍历"></p>
+<p>前序遍历规则是若树为空，则空操作返回，否则先访问根结点，然后依次访问的左子树和右子树。</p>
+<p>中序遍历规则是若树为空，则空操作返回，否则从根结点开始，先遍历根结点的左子树，然后访问根结点，最后访问右子树。</p>
+<p>后序遍历规则是若树为空，则空操作返回，否则从左到右先叶子后结点的方式遍历访问左右子树，最后访问根结点。</p>
+<p>层序遍历规则是若树为空，则空操作返回，否则从树的第一层，也就是根结点开始访问，从上而下逐层遍历，在同一层中，按从左到右的顺序对结点逐个访问。</p>
+<p><img src="/images/code/algo/tree/foreach2.png" alt="二叉树的遍历"></p>
+<h3 id="满二叉树"><a href="#满二叉树" class="headerlink" title="满二叉树"></a>满二叉树</h3><p>叶子节点都在同一层并且除叶子节点外的所有节点都有两个子节点的二叉树。<br><img src="/images/code/algo/tree/fulltree.png" alt="满二叉树"></p>
+<h3 id="完全二叉树"><a href="#完全二叉树" class="headerlink" title="完全二叉树"></a>完全二叉树</h3><p>对于一颗二叉树，假设其深度为d（d&gt;1）。除第d层外的所有节点构成满二叉树，且第d层所有节点从左向右连续地紧密排列，这样的二叉树被称为完全二叉树。</p>
+<p>对一颗具有n个结点的二叉树按层序编号，如果编号为i(1 &lt;= i &lt;= n)的结点与同样深度的满二叉树中编号为i的结点在二叉树中位置完全相同，则棵二叉树称为完全二叉树。</p>
+<p><img src="/images/code/algo/tree/alltree.png" alt="完全二叉树"></p>
+<ol>
+<li>叶子结点只能出现在最下两层。</li>
+<li>最下层的叶子一定集中在左部连续位置。</li>
+<li>倒数二层，若有叶子结点，一定都在右部连续位置。</li>
+<li>如果结点度数为1,则该结点只有左子树，即不存在只有右子树的情况。</li>
+<li>同样结点数的二叉树，完全二叉树的深度最小。</li>
+</ol>
+<h3 id="平衡二叉树-AVL"><a href="#平衡二叉树-AVL" class="headerlink" title="平衡二叉树(AVL)"></a>平衡二叉树(AVL)</h3><p>它是一棵空树或它的左右两个子树的高度差的绝对值不超过1，并且左右两个子树都是一棵平衡二叉树，同时平衡二叉树必定是二叉搜索树。</p>
+<h3 id="二叉搜索树"><a href="#二叉搜索树" class="headerlink" title="二叉搜索树"></a>二叉搜索树</h3><ul>
+<li>若任意节点的左子树不空，则左子树上所有节点的值均小于它的根节点的值；</li>
+<li>若任意节点的右子树不空，则右子树上所有节点的值均大于它的根节点的值；</li>
+<li>任意节点的左、右子树也分别为二叉查找树；</li>
+<li>没有键值相等的节点。</li>
+</ul>
+<h3 id="霍夫曼树"><a href="#霍夫曼树" class="headerlink" title="霍夫曼树"></a>霍夫曼树</h3><p>带权路径最短的二叉树称为哈夫曼树或最优二叉树。</p>
+<h3 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h3><p>红黑树是一颗特殊的二叉查找树，除了二叉查找树的要求外，它还具有以下特性：</p>
+<ul>
+<li>每个节点或者是黑色，或者是红色。</li>
+<li>根节点是黑色。</li>
+<li>每个叶子节点是黑色。<br>如果一个节点是红色的，则它的子节点必须是黑色的。</li>
+<li>从一个节点到该节点的子孙节点的所有路径上包含相同数目的黑节点。</li>
+</ul>
+<h3 id="B-tree"><a href="#B-tree" class="headerlink" title="B-tree"></a>B-tree</h3><p>一颗m阶B树的特性：</p>
+<ul>
+<li>根结点至少有两个子女（如果B树只有一个根节点，这个根节点的key的数量可以为[1~m-1]）</li>
+<li>每个非根节点所包含的关键字个数 j 满足：⌈m/2⌉ - 1 &lt;= j &lt;= m - 1，节点的值按非降序方式存放，即从左到右依次增加</li>
+<li>除根结点以及叶子节点以外的所有结点的度数正好是关键字总数加1，故内部节点的子树个数 k 满足：⌈m/2⌉ &lt;= k &lt;= m</li>
+<li>所有的叶子结点都位于同一层</li>
+</ul>
+<h3 id="B-树"><a href="#B-树" class="headerlink" title="B+树"></a>B+树</h3><p>m阶B+树是m阶B-tree的变体，它的定义大致跟B-tree一致，不过有以下几点不同：</p>
+<ul>
+<li>有n棵子树的结点中含有n个关键字，每个关键字不保存数据，只用来索引，所有数据都保存在叶子节点，其中⌈m/2⌉ &lt;= n &lt;= m</li>
+<li>所有的叶子结点中包含了全部关键字的信息，及指向含这些关键字记录的指针，且叶子结点本身依关键字的大小自小而大顺序链接</li>
+<li>所有的非终端结点可以看成是索引部分，结点中仅含其子树（根结点）中的最大（或最小）关键字</li>
+<li>通常在B+树上有两个头指针，一个指向根结点，一个指向关键字最小的叶子结点</li>
+</ul>
+<h3 id="B-树-1"><a href="#B-树-1" class="headerlink" title="B*树"></a>B*树</h3><p>B*树是B+树的变体，除了B+树的要求之外，还有以下特性：</p>
+<ul>
+<li>⌈m*2/3⌉ &lt;= n &lt;=m 这里的n是除根节点之外的内部节点的键</li>
+<li>增加内部节点中兄弟节点的指针，由左边指向右边</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/binary/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/algo/binary/" class="post-title-link" itemprop="url">二分法的标准写法</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>对于二分法，我们常用的取中位数的算法是这样的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mid = (min + max) / <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<p>但当 min 和 max 很大的时候，会出现溢出的情况，从而导致数组访问出错。改进的办法是将加法变成减法。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="type">static</span> <span class="type">int</span> <span class="title">binary</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> data)</span> </span>&#123;</span><br><span class="line">        <span class="type">int</span> min = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> max = arr.length - <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> mid;</span><br><span class="line">        <span class="keyword">while</span> (min &lt;= max) &#123;</span><br><span class="line">            <span class="comment">// 防止溢出</span></span><br><span class="line">            mid =  min + (max - min) / <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span> (arr[mid] &gt; data) &#123;</span><br><span class="line">                max = mid - <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[mid] &lt; data) &#123;</span><br><span class="line">                min = mid + <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> mid;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>还有一种更高效的办法是使用位运算。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="type">static</span> <span class="type">int</span> <span class="title">binary</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> data)</span> </span>&#123;</span><br><span class="line">       <span class="type">int</span> min = <span class="number">0</span>;</span><br><span class="line">       <span class="type">int</span> max = arr.length - <span class="number">1</span>;</span><br><span class="line">       <span class="type">int</span> mid;</span><br><span class="line">       <span class="keyword">while</span> (min &lt;= max) &#123;</span><br><span class="line">           <span class="comment">// 无符号位运算符的优先级较低，先括起来</span></span><br><span class="line">           mid =  min + ((max - min) &gt;&gt;&gt; <span class="number">1</span>);</span><br><span class="line">           <span class="keyword">if</span> (arr[mid] &gt; data) &#123;</span><br><span class="line">               max = mid - <span class="number">1</span>;</span><br><span class="line">           &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[mid] &lt; data) &#123;</span><br><span class="line">               min = mid + <span class="number">1</span>;</span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               <span class="keyword">return</span> mid;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/array/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -801,7 +1036,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:26:36" itemprop="dateModified" datetime="2022-06-08T17:26:36+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-17 20:49:31" itemprop="dateModified" datetime="2022-06-17T20:49:31+08:00">2022-06-17</time>
               </span>
 
           
@@ -834,9 +1069,7 @@
 </li>
 <li><p>绝大部分进程控制API，包括fork(缺vfork)、_exit、_Exit(缺exit)、wait、waitpid、execl、execle、execv、execve、setuid、setgid、setsid、setpgid、getuid、geteuid、getgid、getegid、getpid、getppid</p>
 </li>
-<li><p>clock_gettime、time</p>
-</li>
-<li><p>POSIX函数 sem_post</p>
+<li><p>POSIX标准库函数</p>
 </li>
 </ul>
 <table>
@@ -1006,16 +1239,136 @@
 </tbody></table>
 <h2 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h2><p>线程安全函数的定义来自多线程环境：如果一个函数在相同的时间点可以被多个线程安全的调用，就称该函数为线程安全函数。</p>
 <p>POSIX中大多数函数都是线程安全的，常用的非线程安全函数主要有以下这些：</p>
-<ul>
-<li>basename、dirname、readdir</li>
-<li>getenv、setenv、unsetenv、system</li>
-<li>gethostent、getnetbyaddr、getnetbyname、getnetent、getserverbyname、getserverbyport、getservent</li>
-<li>strok</li>
-<li>strerror、strsignal</li>
-<li>getopt</li>
-<li>localtime、gmtime</li>
-<li>rand</li>
-</ul>
+<table>
+<thead>
+<tr>
+<th>asctime</th>
+<th>ecvt</th>
+<th>gethostent</th>
+<th>getutxline</th>
+<th>putc_unlocked</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>basename</td>
+<td>encrypt</td>
+<td>getlogin</td>
+<td>gmtime</td>
+<td>putchar_unlocked</td>
+</tr>
+<tr>
+<td>catgets</td>
+<td>endgrent</td>
+<td>getnetbyaddr</td>
+<td>hcreate</td>
+<td>putenv</td>
+</tr>
+<tr>
+<td>crypt</td>
+<td>endpwent</td>
+<td>getnetbyname</td>
+<td>hdestroy</td>
+<td>pututxline</td>
+</tr>
+<tr>
+<td>ctime</td>
+<td>endutxent</td>
+<td>getnetent</td>
+<td>hsearch</td>
+<td>rand</td>
+</tr>
+<tr>
+<td>dbm_clearerr</td>
+<td>fcvt</td>
+<td>getopt</td>
+<td>inet_ntoa</td>
+<td>readdir</td>
+</tr>
+<tr>
+<td>dbm_close</td>
+<td>ftw</td>
+<td>getprotobyname</td>
+<td>l64a</td>
+<td>setenv</td>
+</tr>
+<tr>
+<td>dbm_delete</td>
+<td>gcvt</td>
+<td>getprotobynumber</td>
+<td>lgamma</td>
+<td>setgrent</td>
+</tr>
+<tr>
+<td>dbm_error</td>
+<td>getc_unlocked</td>
+<td>getprotoent</td>
+<td>lgammaf</td>
+<td>setkey</td>
+</tr>
+<tr>
+<td>dbm_fetch</td>
+<td>getchar_unlocked</td>
+<td>getpwent</td>
+<td>lgammal</td>
+<td>setpwent</td>
+</tr>
+<tr>
+<td>dbm_firstkey</td>
+<td>getdate</td>
+<td>getpwnam</td>
+<td>localeconv</td>
+<td>setutxent</td>
+</tr>
+<tr>
+<td>dbm_nextkey</td>
+<td>getenv</td>
+<td>getpwuid</td>
+<td>localtime</td>
+<td>strerror</td>
+</tr>
+<tr>
+<td>dbm_open</td>
+<td>getgrent</td>
+<td>getservbyname</td>
+<td>lrand48</td>
+<td>strsignal</td>
+</tr>
+<tr>
+<td>dbm_store</td>
+<td>getgrgid</td>
+<td>getservbyport</td>
+<td>mrand48</td>
+<td>strtok</td>
+</tr>
+<tr>
+<td>dirname</td>
+<td>getgrnam</td>
+<td>getservent</td>
+<td>nftw</td>
+<td>system</td>
+</tr>
+<tr>
+<td>dlerror</td>
+<td>gethostbyaddr</td>
+<td>getutxent</td>
+<td>nl_langinfo</td>
+<td>tmpnam</td>
+</tr>
+<tr>
+<td>drand48</td>
+<td>gethostbyname</td>
+<td>getutxid</td>
+<td>ptsname</td>
+<td>ttyname</td>
+</tr>
+<tr>
+<td>unsetenv</td>
+<td>wcstombs</td>
+<td>wctomb</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在写函数时候尽量使用局部变量，对全局变量要用互斥手段加以保护，变得线程安全，对于返回值是存放在静态共享的函数可以通过自己传入地址的方式变得线程可重入。</p>
 <p>可重入和线程安全是不同的概念，其观察角度不同，可重入函数和线程安全函数之间也没有必然联系。线程可重入，也就是说是线程安全的，但并不是说对于信号处理函数也是可重入的，同样的也不是异步信号安全的。</p>
 <p>对于printf这类IO函数，它们使用了全局数据结构（iobuffer），所以不是线程安全的（多个线程同时访问共享资源），需要对输出缓冲区加锁，所以是不可重入的（有共享资源）。</p>
@@ -1367,203 +1720,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/module_make/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/kernel/module_make/" class="post-title-link" itemprop="url">make module</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>编译一个模块需要内核源码（已经编译过的）和当前模块的Makefile文件。</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$(info KERNELRELEASE: <span class="variable">$(KERNELRELEASE)</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ifeq</span> (<span class="variable">$(KERNELRELEASE)</span>,)</span><br><span class="line">KERNEL_DIR ?= /lib/modules/<span class="variable">$(<span class="built_in">shell</span> uname -r)</span>/build</span><br><span class="line"></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">	obj-m += hello.o</span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"></span><br><span class="line"><span class="section">all:</span></span><br><span class="line">	<span class="variable">$(MAKE)</span> -C <span class="variable">$(KERNEL_DIR)</span> M=<span class="variable">$(PWD)</span> modules</span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	@find ./ \</span><br><span class="line">		\( -name &#x27;*.[oas]&#x27; -o -name &#x27;.*.cmd&#x27; -o -name &#x27;*.symvers&#x27;\</span><br><span class="line">		-o -name &#x27;.*.d&#x27; -o -name &#x27;.*.tmp&#x27; -o -name &#x27;*.mod.c&#x27; \</span><br><span class="line">		-o -name &#x27;*.symtypes&#x27; -o -name &#x27;modules.order&#x27; \</span><br><span class="line">		-o -name modules.builtin -o -name &#x27;.tmp_*.o.*&#x27; \</span><br><span class="line">		-o -name &#x27;*.gcno&#x27; -o -name tags -o -name &#x27;.tags*&#x27; \</span><br><span class="line">		 \) -type f -print | xargs rm -f</span><br><span class="line"></span><br><span class="line">	@find ./ \</span><br><span class="line">		\( -name .tmp_versions \) -type d -print | xargs rm -rf</span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="keyword">.PHONY</span>: clean all</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<ol>
-<li>先判断<code>KERNELRELEASE</code>环境变量是否为空，该变量的値在进入内核源码目录后，会设置为内核版本号。</li>
-<li>执行<code>-C $(KERNEL_DIR)</code>选项，进入内核源码目录。</li>
-<li>根据选项<code>M=$(PWD)</code>，编译器会回到模块当前目录，再次执行Makefile文件，此时<code>KERNELRELEASE</code>环境变量已经有値了，生成hello.o中间文件。</li>
-<li>运行MODPOST程序，生成hello.mod.c文件。</li>
-<li>最后链接生成hello.ko。</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">KERNELRELEASE: </span><br><span class="line">make -C /lib/modules/4.10.0-38-generic/build M=/home/luo_u/CodeHub/dev/test modules</span><br><span class="line">make[1]: Entering directory &#x27;/usr/src/linux-headers-4.10.0-38-generic&#x27;</span><br><span class="line">KERNELRELEASE: 4.10.0-38-generic</span><br><span class="line">  CC [M]  /home/luo_u/CodeHub/dev/test/hello.o</span><br><span class="line">  Building modules, stage 2.</span><br><span class="line">KERNELRELEASE: 4.10.0-38-generic</span><br><span class="line">  MODPOST 1 modules</span><br><span class="line">  CC      /home/luo_u/CodeHub/dev/test/hello.mod.o</span><br><span class="line">  LD [M]  /home/luo_u/CodeHub/dev/test/hello.ko</span><br><span class="line">make[1]: Leaving directory &#x27;/usr/src/linux-headers-4.10.0-38-generic&#x27;</span><br></pre></td></tr></table></figure>
-
-<p>加载模块，后在/sys/module/hello/目录和/proc/modules文件就可以看到模块信息了。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">lsmod | grep hello</span></span><br><span class="line">hello                  16384  0</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">cat</span> /proc/modules | grep hello</span></span><br><span class="line">hello 16384 0 - Live 0x0000000000000000 (OE)</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">ls</span> /sys/module/hello/</span></span><br><span class="line">coresize  holders  initsize  initstate  notes  refcnt  sections  srcversion  taint  uevent</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/kernel_make/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/kernel/kernel_make/" class="post-title-link" itemprop="url">kernel make and menuconfig</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>指定交叉工具和平台。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm menuconfig</span><br></pre></td></tr></table></figure>
-
-<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><ul>
-<li>屏蔽编译信息</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make &gt; /dev/null</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>使用<code>make -j&lt;n&gt;</code>参数加速编译</p>
-</li>
-<li><p>指定编译某些模块</p>
-</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make M=drivers/i2c/ modules</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>使用 verbose 模式，将每一步执行的命令都打印出来，并重定向到一个文件中去，这样以后可以方便地查找模块之间的依赖关系。</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make V=1 &gt; ~/bak.txt</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>使用 ccache 提高编译速度，使用 ccache时，需要更改源码树根目录下面的 Makefile 文件，在 CC 和 HOSTCC 变量的定义前添加 ccache。<a target="_blank" rel="noopener" href="http://ccache.samba.org/">ccache主页</a>。</li>
-</ul>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CC = ccache <span class="variable">$(CROSS_COMPILE)</span>gcc</span><br><span class="line">HOSTCC = ccache gcc</span><br></pre></td></tr></table></figure>
-
-<h2 id="编译文档"><a href="#编译文档" class="headerlink" title="编译文档"></a>编译文档</h2><p>使用下面的一些命令可以在 Documentation/DocBook/目录下，生成一些文档。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">make htmldocs //生成 HTML 文件</span><br><span class="line">make pdfdocs  //生成 PDF 文件</span><br><span class="line">make psdocs   //生成 Postscript 文件</span><br><span class="line">make mandocs  //生成 Kernel API 手册</span><br><span class="line">make installmandocs //将 Kernel API 手册页安装到 man 程序能够找到的目录中</span><br></pre></td></tr></table></figure>
-
-<h2 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h2><p>1.缺少libncurses5-dev</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make menuconfig requires the ncurses libraries.</span><br></pre></td></tr></table></figure>
-
-<p>2.没有安装u-boot-tools</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkimage command not found – U-Boot images will not be built</span><br></pre></td></tr></table></figure>
-
-<p>3.源文件编译生成的.o文件和模块目标文件xxx.o重名。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">module license &#x27;unspecified&#x27; taints kernel.</span><br><span class="line">Disabling lock debugging due to kernel taint</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1633,7 +1789,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">180</span>
+          <span class="site-state-item-count">179</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1646,7 +1802,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-count">32</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

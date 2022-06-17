@@ -176,6 +176,203 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/module_make/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/kernel/module_make/" class="post-title-link" itemprop="url">make module</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>编译一个模块需要内核源码（已经编译过的）和当前模块的Makefile文件。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$(info KERNELRELEASE: <span class="variable">$(KERNELRELEASE)</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ifeq</span> (<span class="variable">$(KERNELRELEASE)</span>,)</span><br><span class="line">KERNEL_DIR ?= /lib/modules/<span class="variable">$(<span class="built_in">shell</span> uname -r)</span>/build</span><br><span class="line"></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">	obj-m += hello.o</span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"></span><br><span class="line"><span class="section">all:</span></span><br><span class="line">	<span class="variable">$(MAKE)</span> -C <span class="variable">$(KERNEL_DIR)</span> M=<span class="variable">$(PWD)</span> modules</span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	@find ./ \</span><br><span class="line">		\( -name &#x27;*.[oas]&#x27; -o -name &#x27;.*.cmd&#x27; -o -name &#x27;*.symvers&#x27;\</span><br><span class="line">		-o -name &#x27;.*.d&#x27; -o -name &#x27;.*.tmp&#x27; -o -name &#x27;*.mod.c&#x27; \</span><br><span class="line">		-o -name &#x27;*.symtypes&#x27; -o -name &#x27;modules.order&#x27; \</span><br><span class="line">		-o -name modules.builtin -o -name &#x27;.tmp_*.o.*&#x27; \</span><br><span class="line">		-o -name &#x27;*.gcno&#x27; -o -name tags -o -name &#x27;.tags*&#x27; \</span><br><span class="line">		 \) -type f -print | xargs rm -f</span><br><span class="line"></span><br><span class="line">	@find ./ \</span><br><span class="line">		\( -name .tmp_versions \) -type d -print | xargs rm -rf</span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="keyword">.PHONY</span>: clean all</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>先判断<code>KERNELRELEASE</code>环境变量是否为空，该变量的値在进入内核源码目录后，会设置为内核版本号。</li>
+<li>执行<code>-C $(KERNEL_DIR)</code>选项，进入内核源码目录。</li>
+<li>根据选项<code>M=$(PWD)</code>，编译器会回到模块当前目录，再次执行Makefile文件，此时<code>KERNELRELEASE</code>环境变量已经有値了，生成hello.o中间文件。</li>
+<li>运行MODPOST程序，生成hello.mod.c文件。</li>
+<li>最后链接生成hello.ko。</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">KERNELRELEASE: </span><br><span class="line">make -C /lib/modules/4.10.0-38-generic/build M=/home/luo_u/CodeHub/dev/test modules</span><br><span class="line">make[1]: Entering directory &#x27;/usr/src/linux-headers-4.10.0-38-generic&#x27;</span><br><span class="line">KERNELRELEASE: 4.10.0-38-generic</span><br><span class="line">  CC [M]  /home/luo_u/CodeHub/dev/test/hello.o</span><br><span class="line">  Building modules, stage 2.</span><br><span class="line">KERNELRELEASE: 4.10.0-38-generic</span><br><span class="line">  MODPOST 1 modules</span><br><span class="line">  CC      /home/luo_u/CodeHub/dev/test/hello.mod.o</span><br><span class="line">  LD [M]  /home/luo_u/CodeHub/dev/test/hello.ko</span><br><span class="line">make[1]: Leaving directory &#x27;/usr/src/linux-headers-4.10.0-38-generic&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>加载模块，后在/sys/module/hello/目录和/proc/modules文件就可以看到模块信息了。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">lsmod | grep hello</span></span><br><span class="line">hello                  16384  0</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">cat</span> /proc/modules | grep hello</span></span><br><span class="line">hello 16384 0 - Live 0x0000000000000000 (OE)</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">ls</span> /sys/module/hello/</span></span><br><span class="line">coresize  holders  initsize  initstate  notes  refcnt  sections  srcversion  taint  uevent</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/kernel_make/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/kernel/kernel_make/" class="post-title-link" itemprop="url">kernel make and menuconfig</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>指定交叉工具和平台。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm menuconfig</span><br></pre></td></tr></table></figure>
+
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><ul>
+<li>屏蔽编译信息</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make &gt; /dev/null</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>使用<code>make -j&lt;n&gt;</code>参数加速编译</p>
+</li>
+<li><p>指定编译某些模块</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make M=drivers/i2c/ modules</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用 verbose 模式，将每一步执行的命令都打印出来，并重定向到一个文件中去，这样以后可以方便地查找模块之间的依赖关系。</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make V=1 &gt; ~/bak.txt</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用 ccache 提高编译速度，使用 ccache时，需要更改源码树根目录下面的 Makefile 文件，在 CC 和 HOSTCC 变量的定义前添加 ccache。<a target="_blank" rel="noopener" href="http://ccache.samba.org/">ccache主页</a>。</li>
+</ul>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CC = ccache <span class="variable">$(CROSS_COMPILE)</span>gcc</span><br><span class="line">HOSTCC = ccache gcc</span><br></pre></td></tr></table></figure>
+
+<h2 id="编译文档"><a href="#编译文档" class="headerlink" title="编译文档"></a>编译文档</h2><p>使用下面的一些命令可以在 Documentation/DocBook/目录下，生成一些文档。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">make htmldocs //生成 HTML 文件</span><br><span class="line">make pdfdocs  //生成 PDF 文件</span><br><span class="line">make psdocs   //生成 Postscript 文件</span><br><span class="line">make mandocs  //生成 Kernel API 手册</span><br><span class="line">make installmandocs //将 Kernel API 手册页安装到 man 程序能够找到的目录中</span><br></pre></td></tr></table></figure>
+
+<h2 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h2><p>1.缺少libncurses5-dev</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make menuconfig requires the ncurses libraries.</span><br></pre></td></tr></table></figure>
+
+<p>2.没有安装u-boot-tools</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkimage command not found – U-Boot images will not be built</span><br></pre></td></tr></table></figure>
+
+<p>3.源文件编译生成的.o文件和模块目标文件xxx.o重名。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">module license &#x27;unspecified&#x27; taints kernel.</span><br><span class="line">Disabling lock debugging due to kernel taint</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/kernel_arch/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1320,624 +1517,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/usb/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/usb/" class="post-title-link" itemprop="url">usb协议</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 18:03:22" itemprop="dateModified" datetime="2022-06-08T18:03:22+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="USB规范"><a href="#USB规范" class="headerlink" title="USB规范"></a>USB规范</h2><p>USB最初是由英特尔与微软公司倡导发起，其最大的特点是支持热插拔(Hot plug)和即插即用(Plug&amp;Play)。</p>
-<p><strong>电压范围4.75 ~ 5.25V</strong>，普通USB接口<strong>最大提供500mA电流</strong>，USB符号后有一个“+”号的，输出电流可达1A。</p>
-<p><strong>一个USB主控制器最多可连接127个设备，各设备之间的距离不超过5米</strong>。</p>
-<table>
-<thead>
-<tr>
-<th align="left">USB版本</th>
-<th align="left">速率称号</th>
-<th align="left">传输速率</th>
-<th align="left">理论速度</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">USB 3.2</td>
-<td align="left">超高速+  Super-Speed+</td>
-<td align="left">20Gbps</td>
-<td align="left">2560MB/s</td>
-</tr>
-<tr>
-<td align="left">USB 3.1 Gen2</td>
-<td align="left">超高速+  Super-Speed+</td>
-<td align="left">10Gbps</td>
-<td align="left">1280MB/s</td>
-</tr>
-<tr>
-<td align="left">USB 3.1 Gen1</td>
-<td align="left">超高速 Super-Speed</td>
-<td align="left">5Gbps</td>
-<td align="left">640MB/s</td>
-</tr>
-<tr>
-<td align="left">USB 2.0</td>
-<td align="left">高速 Hi-Speed</td>
-<td align="left">480Mbps</td>
-<td align="left">60MB/s</td>
-</tr>
-<tr>
-<td align="left">USB 1.1</td>
-<td align="left">全速 Full-Speed</td>
-<td align="left">12Mbps</td>
-<td align="left">1.5MB/s</td>
-</tr>
-<tr>
-<td align="left">USB 1.0</td>
-<td align="left">低速 Low-Speed</td>
-<td align="left">1.5Mbps</td>
-<td align="left">0.192MB/s</td>
-</tr>
-</tbody></table>
-<p>USB2.0 支持 3 种传输速度:低速模式(1.5Mb/s)、全速模式(12Mb/s)和高速模式(480Mb/s)。在低速和全速模式中，采用的是电压传输模式；高速模式下，是电流传输模式。</p>
-<p>USB2.0 规范要求集线器必须支持高速模式，USB2.0 设备则没有这个要求。一个高速的上行收发器不能支持低速信号传输模式。而 USB2.0 下行收发器必须支持高速、全速和低速模式。</p>
-<h3 id="插入检测机制"><a href="#插入检测机制" class="headerlink" title="插入检测机制"></a>插入检测机制</h3><p>在 USB 集线器的每个下游端口的 D+和 D-上，分别接了一个 15kΩ的下拉电阻。当集线器端口没有设备插入时，输入端被这两个下拉电阻拉到了低电平。而在USB 设备端，在 D+或者 D-上，接了一个 1.5kΩ的上拉电阻到 3.3V 的电源。<strong>对于高速设备和全速设备，上拉电阻接在 D+上；低速设备，上拉电阻接在 D-上</strong>。</p>
-<p>当设备插入到集线器时，接了上拉电阻的数据线的电压由 1.5kΩ的上拉电阻和 15kΩ的下拉电阻分压，大概 3V 左右。这是一个高电平信号。集线器检测到该状态后就上报给 Host控制器，这样就检测到设备插入。通过检测高电平的数据线是 D+还是 D-来判断设备是什么速度类型。</p>
-<p>高速设备会首先被判断为全速设备，然后通过集线器和设备两者确认，切换到高速模式下。高速模式下是电流传输模式，此时需要把 D+的上拉电阻断开。</p>
-<h2 id="USB结构"><a href="#USB结构" class="headerlink" title="USB结构"></a>USB结构</h2><p><img src="/images/usb/bus-topology.png" alt="usb拓扑结构"></p>
-<p>USB是一种主从结构的系统，主机叫做Host，从机叫做设备。USB的设计为非对称式的，它由一个主机(host)控制器和若干通过集线器设备以树形连接的设备组成。以根集线器为起点，最多支持7层，也就是说在USB系统中最多允许5个hub级联。一个USB主控制器最多连接127个设备，这是因为协议规定每个USB设备具有一个7bit的地址，地址0是保留给未初始化的设备使用。</p>
-<h3 id="USB-Host"><a href="#USB-Host" class="headerlink" title="USB Host"></a>USB Host</h3><p>主机具有一个或多个usb主控制器和根集线器(root hub)。主控制器负责数据处理。根集线器则提供一个连接主控制器与设备之间的接口和通道，它集成在主机控制器里，不占用地址。</p>
-<p>Host 主要负责:</p>
-<ul>
-<li>检测 USB 设备拔插</li>
-<li>管理 Host 和 Device 之间的控制流、数据流</li>
-<li>收集 USB 总线状态和活动数据信息</li>
-<li>为连入 USB 总线的设备供电</li>
-</ul>
-<h3 id="USB-Device"><a href="#USB-Device" class="headerlink" title="USB Device"></a>USB Device</h3><p>USB 设备通过 HUB 连接到 USB 总线上，此时 HUB 上的接入点称为端口(Port)。连接到 Hub 上的设备可能是单个设备，也可以是复合设备(Compound<br>Device)。每一个 USB 设备提供不同的功能，又被称作 Function。</p>
-<p>USB 设备支持热插拔。USB 设备通过 HUB 连接到 USB 总线。Hub 有一个状态位，标记 USB 设备是插入还是拔出。Host 会查询 Hub 端口的状态位，当检测到设备插入时，Host 将使能该 Hub 对应的 port，并通过默认地址(0)从设备控制管道为设备分配地址。当一个设备从 Hub 的某个 port 拔出时，Hub 将禁能该 port 并报告给 Host。</p>
-<p>从 USB 系统角度而言，一个逻辑上的 USB 设备是一个端点的集合。分组的端点构成一个接口(Interface)。USB 系统通过管道来管理接口，通过 Host 上的 Buffer 和 USB 设备上的端点来请求数据。 Host Controller 打包数据并将数据包发送出去。</p>
-<h3 id="USB-Hub"><a href="#USB-Hub" class="headerlink" title="USB Hub"></a>USB Hub</h3><p>USB集线器是一种可以对原有的USB口在数量上进行扩展的设备。hub提供了设备连接检测和设备移除检测的能力，并给各下行端口供电。 可以单独使能下行端口，不同端口可以工作在不同的速度等级。</p>
-<h2 id="USB通信协议"><a href="#USB通信协议" class="headerlink" title="USB通信协议"></a>USB通信协议</h2><h3 id="字节顺序"><a href="#字节顺序" class="headerlink" title="字节顺序"></a>字节顺序</h3><p>数据在 USB 线里传送是低位在前高位在后。USB 采用 NRZI(非归零编码)对发送的数据包进行编码，即:输入数据 0，编码成“电平翻转”；输入数据 1，编码成“电平保持”。</p>
-<p><img src="/images/usb/NRZI.png" alt="NRZI编码"></p>
-<p>USB提供了4 种传输方式：</p>
-<ul>
-<li>控制(Control)传输方式。双向传输，数据量通常较小，主要用来进行查询、配置和给 USB 设备发送通用的命令。</li>
-<li>同步(Synchronization)传输方式。提供了确定的带宽和间隔时间，它被用于时间严格并具有较强容错性的流数据传输，或者用于要求恒定的数据传送率的即时应用。例如进行语音业务传输时，使用同步传输方式是很好的选择</li>
-<li>中断(Interrupt)传输方式。传送是单向的，对于 USB 主机而言，只有输入。中断传输方式主要用于定时查询设备是否有中断数据要传送，该传输方式应用在少量的、分散的、不可预测的数据传输场合，键盘、游戏杆和鼠标属于这一类型。</li>
-<li>批量(Bulk)传输方式。主要应用在没有带宽和间隔时间要求的批量数据的传送和接收，它要求保证传输打印机和扫描仪属于这种类型。</li>
-</ul>
-<h2 id="USB协议"><a href="#USB协议" class="headerlink" title="USB协议"></a>USB协议</h2><p>USB 是一种轮询总线，由 Host 发起所有的数据传输。总线传输包含 3 个包(packet)。每个传输都由 Host 先发出令牌包(Token Packet)，明确传输类型、传输方向、USB 设备地址和端点号。对应地址的 USB 设备接收并解析包。一次传输可以由 Host 发向设备，也可以由设备发送至 Host，方向由令牌包说明。</p>
-<h3 id="USB数据包"><a href="#USB数据包" class="headerlink" title="USB数据包"></a>USB数据包</h3><ul>
-<li><strong>USB数据包格式</strong></li>
-</ul>
-<table>
-<thead>
-<tr>
-<th align="center">偏移量</th>
-<th align="center">类型</th>
-<th align="center">大小</th>
-<th align="center">值</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">0</td>
-<td align="center">HeaderChksum</td>
-<td align="center">1</td>
-<td align="center">利用添加包头进行效验，不包括包头本身的校验。</td>
-</tr>
-<tr>
-<td align="center">1</td>
-<td align="center">HeaderSize</td>
-<td align="center">1</td>
-<td align="center">包头的大小，包括可用的字符串。</td>
-</tr>
-<tr>
-<td align="center">2</td>
-<td align="center">Signature</td>
-<td align="center">2</td>
-<td align="center">数据值为0x1234</td>
-</tr>
-<tr>
-<td align="center">4</td>
-<td align="center">VendorID</td>
-<td align="center">2</td>
-<td align="center">USB提供商的ID</td>
-</tr>
-<tr>
-<td align="center">6</td>
-<td align="center">ProductID</td>
-<td align="center">2</td>
-<td align="center">USB产品ID</td>
-</tr>
-<tr>
-<td align="center">8</td>
-<td align="center">ProductVersion</td>
-<td align="center">1</td>
-<td align="center">产品版本号</td>
-</tr>
-<tr>
-<td align="center">9</td>
-<td align="center">FirmwareVersion</td>
-<td align="center">1</td>
-<td align="center">固件版本号</td>
-</tr>
-<tr>
-<td align="center">10</td>
-<td align="center">USB属性</td>
-<td align="center">1</td>
-<td align="center">USB Attribute: Bit 0：如果设为1，包头包括以下三个字符串：语言、制造商、产品字符串；如果设为0，包头不包括任何字符串。 Bit 2：如果设为1，设备自带电源；如果设为0，无自带电源。 Bit 3：如果设为1，设备可以通过总线供电；如果设为0，无法通过总线供电。 Bits 1 and 4—7：保留。</td>
-</tr>
-<tr>
-<td align="center">11</td>
-<td align="center">最大电力</td>
-<td align="center">1</td>
-<td align="center">设备需要的最大电力，以2mA为单位。</td>
-</tr>
-<tr>
-<td align="center">12</td>
-<td align="center">设备属性</td>
-<td align="center">1</td>
-<td align="center">Device Attributes: Bit 0：如果设为1，CPU运行在24 MHz；如果设为0，CPU运行在12 MHz。 Bit 3：如果设为1，设备的EEPROM可以支持400 MHz；如果设为0，不支持400 MHz。 Bits 1, 2 and 4 … 7：保留。</td>
-</tr>
-<tr>
-<td align="center">13</td>
-<td align="center">WPageSize</td>
-<td align="center">1</td>
-<td align="center">I2C的最大写入页面大小</td>
-</tr>
-<tr>
-<td align="center">14</td>
-<td align="center">数据类型</td>
-<td align="center">1</td>
-<td align="center">该数值定义设备是软件EEPROM还是硬件EEPROM。0x02：硬件EEPROM 其它数值无效。</td>
-</tr>
-<tr>
-<td align="center">15</td>
-<td align="center">RpageSize</td>
-<td align="center">1</td>
-<td align="center">I2C最大读取页面大小。如果值为0，整个负载大小由一个I2C读取设备读取。</td>
-</tr>
-<tr>
-<td align="center">16</td>
-<td align="center">PayLoadSize</td>
-<td align="center">2</td>
-<td align="center">如果将EEPROM作为软件EEPROM使用，表示软件的大小；除此之外该值都是0。</td>
-</tr>
-<tr>
-<td align="center">0xxx</td>
-<td align="center">Language string</td>
-<td align="center">4</td>
-<td align="center">语言字符串。以标准USB字符串格式表示。（非必要字段）</td>
-</tr>
-<tr>
-<td align="center">0xxx</td>
-<td align="center">Manufacture string</td>
-<td align="center">…</td>
-<td align="center">制造商字符串。以标准USB字符串格式表示。（非必要字段）</td>
-</tr>
-<tr>
-<td align="center">0xxx</td>
-<td align="center">Product string</td>
-<td align="center">…</td>
-<td align="center">产品字符串，以标准USB字符串格式表示。（非必要字段）</td>
-</tr>
-<tr>
-<td align="center">0xxx</td>
-<td align="center">Application Code</td>
-<td align="center">…</td>
-<td align="center">表示应用代码。以标准USB字符串格式表示。（非必要字段）</td>
-</tr>
-</tbody></table>
-<h2 id="USB设备"><a href="#USB设备" class="headerlink" title="USB设备"></a>USB设备</h2><h3 id="设备分类"><a href="#设备分类" class="headerlink" title="设备分类"></a>设备分类</h3><p>依附在总线上的设备可以是需要特定的驱动程序的完全定制的设备，也可能属于某个设备类别。这些类别定义设备的行为和接口描述符，这样一个驱动程序可能用于所有此种类别的设备。一般操作系统都为支持这些设备类别，为其提供通用驱动程序。设备分类由USB设计论坛设备工作组决定，并分配ID。</p>
-<p>如果一个设备类型属于整个设备，该设备的描述符的bDeviceClass域保存类别ID；如果它这是设备的一个接口，其ID保存在接口描述符的bInterfaceClass域。他们都占用一个字节，所以最多有253种设备类别。（0x00和0xFF保留）。当bDeviceClass设为0x00，操作系统会检查每个接口的bInterfaceClass以确定其类别。</p>
-<p>常用设备类别和ID有：<br>|  ID  |       设备        |                             例子                             |<br>| :–: | :—————:| :———————————————————-: |<br>| 0x00 | 保留值       |                              无                              |<br>| 0x01 | 音效设备      |                             声卡                             |<br>| 0x02 | USB通信控制设备   |                  网卡、调制解调器、串列端口                   |<br>| 0x03 | 人机界面设备(HID)  |                          键盘、鼠标                          |<br>| 0x05 | 物理接口设备      |        控制杆    |<br>| 0x06 | 静止图像捕捉设备  | 影像扫描仪、Picture Transfer Protocol |<br>| 0x07 |  打印设备        |        打印机      |<br>| 0x08 | 大容量访问设备    | U盘、移动硬盘、存储卡读卡器、数字相机 |<br>| 0x09 | 集线器       |                            集线器                            |<br>| 0x0A | 通信设备      | 调制解调器、网络卡、ISD、传真 |<br>| 0x0B | 智能卡设备     |                            读卡器                            |<br>| 0x0E | 影像设备    |      摄像头   |<br>| 0xE0 | 无线传输设备   |          蓝牙   |<br>| 0xFE | 特殊的应用    |                       红外线资料桥接器                       |<br>| 0xFF | 定制设备      |                                                              |</p>
-<h3 id="lsusb"><a href="#lsusb" class="headerlink" title="lsusb"></a>lsusb</h3><p>显示本机的usb设备列表，可以显示出usb的详细信息，包括设备的读取速度和描述符。</p>
-<table>
-<thead>
-<tr>
-<th>选项</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>-v</td>
-<td>告诉lsusb详细显示所示设备的详细信息。这包括设备当前速度的配置描述符。如果可用，类描述符将显示USB设备类，包括集线器、音频、HID、通信和芯片卡。</td>
-</tr>
-<tr>
-<td>-s [[bus]:][devnum]</td>
-<td>显示指定总线和设备号的设备信息，总线和设备号用十进制标识。格式：lsusb –s 00:01</td>
-</tr>
-<tr>
-<td>-d [vendor]:[product]</td>
-<td>显示指定厂商和产品编号的设备，用十六进制表示编号。格式：lsusb –d 8086:</td>
-</tr>
-<tr>
-<td>-D</td>
-<td>显示指定设备文件的设备信息，例如：<code>lsusb –D /proc/bus/usb/001/001</code>。只有root用户才可以使用这个选项</td>
-</tr>
-<tr>
-<td>-t</td>
-<td>以树状结构显示</td>
-</tr>
-<tr>
-<td>-V</td>
-<td>指令版本信息</td>
-</tr>
-</tbody></table>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/modbus/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/modbus/" class="post-title-link" itemprop="url">modbus协议</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:57:34" itemprop="dateModified" datetime="2022-06-08T17:57:34+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Modbus"><a href="#Modbus" class="headerlink" title="Modbus"></a>Modbus</h2><p>Modbus协议是一种广泛应用于工业控制领域的通用通讯协议，使用的是主从通讯技术，即由主设备主动查询和操作从设备。通讯物理接口可以选用串口（包括RS232、RS485和RS422），也可以选择以太网口。有三种通信方式：</p>
-<ul>
-<li>以太网：对应的通信模式是MODBUS TCP/IP。</li>
-<li>异步串行传输（各种介质如有线RS-232-/422/485/；光纤、无线等），对应的通信模式是MODBUS RTU或MODBUS ASCII。</li>
-<li>高速令牌传递网络：对应的通信模式是Modbus PLUS</li>
-</ul>
-<h3 id="ASCII模式"><a href="#ASCII模式" class="headerlink" title="ASCII模式"></a>ASCII模式</h3><p><img src="/images/uart/Modbus-frame-structure-ASCII-mode.jpg" alt="Modbus帧结构-ASCII模式"></p>
-<p>在ASCII模式下，消息以冒号（:）字符（ASCII码 3AH）开始，以回车换行符结束（ASCII码 0DH,0AH）。其它域可以使用的传输字符是十六进制的0…9,A…F。网络上的设备不断侦测“:”字符，当有一个冒号接收到时，每个设备都解码地址域来判断是否发给自己的。消息中字符间发送的时间间隔最长不能超过1秒，否则接收的设备将认为传输错误。</p>
-<p>错误检测域包含两个ASCII字符，使用LRC（纵向冗长检测）方法对消息内容计算得出的，不包括开始的冒号符及回车换行符。</p>
-<h3 id="RTU模式"><a href="#RTU模式" class="headerlink" title="RTU模式"></a>RTU模式</h3><p><img src="/images/uart/RTU.bmp" alt="RTU报文帧"></p>
-<p><img src="/images/uart/1.5T.jpg" alt="img"></p>
-<p>RTU模式规定消息发送至少要以3.5个字符时间的停顿间隔开始。至少3.5个字符时间的停顿标定了消息的结束。消息帧内字节间隔为1.5个字符时间。</p>
-<p>从设备的地址范围是1~247，地址0是用作广播地址。主设备通过将要联络的从设备的地址放入消息中的地址域来选通从设备。当从设备发送回应消息时，它把自己的地址放入回应的地址域中，以便主设备知道是哪一个设备作出回应。</p>
-<h3 id="功能码"><a href="#功能码" class="headerlink" title="功能码"></a>功能码</h3><p>Modbus的操作对象有四种：线圈、离散输入、输入寄存器、保持寄存器。</p>
-<table>
-<thead>
-<tr>
-<th>对象</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>线圈</td>
-<td>1bit，ON或OFF，可读可写，有效的地址范围是1-9999</td>
-</tr>
-<tr>
-<td>离散量</td>
-<td>1bit，ON或OFF，只读，有效地址范围是10001-19999</td>
-</tr>
-<tr>
-<td>输入寄存器</td>
-<td>16位的寄存器，只读，可以用作模拟量或16位打包输入点，有效地址范围是30001-39999</td>
-</tr>
-<tr>
-<td>保持寄存器</td>
-<td>16位的寄存器，可读可写，既可以是一个模拟量或16位打包输入点，也可以是模拟量或16位打包输出点，有效地址范围是40001-49999</td>
-</tr>
-</tbody></table>
-<p>Modbus的功能码有：</p>
-<table>
-<thead>
-<tr>
-<th>功能码</th>
-<th>名称</th>
-<th>功能</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>01</td>
-<td>读线圈状态</td>
-<td>读位（读N个bit）—读从机线圈寄存器，位操作</td>
-</tr>
-<tr>
-<td>02</td>
-<td>读输入离散量</td>
-<td>读位（读N个bit）—读离散输入寄存器，位操作</td>
-</tr>
-<tr>
-<td>03</td>
-<td>读多个寄存器</td>
-<td>读整型、字符型、状态字、浮点型（读N个words）—读保持寄存器，字节操作</td>
-</tr>
-<tr>
-<td>04</td>
-<td>读输入寄存器</td>
-<td>读整型、状态字、浮点型（读N个words）—读输入寄存器，字节操作</td>
-</tr>
-<tr>
-<td>05</td>
-<td>写单个线圈</td>
-<td>写位（写一个bit）—写线圈寄存器，位操作</td>
-</tr>
-<tr>
-<td>06</td>
-<td>写单个保持寄存器</td>
-<td>写整型、字符型、状态字、浮点型（写一个word）—写保持寄存器，字节操作</td>
-</tr>
-<tr>
-<td>07</td>
-<td>读取异常状态</td>
-<td>取得8个内部线圈的通断状态，这8个线圈的地址由控制器决定，用户逻辑可以将这些线圈定义，以说明从机状态，短报文适宜于迅速读取状态</td>
-</tr>
-<tr>
-<td>08</td>
-<td>回送诊断校验</td>
-<td>把诊断校验报文送从机，以对通信处理进行评鉴</td>
-</tr>
-<tr>
-<td>09</td>
-<td>编程（只用于484）</td>
-<td>使主机模拟编程器作用，修改PC从机逻辑</td>
-</tr>
-<tr>
-<td>0A</td>
-<td>控询（只用于484）</td>
-<td>可使主机与一台正在执行长程序任务从机通信，探询该从机是否已完成其操作任务，仅在含有功能码9的报文发送后，本功能码才发送</td>
-</tr>
-<tr>
-<td>0B</td>
-<td>读取事件计数</td>
-<td>可使主机发出单询问，并随即判定操作是否成功，尤其是该命令或其他应答产生通信错误时</td>
-</tr>
-<tr>
-<td>0C</td>
-<td>读取通讯事件记录</td>
-<td>可是主机检索每台从机的ModBus事务处理通信事件记录。如果某项事务处理完成，记录会给出有关错误</td>
-</tr>
-<tr>
-<td>0D</td>
-<td>编程（184/384/484/584）</td>
-<td>可使主机模拟编程器功能修改PC从机逻辑</td>
-</tr>
-<tr>
-<td>0E</td>
-<td>探询（184/384/484/584）</td>
-<td>可使主机与正在执行任务的从机通信，定期控询该从机是否已完成其程序操作，仅在含有功能13的报文发送后，本功能码才得发送</td>
-</tr>
-<tr>
-<td>0F</td>
-<td>写多个线圈</td>
-<td>可以写多个线圈—强置一串连续逻辑线圈的通断</td>
-</tr>
-<tr>
-<td>10</td>
-<td>写多个保持寄存器</td>
-<td>写多个保持寄存器—把具体的二进制值装入一串连续的保持寄存器</td>
-</tr>
-<tr>
-<td>11</td>
-<td>报告从机标识</td>
-<td>可使主机判断编址从机的类型及该从机运行指示灯的状态</td>
-</tr>
-<tr>
-<td>12</td>
-<td>（884和MICRO84）</td>
-<td>可使主机模拟编程功能，修改PC状态逻辑</td>
-</tr>
-<tr>
-<td>13</td>
-<td>重置通信链路</td>
-<td>发生非可修改错误后，是从机复位于已知状态，可重置顺序字节</td>
-</tr>
-<tr>
-<td>14</td>
-<td>读取通用参数（584L）</td>
-<td>显示扩展存储文件中的数据信息</td>
-</tr>
-<tr>
-<td>15</td>
-<td>写入通用参数（584L）</td>
-<td>把通用参数写入扩展存储文件</td>
-</tr>
-<tr>
-<td>16~40</td>
-<td>保留做扩展功能备用</td>
-<td></td>
-</tr>
-<tr>
-<td>41~48</td>
-<td>保留以备用户功能所用</td>
-<td>留作用户功能的扩展编码</td>
-</tr>
-<tr>
-<td>49~77</td>
-<td>非法功能</td>
-<td></td>
-</tr>
-<tr>
-<td>78~7F</td>
-<td>保留</td>
-<td>留作内部作用</td>
-</tr>
-<tr>
-<td>80~FF</td>
-<td>保留</td>
-<td>用于异常应答</td>
-</tr>
-</tbody></table>
-<p>常用功能码如下：</p>
-<table>
-<thead>
-<tr>
-<th>功能码</th>
-<th>名称</th>
-<th>功能</th>
-<th>对应的地址类型</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>01</td>
-<td>读线圈状态</td>
-<td>读位（读N个bit）—读从机线圈寄存器，位操作</td>
-<td>0x</td>
-</tr>
-<tr>
-<td>02</td>
-<td>读输入离散量</td>
-<td>读位（读N个bit）—读离散输入寄存器，位操作</td>
-<td>1x</td>
-</tr>
-<tr>
-<td>03</td>
-<td>读多个寄存器</td>
-<td>读整型、字符型、状态字、浮点型（读N个words）—读保持寄存器，字节操作</td>
-<td>4X</td>
-</tr>
-<tr>
-<td>04</td>
-<td>读输入寄存器</td>
-<td>读整型、状态字、浮点型（读N个words）—读输入寄存器，字节操作</td>
-<td>3x</td>
-</tr>
-<tr>
-<td>05</td>
-<td>写单个线圈</td>
-<td>写位（写一个bit）—写线圈寄存器，位操作</td>
-<td>0x</td>
-</tr>
-<tr>
-<td>06</td>
-<td>写单个保持寄存器</td>
-<td>写整型、字符型、状态字、浮点型（写一个word）—写保持寄存器，字节操作</td>
-<td>4x</td>
-</tr>
-<tr>
-<td>0F</td>
-<td>写多个线圈</td>
-<td>写位（写n个bit）—强置一串连续逻辑线圈的通断</td>
-<td>0x</td>
-</tr>
-<tr>
-<td>10</td>
-<td>写多个保持寄存器</td>
-<td>写整形、字符型、状态字、浮点型（写n个word）—把具体的二进制值装入一串连续的保持寄存器</td>
-<td>4x</td>
-</tr>
-</tbody></table>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -2007,7 +1586,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">180</span>
+          <span class="site-state-item-count">179</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -2020,7 +1599,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-count">32</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

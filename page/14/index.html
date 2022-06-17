@@ -176,6 +176,624 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/usb/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/hardware/usb/" class="post-title-link" itemprop="url">usb协议</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 18:03:22" itemprop="dateModified" datetime="2022-06-08T18:03:22+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="USB规范"><a href="#USB规范" class="headerlink" title="USB规范"></a>USB规范</h2><p>USB最初是由英特尔与微软公司倡导发起，其最大的特点是支持热插拔(Hot plug)和即插即用(Plug&amp;Play)。</p>
+<p><strong>电压范围4.75 ~ 5.25V</strong>，普通USB接口<strong>最大提供500mA电流</strong>，USB符号后有一个“+”号的，输出电流可达1A。</p>
+<p><strong>一个USB主控制器最多可连接127个设备，各设备之间的距离不超过5米</strong>。</p>
+<table>
+<thead>
+<tr>
+<th align="left">USB版本</th>
+<th align="left">速率称号</th>
+<th align="left">传输速率</th>
+<th align="left">理论速度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">USB 3.2</td>
+<td align="left">超高速+  Super-Speed+</td>
+<td align="left">20Gbps</td>
+<td align="left">2560MB/s</td>
+</tr>
+<tr>
+<td align="left">USB 3.1 Gen2</td>
+<td align="left">超高速+  Super-Speed+</td>
+<td align="left">10Gbps</td>
+<td align="left">1280MB/s</td>
+</tr>
+<tr>
+<td align="left">USB 3.1 Gen1</td>
+<td align="left">超高速 Super-Speed</td>
+<td align="left">5Gbps</td>
+<td align="left">640MB/s</td>
+</tr>
+<tr>
+<td align="left">USB 2.0</td>
+<td align="left">高速 Hi-Speed</td>
+<td align="left">480Mbps</td>
+<td align="left">60MB/s</td>
+</tr>
+<tr>
+<td align="left">USB 1.1</td>
+<td align="left">全速 Full-Speed</td>
+<td align="left">12Mbps</td>
+<td align="left">1.5MB/s</td>
+</tr>
+<tr>
+<td align="left">USB 1.0</td>
+<td align="left">低速 Low-Speed</td>
+<td align="left">1.5Mbps</td>
+<td align="left">0.192MB/s</td>
+</tr>
+</tbody></table>
+<p>USB2.0 支持 3 种传输速度:低速模式(1.5Mb/s)、全速模式(12Mb/s)和高速模式(480Mb/s)。在低速和全速模式中，采用的是电压传输模式；高速模式下，是电流传输模式。</p>
+<p>USB2.0 规范要求集线器必须支持高速模式，USB2.0 设备则没有这个要求。一个高速的上行收发器不能支持低速信号传输模式。而 USB2.0 下行收发器必须支持高速、全速和低速模式。</p>
+<h3 id="插入检测机制"><a href="#插入检测机制" class="headerlink" title="插入检测机制"></a>插入检测机制</h3><p>在 USB 集线器的每个下游端口的 D+和 D-上，分别接了一个 15kΩ的下拉电阻。当集线器端口没有设备插入时，输入端被这两个下拉电阻拉到了低电平。而在USB 设备端，在 D+或者 D-上，接了一个 1.5kΩ的上拉电阻到 3.3V 的电源。<strong>对于高速设备和全速设备，上拉电阻接在 D+上；低速设备，上拉电阻接在 D-上</strong>。</p>
+<p>当设备插入到集线器时，接了上拉电阻的数据线的电压由 1.5kΩ的上拉电阻和 15kΩ的下拉电阻分压，大概 3V 左右。这是一个高电平信号。集线器检测到该状态后就上报给 Host控制器，这样就检测到设备插入。通过检测高电平的数据线是 D+还是 D-来判断设备是什么速度类型。</p>
+<p>高速设备会首先被判断为全速设备，然后通过集线器和设备两者确认，切换到高速模式下。高速模式下是电流传输模式，此时需要把 D+的上拉电阻断开。</p>
+<h2 id="USB结构"><a href="#USB结构" class="headerlink" title="USB结构"></a>USB结构</h2><p><img src="/images/usb/bus-topology.png" alt="usb拓扑结构"></p>
+<p>USB是一种主从结构的系统，主机叫做Host，从机叫做设备。USB的设计为非对称式的，它由一个主机(host)控制器和若干通过集线器设备以树形连接的设备组成。以根集线器为起点，最多支持7层，也就是说在USB系统中最多允许5个hub级联。一个USB主控制器最多连接127个设备，这是因为协议规定每个USB设备具有一个7bit的地址，地址0是保留给未初始化的设备使用。</p>
+<h3 id="USB-Host"><a href="#USB-Host" class="headerlink" title="USB Host"></a>USB Host</h3><p>主机具有一个或多个usb主控制器和根集线器(root hub)。主控制器负责数据处理。根集线器则提供一个连接主控制器与设备之间的接口和通道，它集成在主机控制器里，不占用地址。</p>
+<p>Host 主要负责:</p>
+<ul>
+<li>检测 USB 设备拔插</li>
+<li>管理 Host 和 Device 之间的控制流、数据流</li>
+<li>收集 USB 总线状态和活动数据信息</li>
+<li>为连入 USB 总线的设备供电</li>
+</ul>
+<h3 id="USB-Device"><a href="#USB-Device" class="headerlink" title="USB Device"></a>USB Device</h3><p>USB 设备通过 HUB 连接到 USB 总线上，此时 HUB 上的接入点称为端口(Port)。连接到 Hub 上的设备可能是单个设备，也可以是复合设备(Compound<br>Device)。每一个 USB 设备提供不同的功能，又被称作 Function。</p>
+<p>USB 设备支持热插拔。USB 设备通过 HUB 连接到 USB 总线。Hub 有一个状态位，标记 USB 设备是插入还是拔出。Host 会查询 Hub 端口的状态位，当检测到设备插入时，Host 将使能该 Hub 对应的 port，并通过默认地址(0)从设备控制管道为设备分配地址。当一个设备从 Hub 的某个 port 拔出时，Hub 将禁能该 port 并报告给 Host。</p>
+<p>从 USB 系统角度而言，一个逻辑上的 USB 设备是一个端点的集合。分组的端点构成一个接口(Interface)。USB 系统通过管道来管理接口，通过 Host 上的 Buffer 和 USB 设备上的端点来请求数据。 Host Controller 打包数据并将数据包发送出去。</p>
+<h3 id="USB-Hub"><a href="#USB-Hub" class="headerlink" title="USB Hub"></a>USB Hub</h3><p>USB集线器是一种可以对原有的USB口在数量上进行扩展的设备。hub提供了设备连接检测和设备移除检测的能力，并给各下行端口供电。 可以单独使能下行端口，不同端口可以工作在不同的速度等级。</p>
+<h2 id="USB通信协议"><a href="#USB通信协议" class="headerlink" title="USB通信协议"></a>USB通信协议</h2><h3 id="字节顺序"><a href="#字节顺序" class="headerlink" title="字节顺序"></a>字节顺序</h3><p>数据在 USB 线里传送是低位在前高位在后。USB 采用 NRZI(非归零编码)对发送的数据包进行编码，即:输入数据 0，编码成“电平翻转”；输入数据 1，编码成“电平保持”。</p>
+<p><img src="/images/usb/NRZI.png" alt="NRZI编码"></p>
+<p>USB提供了4 种传输方式：</p>
+<ul>
+<li>控制(Control)传输方式。双向传输，数据量通常较小，主要用来进行查询、配置和给 USB 设备发送通用的命令。</li>
+<li>同步(Synchronization)传输方式。提供了确定的带宽和间隔时间，它被用于时间严格并具有较强容错性的流数据传输，或者用于要求恒定的数据传送率的即时应用。例如进行语音业务传输时，使用同步传输方式是很好的选择</li>
+<li>中断(Interrupt)传输方式。传送是单向的，对于 USB 主机而言，只有输入。中断传输方式主要用于定时查询设备是否有中断数据要传送，该传输方式应用在少量的、分散的、不可预测的数据传输场合，键盘、游戏杆和鼠标属于这一类型。</li>
+<li>批量(Bulk)传输方式。主要应用在没有带宽和间隔时间要求的批量数据的传送和接收，它要求保证传输打印机和扫描仪属于这种类型。</li>
+</ul>
+<h2 id="USB协议"><a href="#USB协议" class="headerlink" title="USB协议"></a>USB协议</h2><p>USB 是一种轮询总线，由 Host 发起所有的数据传输。总线传输包含 3 个包(packet)。每个传输都由 Host 先发出令牌包(Token Packet)，明确传输类型、传输方向、USB 设备地址和端点号。对应地址的 USB 设备接收并解析包。一次传输可以由 Host 发向设备，也可以由设备发送至 Host，方向由令牌包说明。</p>
+<h3 id="USB数据包"><a href="#USB数据包" class="headerlink" title="USB数据包"></a>USB数据包</h3><ul>
+<li><strong>USB数据包格式</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center">偏移量</th>
+<th align="center">类型</th>
+<th align="center">大小</th>
+<th align="center">值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">0</td>
+<td align="center">HeaderChksum</td>
+<td align="center">1</td>
+<td align="center">利用添加包头进行效验，不包括包头本身的校验。</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">HeaderSize</td>
+<td align="center">1</td>
+<td align="center">包头的大小，包括可用的字符串。</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="center">Signature</td>
+<td align="center">2</td>
+<td align="center">数据值为0x1234</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="center">VendorID</td>
+<td align="center">2</td>
+<td align="center">USB提供商的ID</td>
+</tr>
+<tr>
+<td align="center">6</td>
+<td align="center">ProductID</td>
+<td align="center">2</td>
+<td align="center">USB产品ID</td>
+</tr>
+<tr>
+<td align="center">8</td>
+<td align="center">ProductVersion</td>
+<td align="center">1</td>
+<td align="center">产品版本号</td>
+</tr>
+<tr>
+<td align="center">9</td>
+<td align="center">FirmwareVersion</td>
+<td align="center">1</td>
+<td align="center">固件版本号</td>
+</tr>
+<tr>
+<td align="center">10</td>
+<td align="center">USB属性</td>
+<td align="center">1</td>
+<td align="center">USB Attribute: Bit 0：如果设为1，包头包括以下三个字符串：语言、制造商、产品字符串；如果设为0，包头不包括任何字符串。 Bit 2：如果设为1，设备自带电源；如果设为0，无自带电源。 Bit 3：如果设为1，设备可以通过总线供电；如果设为0，无法通过总线供电。 Bits 1 and 4—7：保留。</td>
+</tr>
+<tr>
+<td align="center">11</td>
+<td align="center">最大电力</td>
+<td align="center">1</td>
+<td align="center">设备需要的最大电力，以2mA为单位。</td>
+</tr>
+<tr>
+<td align="center">12</td>
+<td align="center">设备属性</td>
+<td align="center">1</td>
+<td align="center">Device Attributes: Bit 0：如果设为1，CPU运行在24 MHz；如果设为0，CPU运行在12 MHz。 Bit 3：如果设为1，设备的EEPROM可以支持400 MHz；如果设为0，不支持400 MHz。 Bits 1, 2 and 4 … 7：保留。</td>
+</tr>
+<tr>
+<td align="center">13</td>
+<td align="center">WPageSize</td>
+<td align="center">1</td>
+<td align="center">I2C的最大写入页面大小</td>
+</tr>
+<tr>
+<td align="center">14</td>
+<td align="center">数据类型</td>
+<td align="center">1</td>
+<td align="center">该数值定义设备是软件EEPROM还是硬件EEPROM。0x02：硬件EEPROM 其它数值无效。</td>
+</tr>
+<tr>
+<td align="center">15</td>
+<td align="center">RpageSize</td>
+<td align="center">1</td>
+<td align="center">I2C最大读取页面大小。如果值为0，整个负载大小由一个I2C读取设备读取。</td>
+</tr>
+<tr>
+<td align="center">16</td>
+<td align="center">PayLoadSize</td>
+<td align="center">2</td>
+<td align="center">如果将EEPROM作为软件EEPROM使用，表示软件的大小；除此之外该值都是0。</td>
+</tr>
+<tr>
+<td align="center">0xxx</td>
+<td align="center">Language string</td>
+<td align="center">4</td>
+<td align="center">语言字符串。以标准USB字符串格式表示。（非必要字段）</td>
+</tr>
+<tr>
+<td align="center">0xxx</td>
+<td align="center">Manufacture string</td>
+<td align="center">…</td>
+<td align="center">制造商字符串。以标准USB字符串格式表示。（非必要字段）</td>
+</tr>
+<tr>
+<td align="center">0xxx</td>
+<td align="center">Product string</td>
+<td align="center">…</td>
+<td align="center">产品字符串，以标准USB字符串格式表示。（非必要字段）</td>
+</tr>
+<tr>
+<td align="center">0xxx</td>
+<td align="center">Application Code</td>
+<td align="center">…</td>
+<td align="center">表示应用代码。以标准USB字符串格式表示。（非必要字段）</td>
+</tr>
+</tbody></table>
+<h2 id="USB设备"><a href="#USB设备" class="headerlink" title="USB设备"></a>USB设备</h2><h3 id="设备分类"><a href="#设备分类" class="headerlink" title="设备分类"></a>设备分类</h3><p>依附在总线上的设备可以是需要特定的驱动程序的完全定制的设备，也可能属于某个设备类别。这些类别定义设备的行为和接口描述符，这样一个驱动程序可能用于所有此种类别的设备。一般操作系统都为支持这些设备类别，为其提供通用驱动程序。设备分类由USB设计论坛设备工作组决定，并分配ID。</p>
+<p>如果一个设备类型属于整个设备，该设备的描述符的bDeviceClass域保存类别ID；如果它这是设备的一个接口，其ID保存在接口描述符的bInterfaceClass域。他们都占用一个字节，所以最多有253种设备类别。（0x00和0xFF保留）。当bDeviceClass设为0x00，操作系统会检查每个接口的bInterfaceClass以确定其类别。</p>
+<p>常用设备类别和ID有：<br>|  ID  |       设备        |                             例子                             |<br>| :–: | :—————:| :———————————————————-: |<br>| 0x00 | 保留值       |                              无                              |<br>| 0x01 | 音效设备      |                             声卡                             |<br>| 0x02 | USB通信控制设备   |                  网卡、调制解调器、串列端口                   |<br>| 0x03 | 人机界面设备(HID)  |                          键盘、鼠标                          |<br>| 0x05 | 物理接口设备      |        控制杆    |<br>| 0x06 | 静止图像捕捉设备  | 影像扫描仪、Picture Transfer Protocol |<br>| 0x07 |  打印设备        |        打印机      |<br>| 0x08 | 大容量访问设备    | U盘、移动硬盘、存储卡读卡器、数字相机 |<br>| 0x09 | 集线器       |                            集线器                            |<br>| 0x0A | 通信设备      | 调制解调器、网络卡、ISD、传真 |<br>| 0x0B | 智能卡设备     |                            读卡器                            |<br>| 0x0E | 影像设备    |      摄像头   |<br>| 0xE0 | 无线传输设备   |          蓝牙   |<br>| 0xFE | 特殊的应用    |                       红外线资料桥接器                       |<br>| 0xFF | 定制设备      |                                                              |</p>
+<h3 id="lsusb"><a href="#lsusb" class="headerlink" title="lsusb"></a>lsusb</h3><p>显示本机的usb设备列表，可以显示出usb的详细信息，包括设备的读取速度和描述符。</p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-v</td>
+<td>告诉lsusb详细显示所示设备的详细信息。这包括设备当前速度的配置描述符。如果可用，类描述符将显示USB设备类，包括集线器、音频、HID、通信和芯片卡。</td>
+</tr>
+<tr>
+<td>-s [[bus]:][devnum]</td>
+<td>显示指定总线和设备号的设备信息，总线和设备号用十进制标识。格式：lsusb –s 00:01</td>
+</tr>
+<tr>
+<td>-d [vendor]:[product]</td>
+<td>显示指定厂商和产品编号的设备，用十六进制表示编号。格式：lsusb –d 8086:</td>
+</tr>
+<tr>
+<td>-D</td>
+<td>显示指定设备文件的设备信息，例如：<code>lsusb –D /proc/bus/usb/001/001</code>。只有root用户才可以使用这个选项</td>
+</tr>
+<tr>
+<td>-t</td>
+<td>以树状结构显示</td>
+</tr>
+<tr>
+<td>-V</td>
+<td>指令版本信息</td>
+</tr>
+</tbody></table>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/modbus/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/hardware/modbus/" class="post-title-link" itemprop="url">modbus协议</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:57:34" itemprop="dateModified" datetime="2022-06-08T17:57:34+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Modbus"><a href="#Modbus" class="headerlink" title="Modbus"></a>Modbus</h2><p>Modbus协议是一种广泛应用于工业控制领域的通用通讯协议，使用的是主从通讯技术，即由主设备主动查询和操作从设备。通讯物理接口可以选用串口（包括RS232、RS485和RS422），也可以选择以太网口。有三种通信方式：</p>
+<ul>
+<li>以太网：对应的通信模式是MODBUS TCP/IP。</li>
+<li>异步串行传输（各种介质如有线RS-232-/422/485/；光纤、无线等），对应的通信模式是MODBUS RTU或MODBUS ASCII。</li>
+<li>高速令牌传递网络：对应的通信模式是Modbus PLUS</li>
+</ul>
+<h3 id="ASCII模式"><a href="#ASCII模式" class="headerlink" title="ASCII模式"></a>ASCII模式</h3><p><img src="/images/uart/Modbus-frame-structure-ASCII-mode.jpg" alt="Modbus帧结构-ASCII模式"></p>
+<p>在ASCII模式下，消息以冒号（:）字符（ASCII码 3AH）开始，以回车换行符结束（ASCII码 0DH,0AH）。其它域可以使用的传输字符是十六进制的0…9,A…F。网络上的设备不断侦测“:”字符，当有一个冒号接收到时，每个设备都解码地址域来判断是否发给自己的。消息中字符间发送的时间间隔最长不能超过1秒，否则接收的设备将认为传输错误。</p>
+<p>错误检测域包含两个ASCII字符，使用LRC（纵向冗长检测）方法对消息内容计算得出的，不包括开始的冒号符及回车换行符。</p>
+<h3 id="RTU模式"><a href="#RTU模式" class="headerlink" title="RTU模式"></a>RTU模式</h3><p><img src="/images/uart/RTU.bmp" alt="RTU报文帧"></p>
+<p><img src="/images/uart/1.5T.jpg" alt="img"></p>
+<p>RTU模式规定消息发送至少要以3.5个字符时间的停顿间隔开始。至少3.5个字符时间的停顿标定了消息的结束。消息帧内字节间隔为1.5个字符时间。</p>
+<p>从设备的地址范围是1~247，地址0是用作广播地址。主设备通过将要联络的从设备的地址放入消息中的地址域来选通从设备。当从设备发送回应消息时，它把自己的地址放入回应的地址域中，以便主设备知道是哪一个设备作出回应。</p>
+<h3 id="功能码"><a href="#功能码" class="headerlink" title="功能码"></a>功能码</h3><p>Modbus的操作对象有四种：线圈、离散输入、输入寄存器、保持寄存器。</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>线圈</td>
+<td>1bit，ON或OFF，可读可写，有效的地址范围是1-9999</td>
+</tr>
+<tr>
+<td>离散量</td>
+<td>1bit，ON或OFF，只读，有效地址范围是10001-19999</td>
+</tr>
+<tr>
+<td>输入寄存器</td>
+<td>16位的寄存器，只读，可以用作模拟量或16位打包输入点，有效地址范围是30001-39999</td>
+</tr>
+<tr>
+<td>保持寄存器</td>
+<td>16位的寄存器，可读可写，既可以是一个模拟量或16位打包输入点，也可以是模拟量或16位打包输出点，有效地址范围是40001-49999</td>
+</tr>
+</tbody></table>
+<p>Modbus的功能码有：</p>
+<table>
+<thead>
+<tr>
+<th>功能码</th>
+<th>名称</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>01</td>
+<td>读线圈状态</td>
+<td>读位（读N个bit）—读从机线圈寄存器，位操作</td>
+</tr>
+<tr>
+<td>02</td>
+<td>读输入离散量</td>
+<td>读位（读N个bit）—读离散输入寄存器，位操作</td>
+</tr>
+<tr>
+<td>03</td>
+<td>读多个寄存器</td>
+<td>读整型、字符型、状态字、浮点型（读N个words）—读保持寄存器，字节操作</td>
+</tr>
+<tr>
+<td>04</td>
+<td>读输入寄存器</td>
+<td>读整型、状态字、浮点型（读N个words）—读输入寄存器，字节操作</td>
+</tr>
+<tr>
+<td>05</td>
+<td>写单个线圈</td>
+<td>写位（写一个bit）—写线圈寄存器，位操作</td>
+</tr>
+<tr>
+<td>06</td>
+<td>写单个保持寄存器</td>
+<td>写整型、字符型、状态字、浮点型（写一个word）—写保持寄存器，字节操作</td>
+</tr>
+<tr>
+<td>07</td>
+<td>读取异常状态</td>
+<td>取得8个内部线圈的通断状态，这8个线圈的地址由控制器决定，用户逻辑可以将这些线圈定义，以说明从机状态，短报文适宜于迅速读取状态</td>
+</tr>
+<tr>
+<td>08</td>
+<td>回送诊断校验</td>
+<td>把诊断校验报文送从机，以对通信处理进行评鉴</td>
+</tr>
+<tr>
+<td>09</td>
+<td>编程（只用于484）</td>
+<td>使主机模拟编程器作用，修改PC从机逻辑</td>
+</tr>
+<tr>
+<td>0A</td>
+<td>控询（只用于484）</td>
+<td>可使主机与一台正在执行长程序任务从机通信，探询该从机是否已完成其操作任务，仅在含有功能码9的报文发送后，本功能码才发送</td>
+</tr>
+<tr>
+<td>0B</td>
+<td>读取事件计数</td>
+<td>可使主机发出单询问，并随即判定操作是否成功，尤其是该命令或其他应答产生通信错误时</td>
+</tr>
+<tr>
+<td>0C</td>
+<td>读取通讯事件记录</td>
+<td>可是主机检索每台从机的ModBus事务处理通信事件记录。如果某项事务处理完成，记录会给出有关错误</td>
+</tr>
+<tr>
+<td>0D</td>
+<td>编程（184/384/484/584）</td>
+<td>可使主机模拟编程器功能修改PC从机逻辑</td>
+</tr>
+<tr>
+<td>0E</td>
+<td>探询（184/384/484/584）</td>
+<td>可使主机与正在执行任务的从机通信，定期控询该从机是否已完成其程序操作，仅在含有功能13的报文发送后，本功能码才得发送</td>
+</tr>
+<tr>
+<td>0F</td>
+<td>写多个线圈</td>
+<td>可以写多个线圈—强置一串连续逻辑线圈的通断</td>
+</tr>
+<tr>
+<td>10</td>
+<td>写多个保持寄存器</td>
+<td>写多个保持寄存器—把具体的二进制值装入一串连续的保持寄存器</td>
+</tr>
+<tr>
+<td>11</td>
+<td>报告从机标识</td>
+<td>可使主机判断编址从机的类型及该从机运行指示灯的状态</td>
+</tr>
+<tr>
+<td>12</td>
+<td>（884和MICRO84）</td>
+<td>可使主机模拟编程功能，修改PC状态逻辑</td>
+</tr>
+<tr>
+<td>13</td>
+<td>重置通信链路</td>
+<td>发生非可修改错误后，是从机复位于已知状态，可重置顺序字节</td>
+</tr>
+<tr>
+<td>14</td>
+<td>读取通用参数（584L）</td>
+<td>显示扩展存储文件中的数据信息</td>
+</tr>
+<tr>
+<td>15</td>
+<td>写入通用参数（584L）</td>
+<td>把通用参数写入扩展存储文件</td>
+</tr>
+<tr>
+<td>16~40</td>
+<td>保留做扩展功能备用</td>
+<td></td>
+</tr>
+<tr>
+<td>41~48</td>
+<td>保留以备用户功能所用</td>
+<td>留作用户功能的扩展编码</td>
+</tr>
+<tr>
+<td>49~77</td>
+<td>非法功能</td>
+<td></td>
+</tr>
+<tr>
+<td>78~7F</td>
+<td>保留</td>
+<td>留作内部作用</td>
+</tr>
+<tr>
+<td>80~FF</td>
+<td>保留</td>
+<td>用于异常应答</td>
+</tr>
+</tbody></table>
+<p>常用功能码如下：</p>
+<table>
+<thead>
+<tr>
+<th>功能码</th>
+<th>名称</th>
+<th>功能</th>
+<th>对应的地址类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>01</td>
+<td>读线圈状态</td>
+<td>读位（读N个bit）—读从机线圈寄存器，位操作</td>
+<td>0x</td>
+</tr>
+<tr>
+<td>02</td>
+<td>读输入离散量</td>
+<td>读位（读N个bit）—读离散输入寄存器，位操作</td>
+<td>1x</td>
+</tr>
+<tr>
+<td>03</td>
+<td>读多个寄存器</td>
+<td>读整型、字符型、状态字、浮点型（读N个words）—读保持寄存器，字节操作</td>
+<td>4X</td>
+</tr>
+<tr>
+<td>04</td>
+<td>读输入寄存器</td>
+<td>读整型、状态字、浮点型（读N个words）—读输入寄存器，字节操作</td>
+<td>3x</td>
+</tr>
+<tr>
+<td>05</td>
+<td>写单个线圈</td>
+<td>写位（写一个bit）—写线圈寄存器，位操作</td>
+<td>0x</td>
+</tr>
+<tr>
+<td>06</td>
+<td>写单个保持寄存器</td>
+<td>写整型、字符型、状态字、浮点型（写一个word）—写保持寄存器，字节操作</td>
+<td>4x</td>
+</tr>
+<tr>
+<td>0F</td>
+<td>写多个线圈</td>
+<td>写位（写n个bit）—强置一串连续逻辑线圈的通断</td>
+<td>0x</td>
+</tr>
+<tr>
+<td>10</td>
+<td>写多个保持寄存器</td>
+<td>写整形、字符型、状态字、浮点型（写n个word）—把具体的二进制值装入一串连续的保持寄存器</td>
+<td>4x</td>
+</tr>
+</tbody></table>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/spi-bus/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1735,198 +2353,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/motor/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/motor/" class="post-title-link" itemprop="url">motor</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="步进电机"><a href="#步进电机" class="headerlink" title="步进电机"></a>步进电机</h2><h3 id="24BYJ48"><a href="#24BYJ48" class="headerlink" title="24BYJ48"></a>24BYJ48</h3><p>24BYJ48-5V型号的具体含义：</p>
-<pre><code>24——表示此步进电机的有效最大外径是24mm。
-
-B——表示是步进电机，“步”字的汉语拼音（Bu）开头字母。
-
-Y——表示该步进电机是永磁式，“永”汉语拼音（Yong）开头字母。
-
-J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian）开头字母。
-
-那么“BYJ”合起来就表示——永磁式减速步进电机。
-
-48——表示四相八拍。
-
-5V——表示这个步进电机的额定电压为5V。
-</code></pre>
-<ul>
-<li><p><strong>参数</strong></p>
-<p>  减速比:1/64<br>  步距角:5.625°/64<br>  驱动方式:4相8拍<br>  直流电阻:50Ω±7%(25℃)<br>  起动转矩100PPS g.cm ≥300<br>  起动频率PPS ≥500<br>  起位转矩g.cm ≥300<br>  空载牵入频率:≥500Hz<br>  空载牵出频率:≥900Hz<br>  牵入转矩:29.4mN.m(120Hz)<br>  自定位转矩:34.3mN.m<br>  绝缘电阻:＞50MΩ(500V)<br>  绝缘介电强度:600VAC/1mA/1S<br>  绝缘等级:A<br>  温升:＜40K(120Hz)<br>  噪音:＜40dB(120Hz)<br>  重量:大约40g<br>  转向：CCW</p>
-</li>
-<li><p><strong>内部结构</strong></p>
-</li>
-</ul>
-<p>内圈上面有6个齿，分别标注为0～5，这个叫做转子，转子的每个齿上都带有永久的磁性，是一块永磁体，这就是“永磁式”的概念。外圈就是定子，它是跟电机的外壳固定在一起的，上面有8个齿，而每个齿上都缠上了一个线圈绕组，正对着的2个齿上的绕组又是串联在一起的，也就是说正对着的2个绕组总是会同时导通或关断的，如此就形成了4相，在图中分别标注为 A-B-C-D，这就是“4相”的概念。</p>
-<p><img src="/images/motor/24BYJ48.png" alt="步进电机内部结构示意图"></p>
-<ul>
-<li><strong>工作原理</strong></li>
-</ul>
-<p>假定电机的起始状态就如图所示，B相绕组的开关闭合，B相绕组导通，那么导通电流就会在正上和正下两个定子齿上产生磁性，这两个定子齿上的磁性就会对转子上的0和3号齿产生最强的吸引力，转子的0号齿在正上、3号齿在正下而处于平衡状态。转子的1号齿与右上的定子齿也就是C相的一个绕组呈现一个很小的夹角。</p>
-<p>接下来，我们把B相绕组断开，而使C相绕组导通，右上的定子齿将对转子1号齿产生最大的吸引力，转子就转过了起始状态时1号齿和C相绕组那个夹角的角度。再接下来，断开C相绕组，导通D相绕组，过程与上述的情况完全相同，最终将使转子2、5号齿与定子D相绕组对齐，转子又转过了上述同样的角度。</p>
-<p>当A相绕组再次导通，完成一个 B-C-D-A 的四节拍操作后，转子的0、3号齿将由原来对齐到B相绕组上变为了对齐到A相绕组上，即转子转过了一个定子齿的角度。依此类推，再来一个四节拍，转子就将再转过一个齿的角度，8个四节拍后转子将转过完整的一圈，那么单个节拍使转子转过的角度为360度/(8*4)=11.25度，这个值就叫做步进角度。</p>
-<p>在单四拍的两个节拍之间再插入一个双绕组导通的中间节拍，组成八拍模式。新插入的节拍使转子转了单四拍模式中步进角度的一半，即5.625度，转动精度增加了一倍，而转子转动一圈则需要8*8=64拍。另外还会在原来单四拍的两个节拍引力之间又加了一把引力，从而大大增加电机的扭力。</p>
-<p><img src="/images/motor/24BYJ48_p.png" alt="线序"></p>
-<p><img src="/images/motor/24BYJ48_2.png" alt="励磁方式"></p>
-<p>对力矩要求高使用2相励磁，对精度要求高使用1-2相励磁。</p>
-<h3 id="2相4线"><a href="#2相4线" class="headerlink" title="2相4线"></a>2相4线</h3><p><img src="/images/motor/2p4l.jpeg" alt="内部结构图"></p>
-<p><img src="/images/motor/2p4l.jpg" alt="规格"></p>
-<h2 id="舵机"><a href="#舵机" class="headerlink" title="舵机"></a>舵机</h2><p>舵机（Servo）由直流电机、减速齿轮组、传感器和控制电路组成的一套自动控制系统。通过发送信号，指定输出轴旋转角度。最大旋转180度。与普通直流电机的区别主要在，直流电机是一圈圈转动的，舵机只能在一定角度内转动，不能一圈圈转。</p>
-<p>舵机内部有一个基准电路，产生周期为20ms、宽度为1.5ms的基准信号，将获得的直流偏置电压与电位器的电压比较，获得电压差输出。经过电路板IC方向判断，再驱动无核心马达开始转动，透过减速齿轮将动力传至摆臂，同时由位置检测器送回信号，判断是否已经到位。</p>
-<p>舵机转动的角度是通过调节PWM的占空比来实现的。标准的PWM信号的<strong>周期固定为20ms，高电平脉宽应该在0.5~2.5ms范围之间</strong>，脉宽与转角0°—180°相对应。</p>
-<p>0.5ms————-0度</p>
-<p>1.0ms————45度</p>
-<p>1.5ms————90度</p>
-<p>2.0ms———–135度</p>
-<p>2.5ms———–180度</p>
-<p>![舵机]](/images/motor/servo.gif)</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/gpio/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/gpio/" class="post-title-link" itemprop="url">gpio structure</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>开漏输出要输出高电平需要接一个上拉电阻，I2C支持多个主设备与多个从设备在一条总线上，用推挽输出，会造成主从设备之间短路，故要用开漏输出。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1996,7 +2422,7 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">180</span>
+          <span class="site-state-item-count">179</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -2009,7 +2435,7 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-count">32</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
