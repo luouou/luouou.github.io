@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="spi框架123456789├── spi-bitbang.c├── spi.c├── spidev.c├── spi-gpio.c├── spi-imx.c├── spi-mxs.c├── spi-rockchip.c├── spi-s3c24xx.c├── spi-stm32.c  linux SPI驱动框架主要分为核心层，控制器驱动层以及设备驱动层。  SPI核心层代码位于 drivers&#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spi 主机驱动">
+<meta property="og:url" content="http://example.com/2022/06/21/dev/spi_master/index.html">
+<meta property="og:site_name" content="nullptr">
+<meta property="og:description" content="spi框架123456789├── spi-bitbang.c├── spi.c├── spidev.c├── spi-gpio.c├── spi-imx.c├── spi-mxs.c├── spi-rockchip.c├── spi-s3c24xx.c├── spi-stm32.c  linux SPI驱动框架主要分为核心层，控制器驱动层以及设备驱动层。  SPI核心层代码位于 drivers&#x2F;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/kernel/spi/spi-arch.jpg">
+<meta property="article:published_time" content="2022-06-21T10:40:36.881Z">
+<meta property="article:modified_time" content="2022-06-21T10:40:36.881Z">
+<meta property="article:author" content="ubun2">
+<meta property="article:tag" content="spi">
+<meta property="article:tag" content="device">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/kernel/spi/spi-arch.jpg">
+
+<link rel="canonical" href="http://example.com/2022/06/21/dev/spi_master/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>spi 主机驱动 | nullptr</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nullptr</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">吾生也有涯 而知也无涯</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/21/dev/spi_master/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          spi 主机驱动
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-21 18:40:36" itemprop="dateCreated datePublished" datetime="2022-06-21T18:40:36+08:00">2022-06-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="spi框架"><a href="#spi框架" class="headerlink" title="spi框架"></a>spi框架</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">├── spi-bitbang.c</span><br><span class="line">├── spi.c</span><br><span class="line">├── spidev.c</span><br><span class="line">├── spi-gpio.c</span><br><span class="line">├── spi-imx.c</span><br><span class="line">├── spi-mxs.c</span><br><span class="line">├── spi-rockchip.c</span><br><span class="line">├── spi-s3c24xx.c</span><br><span class="line">├── spi-stm32.c</span><br></pre></td></tr></table></figure>
+
+<p>linux SPI驱动框架主要分为核心层，控制器驱动层以及设备驱动层。</p>
+<p><img src="/images/kernel/spi/spi-arch.jpg" alt="SPI驱动框架"></p>
+<p>SPI核心层代码位于 drivers/spi/spi.c，注册spi总线和spi_master设备类，同时提供spi设备驱动对spi总线操作的API。</p>
+<h2 id="spi总线"><a href="#spi总线" class="headerlink" title="spi总线"></a>spi总线</h2><p><strong>注册SPI总线</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">bus_type</span> <span class="title">spi_bus_type</span> =</span> &#123;</span><br><span class="line">    .name       = <span class="string">&quot;spi&quot;</span>,</span><br><span class="line">    .dev_groups = spi_dev_groups,</span><br><span class="line">    .match      = spi_match_device,</span><br><span class="line">    .uevent     = spi_uevent,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="keyword">class</span> <span class="title">spi_master_class</span> =</span> &#123;</span><br><span class="line">    .name       = <span class="string">&quot;spi_master&quot;</span>,</span><br><span class="line">    .owner      = THIS_MODULE,</span><br><span class="line">    .dev_release    = spi_controller_release,</span><br><span class="line">    .dev_groups = spi_master_groups,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_SPI_SLAVE</span></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="keyword">class</span> <span class="title">spi_slave_class</span> =</span> &#123;</span><br><span class="line">    .name       = <span class="string">&quot;spi_slave&quot;</span>,</span><br><span class="line">    .owner      = THIS_MODULE,</span><br><span class="line">    .dev_release    = spi_controller_release,</span><br><span class="line">    .dev_groups = spi_slave_groups,</span><br><span class="line">&#125;;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="class"><span class="keyword">struct</span> <span class="keyword">class</span> <span class="title">spi_slave_class</span>;</span>    <span class="comment">/* dummy */</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">spi_init</span><span class="params">(<span class="type">void</span>)</span>  </span><br><span class="line">&#123;</span><br><span class="line">    buf = kmalloc(SPI_BUFSIZ, GFP_KERNEL);  <span class="comment">//分配数据收发缓冲区</span></span><br><span class="line"></span><br><span class="line">    status = bus_register(&amp;spi_bus_type);  <span class="comment">//注册spi总线 </span></span><br><span class="line"></span><br><span class="line">    status = class_register(&amp;spi_master_class);  <span class="comment">//注册spi主机类</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (IS_ENABLED(CONFIG_SPI_SLAVE)) &#123;</span><br><span class="line">        status = class_register(&amp;spi_slave_class);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注册SPI总线，成功注册后，在/sys/bus下即可找到spi目录。注册设备类，成功注册后，在/sys/class目录下即可找到spi_master目录。</p>
+<p><strong>总线匹配</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">spi_match_device</span><span class="params">(<span class="keyword">struct</span> device *dev, <span class="keyword">struct</span> device_driver *drv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">spi_device</span> *<span class="title">spi</span> =</span> to_spi_device(dev);</span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">spi_driver</span> *<span class="title">sdrv</span> =</span> to_spi_driver(drv);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Check override first, and if set, only use the named driver */</span></span><br><span class="line">    <span class="keyword">if</span> (spi-&gt;driver_override)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">strcmp</span>(spi-&gt;driver_override, drv-&gt;name) == <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (of_driver_match_device(dev, drv))</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (acpi_driver_match_device(dev, drv))</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (sdrv-&gt;id_table)</span><br><span class="line">        <span class="keyword">return</span> !!spi_match_id(sdrv-&gt;id_table, spi);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">strcmp</span>(spi-&gt;modalias, drv-&gt;name) == <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总线匹配规则：</p>
+<ol>
+<li>比较驱动中的of_match_table的compatible和device的of_node的compatible。</li>
+<li>比较驱动中的acpi_match_table的compatible和device的of_node的compatible。</li>
+<li>判断驱动中是否支持id数组，如果支持，查找匹配此id的spi_device。</li>
+<li>比较设备的modalias的和驱动的名字是否相同。</li>
+</ol>
+<h2 id="spi-master"><a href="#spi-master" class="headerlink" title="spi_master"></a>spi_master</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">spi_master</span> &#123;</span> </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device</span>   <span class="title">dev</span>;</span>    <span class="comment">//spi主机设备文件</span></span><br><span class="line">    s16 bus_num;    <span class="comment">//spi总线号</span></span><br><span class="line">    u16 num_chipselect; <span class="comment">//片选号</span></span><br><span class="line">    u16 dma_alignment;  <span class="comment">//dma算法</span></span><br><span class="line">    u16 mode_bits;  <span class="comment">//模式位 </span></span><br><span class="line">    u16 flags;  <span class="comment">//传输类型标志 </span></span><br><span class="line">    <span class="type">int</span> (*setup)(<span class="keyword">struct</span> spi_device *spi);   <span class="comment">//setup方法</span></span><br><span class="line">    <span class="type">int</span> (*transfer)(<span class="keyword">struct</span> spi_device *spi,<span class="keyword">struct</span> spi_message *mesg);   <span class="comment">//传输方法</span></span><br><span class="line">    <span class="type">void</span>    (*cleanup)(<span class="keyword">struct</span> spi_device *spi); <span class="comment">//cleanup方法</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="注册-spi-master"><a href="#注册-spi-master" class="headerlink" title="注册 spi_master"></a>注册 spi_master</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">s3c64xx_spi_probe</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">resource</span> *<span class="title">mem_res</span>, *<span class="title">dmatx_res</span>, *<span class="title">dmarx_res</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">s3c64xx_spi_driver_data</span> *<span class="title">sdd</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">s3c64xx_spi_info</span> *<span class="title">sci</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">spi_master</span> *<span class="title">master</span>;</span></span><br><span class="line"></span><br><span class="line">    master = spi_alloc_master(&amp;pdev-&gt;dev, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> s3c64xx_spi_driver_data));</span><br><span class="line"></span><br><span class="line">    master-&gt;bus_num = pdev-&gt;id;</span><br><span class="line">    master-&gt;setup = s3c64xx_spi_setup;</span><br><span class="line">    master-&gt;transfer = s3c64xx_spi_transfer;</span><br><span class="line">    master-&gt;num_chipselect = sci-&gt;num_cs;</span><br><span class="line">    master-&gt;dma_alignment = <span class="number">8</span>;</span><br><span class="line">    <span class="comment">/* the spi-&gt;mode bits understood by this driver: */</span></span><br><span class="line">    master-&gt;mode_bits = SPI_CPOL | SPI_CPHA | SPI_CS_HIGH;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Setup Deufult Mode */</span></span><br><span class="line">    s3c64xx_spi_hwinit(sdd, pdev-&gt;id);</span><br><span class="line"></span><br><span class="line">    spi_register_master(master);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">platform_driver</span> <span class="title">s3c64xx_spi_driver</span> =</span> &#123;</span><br><span class="line">    .driver = &#123;</span><br><span class="line">        .name  = <span class="string">&quot;s3c64xx-spi&quot;</span>,</span><br><span class="line">        .owner = THIS_MODULE,</span><br><span class="line">    &#125;,</span><br><span class="line">    .remove = s3c64xx_spi_remove,</span><br><span class="line">    .suspend = s3c64xx_spi_suspend,</span><br><span class="line">    .resume = s3c64xx_spi_resume,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">s3c64xx_spi_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> platform_driver_probe(&amp;s3c64xx_spi_driver, s3c64xx_spi_probe);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用 spi_alloc_master() 函数实例化一个spi控制器，初始化中断和时钟，实现 transfer_one() 函数，最后会使用 spi_register_master() 函数注册。注册成功后/sys/class/spi_master下会出现spi控制器。</p>
+<h3 id="spi-register-master"><a href="#spi-register-master" class="headerlink" title="spi_register_master()"></a>spi_register_master()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">spi_register_master</span><span class="params">(<span class="keyword">struct</span> spi_master *master)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">static</span> <span class="type">atomic_t</span>     dyn_bus_id = ATOMIC_INIT((<span class="number">1</span>&lt;&lt;<span class="number">15</span>) - <span class="number">1</span>);</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device</span>       *<span class="title">dev</span> =</span> master-&gt;dev.parent;</span><br><span class="line">    <span class="type">int</span>         dynamic = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* even if it&#x27;s just one always-selected device, there must</span></span><br><span class="line"><span class="comment">     * be at least one chipselect</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">if</span> (master-&gt;num_chipselect == <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> -EINVAL;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* register the device, then userspace will see it.</span></span><br><span class="line"><span class="comment">     * registration fails if the bus ID is in use.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    dev_set_name(&amp;master-&gt;dev, <span class="string">&quot;spi%u&quot;</span>, master-&gt;bus_num);</span><br><span class="line">    status = device_add(&amp;master-&gt;dev);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* populate children from any spi device tables */</span></span><br><span class="line">    scan_boardinfo(master);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">scan_boardinfo</span><span class="params">(<span class="keyword">struct</span> spi_master *master)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">boardinfo</span> *<span class="title">bi</span>;</span></span><br><span class="line"></span><br><span class="line">    mutex_lock(&amp;board_lock);</span><br><span class="line">    list_for_each_entry(bi, &amp;board_list, <span class="built_in">list</span>) &#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">spi_board_info</span> *<span class="title">chip</span> =</span> bi-&gt;board_info;</span><br><span class="line">        <span class="type">unsigned</span> n;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (n = bi-&gt;n_board_info; n &gt; <span class="number">0</span>; n--, chip++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (chip-&gt;bus_num != master-&gt;bus_num)</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            <span class="comment">/* <span class="doctag">NOTE:</span> this relies on spi_new_device to</span></span><br><span class="line"><span class="comment">             * issue diagnostics when given bogus inputs</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            (<span class="type">void</span>) spi_new_device(master, chip);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    mutex_unlock(&amp;board_lock);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将控制器添加到 spi_controller_list 链表，然后遍历 board_list 链表，如果匹配到 spi_board_info，则添加一个spi设备。</p>
+<h3 id="spi-new-device"><a href="#spi-new-device" class="headerlink" title="spi_new_device()"></a>spi_new_device()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> spi_device *<span class="title function_">spi_new_device</span><span class="params">(<span class="keyword">struct</span> spi_master *master,</span></span><br><span class="line"><span class="params">                  <span class="keyword">struct</span> spi_board_info *chip)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">spi_device</span> *<span class="title">proxy</span>;</span></span><br><span class="line">    <span class="type">int</span>   status;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* <span class="doctag">NOTE:</span>  caller did any chip-&gt;bus_num checks necessary.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * Also, unless we change the return value convention to use</span></span><br><span class="line"><span class="comment">     * error-or-pointer (not NULL-or-pointer), troubleshootability</span></span><br><span class="line"><span class="comment">     * suggests syslogged diagnostics are best here (ugh).</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"></span><br><span class="line">    proxy = spi_alloc_device(master);</span><br><span class="line"></span><br><span class="line">    WARN_ON(<span class="built_in">strlen</span>(chip-&gt;modalias) &gt;= <span class="keyword">sizeof</span>(proxy-&gt;modalias));</span><br><span class="line"></span><br><span class="line">    proxy-&gt;chip_select = chip-&gt;chip_select;</span><br><span class="line">    proxy-&gt;max_speed_hz = chip-&gt;max_speed_hz;</span><br><span class="line">    proxy-&gt;mode = chip-&gt;mode;</span><br><span class="line">    proxy-&gt;irq = chip-&gt;irq;</span><br><span class="line">    strlcpy(proxy-&gt;modalias, chip-&gt;modalias, <span class="keyword">sizeof</span>(proxy-&gt;modalias));</span><br><span class="line">    proxy-&gt;dev.platform_data = (<span class="type">void</span> *) chip-&gt;platform_data;</span><br><span class="line">    proxy-&gt;controller_data = chip-&gt;controller_data;</span><br><span class="line">    proxy-&gt;controller_state = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    status = spi_add_device(proxy);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> proxy;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">spi_add_device</span><span class="params">(<span class="keyword">struct</span> spi_device *spi)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">static</span> <span class="title function_">DEFINE_MUTEX</span><span class="params">(spi_add_lock)</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device</span> *<span class="title">dev</span> =</span> spi-&gt;master-&gt;dev.parent;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device</span> *<span class="title">d</span>;</span></span><br><span class="line">    <span class="type">int</span> status;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Chipselects are numbered 0..max; validate. */</span></span><br><span class="line">    <span class="keyword">if</span> (spi-&gt;chip_select &gt;= spi-&gt;master-&gt;num_chipselect) &#123;</span><br><span class="line">        <span class="keyword">return</span> -EINVAL;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Set the bus ID string */</span></span><br><span class="line">    dev_set_name(&amp;spi-&gt;dev, <span class="string">&quot;%s.%u&quot;</span>, dev_name(&amp;spi-&gt;master-&gt;dev),</span><br><span class="line">            spi-&gt;chip_select);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* We need to make sure there&#x27;s no other device with this</span></span><br><span class="line"><span class="comment">     * chipselect **BEFORE** we call setup(), else we&#x27;ll trash</span></span><br><span class="line"><span class="comment">     * its configuration.  Lock against concurrent add() calls.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    mutex_lock(&amp;spi_add_lock);</span><br><span class="line"></span><br><span class="line">    d = bus_find_device_by_name(&amp;spi_bus_type, <span class="literal">NULL</span>, dev_name(&amp;spi-&gt;dev));</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Drivers may modify this initial i/o setup, but will</span></span><br><span class="line"><span class="comment">     * normally rely on the device being setup.  Devices</span></span><br><span class="line"><span class="comment">     * using SPI_CS_HIGH can&#x27;t coexist well otherwise...</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    status = spi_setup(spi);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Device may be bound to an active driver when this returns */</span></span><br><span class="line">    status = device_add(&amp;spi-&gt;dev);</span><br><span class="line"></span><br><span class="line">    mutex_unlock(&amp;spi_add_lock);</span><br><span class="line">    <span class="keyword">return</span> status;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">spi_setup</span><span class="params">(<span class="keyword">struct</span> spi_device *spi)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> bad_bits;</span><br><span class="line">    <span class="type">int</span>  status;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* help drivers fail *cleanly* when they need options</span></span><br><span class="line"><span class="comment">     * that aren&#x27;t supported with their current master</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    bad_bits = spi-&gt;mode &amp; ~spi-&gt;master-&gt;mode_bits;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!spi-&gt;bits_per_word)</span><br><span class="line">        spi-&gt;bits_per_word = <span class="number">8</span>;</span><br><span class="line"></span><br><span class="line">    status = spi-&gt;master-&gt;setup(spi);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> status;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="spi-message"><a href="#spi-message" class="headerlink" title="spi_message"></a>spi_message</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">spi_message</span> &#123;</span> </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>    <span class="title">transfers</span>;</span>  <span class="comment">//spi传输事务链表头</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">spi_device</span>   *<span class="title">spi</span>;</span>   <span class="comment">//所属spi设备</span></span><br><span class="line">    <span class="type">unsigned</span>    is_dma_mapped:<span class="number">1</span>;</span><br><span class="line">    <span class="type">void</span>    (*complete)(<span class="type">void</span> *context);</span><br><span class="line">    <span class="type">void</span>    *context; </span><br><span class="line">    <span class="type">unsigned</span>    actual_length;</span><br><span class="line">    <span class="type">int</span>     status; <span class="comment">//传输状态</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>    <span class="title">queue</span>;</span></span><br><span class="line">    <span class="type">void</span>    *state;</span><br><span class="line">&#125;; </span><br></pre></td></tr></table></figure>
+
+<h3 id="spi-transfer"><a href="#spi-transfer" class="headerlink" title="spi_transfer"></a>spi_transfer</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">spi_transfer</span> &#123;</span> </span><br><span class="line">    <span class="type">const</span> <span class="type">void</span>  *tx_buf;    <span class="comment">//发送缓冲区指针 </span></span><br><span class="line">    <span class="type">void</span>        *rx_buf;    <span class="comment">//接收缓冲区指针 </span></span><br><span class="line">    <span class="type">unsigned</span>    len;    <span class="comment">//消息长度 </span></span><br><span class="line">    <span class="type">dma_addr_t</span>  tx_dma; <span class="comment">//DMA发送地址 </span></span><br><span class="line">    <span class="type">dma_addr_t</span>  rx_dma; <span class="comment">//DMA接收地址 </span></span><br><span class="line">    <span class="type">unsigned</span>    cs_change:<span class="number">1</span>;     </span><br><span class="line">    u8      bits_per_word;  <span class="comment">//一个字多少位 </span></span><br><span class="line">    u16     delay_usecs;    <span class="comment">//毫秒级延时 </span></span><br><span class="line">    u32     speed_hz;   <span class="comment">//速率 </span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">transfer_list</span>;</span> <span class="comment">//传输链表头 </span></span><br><span class="line">&#125;; </span><br></pre></td></tr></table></figure>
+
+<h2 id="spidev-c"><a href="#spidev-c" class="headerlink" title="spidev.c"></a>spidev.c</h2><p>注册SPI设备驱动代码位于/drivers/spi/spidev.c，同时创建spi字符设备文件，为应用层提供文件操作接口。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">spidev_fops</span> =</span> &#123;</span><br><span class="line">    .owner = THIS_MODULE,</span><br><span class="line">    <span class="comment">/* REVISIT switch to aio primitives, so that userspace</span></span><br><span class="line"><span class="comment">     * gets more complete API coverage.  It&#x27;ll simplify things</span></span><br><span class="line"><span class="comment">     * too, except for the locking.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    .write = spidev_write,</span><br><span class="line">    .read =  spidev_read,</span><br><span class="line">    .unlocked_ioctl = spidev_ioctl,</span><br><span class="line">    .open =  spidev_open,</span><br><span class="line">    .release = spidev_release,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">spi_driver</span> <span class="title">spidev_spi_driver</span> =</span> &#123;</span><br><span class="line">    .driver = &#123;</span><br><span class="line">        .name =  <span class="string">&quot;spidev&quot;</span>,</span><br><span class="line">        .owner = THIS_MODULE,</span><br><span class="line">    &#125;,</span><br><span class="line">    .probe = spidev_probe,</span><br><span class="line">    .remove = __devexit_p(spidev_remove),</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">spidev_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> status;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Claim our 256 reserved device numbers.  Then register a class</span></span><br><span class="line"><span class="comment">     * that will key udev/mdev to add/remove /dev nodes.  Last, register</span></span><br><span class="line"><span class="comment">     * the driver which manages those device numbers.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    BUILD_BUG_ON(N_SPI_MINORS &gt; <span class="number">256</span>);</span><br><span class="line">    status = register_chrdev(SPIDEV_MAJOR, <span class="string">&quot;spi&quot;</span>, &amp;spidev_fops);</span><br><span class="line"></span><br><span class="line">    spidev_class = class_create(THIS_MODULE, <span class="string">&quot;spidev&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (IS_ERR(spidev_class)) &#123;</span><br><span class="line">        unregister_chrdev(SPIDEV_MAJOR, spidev_spi_driver.driver.name);</span><br><span class="line">        <span class="keyword">return</span> PTR_ERR(spidev_class);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    status = spi_register_driver(&amp;spidev_spi_driver);</span><br><span class="line">    <span class="keyword">return</span> status;</span><br><span class="line">&#125;</span><br><span class="line">module_init(spidev_init);</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/spi/" rel="tag"># spi</a>
+              <a href="/tags/device/" rel="tag"># device</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/21/dev/spi_device/" rel="prev" title="spi 设备驱动">
+      <i class="fa fa-chevron-left"></i> spi 设备驱动
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/21/dev/tty/" rel="next" title="tty 设备">
+      tty 设备 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#spi%E6%A1%86%E6%9E%B6"><span class="nav-number">1.</span> <span class="nav-text">spi框架</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#spi%E6%80%BB%E7%BA%BF"><span class="nav-number">2.</span> <span class="nav-text">spi总线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#spi-master"><span class="nav-number">3.</span> <span class="nav-text">spi_master</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E5%86%8C-spi-master"><span class="nav-number">3.1.</span> <span class="nav-text">注册 spi_master</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#spi-register-master"><span class="nav-number">3.2.</span> <span class="nav-text">spi_register_master()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#spi-new-device"><span class="nav-number">3.3.</span> <span class="nav-text">spi_new_device()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#spi-message"><span class="nav-number">4.</span> <span class="nav-text">spi_message</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#spi-transfer"><span class="nav-number">4.1.</span> <span class="nav-text">spi_transfer</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#spidev-c"><span class="nav-number">5.</span> <span class="nav-text">spidev.c</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ubun2</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">183</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ubun2</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
