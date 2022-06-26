@@ -176,7 +176,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/net/wifi-tool/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/mipi/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -190,7 +190,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/net/wifi-tool/" class="post-title-link" itemprop="url">wifi 调试工具</a>
+            <a href="/2022/06/07/hardware/mipi/" class="post-title-link" itemprop="url">mipi接口</a>
         </h1>
 
         <div class="post-meta">
@@ -207,7 +207,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:53:37" itemprop="dateModified" datetime="2022-06-08T17:53:37+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:56:37" itemprop="dateModified" datetime="2022-06-08T17:56:37+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -215,7 +215,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
                 </span>
             </span>
 
@@ -230,486 +230,76 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>wext为linux-2.6.18版本之前实现方式；用户空间使用ioctl方式访问驱动，设置无线参数或者获取无线参数，配置无线驱动进行联网操作；无线驱动事件到应用层的传递采用的netlink socket技术。</p>
-<p>linux-2.6.18以后wifi驱动实现方式增加了nl80211，无论是用户层访问驱动还是驱动事件通知应用层、都采用的netlink技术。</p>
-<p>用<code>lsusb</code>命令查看USB ID号，无线网上的硬件id为：0bda:xxxx。</p>
-<h2 id="wpa-supplicant"><a href="#wpa-supplicant" class="headerlink" title="wpa_supplicant"></a>wpa_supplicant</h2><p>支持OPEN、WEP、WPA(TKIP)、WPA2(AES)无线加密方式。下载地址：<a target="_blank" rel="noopener" href="https://w1.fi/releases/">https://w1.fi/releases/</a><br>wpa_supplicant-0.8以前的版本，编译前对.config文件进行裁剪，去掉一些功能。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#CONFIG_DRIVER_HOSTAP=y</span><br><span class="line">#CONFIG_DRIVER_ATMEL=y</span><br><span class="line">#CONFIG_DRIVER_NL80211=y</span><br><span class="line">#CONFIG_DRIVER_WIRED=y</span><br><span class="line">CONFIG_WPS=y</span><br><span class="line">CONFIG_TLS=internal</span><br><span class="line">CONFIG_INTERNAL_LIBTOMMATH=y</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cp defconfig .config</span><br><span class="line">make CC=arm-himix100-linux-gcc clean</span><br><span class="line">make CC=arm-himix100-linux-gcc -j4</span><br><span class="line">arm-himix100-linux-strip wpa_supplicant</span><br></pre></td></tr></table></figure>
-
-<p>依赖libnl，openssl，dbus库，Makefie修改：</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">CFLAGS += -I/home/luo_u/usr/hisi/dbus-1.12.10/<span class="keyword">include</span>/dbus-1.0</span><br><span class="line">LIBS += -L/home/luo_u/usr/hisi/dbus-1.12.10/lib -ldbus-1</span><br><span class="line">CFLAGS += -I/home/luo_u/usr/hisi/expat-2.2.9/<span class="keyword">include</span>/</span><br><span class="line">LIBS += -L/home/luo_u/usr/hisi/expat-2.2.9/lib </span><br><span class="line">CFLAGS += -I/home/luo_u/usr/hisi/openssl-1.1.1/<span class="keyword">include</span></span><br><span class="line">LIBS += -L/home/luo_u/usr/hisi/openssl-1.1.1/lib </span><br><span class="line">CFLAGS += -I/home/luo_u/usr/hisi/libnl-3.4.0/<span class="keyword">include</span>/libnl3</span><br><span class="line">LIBS += -L/home/luo_u/usr/hisi/libnl-3.4.0/lib </span><br></pre></td></tr></table></figure>
-
-<p><a target="_blank" rel="noopener" href="http://www.linuxfromscratch.org/blfs/view/svn/basicnet/wpa_supplicant.html">http://www.linuxfromscratch.org/blfs/view/svn/basicnet/wpa_supplicant.html</a></p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">ctrl_interface=/var/run/wpa_supplicant/</span><br><span class="line">update_config=<span class="number">1</span></span><br><span class="line"></span><br><span class="line">network=<span class="punctuation">&#123;</span></span><br><span class="line">    ssid=<span class="string">&quot;SECULINK  R&amp;D&quot;</span></span><br><span class="line">    scan_ssid=<span class="number">1</span></span><br><span class="line">    psk=<span class="string">&quot;secueye1&quot;</span></span><br><span class="line">    key_mgmt=WPA-PSK WPA-EAP IEEE8021X NONE</span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">#连接无密码的ssid字段，需要添加key_mgmt=NONE去连接这个网络</span><br><span class="line">network=<span class="punctuation">&#123;</span></span><br><span class="line">        key_mgmt=NONE</span><br><span class="line">        ssid=<span class="string">&quot;wifi-name&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./wpa_supplicant -i wlan0 -D wext -c wpa_supplicant.conf -B -dd</span><br></pre></td></tr></table></figure>
-
-<p>加<code>-dd</code>选项，显示调试打印。</p>
-<ul>
-<li><strong>错误</strong></li>
-</ul>
-<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">rfkill: <span class="title">Cannot</span> <span class="title">open</span> <span class="title">RFKILL</span> <span class="title">control</span> <span class="title">device</span></span></span><br></pre></td></tr></table></figure>
-
-<p>打开rfkill失败，这是一个控制接口应该在/dev/rfkill，看了下板子上，确实没有这个设备接口。打开内核配置<code>CONFIG_RFKILL</code></p>
-<h2 id="wpa-cli"><a href="#wpa-cli" class="headerlink" title="wpa_cli"></a>wpa_cli</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">wpa_cli -i wlan0 scan 　       #搜索wifi热点</span><br><span class="line">wpa_cli -i wlan0 scan_result 　#显示搜索wifi热点</span><br><span class="line">wpa_cli -i wlan0 status      　#当前WPA/EAPOL/EAP通讯状态</span><br><span class="line">wpa_cli -i wlan0 ping        　#ping wpa_supplicant</span><br><span class="line"></span><br><span class="line">wpa_cli -i wlan0 add_network   #添加一个网络连接,会返回&lt;network id&gt;</span><br><span class="line">wpa_cli set_network &lt;network id&gt; ssid &#x27;&quot;name&quot;&#x27;  #ssid名称</span><br><span class="line">wpa_cli set_network &lt;network id&gt; psk &#x27;“psk”&#x27;    #密码</span><br><span class="line">wpa_cli set_network &lt;network id&gt; scan_ssid 1</span><br><span class="line">wpa_cli set_network &lt;network id&gt; priority 1     #优先级</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">连接指定的ssid</span></span><br><span class="line">wpa_cli -i wlan0 select_network &lt;network id&gt;   </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">连接无密码热点</span></span><br><span class="line">wpa_cli set_network &lt;network id&gt; ssid &quot;wifi-name&quot;</span><br><span class="line">wpa_cli set_network &lt;network id&gt; key_mgmt NONE</span><br><span class="line">       </span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">断开连接</span></span><br><span class="line">wpa_cli -i wlan0 disable_network &lt;network id&gt;   </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">信息保存到默认的配置文件中</span></span><br><span class="line">wpa_cli -i wlan0 save_config </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">列举保存过得连接</span></span><br><span class="line">wpa_cli -i wlan0 list_network     </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">使能制定的ssid</span></span><br><span class="line">wpa_cli -i wlan0 enable_network &lt;network id&gt;   </span><br></pre></td></tr></table></figure>
-
-<h2 id="iwconfig"><a href="#iwconfig" class="headerlink" title="iwconfig"></a>iwconfig</h2><p>Wireles stools用来设置支持LinuxWireless Extension的无线设备。Wireles stools for Linux 和Linux Wireless Extension 由 Jean Tourrilhes在维护，由HP惠普赞助。</p>
-<p>WirelessExtension (WE)是一组通用的API，能在用户空间对通用Wireless LANs进行配置和统计。它的好处在于仅通过一组单一的工具就能对各种各样的WirelessLANs进行管理，不管它们是什么类型，只要其驱动支持WirelessExtension就行；另一个好处就是不用重启驱动或Linux就能改变这些参数。</p>
-<p>WirelessTools (WT)就是用来操作Wireless Extensions的工具集，它们使用字符界面，支持所有WirelessExtension。WirelessTools包括以下工具：</p>
-<p>-　iwconfig：设置基本无线参数<br>-　iwlist：扫描、列出频率，比特率，密钥等<br>-　iwspy：获取每个节点链接的质量<br>-　iwpriv：操作WirelessExtensions 特定驱动<br>-　ifrename： 基于各种静态标准命名接口</p>
-<p>下载地址：<a target="_blank" rel="noopener" href="https://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Tools.html">https://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Tools.html</a><br>修改Makefile，编译。</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CC = arm-himix100-linux-gcc</span><br><span class="line">AR = arm-himix100-linux-ar</span><br><span class="line">RANLIB = arm-himix100-linux-anlib</span><br><span class="line">BUILD_STATIC = y</span><br></pre></td></tr></table></figure>
-
-<p>只适用于OPEN和WEP加密方式。建议用iw工具替代。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">iwlist wlan0 scan   #搜索ap</span><br><span class="line">iwconfig wlan0 key &lt;psk&gt;  #验证密码</span><br><span class="line">iwconfig wlan0 key open   #密码验证功能打开</span><br><span class="line">iwconfig wlan0 essid &lt;ssid&gt;  #连接ap</span><br></pre></td></tr></table></figure>
-
-<p>在设置监听模式之前需要将无线网卡down掉，开启监听模式再up，然后在锁定信道.。</p>
-<h2 id="iw"><a href="#iw" class="headerlink" title="iw"></a>iw</h2><p>iw 是一种新的基于 nl80211 的用于无线设备的CLI配置实用程序。只能连接 OPEN和WEP 加密方式的热点。下载地址：<a target="_blank" rel="noopener" href="https://mirrors.edge.kernel.org/pub/software/network/iw/">https://mirrors.edge.kernel.org/pub/software/network/iw/</a></p>
-<p>修改Makefile，依赖libnl库。</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CC = arm-anykav200-linux-uclibcgnueabi-gcc</span><br><span class="line">CFLAGS += -I/home/luoyou/home/usr/anyka/libnl-3.4.0/<span class="keyword">include</span>/libnl3</span><br><span class="line">LIBS += -L/home/luoyou/home/usr/anyka/libnl-3.4.0/lib</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export PKG_CONFIG_PATH=/home/luoyou/home/usr/anyka/libnl-3.4.0/lib/pkgconfig</span><br><span class="line">make</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">iw help    # 帮助</span><br><span class="line">iw list    # 获得所有设备的功能，如带宽信息和802.11n的信息</span><br><span class="line">iw dev wlan0 scan   # 扫描</span><br><span class="line">iw event            # 监听事件 </span><br><span class="line">iw dev wlan0 link   # 获得链路状态 </span><br><span class="line"></span><br><span class="line">iw wlan0 connect &lt;essid&gt;       # 连接开放的AP</span><br><span class="line">iw wlan0 connect &lt;essid&gt; 2432  # 连接到2432频道的AP </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">连接WEP的AP，d:default, 0:第0个密码, 1:第0个密码</span></span><br><span class="line">iw wlan0 connect foo keys 0:abcde d:1:123456    </span><br><span class="line"></span><br><span class="line">iw dev wlan1 station dump    # 获取station 的统计信息</span><br><span class="line">iw dev wlan1 station get     # 获得station对应的peer统计信息</span><br><span class="line">iw wlan0 set bitrates legacy-2.4 12 18 24    # 修改传输比特率 </span><br><span class="line">iw dev wlan0 set bitrates mcs-5 4    # 修改tx HT MCS的比特率 </span><br><span class="line">iw dev wlan0 set bitrates mcs-2.4 10  </span><br><span class="line">iw dev wlan0 set bitrates mcs-5  # 清除所有tx比特率和设置的东西来恢复正常</span><br><span class="line">iw dev　set txpower  []   #设置传输功率</span><br><span class="line">iw phy　set txpower  []   #设置传输功率</span><br><span class="line">iw dev wlan0 set power_save on  #设置省电模式</span><br><span class="line">iw dev wlan0 get power_save     #查询当前的节电设定</span><br><span class="line">iw phy phy0 interface add moni0 type monitor  #添加一个monitor接口</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/phy/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/phy/" class="post-title-link" itemprop="url">PHY</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>PHY（Physical Layer）即物理接口收发器，它实现OSI模型的物理层。包括MII/GMII（介质独立接口）子层、PCS（物理编码子层）、PMA（物理介质附加）子层、PMD（物理介质相关）子层、MDI子层。PHY是IEEE802.3中定义的一个标准模块，STA（station management entity，管理实体，一般为MAC或CPU）通过SMI（Serial Manage Interface）对PHY的行为、状态进行管理和控制，而具体管理和控制动作是通过读写PHY内部的寄存器实现的。<br>10BaseT 和 100BaseTX PHY两种实现的帧格式是一样的，但信令机制不同，而且10BaseT采用曼彻斯特编码，100BaseTX 采用4B/5B编码。</p>
-<p><img src="/images/net/phy/PHY.png" alt="img"></p>
-<p>PHY里面的部分寄存器是IEEE定义的，这样PHY把自己的目前的状态反映到寄存器里面，MAC通过SMI总线不断的读取PHY的状态寄存器以得知目前PHY的状态，例如连接速度，双工的能力等。当然也可以通过SMI设置PHY的寄存器达到控制的目的，例如流控的打开关闭，自协商模式还是强制模式等。不论是物理连接的MII总线和SMI总线还是PHY的状态寄存器和控制寄存器都是有IEEE的规范的，因此不同公司的MAC和PHY一样可以协调工作。当然为了配合不同公司的PHY的自己特有的一些功能，驱动需要做相应的修改。</p>
-<ul>
-<li><strong>工作过程</strong></li>
-</ul>
-<p>PHY在发送数据的时候，收到MAC过来的数据(对PHY来说，没有帧的概念，对它来说，都是数据而不管什么地址，数据还是CRC)，每4bit就增加1bit的检错码，然后把并行数据转化为串行流数据，再按照物理层的编码规则(10Based-T的NRZ编码或100based-T的曼彻斯特编码)把数据编码，再变为模拟信号把数据送出去。收数据时的流程反之。</p>
-<h2 id="PHY寄存器"><a href="#PHY寄存器" class="headerlink" title="PHY寄存器"></a>PHY寄存器</h2><p>PHY寄存器的地址空间为5位，从0到31最多可以定义32个寄存器（随着芯片功能不断增加，很多PHY芯片采用分页技术来扩展地址空间以定义更多的寄存器），IEEE802.3定义了地址为0-15这16个寄存器的功能，地址16-31的寄存器留给芯片制造商自由定义，如下表所示。</p>
-<p><img src="/images/net/phy/PHY_REG.png" alt="PHY_REG"></p>
-<h3 id="Control-Register-Register-0"><a href="#Control-Register-Register-0" class="headerlink" title="Control Register (Register 0)"></a>Control Register (Register 0)</h3><p>寄存器0是PHY控制寄存器，通过Control Register可以对PHY的主要工作状态进行设置。应该保证控制寄存器每个位的默认值，以便在没有管理干预的情况下，上电或复位时PHY的初始状态为正常操作状态。Control Register的每一位完成的功能见下。</p>
-<p><img src="/images/net/phy/PHY_CTRL_REG.png" alt="PHY_CTRL_REG"></p>
-<ul>
-<li><strong>Reset：</strong> 通过将位0.15设置为逻辑1来完成复位PHY。 该操作应将状态和控制寄存器设置为其默认状态。 因此，此操作可能会改变PHY的内部状态以及与PHY关联的物理链路的状态。复位过程中Bit15保持为1，复位完成之后该位应该自动清零。在复位过程完成之前，PHY不需要接受对控制寄存器的写入操作，并且在复位过程完成之前写入0.15以外的控制寄存器位可能不起作用。 复位过程应在0.15位设置的0.5 s内完成。</li>
-</ul>
-<blockquote>
-<p>（1）一般要改变端口的工作模式（如速率、双工、流控或协商信息等）时，在设置完相应位置的寄存器之后，需要通过Reset位复位PHY来使配置生效。<br>（2）该比特位的默认值为 0。</p>
-</blockquote>
-<ul>
-<li><strong>Loopback：</strong> 当位0.14被设置为逻辑1时，PHY应置于环回操作模式。 当位0.14置位时，PHY接收电路应与网络介质隔离，并且MII或GMII处的TX_EN断言不应导致网络介质上的数据传输。 当位0.14置位时，PHY应接受来自MII或GMII发送数据路径的数据，并将其返回给MII或GMII接收数据路径，以响应TX_EN的断言。 当位0.14置位时，从断言TX_EN到断言RX_DV的延迟应小于512 BT。 当位0.14置位时，除非设置了位0.7，否则COL信号应始终保持无效，在这种情况下，COL信号的行为应如22.2.4.1.9所述。 清0.14位为零允许正常操作。</li>
-</ul>
-<p>Loopback是一个调试以及故障诊断中常用的功能，Bit14置1之后，PHY和外部MDI的连接在逻辑上将被断开，从MAC经过MII/GMII（也可能是其他的MAC/PHY接口）发送过来的数据将不会被发送到MDI上，而是在PHY内部（一般在PCS）回环到本端口的MII/GMII接收通道上，通过Loopback功能可以检查MII/GMII以及PHY接口部分是否工作正常，对于端口不通的情况可用于故障定位。</p>
-<blockquote>
-<p>（1）需要注意的是，很多时候PHY设置Loopback后端口可能就Link down了，MAC无法向该端口发帧，这时就需要通过设置端口Force Link up才能使用Loopback功能。<br>（2）该比特位的默认值为 0。</p>
-</blockquote>
-<ul>
-<li><p><strong>Speed Selection：</strong> <em><strong>Bit13和Bit6两位联合实现</strong></em>对端口的速率控制功能。链接速度可以通过自动协商过程或手动速度选择来选择。 通过将位0.12清零来禁用自动协商时，允许手动速度选择。</p>
-</li>
-<li><p>当禁用自动协商并将位0.6清除为逻辑0时，将位0.13设置为逻辑1将PHY配置为100 Mb / s操作，并将位0.13清除为逻辑0将PHY配置为10 Mb / s操作 。</p>
-</li>
-<li><p>当禁用自动协商并将位0.6设置为逻辑1时，将位0.13清零为逻辑0会选择1000 Mb / s的操作。 将位0.6和0.13设置为逻辑1的组合保留用于未来的标准化。</p>
-</li>
-<li><p>当使能自动协商时，可以读取或写入位0.6和0.13，但位0.6和位0.13的状态对链路配置没有影响，位0.6和位0.13不需要反映当它被读取时链接。</p>
-</li>
-</ul>
-<p>如果PHY通过比特1.15：9和比特15.15：12报告它不能工作在所有速度时，则比特0.6和0.13的值应该与PHY可以操作的速度相对应。并且任何试图将该位设置为无效的操作均将被忽略。</p>
-<blockquote>
-<p>（1）对Speed Selection的修改设置，往往需要复位端口才能配置生效。因此在设置该位置的时候需要检查自动协商的设置并通过Bit15复位端口。<br>（2）位0.6和0.13的默认值是根据位1.15：9和15.15：12所指示的PHY可以操作的最高数据速率的编码组合。</p>
-</blockquote>
-<ul>
-<li><strong>Auto-Negotiation Enable：</strong> 自动协商过程应通过将位0.12设置为逻辑1来启用。 如果位0.12设置为逻辑1，则位0.13、0.8和0.6不应对链路配置和除了自动协商协议规定之外的站操作产生影响。 如果将位0.12清零为逻辑0，则无论链路配置和自动协商过程的先前状态如何，位0.13、0.8和0.6都将确定链路配置。</li>
-</ul>
-<p>如果PHY通过位1.3报告它缺乏执行自动协商的能力，则PHY应在位0.12返回零值。 如果PHY通过位1.3报告它缺乏执行自动协商的能力，则位0.12应该始终写为0，并且任何尝试将1写入位0.12都应该被忽略。</p>
-<blockquote>
-<p>必须注意的是，对于1000BASE-T接口,自动协商必须打开。</p>
-</blockquote>
-<ul>
-<li><strong>Power Down：</strong> 通过将位0.11设置为逻辑1，可以将PHY置于低功耗状态。 清0.11位为零允许正常操作。 PHY在掉电状态下的具体行为是特定实现的。 处于掉电状态时，PHY应响应管理事务。 在转换到掉电状态期间和处于掉电状态期间，PHY不应在MII或GMII上产生寄生信号。</li>
-</ul>
-<p>当位0.11或位0.10被设置为逻辑1时，PHY不需要满足RX_CLK和TX_CLK信号功能要求。 在位0.11和0.10清零后，PHY应在0.5 s内满足22.2.2中定义的RX_CLK和TX_CLK信号功能要求。</p>
-<blockquote>
-<p>（1）Power Down模式一般在软件shut down端口的时候使用，需要注意的是端口从Power Down模式恢复，需要复位端口以保证端口可靠的连接。<br>（2）该位的默认值为 0。</p>
-</blockquote>
-<ul>
-<li><strong>Isolate：</strong> 通过将位0.10设置为逻辑1，PHY可能被迫将其数据路径与MII或GMII电隔离。 清零位0.10允许正常操作。 当PHY与MII或GMII隔离时，它不会响应TXD数据包和TX_EN，TX_ER、GTX_CLK的输入。并且它的TX_CLK，RX_CLK，RX_DV，RX_ER，RXD数据包、COL和CRS输出均应为高阻态。 当PHY与MII或GMII隔离时，它将响应管理事务（MDC/MDIO接口的信号）。</li>
-</ul>
-<blockquote>
-<p>（1）IEEE802.3没有对Isolate 时MDI接口的状态进行规范，此时MDI端可能还在正常运行。Isolate在实际应用中并没有用到。<br>（2）由于目前很多百兆的PHY芯片其MAC接口主流的都是SMII/S3MII，8个端口的接口是相互关联的，一个端口设置Isolate可能会影响其他端口的正常使用，因此在使用中注意不要随意更改bit10的状态。</p>
-</blockquote>
-<ul>
-<li><strong>Restart Auto-Negotiation：</strong> 如果PHY通过位1.3报告它缺乏执行自动协商的能力，或者如果自动协商被禁用，则PHY应在位0.9返回零值。 如果PHY通过位1.3报告它缺乏执行自动协商的能力，或者如果禁用了自动协商，则应将位0.9始终写为0，并且任何尝试将1写入位0.9应被忽略。</li>
-</ul>
-<p>Bit9置1将重新启动端口的自动协商进程，当然前提是Auto-Negotiation Enable是使能的。</p>
-<blockquote>
-<p>一般在修改端口的自动协商能力信息之后通过Bit9置1重新启动自动协商来使端口按照新的配置建立link。</p>
-</blockquote>
-<ul>
-<li><strong>Duplex Mode：</strong> 可以通过自动协商过程或手动双面选择来选择双工模式。 通过将位0.12清零来禁用自动协商时，允许手动双面选择。</li>
-</ul>
-<ul>
-<li>当禁用自动协商时，将位0.8设置为逻辑1将PHY配置为全双工操作，并将位0.8清零以将逻辑0配置为用于半双工操作的PHY。</li>
-<li>当启用自动协商时，可以读取或写入位0.8，但位0.8的状态对链路配置没有影响。</li>
-</ul>
-<p>如果PHY通过位1.15：9和15.15：12报告它只能在一个双工模式下工作，则位0.8的值应该与PHY可以工作的模式相对应，并且任何尝试改变将该位0.8修改为无效指的操作应被忽略。</p>
-<blockquote>
-<p>对Duplex Mode的修改配置也需要复位端口才能生效。</p>
-</blockquote>
-<ul>
-<li><strong>Collision Test：</strong> 冲突信号（COL）测试开关。在需要对COL信号进行测试时，可以通过Bit7置1，这时PHY将输出一个COL脉冲以供测试。实际测试操作中也可以将端口配置为半双工状态，通过发帧冲突来测试COL信号，因此该配置实用价值不大。</li>
-<li><strong>Unidirectional enable：</strong> 如果PHY通过比特1.7报告它不具备编码和传输来自媒体独立接口的数据的能力，而不管PHY是否确定已建立有效链路，则PHY应在比特0.5中返回零值，并且 任何尝试写一个到位0.5应该被忽略。</li>
-</ul>
-<h3 id="Status-register"><a href="#Status-register" class="headerlink" title="Status register"></a>Status register</h3><p>寄存器1是PHY状态寄存器，主要包含PHY的状态信息，大多数bit的值都是由芯片厂家确定的，每一个bit的功能在表3种已有详细说明。</p>
-<p><img src="/images/net/phy/PHY_STA_REG.png" alt="PHY_STA_REG"></p>
-<ul>
-<li><strong>100BASE-T4 ability：</strong> 当读为逻辑1时，位1.15指示PHY有能力使用100BASE-T4信令规范执行链路发送和接收。 当读为逻辑0时，位1.15表示PHY缺乏使用100BASE-T4信令规范执行链路发送和接收的能力。</li>
-<li><strong>100BASE-X full duplex ability：</strong> 当读为逻辑1时，位1.14指示PHY有能力使用100BASE-X信令规范执行全双工链路传输和接收。 当作为逻辑0读取时，bit1.14表示PHY缺乏使用100BASE-X信令规范执行全双工链路传输和接收的能力。</li>
-<li><strong>100BASE-X half duplex ability：</strong> 当读为逻辑1时，位1.13指示PHY有能力使用100BASE-X信令规范执行半双工链路传输和接收。 当读为逻辑0时，位1.13指示PHY缺乏使用100BASE-X信令规范执行半双工链路传输和接收的能力。</li>
-<li><strong>Unidirectional ability：</strong> 当读为逻辑1时，位1.7指示PHY具有编码和传输来自媒体独立接口的数据的能力，而不管PHY是否确定已建立有效链路。 当读为逻辑0时，位1.7指示PHY只有在PHY确定已建立有效链路时才能从媒体独立接口传输数据。</li>
-<li><strong>MF preamble suppression ability：</strong> 当读为逻辑1时，位1.6指示PHY能够接受管理帧，而不管它们是否在22.2.4.5.2中描述的前导码模式之前。 当读为逻辑0时，位1.6指示PHY不能接受管理帧，除非它们之前是22.2.4.5.2中描述的前导码模式。</li>
-<li><strong>Auto-Negotiation Complete：</strong> 当读为逻辑1时，位1.5指示自动协商过程已完成，并且由自动协商协议（条款28或条款37）实施的扩展寄存器的内容是有效的。 当读为逻辑0时，位1.5指示自动协商过程尚未完成，并且扩展寄存器的内容由自动协商协议的当前状态定义，或者为手动配置写入。 如果自动协商通过清除位0.12禁用，则PHY应在位1.5返回零值。 如果PHY缺乏执行自动协商的能力，它还应在位1.5返回零值。</li>
-</ul>
-<blockquote>
-<p>在调试以及异常故障处理时，可以通过该位寄存器的状态判断AN是否成功，从而进一步的检查AN相关的设置是否正确，或者芯片的AN功能是否正常等。</p>
-</blockquote>
-<ul>
-<li><strong>Remote Fault：</strong> 当读为逻辑1时，位1.4表示检测到远程故障状态。 故障类型以及故障检测的标准和方法是PHY特定的。 远程故障位必须使用锁存功能来实现，以便发生远程故障将导致远程故障位置位，并保持置位状态直至被清除。 每当通过管理接口读取寄存器1时，远程故障位应清零，并且还应通过PHY复位清零。</li>
-</ul>
-<p>远端错误指示位。Bit4=1代表连接对端（Link Partner）出错，至于出错的具体类型以及错误检测机制在规范中并没有定义，由PHY的制造商自由发挥，一般的厂商都会在其他的寄存器（Register16-31由厂商自行定义）指示比较详细的错误类型。在与端口相关的故障查证中，Remote Fault是一个重要的指示信息，通过互联双方的Remote Fault信息（可能要加上其他的具体错误指示），可以帮助定位故障原因。</p>
-<ul>
-<li><p><strong>Auto-Negotiation ability：</strong> 当读为逻辑1时，位1.3指示PHY有能力执行自动协商。 当读为逻辑0时，位1.3指示PHY缺乏执行自动协商的能力。</p>
-</li>
-<li><p><strong>Link Status：</strong> 当读为逻辑1时，位1.2指示PHY已经确定已建立有效链路。 当作为逻辑0读取时，位1.2指示该链接无效。 确定链路有效性的标准是PHY特定的。 链路状态位应该使用锁存功能来实现，以便发生链路故障情况将导致链路状态位清零并保持清零，直到通过管理接口读取。 此状态指示旨在支持在30.5.1.1.4，aMediaAvailable中定义的管理属性。</p>
-</li>
-</ul>
-<p>实际应用中一般都是通过Bit2来判断端口的状态。而且，一般的MAC芯片也是通过轮询PHY的这个寄存器值来判断端口的Link状态的（这个过程可能有不同的名称，比如BCM叫做Link Scan，而Marvell叫做PHY Polling。）如前所述，在AN Enable的情况下，Link Status的信息只有在Auto-Negotiation Complete指示已经完成的情况下才是正确可靠的，否则有可能出错。</p>
-<ul>
-<li><strong>Jabber Detect：</strong> 当作为逻辑1读取时，位1.1指示已经检测到爆音条件。 此状态指示旨在支持30.5.1.1.6中定义的管理属性，aJabber和30.5.1.3.1 nJabber中定义的MAU通知。 检测Jabber条件的标准是PHY特定的。 Jabber检测位应该使用锁存功能来实现，以便发生Jabber条件将导致Jabber检测位置位，并保持置位状态直至被清除。 每次通过管理接口读取寄存器1时，Jabber检测位应清零，并且还应通过PHY复位清零。</li>
-</ul>
-<p>IEEE802.3对Jabber的解释是“A condition wherein a station transmits for a period of time longer than the maximum permissible packet length, usually due to a fault condition”。这一位指示的是Link Partner发送的时间超过了规定的最大长度。值得注意的是，Jabber Detect只有在10BASE-T模式下才有意义，100和1000M模式是没有定义Jabber这一功能的。</p>
-<h3 id="PHY-Identifier-Register"><a href="#PHY-Identifier-Register" class="headerlink" title="PHY Identifier Register"></a>PHY Identifier Register</h3><p>寄存器2和3存放PHY芯片的型号代码，寄存器2(PHY ID1)为高16位，而寄存器3(PHY ID2)为低16位。由芯片制造商自行定义，实际应用中软件通过读取这两个寄存器的内容可以识别PHY的型号和版本。</p>
-<p>PHY标识符应由由IEEE分配给PHY制造商的组织唯一标识符（OUI）的（<em>只需要使用第3至第24位，共22位</em>），加上6位制造商的型号以及4位制造商的修订版编号组成。 PHY标识符旨在提供足够的信息来支持30.1.2中所要求的oResourceTypeID对象。</p>
-<p>OUI的第三位分配给位2.15，OUI的第四位分配给位2.14，依此类推。 位2.0包含OUI的第十八位。 位3.15包含OUI的第十九位，位3.10包含OUI的第二十四位。 位3.9包含制造商型号的MSB。 位3.4包含制造商型号的LSB。 位3.3包含制造商版本号的MSB，位3.0包含制造商版本号的LSB。具体如下图所示：</p>
-<p><img src="/images/net/phy/PHY_ID_REG.png" alt="PHY_ID_REG"></p>
-<h3 id="Auto-Negotiation-Advertisement-Register-Register-4-R-W"><a href="#Auto-Negotiation-Advertisement-Register-Register-4-R-W" class="headerlink" title="Auto-Negotiation Advertisement Register (Register 4) (R/W)"></a>Auto-Negotiation Advertisement Register (Register 4) (R/W)</h3><p>寄存器4是自动协商的能力通告寄存器，在AN Enable的前提下（见寄存器0），端口根据该寄存器的相关配置将自动协商信息通过FLP在MDI上进行通告。当AN配置为Disable状态的时候，寄存器4的配置将不起作用，端口的工作模式由控制寄存器中的配置决定。</p>
-<p>该寄存器包含PHY的通告能力，它们将在自动协商期间传送给其链接伙伴。 基本页的位定义在IEEE标准的28.2.1.2中定义。 上电时，在自动协商开始之前，该寄存器应具有以下默认配置：</p>
-<ul>
-<li><strong>Selector Field （4.4：0）：</strong> 被设置为适当的代码，如IEEE标准的附件28A中所规定。</li>
-<li><strong>Reserved（4.14）：</strong> 被设置为逻辑0。</li>
-<li><strong>Technology Ability Field（4.11：5）：</strong> <em><strong>根据MII状态寄存器（寄存器1）（1.15：11）中设置的值或等效值设置</strong></em>。 另见28.2.1.2.3和附件28D。</li>
-</ul>
-<p><img src="/images/net/phy/PHY_REG_4.png" alt="PHY_REG_4"></p>
-<h3 id="Link-codeword-encoding（基本链路码字）"><a href="#Link-codeword-encoding（基本链路码字）" class="headerlink" title="Link codeword encoding（基本链路码字）"></a>Link codeword encoding（基本链路码字）</h3><p>在FLP Burst内传输的基本链路代码字（基本页面）应该传达如图28-7所示的编码。 自动协商功能可以使用下一页功能支持其他页面。 下一页交换中使用的链接代码字的编码在28.2.3.4中定义。 在FLP Burst中，D0应该是第一个传输的位。</p>
-<p><img src="/images/net/phy/20180428154543415.png" alt="这里写图片描述"></p>
-<h3 id="Next-Page-function"><a href="#Next-Page-function" class="headerlink" title="Next Page function"></a>Next Page function</h3><p>下一页功能使用标准的自动协商仲裁机制来允许交换任意的数据。 数据由可选的下一页信息携带，其遵循用于基本链接码字的传输和确认过程。 定义了四种类型的下一页编码：消息页面，未格式化页面，扩展消息页面和扩展的未格式化页面。</p>
-<p>关于该部分，具体见IEEE标准的<strong>28.2.3.4 Next Page function</strong>。</p>
-<p>在IEEE标准中，Auto-Negotiation Advertisement Register中的各部分全部是在独立章节中进行介绍的。具体如下：</p>
-<ul>
-<li><strong>Selector Field：</strong> 选择器字段（S [4：0]）是一个5位宽的字段，编码32个可能的消息。 链路码字中的选择器字段S [4：0]应用于识别自动协商发送的消息的类型。 下表列出了可能发送的消息的类型。 随着新消息的发展，该表格将相应更新。</li>
-</ul>
-<p><img src="/images/net/phy/20180428155653138.png" alt="Selector Field"></p>
-<p>未指定的组合保留供将来使用。 不会传输选择器字段的预留组合。<em><strong>我们所接触的以太网PHY遵从IEEE802.3规范，Selector Field=0001，该区域不可随意更改（很多PHY将此区域设计为只读寄存器，以免被修改）</strong></em>。</p>
-<ul>
-<li><strong>Technology Ability Field：</strong> 技术能力字段（A [6：0]）是一个7位宽的字段，其中包含指示选择器字段值特定的支持技术的信息。 这些位被映射到各个技术，以便能够针对单个选择器字段值并行通告能力。 附录28B.2和附件28D描述了IEEE 802.3选择器的技术能力字段编码。 链接代码字中可能会公布多种技术。 设备应支持其宣传的技术的数据服务能力。</li>
-</ul>
-<p><img src="/images/net/phy/20180428152215994.png" alt="Technology Ability Field"></p>
-<ul>
-<li><p><strong>Extended Next Page：</strong> 扩展下一页（XNP）被编码在基本链路码字的位D12中。 扩展下一页位指示本地设备在设置为逻辑1时支持扩展下一页的传输，并指示本地设备在设置为逻辑0时不支持扩展下一页。 Extended Next Page的使用与协商的数据速率，媒体或链接技术是正交的。 扩展下一页位按照28.2.3.4中的扩展下一页功能规范使用。</p>
-</li>
-<li><p><strong>Next Page：</strong> 无论选择器字段值还是链接码字编码，下一页（NP）都在D15位编码。 支持附加链接码字编码的传输和接收是可选的。 如果不支持Next Page功能，NP位应始终设置为逻辑0。 如果设备实现下一页功能并希望进行下一页交换，则应将NP位设置为逻辑1。 设备可以实现下一页功能，并通过将NP位设置为逻辑0来选择不参与下一页交换。 下一页功能在28.2.3.4中定义。</p>
-</li>
-<li><p><strong>Remote Fault：</strong> 远程故障（RF）编码在基本链路码字的位D13中。 默认值是逻辑零。 远程故障位为传输简单的故障信息提供了一种标准的传输机制。 当自动协商通告寄存器（寄存器4）中的RF位设置为逻辑1时，发送的基本链路码字中的RF位被设置为逻辑1。 当接收到的基本链路代码字中的RF位被设置为逻辑1时，如果存在MII管理功能，则MII状态寄存器（寄存器1）中的远程故障位将被设置为逻辑1。</p>
-</li>
-</ul>
-<h3 id="Auto-Negotiation-Link-Partner-ability-register-Register-5-RO"><a href="#Auto-Negotiation-Link-Partner-ability-register-Register-5-RO" class="headerlink" title="Auto-Negotiation Link Partner ability register (Register 5) (RO)"></a>Auto-Negotiation Link Partner ability register (Register 5) (RO)</h3><p>寄存器5保存的是本端PHY接收到的对端PHY所通告的端口能力，寄存器5的结构和寄存器4基本一致。</p>
-<h3 id="Auto-Negotiation-Expansion-Register-Register-6-RO"><a href="#Auto-Negotiation-Expansion-Register-Register-6-RO" class="headerlink" title="Auto-Negotiation Expansion Register (Register 6) (RO)"></a>Auto-Negotiation Expansion Register (Register 6) (RO)</h3><p>寄存器6保存了PHY自动协商过程的异常信息。从这个寄存其中我们可以获取到Link Partner子否支持自动协商以及自动协商下一页有没有收到的信息。</p>
-<p><img src="/images/net/phy/20180428163901700.png" alt="Auto-Negotiation Expansion Register"></p>
-<h3 id="Auto-Negotiation-Next-Page-transmit-register-Register-7-R-W"><a href="#Auto-Negotiation-Next-Page-transmit-register-Register-7-R-W" class="headerlink" title="Auto-Negotiation Next Page transmit register (Register 7) (R/W)"></a>Auto-Negotiation Next Page transmit register (Register 7) (R/W)</h3><p>自动协商下一页发送寄存器包含在支持下一页功能时要发送的下一页链接码字。 （见表28-6）内容在28.2.3.4中定义。 上电时，该寄存器应包含默认值2001H，该值表示消息代码设置为Null消息的消息页面。 该值可以由设备希望传输的任何有效的下一页消息代码替换。 写入该寄存器应将mr_next_page_loaded设置为true。</p>
-<p><img src="/images/net/phy/2018042816462224.png" alt="Register 7"></p>
-<h3 id="Auto-Negotiation-Link-Partner-Received-Next-Page-register-Register-8-RO"><a href="#Auto-Negotiation-Link-Partner-Received-Next-Page-register-Register-8-RO" class="headerlink" title="Auto-Negotiation Link Partner Received Next Page register (Register 8) (RO)"></a>Auto-Negotiation Link Partner Received Next Page register (Register 8) (RO)</h3><p><img src="/images/net/phy/20180428164942266.png" alt="Register 8"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/mii/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/mii/" class="post-title-link" itemprop="url">Media Independent Interface</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="MII"><a href="#MII" class="headerlink" title="MII"></a>MII</h2><p>MII（Media Independent Interface）即媒体独立接口，MII接口是MAC与PHY连接的标准接口。它是IEEE-802.3定义的以太网行业标准。MII接口提供了MAC与PHY之间、PHY与STA(Station Management)之间的互联技术，该接口支持10Mb/s与100Mb/s的数据传输速率，单向传输的数据线有4根，整个接口由14根线组成。媒体独立的意思，是指不管铜轴、光纤、电缆等媒体的变化，媒体处理的相关工作都由PHY和MAC的芯片完成。</p>
-<p>MII接口主要包括四个部分。一是从MAC层到PHY层的发送数据接口，二是从PHY层到MAC层的接收数据接口，三是从PHY层到MAC层的状态指示信号，四是MAC层和PHY层之间传送控制和状态信息的MDIO接口。</p>
-<p><img src="/images/net/mii/MII.jpg" alt="MII"></p>
-<ul>
-<li><p>TXD[3:0]：数据发送信号，共4根信号线；</p>
-</li>
-<li><p>TX_CLK：发送数据使用的时钟信号，对于10M位/s的数据传输，此时钟为2.5MHz，对于100M位/s的数据传输，此时钟为25MHz。</p>
-</li>
-<li><p>TX_ER（transmit coding error）： TX_ER同步于TX_CLK，在数据传输过程中，如果TX_ER有效超过一个时钟周期，并且此时TX_EN是有效的，则数据通道中传输的数据是无效的，没用的。注：当TX_ER有效并不影响工作在10Mb/s的PHY或者TX_EN无效时的数据传输。在MII接口的连线中，如果TX_ER信号线没有用到，必须将它下拉接地。</p>
-</li>
-<li><p>TX_EN：传输使能信号，此信号必需与数据前导符的起始位同步出现，并在传输完毕前一直保持。</p>
-</li>
-<li><p>TXD[3:0]：发送数据线，每次传输4位数据，数据在TX_EN信号有效时有效。当TX_EN信号无效时，PHY忽略传输的数据。</p>
-</li>
-<li><p>RX_CLK：接收数据使用的时钟信号，对于10M位/s的数据传输，此时钟为2.5MHz，对于100M位/s的数据传输，此时钟为25MHz。</p>
-</li>
-<li><p>RXD[3:0]：接收数据线，每次接收4位数据，数据在RX_DV信号有效时有效。当RX_EN无效，而RX_ER有效时，RXD[3:0]数据值代表特定的信息。</p>
-</li>
-<li><p>RX_DV：接收数据使能信号，由PHY控制，当PHY准备好数据供MAC接收时，使能该信号。此信号必需和帧数据的首位同步出现，并保持有效直到数据传输完成。在传送最后4位数据后的第一个时钟之前，此信号必需变为无效状态。为了正确的接收一个帧，有效电平不能滞后于数据线上的SFD位出现。</p>
-</li>
-<li><p>RX_ER：接收出错信号，保持一个或多个时钟周期(RX_CLK)的有效状态，表明MAC在接收过程中检测到错误。具体错误原因需配合RX_DV的状态及RXD[3:0]的数据值。</p>
-</li>
-<li><p>CRS：载波侦听信号，仅工作在半双工模式下，由PHY控制，当发送或接收的介质非空闲时，使能此信号。 PHY必需保证CRS信号在发生冲突的整个时间段内都保持有效，不需要此信号与发送/接收的时钟同步。</p>
-</li>
-<li><p>COL：冲突检测信号，仅工作在半双工模式下，由PHY控制，当检测到介质发生冲突时，使能此信号，并且在整个冲突的持续时间内，保持此信号有效。此信号不需要和发送/接收的时钟同步。</p>
-</li>
-<li><p>MDC：配置接口时钟。</p>
-</li>
-<li><p>MDIO：配置接口I/O，是PHY和STA之间的双向信号。 它用于在PHY和STA之间传输控制信息和状态。 控制信息由STA同步地针对MDC驱动并且由PHY同步地采样。 状态信息由PHY针对MDC同步驱动并由STA同步采样。需要1.5K电阻上拉。</p>
-</li>
-</ul>
-<p>MII接口的类型有很多，常用的有MII、RMII、SMII、SSMII、SSSMII、GMII、RGMII、SGMII、TBI、RTBI、XGMII、XAUI、XLAUI等。</p>
+          <p>MIPI (Mobile Industry Processor Interface) 是2003年由ARM, Nokia, ST ,TI等公司成立的一个联盟，目的是把手机内部的接口如摄像头、显示屏接口、射频/基带接口等标准化，从而减少手机设计的复杂程度和增加设计灵活性。</p>
+<p>MIPI联盟下面有不同的WorkGroup，分别定义了一系列的手机内部接口标准，比如摄像头接口CSI、显示接口DSI、射频接口DigRF、麦克风 /喇叭接口SLIMbus等。统一接口标准的好处是手机厂商根据需要可以从市面上灵活选择不同的芯片和模组，更改设计和功能时更加快捷方便。下图是按照 MIPI的规划下一代智能手机的内部架构。</p>
+<p><img src="/images/mipi/MIPI-Protocol-865x1024.png" alt="img"></p>
+<h2 id="MIPI规范"><a href="#MIPI规范" class="headerlink" title="MIPI规范"></a>MIPI规范</h2><p>已经完成和正在计划中的规范如下:<br><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/MIPI#cite_note-Working_Groups:_Overview-1">https://zh.wikipedia.org/wiki/MIPI#cite_note-Working_Groups:_Overview-1</a></p>
 <table>
 <thead>
 <tr>
-<th></th>
-<th>MII</th>
-<th>RMII</th>
-<th>GMII</th>
-<th>RGMII</th>
-<th>SMII</th>
+<th><strong>工作组</strong></th>
+<th><strong>规范名称</strong></th>
 </tr>
 </thead>
 <tbody><tr>
-<td>传输速度</td>
-<td>100/10M</td>
-<td>100/10M</td>
-<td>1000/100/10M</td>
-<td>1000/100/10M</td>
-<td>100M</td>
+<td>Camera工作组</td>
+<td>MIPI Camera Serial Interface 2 (MIPI CSI-2) v2.0 (March 2017)MIPI Camera Serial Interface 3 (MIPI CSI-3) v1.1 (March 2014)MIPI Camera Command Set (MIPI CCS) v1.0 (October 2017)</td>
 </tr>
 <tr>
-<td>单向数据线数</td>
-<td>4</td>
-<td>2</td>
-<td>8</td>
-<td>4</td>
-<td>1</td>
+<td>Device Descriptor Block工作组</td>
+<td>暂无</td>
 </tr>
 <tr>
-<td>时钟速率</td>
-<td>25/2.5M</td>
-<td>50/5M</td>
-<td>25/2.5M</td>
-<td>125/25/2.5M</td>
-<td>125M</td>
+<td>DigRF工作组</td>
+<td>DigRF Baseband/RF Digital Interface Specification v4 (Feb. 2014)</td>
+</tr>
+<tr>
+<td>Display工作组</td>
+<td>DBI-2DPI-2DSI-2 v1.0 (January 2016)DCS</td>
+</tr>
+<tr>
+<td>高速同步接口工作组</td>
+<td>HSI 1.0</td>
+</tr>
+<tr>
+<td>接口管理框架工作组</td>
+<td>暂无</td>
+</tr>
+<tr>
+<td>低速多点连接工作组</td>
+<td>SLIMbus v2.0 (August 2015)SoundWire v1.1 (August 2016)</td>
+</tr>
+<tr>
+<td>NAND软件工作组</td>
+<td>暂无</td>
+</tr>
+<tr>
+<td>物理层工作组</td>
+<td>C-PHY v1.2 (March 2017)D-PHY v2.1 (March 2017)M-PHY v4.1 (March 2017)</td>
+</tr>
+<tr>
+<td>软件工作组</td>
+<td>暂无</td>
+</tr>
+<tr>
+<td>系统电源管理工作组</td>
+<td>SPMI v2.0 (August 2012)</td>
+</tr>
+<tr>
+<td>检测与调试工作组</td>
+<td>暂无</td>
+</tr>
+<tr>
+<td>统一协议工作组</td>
+<td>UniPro 1 point-to-point v1.61 (October 2015)PIE</td>
 </tr>
 </tbody></table>
-<h2 id="RMII"><a href="#RMII" class="headerlink" title="RMII"></a>RMII</h2><p>RMII即Reduced MII，是简化的MII接口。连线数量由MII的16根减少为8根，对于10Mbps线速，MII的时钟速率是2.5MHz就可以了，RMII则需要5MHz；对于100Mbps线速，MII需要的时钟速率是25MHz，RMII则是50MHz。</p>
-<p><img src="/images/net/mii/RMII.jpg" alt="RMII"></p>
-<ul>
-<li><p>TXD[1:0]：数据发送信号线，数据位宽为2</p>
-</li>
-<li><p>RXD[1:0]：数据接收信号线，数据位宽为2</p>
-</li>
-<li><p>TX_EN(Transmit Enable)：数据发送使能信号</p>
-</li>
-<li><p>RX_ER(Receive Error)：数据接收错误提示信号</p>
-</li>
-<li><p>CLK_REF：是由外部时钟源提供的50MHz参考时钟，与MII接口不同，MII接口中的接收时钟和发送时钟是分开的，而且都是由PHY芯片提供给MAC芯片的。这里需要注意的是，由于数据接收时钟是由外部晶振提供而不是由载波信号提取的，所以在PHY层芯片内的数据接收部分需要设计一个FIFO，用来协调两个不同的时钟,在发送接收的数据时提供缓冲。PHY层芯片的发送部分则不需要FIFO，它直接将接收到的数据发送到MAC就可以了。</p>
-</li>
-<li><p>CRS_DV：此信号是由MII接口中的RX_DV和CRS两个信号合并而成。当介质不空闲时，CRS_DV和RE_CLK相异步的方式给出。当CRS比RX_DV早结束时(即载波消失而队列中还有数据要传输时)，就会出现CRS_DV在半位元组的边界以25MHz/2.5MHz的频率在0、1之间的来回切换。因此，MAC能够从 CRS_DV中精确的恢复出RX_DV和CRS。</p>
-</li>
-</ul>
-<p>在100Mbps速率时，TX/RX每个时钟周期采样一个数据；在10Mbps速率时，TX/RX每隔10个周期采样一个数据，因而TX/RX数据需要在数据线上保留10个周期，相当于一个数据发送10次。</p>
-<p>当PHY层芯片收到有效的载波信号后，CRS_DV信号变为有效，此时如果FIFO中还没有数据，则它会发送出全0的数据给MAC，然后当FIFO中填入有效的数据帧，数据帧的开头是“101010—”交叉的前导码，当数据中出现“01”的比特时，代表正式数据传输开始，MAC芯片检测到这一变化，从而开始接收数据。</p>
-<p>当外部载波信号消失后，CRS_DV会变为无效，但如果FIFO中还有数据要发送时，CRS_DV在下一周期又会变为有效，然后再无效再有效，直到FIFO中数据发送完为止。在接收过程中如果出现无效的载波信号或者无效的数据编码，则RX_ER会变为有效，表示物理层芯片接收出错。</p>
-<h2 id="SMII"><a href="#SMII" class="headerlink" title="SMII"></a>SMII</h2><p>SMII即Serial MII，串行MII的意思，跟RMII相比，连线进一步减少到4根。只用一根信号线传送发送数据，一根信号线传输接受数据，所以在时钟上为了满足100的需求，它的时钟频率高达到125M，数据线里面还会传送一些控制信息。所有端口的数据收发都公用同一个外部的125M时钟。</p>
-<p><img src="/images/net/mii/SMII.jpg" alt="SMII"></p>
-<ul>
-<li>TXD：发送数据信号，位宽为1；</li>
-<li>RXD：接收数据信号，位宽为1；</li>
-<li>SYNC：收发数据同步信号，每10个时钟周期置1次高电平，指示同步。</li>
-<li>CLK_REF：所有端口共用的一个参考时钟，频率为125MHz，为什么100Mbps速率要用125MHz时钟？因为在每8位数据中会插入2位控制信号，请看下面介绍。</li>
-</ul>
-<p>TXD/RXD以10比特为一组，以SYNC为高电平来指示一组数据的开始，在SYNC变高后的10个时钟周期内，TXD上依次输出的数据是：TXD[7:0]、TX_EN、TX_ER，控制信号的含义与MII接口中的相同；RXD上依次输出的数据是：RXD[7:0]、RX_DV、CRS，RXD[7:0]的含义与RX_DV有关，当RX_DV为有效时(高电平)，RXD[7:0]上传输的是物理层接收的数据。当RX_DV为无效时(低电平)，RXD[7:0]上传输的是物理层的状态信息数据。见下表：</p>
-<p><img src="/images/net/mii/SMII2.jpg" alt="img"></p>
-<p>当速率为10Mbps时，每一组数据要重复10次，MAC/PHY芯片每10个周期采样一次。MAC/PHY芯片在接收到数据后会进行串/并转换。</p>
-<h2 id="SSMII"><a href="#SSMII" class="headerlink" title="SSMII"></a>SSMII</h2><p>SSMII即Serial Sync MII，叫串行同步接口，跟SMII接口很类似，只是收发使用独立的参考时钟和同步时钟，不再像SMII那样收发共用参考时钟和同步时钟，传输距离比SMII更远。</p>
-<p><img src="/images/net/mii/SSMII.jpg" alt="img"></p>
-<h2 id="SSSMII"><a href="#SSSMII" class="headerlink" title="SSSMII"></a>SSSMII</h2><p>SSSMII即Source Sync Serial MII，叫源同步串行MII接口，SSSMII与SSMII的区别在于参考时钟和同步时钟的方向，SSMII的TX/RX参考时钟和同步时钟都是由PHY芯片提供的，而SSSMII的TX参考时钟和同步时钟是由MAC芯片提供的，RX参考时钟和同步时钟是由PHY芯片提供的，所以顾名思义叫源同步串行。</p>
-<p><img src="/images/net/mii/SSSMII.jpg" alt="img"></p>
-<h2 id="GMII"><a href="#GMII" class="headerlink" title="GMII"></a>GMII</h2><p>GMII(Gigabit MII)是千兆网的MII接口。GMII采用8位接口数据，工作时钟125MHz，因此传输速率可达1000Mbps。同时兼容MII所规定的10/100 Mbps工作方式。GMII接口数据结构符合IEEE 802.3-2000以太网标准。</p>
-<p>与MII接口相比，GMII的数据宽度由4位变为8位，GMII接口中的控制信号如TX_ER、TX_EN、RX_ER、RX_DV、CRS和COL的作用同MII接口中的一样，发送参考时钟GTX_CLK和接收参考时钟RX_CLK的频率均为125MHz(1000Mbps/8=125MHz)。</p>
-<p>发送参考时钟GTX_CLK，它和MII接口中的TX_CLK是不同的，MII接口中的TX_CLK是由PHY芯片提供给MAC芯片的，而GMII接口中的GTX_CLK是由MAC芯片提供给PHY芯片的。两者方向不一样。绝大多数GMII接口都是兼容MII接口的，所以GMII接口都有两个发送参考时钟：TX_CLK和GTX_CLK(两者方向不一样)，在用作MII模式时，使用TX_CLK和8根数据线中的4根。</p>
-<p><img src="/images/net/mii/GMII.jpg" alt="GMII"></p>
-<p>在千兆速率下，向PHY提供GTXCLK信号、TXD、TXEN、TXER信号与此时钟信号同步。否则在10/100Mbps速率下，PHY提供TXCLK时钟信号，其它信号与此信号同步。其工作频率为25MHz(100M网络)或2.5MHz(10M网络)。</p>
-<h2 id="RGMII"><a href="#RGMII" class="headerlink" title="RGMII"></a>RGMII</h2><p>RGMII即Reduced GMII，是GMII的简化版本，将接口信号线数量从24根减少到14根，时钟频率仍旧为125MHz，TX/RX数据宽度从8为变为4位，为了保持1000Mbps的传输速率不变，RGMII接口在时钟的上升沿和下降沿都采样数据。在参考时钟的上升沿发送GMII接口中的TXD[3:0]/RXD[3:0]，在参考时钟的下降沿发送GMII接口中的TXD[7:4]/RXD[7:4]。RGMI同时也兼容100Mbps和10Mbps两种速率，此时参考时钟速率分别为25MHz和2.5MHz。</p>
-<p>TX_EN信号线上传送TX_EN和TX_ER两种信息，在TX_CLK的上升沿发送TX_EN，下降沿发送TX_ER；同样的，RX_DV信号线上也传送RX_DV和RX_ER两种信息，在RX_CLK的上升沿发送RX_DV，下降沿发送RX_ER。</p>
-<p><img src="/images/net/mii/RGMII.jpg" alt="RGMII"></p>
-<p><img src="/images/net/mii/RGMII2.jpg" alt="img"></p>
-<h2 id="SGMII"><a href="#SGMII" class="headerlink" title="SGMII"></a>SGMII</h2><p>SGMII即Serial GMII，串行GMII，收发各一对差分信号线，时钟频率625MHz，在时钟信号的上升沿和下降沿均采样，参考时钟RX_CLK由PHY提供，是可选的，主要用于MAC侧没有时钟的情况，一般情况下，RX_CLK不使用。收发都可以从数据中恢复出时钟。</p>
-<p>在TXD发送的串行数据中，每8比特数据会插入TX_EN/TX_ER 两比特控制信息，同样，在RXD接收数据中，每8比特数据会插入RX_DV/RX_ER 两比特控制信息，所以总的数据速率为1.25Gbps=625Mbps*2。</p>
-<p>其实，大多数MAC芯片的SGMII接口都可以配置成SerDes接口(在物理上完全兼容，只需配置寄存器即可)，直接外接光模块，而不需要PHY层芯片，此时时钟速率仍旧是625MHz，不过此时跟SGMII接口不同，SGMII接口速率被提高到1.25Gbps是因为插入了控制信息，而SerDes端口速率被提高是因为进行了8B/10B变换，本来8B/10B变换是PHY芯片的工作，在SerDes接口中，因为外面不接PHY芯片，此时8B/10B变换在MAC芯片中完成了。8B/10B变换的主要作用是扰码，让信号中不出现过长的连“0”和连“1”情况，影响时钟信息的提取，关于8B/10B变换知识，我后续会单独介绍。</p>
-<p><img src="/images/net/mii/SGMII.jpg" alt="SGMII"></p>
-<h2 id="TBI"><a href="#TBI" class="headerlink" title="TBI"></a>TBI</h2><p>TBI即Ten Bit Interface，接口数据位宽由GMII接口的8位增加到10位，其实，TBI接口跟GMII接口的差别不是很大，多出来的2位数据主要是因为在TBI接口下，MAC芯片在将数据发给PHY芯片之前进行了8B/10B变换(8B/10B变换本是在PHY芯片中完成的，前面已经说过了)，另外，RX_CLK+/-是从接收数据中恢复出来的半频时钟，频率为62.5MHz，RX_CLK+/-不是差分信号，而是两个独立的信号，两者之间有180度的相位差，在这两个时钟的上升沿都采样数据。RX_CLK+/-也叫伪差分信号。除掉上面说到的之外，剩下的信号都跟GMII接口中的相同。大多数芯片的TBI接口和GMII接口兼容。在用作TBI接口时，CRS和COL一般不用。</p>
-<p><img src="/images/net/mii/TBI.jpg" alt="img"></p>
-<h2 id="RTBI"><a href="#RTBI" class="headerlink" title="RTBI"></a>RTBI</h2><p>RTBI即Reduced TBI，简化版TBI，接口数据位宽为5bit，时钟频率为125MHz，在时钟的上升沿和下降沿都采样数据，同RGMII接口一样，TX_EN线上会传送TX_EN和TX_ER两种信息，在时钟的上升沿传TX_EN，下降沿传TX_ER；RX_DV线上传送RX_DV和RX_ER两种信息，在RX_CLK上升沿传RX_DV，下降沿传RX_ER。</p>
-<p><img src="/images/net/mii/RTBI.jpg" alt="img"></p>
-<h2 id="XGMII"><a href="#XGMII" class="headerlink" title="XGMII"></a>XGMII</h2><p>XGMII–10 Gigabit Media Independent Interface 即10Gb独立于媒体的接口，X对应罗马数字10。</p>
-<p><img src="/images/net/mii/XGMII.jpg" alt="XGMII"></p>
-<p>XGMII接口共74根连线，单端信号，采用HSTL/SSTL_2逻辑，端口电压1.5V/2.5V，由于SSTL_2的端口电压高，功耗大，现在已很少使用。</p>
-<ul>
-<li><p>TXD[31:0]：数据发送通道，32位并行数据。</p>
-</li>
-<li><p>RXD[31:0]：数据接收通道，32位并行数据。</p>
-</li>
-<li><p>TXC[3:0]：发送通道控制信号，TXC=0时，表示TXD上传输的是数据；TXC=1时，表示TXD上传输的是控制字符。TXC[3:0]分别对应TXD[31:24], TXD[23:16], TXD[15:8], TXD[7:0]。</p>
-</li>
-<li><p>RXC[3:0]：接收通道控制信号，RXC=0时，表示RXD上传输的是数据；RXC=1时，表示RXD上传输的是控制字符。RXC[3:0]分别对应RXD[31:24], RXD[23:16], RXD[15:8], RXD[7:0]。</p>
-</li>
-<li><p>TX_CLK：TXD和TXC的参考时钟，时钟频率156.25MHz，在时钟信号的上升沿和下降沿都采样数据。156.25MHz - 2 - 32 = 10Gbps 。</p>
-</li>
-<li><p>RX_CLK：RXD和RXC的参考时钟，时钟频率156.25MHz，在时钟信号的上升沿和下降沿都采样数据。</p>
-</li>
-</ul>
-<p>HSTL即High Speed Transceiver Logic，高速发送逻辑的意思。</p>
-<p>SSTL，即Stub Series Terminated Logic，短路终止逻辑，主要用于高速内存接口，SSTL目前存在两种标准，SSTL_3是3.3V标准；SSTL_2是2.5V标准。</p>
-<h2 id="XAUI"><a href="#XAUI" class="headerlink" title="XAUI"></a>XAUI</h2><p>由于受电气特性的影响，XGMII接口的PCB走线最大传输距离仅有7cm，并且XGMII接口的连线数量太多，给实际应用带来不便，因此，在实际应用中，XGMII接口通常被XAUI接口代替，XAUI即10 Gigabit attachment unit interface，将XGMII集成到芯片内部，XAUI在XGMII的基础上实现了XGMII接口的物理距离扩展，将PCB走线的传输距离增加到50cm，使背板走线成为可能。</p>
-<p>源端XGMII把收发32位宽度数据流分为4个独立的lane通道，每个lane通道对应一个字节，经XGXS(XGMII Extender Sublayer)完成8B/10B编码后，将4个lane分别对应XAUI的4个独立通道，XAUI端口速率为：<code>2.5Gbps - 1.25 - 4＝12.5Gbps</code>。</p>
-<p><img src="/images/net/mii/XAUI.jpg" alt="img"></p>
-<p>在发送端的XGXS模块中，将TXD[31:0]/ RXD[31:0],TXC[3:0]/ RXC[3:0], TX_CLK/ RX_CLK转换成串行数据从TX Lane[3:0]/ RX Lane[3:0]中发出去，在接收端的XGXS模块中，串行数据被转换成并行，并且进行时钟恢复和补偿，完成时钟去抖，经过5B/4B解码后，重新聚合成XGMII。</p>
-<p>万兆以太网接口的端口速率为10Gbps，主要有XGMII和XAUI两种，另外还有HIGIG。</p>
+<h3 id="DSI-CSI"><a href="#DSI-CSI" class="headerlink" title="DSI/CSI"></a>DSI/CSI</h3><p>MIPI是一个比较新的标准，其规范也在不断修改和改进，目前比较成熟的接口应用有DSI(显示接口)和CSI（摄像头接口）。CSI/DSI分别是指其承载的是针对Camera或Display应用，都有复杂的协议结构。以DSI为例，其协议层结构如下：</p>
+<p><img src="/images/mipi/MIPI-DSI.png" alt="img"></p>
+<p>CSI/DSI的物理层（Phy Layer）由专门的WorkGroup负责制定，其目前的标准是D-PHY。D-PHY采用1对源同步的差分时钟和1～4对差分数据线来进行数据传输。数据传输采用DDR方式，即在时钟的上下边沿都有数据传输。</p>
+<p>D-PHY的物理层支持HS(High Speed)和LP(Low Power)两种工作模式。HS模式下采用低压差分信号，功耗较大，但是可以传输很高的数据速率（数据速率为80M～1Gbps）； LP模式下采用单端信号，数据速率很低（&lt;10Mbps），但是相应的功耗也很低。两种模式的结合保证了MIPI总线在需要传输大量数据（如图像） 时可以高速传输，而在不需要大数据量传输时又能够减少功耗。</p>
+<p><img src="/images/mipi/MIPI-DPHY.png" alt="img"></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/100476927">https://zhuanlan.zhihu.com/p/100476927</a></p>
 
       
     </div>
@@ -729,7 +319,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/rj45/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/sensor/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -743,7 +333,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/hardware/rj45/" class="post-title-link" itemprop="url">RJ45 interface</a>
+            <a href="/2022/06/07/hardware/sensor/" class="post-title-link" itemprop="url">sensor</a>
         </h1>
 
         <div class="post-meta">
@@ -760,7 +350,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:55:37" itemprop="dateModified" datetime="2022-06-08T17:55:37+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -768,7 +358,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
                 </span>
             </span>
 
@@ -783,28 +373,58 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>以太网信号最终是通过RJ45接头接入网络的。RJ是Registered Jack的缩写，意思是注册的插座。在FCC（美国联邦通信委员会标准和规章）中RJ是描述公用电信网络的接口，计算机网络的RJ45是标准8位模块化接口的俗称。连接器由插头（8P8C接头，水晶头）和插座组成。</p>
-<p>RJ45型网线插头又称水晶头，有两种连接方式，分别称作 T568A 线序和 T568B 线序。两者的主要区别是橙色和绿色双绞线进行了交换。</p>
-<p>这两种标准只是在线缆颜色上有所区别，目的是在线缆侧实现交叉互连。直连线常用于异种网络之间的互连（比如计算机交换机之间），交叉线常用于同种网络之间的互联（比如计算机与之间）。</p>
-<p><img src="/images/net/RJ45/RJ-45_T568AB.jpg" alt="RJ-45接线图"></p>
-<p><img src="/images/net/RJ45/T568AB.bmp" alt="RJ-45接线图2"></p>
-<p>交叉互连，所谓交叉是指网线的一端和另一端与 RJ45 网线插头的接法不同，一端按 T568A 线序接，另一端按 T568B 线序接，即有几根网线在另一端是先做了交叉才接到 RJ45 插头上去的，适用的场合：</p>
+          <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>Sensor 将从 lens 上传导过来的光线转换为电信号，再经过内部AD转换为数字信号。每个pixel像素点只能感受R、G、B中的一种，因此每个像素点中存放的数据是单色光，像素表示的就是有多少个感光点，每个感光点只能感应一种光，这些最原始的感光数据我们称为RAW Data。Raw Data数据要经过ISP的处理才能还原出三原色，也就是说如果一个像素点感应为R值，那么ISP会根据该感光点周围的G、B的值，通过插值和特效处理等，计算出该R点的G、B值，这样该点的RGB就被还原了。目前常用的sensor有两种，一种是CCD（电荷耦合）；一种是CMOS（金属氧化物导体）。</p>
 <ul>
-<li>电脑——电脑，称对等网连接</li>
-<li>集线器——集线器</li>
-<li>交换机——交换机</li>
+<li>CCD（Charge Coupled Device），电荷耦合器件传感器：使用一种高感光度的半导体材料制成，能把光线转变成电荷，通过模数转换器芯片转换成电信号。CCD由许多独立的感光单位组成，通常以百万像素为单位。当CCD表面受到光照时，每个感光单位都会将电荷反映在组件上，所有的感光单位产生的信号加在一起，就构成了一幅完整的图像。CCD传感器以日本厂商为主导，全球市场上有90%被日本厂商垄断，索尼、松下、夏普是龙头。</li>
+<li>CMOS（Complementary Metal-Oxide Semiconductor），互补性氧化金属半导体：主要是利用硅和锗做成的半导体，使其在CMOS上共存着带N(-)和P(+)级的半导体，这两个互补效应所产生的电流可以被处理芯片记录并解读成影像。CMOS传感器主要以美国、韩国和中国台湾为主导，主要生产厂家是美国的OmnVison、Agilent、Micron，中国台湾的锐像、原相、泰视等，韩国的三星、现代。</li>
 </ul>
-<p>直连线互连的网线的两端均按T568B接线，适用场合：</p>
+<h2 id="ISP"><a href="#ISP" class="headerlink" title="ISP"></a>ISP</h2><p>ISP 是图像信号处理器（Image Sensor Processor）。一般用来处理Image Sensor（图像传感器）的输出数据，如做AE（自动曝光）、AGC（自动增益控制）、AWB（自动白平衡）、色彩校正、Lens Shading、Gamma 校正、祛除坏点、Auto Black Level、Auto White Level 等等功能的处理。</p>
+<h3 id="AE"><a href="#AE" class="headerlink" title="AE"></a>AE</h3><p>自动曝光（Auto Exposure），根据外界光线的强弱自动调整曝光量和增益，防止曝光过度或者不足。AE 算法的主要调控对象一般是光圈、sensor增益（包含模拟增益和数字增益）、ISP数字增益这三个参数。</p>
+<p>影响曝光的因素有曝光时间；光圈大小；Sensor的ISO感光度。</p>
+<p>帧曝光时间Ft和帧率f的关系为：f = 1 / Ft，曝光时间的计算方法由sensor厂商提供。</p>
+<p>EV曝光值（exposure value），摄影技术中定义的曝光值参数，代表能够给出同样曝光的所有相机光圈组合。它的定义是：$EV = \log(N^2 \div t)$<br>其中N是光圈的f-stop值；t是曝光时间，单位为秒。</p>
+<p>EV0 对应于ISO100，曝光时间为1秒，光圈为f/1.0，以及与之等效的所有曝光组合，这些组合可以使18%的中性灰卡在所处光照条件下获得合适的曝光。因此曝光值主要体现了拍摄场景的亮度，同时在一定程度上也能反映相机的灵敏度。</p>
+<p>曝光值每增加1称为增加一挡曝光，也就是将曝光量减半，比如将曝光时间或光圈面积减半，因此可以从EV0出发，按照光圈、快门加倍或减半的方式推导出其余的曝光档位，一般常用的档位在-6~20之间。</p>
+<p>如果已知使画面正确曝光的EV值，则可以在下表中选择一个合适的曝光时间+光圈组合。举例来说，假设已知某拍摄场景正确曝光需要EV2，在固定ISO100的前提下，光圈和快门组合只能在（1s,f/2），（1/2s,f/1.4），（1/4s,f/1）这三个方案中选择一个。</p>
+<p><img src="/images/sensor/v2-c02e83e125e4c8ef22e1ed881274f0a0_b.jpg" alt="img"></p>
+<p>下表给出了EV0~EV20的典型场景。<br><img src="/images/sensor/v2-6e533fff18f0d918e10799c77da24350_b.jpg" alt="img"></p>
+<p>下表给出了更完整的EV数据，同时包含了ISO，光圈和快门值<br><img src="/images/sensor/v2-fdcf59270dee877d6e1b9d79bf9c625f_b.jpg" alt="img"></p>
+<p>光圈、快门、增益都可以影响画面亮度，但是这三者在效能上并不是完全等价的。摄影领域常用一个曝光三角形来形象地阐释三者之间的关系。<br><img src="/images/sensor/v2-af09e43949d8c5d8dc36214597209286_b.jpg" alt="img"></p>
+<p>光圈（aperture）的副作用主要是影响景深。快门的副作用主要是影响运动模糊。一般而言，当曝光时间大于15ms时，画面中速度大于40km/h的车辆就会开始变模糊。当曝光时间大于30ms时，画面中走动的人就会变模糊。因此拍摄对象的预期移动速度基本上决定了曝光时间的上限。增益的副作用主要表现为画面噪声，尤其是数字增益会引入较大的噪声，显著降低图像质量。<br><img src="/images/sensor/v2-ed7c2425f86f43612ef449e0bff2ce4a_b.jpg" alt="img"></p>
+<h3 id="AWB"><a href="#AWB" class="headerlink" title="AWB"></a>AWB</h3><p>色温随可见光的光谱成分变化而变化，在低色温光源下，白色物体偏红，在高色温光源下，白色物体偏蓝。人眼可根据大脑的记忆判断，识别物体的真实颜色，AWB（自动白平衡调整Auto White Balance ） 算法的功能是降低外界光源对物体真实颜色的影响，使得我们采集的颜色信息转变为在理想日光光源下的无偏色信息。要求在不同色温环境下，照白色的物体，屏幕中的图像应也是白色的。</p>
 <ul>
-<li>电脑——ADSL 猫</li>
-<li>ADSL猫——ADSL 路由器的 WAN 口</li>
-<li>电脑——ADSL 路由器的 LAN 口</li>
-<li>电脑——集线器或交换机</li>
+<li><p>色温的定义：将黑体从绝对零度开始加温，当温度升高到一定程度时候，黑体便辐射出可见光，其光谱成份以及给人的感觉也会着温度的不断升高发生相应的变化。于是，就把黑体辐射一定色光的温度定为发射相同色光光源的色温。</p>
+</li>
+<li><p>白平衡：在不同色温的光源下，白色在传感器中的响应会偏蓝或偏红。白平衡算法通过调整 R, G, B 三个颜色通道的强度，使白色真实呈现。</p>
+</li>
 </ul>
-<p>现在PHY芯片大部分具有自动交叉（auto MDI-X）的能力，它可以实现RJ-45接口的传送信号线和接收信号线的功能自动互相交换，有的PHY甚至支持一对线中的正信号和负信号的功能自动交换，这样就不必考虑选用直连网线还是交叉网线，只需要直连即可。</p>
-<p><img src="/images/net/RJ45/T-568A.jpg" alt="T-568A"></p>
-<p><img src="/images/net/RJ45/T-568B.jpg" alt="T-568B"></p>
-<p><img src="/images/net/RJ45/RJ45-pinout.jpg" alt="RJ45-pinout"></p>
+<h3 id="3DNR"><a href="#3DNR" class="headerlink" title="3DNR"></a>3DNR</h3><p>2D降噪：只在2维空间域上进行降噪处理。对一个像素将其与周围像素平均，平均后噪声降低，但缺点是会造成画面模糊，特别是物体边缘部分。因此对这种算法的改进主要是进行边缘检测，边缘部分的像素不用来进行模糊。</p>
+<p>3D降噪即3D DNR（3D Digital Noise Reducer），通过对比相邻的几帧图像，将图像信号中不重叠的噪波自动滤出。目前比较普遍的是进行Y/C分离，即从视频信号中将亮度信号（Y）和颜色信号（C）分离，然后对Y信号，C信号进行3维数字降噪。3D降噪增添了时域处理，因此变为3维。和2D降噪的不同在于，2D降噪只考虑一帧图像，而3D降噪进一步考虑帧与帧之间的时域关系，对每个像素进行时域上的平均，故计算量大，耗时更长。</p>
+<h3 id="BLC"><a href="#BLC" class="headerlink" title="BLC"></a>BLC</h3><p>BLC（Black Level Correction）/ Black Level Compensate (OBC) ：黑电平校正。黑电平是在没有外界光线输入时，理想情况下像素值应该是0，但是实际中因为sensor暗电流作用仍会输出的亮度值。ISP 需要减去这个亮度值（这一个值会受到AWBGain，CCM，Gamma的影响）。</p>
+<h3 id="LSC"><a href="#LSC" class="headerlink" title="LSC"></a>LSC</h3><p>LSC（Lens Shading Correction）/Color Shading ：阴影校正。Lens Shading是由于镜片从边缘到中心对入射光线的反射程度不同，镜头中心接收的光强大，边缘接收的光强较少， 造成图像从中心到边缘亮度逐渐变暗。Color Shading是由于Lens从中心到边缘，其R、G、B变暗的速率不一样，总体表现就是Gb/Gr像素值差异较大，两个像素之间有细微纹理。</p>
+<h3 id="CCM"><a href="#CCM" class="headerlink" title="CCM"></a>CCM</h3><p>CCM（Color Correction Matrix/ DSC color calibration）：颜色校正矩阵。sensor 对光谱的响应在 RGB 各分量上与人眼对光谱的响应通常是有偏差的，拍摄color checker24色板，将相机拍摄图片值与色板标准值之间进行对比，得出一组能将拍摄值校正到最接近标准值的3x3矩阵。通常通过一个色彩校正矩阵对所有相机拍摄的图片进行颜色校正，使图像与人眼视觉在色彩上保持一致。</p>
+<p><img src="/images/sensor/image-20200221200943546.png" alt="image-20200221200943546"><br>m<del>RR</del> + m<del>RG</del> + m<del>RB</del> = 256<br>m<del>GR</del> + m<del>GG</del> + m<del>GB</del> = 256<br>m<del>BR</del> + m<del>BG</del> + m<del>BB</del> = 256</p>
+<p>（2）DPC/BPD（Defect Pixel Correction/Bad Pixel Detect）：坏点校正/坏点检测。相机中成像坏点一般是白色或者黑色的点，和周围像素点的差异明显。</p>
+<p>（3）FPN（Fix Pattern Noise）：固定模式噪声。由于CMOS每个感光二极体旁都搭配一个ADC 放大器，如果以百万像素计，那么就需要百万个以上的 ADC 放大器，但是每个像素结构中的光电二极管的尺寸、掺杂浓度、生产过程中的沾污以及MOS场效应管的参数的偏差等都会造成像素输出信号的变化。对于给定的单个像素它是固定的。通常消除固定模式噪声采用“双采样降噪”方法，这是CMOS 感光器件特有的一种降噪方式。在光线较暗的环境下使用时，画面会有明显的噪声，这时通过对景物进行两次不同曝光率和敏感度的采样，然后将两次采样的结果进行综合处理，就可以有效解决低照度下的图像噪声问题。</p>
+<p>（5）Flare offset：光学上称Flare也叫stray light,耀斑补偿。镜片的表面反射或镜筒、反光镜组的内面所引起的反射光，到达底面后造成画面整体或一部份产生了雾蒙，降低了图像的鲜锐度。镜片的镀膜及内面防反射处理的加强，固然可以大幅度地减少光斑，但被摄体的状况并不相同，不可能完全消除。</p>
+<p>因此，在相机里面设计都是黑色的，且其内侧表明设计都是粗糙的，目前就是为了减小flare。flare如何修正？做直方图，然后每阶的亮度都往下降，这样是否会影响颜色呢？因此，flare一定要是在linear domain去做，不能在RGB domain去做。</p>
+<p>（9）DM（Demosaicing/Color Filter Array Interpolation/CFA插值）：CMOS Sensor出来的RawData是Bayer格式的图像，每个像素只有一个通道的信息。DM是将Bayer格式的图像恢复成每个像素用RGB三通道表示的方式。DM的主要依据是图像在平滑的局部区域，各分量的ratio是相等的。插值算法的好坏会影响图片的细节，如摩尔纹。</p>
+<p>（12）EE（Edge Enhancement/Edge Sharpening）：锐化，边缘增强。通过滤波器获取图像的高频分量，按照一定的比例将高频部分和原图进行加权求和获取锐化后的图像。</p>
+<p>（13）DRC/HDR（Dynamic Range Compression/ High-Dynamic Range）：宽动态。高动态图像的拍摄出来的结果通常会有，亮部太亮，暗部太暗的问题。DRC是调整图像暗部亮度使之变亮，调整亮部亮度使之变暗，而且保持图像的对比度。</p>
+<p>（14）PCA/VDE：Hue，Saturation，Contrast，Brightness调试。单独针对Hue，Saturation，Contrast，Brightness各图像分量进行调节。</p>
+<p>（15）Histogram：直方图均衡化。重新分布图片的亮度。使图片的亮度分布更加均匀。</p>
+<p>（16）FlashLight Control：闪光灯控制</p>
+<p>（17）Cross talk：Optical cross-talk是当主光线进光角度过大，导致光线不能有效地进入本像素的Microlens内，而是进入相邻像素单元或其他无效区域内的现象。</p>
+<p>Electric cross-talk：相邻单元之间的光生少数载流子通过衬底扩散和漏电相互影响造成相邻单元的现象。</p>
+<p>上述原因导致结果都是图像在对角线上相邻两个像素的Gr和Gb value差异较大而产生不平滑的纹理状。</p>
+<p>（18）Gradation Control（GDC）：可能是对图像数据精度进行的操作</p>
+<p>（19）Scaler：对图像进行缩放，缩放的过程中采样和插值直接影响图像的细节质量。</p>
+<p>（20）Adaptive tone scale：(这个没有办法处理多种场景)进来的影像，根据histogram，可以调节，让其明暗亮度的曲线比较好看。因此，它最重要的就是histogram equalization，其关键是在哪个domain去做。目前我们的做法应该是在L*做histogram，但只做edge的histogram，这样就ok了。</p>
+<p>（21）Dynamic Range Compression：就是把暗的地方变亮一些，亮的地方变暗一些。AE的主要目的是避免亮度饱和的pixels，其余exposure的pixel可以通过DRC校准回来。</p>
+<h2 id="Iris"><a href="#Iris" class="headerlink" title="Iris"></a>Iris</h2><p>光圈是镜头上的一个组件，由机械或电压控制，可通过控制通光孔的开合程度，控制进光量的大小，光圈的进光量与其f值的平方成反比。DC-Iris不能精确定位，P-Iris能精确定位。</p>
+<p>计量光学系统的通光量时使用f-stop作为计量单位，f-stop = f （镜头焦距）/ D（光圈孔径），f-stop值越大表示光圈孔径越小，常用的f-stop值一般在1.4~22之间,如下图所示。<br><img src="/images/sensor/v2-910b34243ef1be1dfba55f6f564290a0_720w.jpg" alt="img"></p>
+<p>由于f-stop反比于光圈孔径，根据圆面积公式S=πD^2/4，镜头的实际通光量与f-stop的平方成反比，它们之间名义上的对应关系如下。<br><img src="/images/sensor/v2-907684804fe2f746a039be86ab42a9cf_720w.jpg" alt="img"></p>
+<p>一般来说，光圈f值从f1.8<del>f22较常见， 其中 f1.8</del>f5.4，室内用得多一些；而f5.0以上室外用得多，暗场景一般使用最小的f值光圈以获得较大的通光量。</p>
 
       
     </div>
@@ -824,7 +444,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/net/eth/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/pc/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -838,7 +458,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/net/eth/" class="post-title-link" itemprop="url">ethernet and MAC</a>
+            <a href="/2022/06/07/hardware/pc/" class="post-title-link" itemprop="url">计算机组成原理</a>
         </h1>
 
         <div class="post-meta">
@@ -855,7 +475,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 20:39:27" itemprop="dateModified" datetime="2022-06-08T20:39:27+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -863,7 +483,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
                 </span>
             </span>
 
@@ -878,445 +498,52 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="网卡"><a href="#网卡" class="headerlink" title="网卡"></a>网卡</h2><p>以太网接口由MAC控制器物理层接口PHY组成。PHY整合了大量模拟硬件，而MAC是典型的全数字器件。考虑到芯片面积及模拟/数字混合架构的原因，通常，将MAC集成进微控制器而将PHY留在片外。</p>
-<p><img src="/images/net/eth/eth-arch.png" alt="基本构成"></p>
-<p><img src="/images/net/eth/eth-arch2.jpg" alt="cpu内部框架"></p>
-<p>网卡工作在osi的最后两层，物理层和数据链路层，物理层定义了数据传送与接收所需要的电与光信号、线路状态、时钟基准、数据编码和电路等，并向数据链路层设备提供标准接口。物理层的芯片称之为PHY。数据链路层则提供寻址机构、数据帧的构建、数据差错检查、传送控制、向网络层提供标准的数据接口等功能。以太网卡中数据链路层的芯片称之为MAC控制器。很多网卡的这两个部分是做到一起的。他们之间的关系是pci总线接mac总线，mac接phy，phy接网线。</p>
-<p>隔离变压器的作用是防干扰，防雷击。长距离连接的两个以太网设备，很可能不共地，地线之间有电压差，如果不隔离，电流会经网线走，网卡接口就很容易坏了。</p>
-<p>RJ-45接头实现了网卡和网线的连接，10M网卡的RJ-45插口也只用了1,2,3,6四根，而100M或1000M网卡使用八根。其中100M的网络中1,2是传送数据的，3,6是接收数据的，1,2之间是一对差分信号，也就是说它们的波形一样，但是相位相差180度。</p>
-<h2 id="MAC"><a href="#MAC" class="headerlink" title="MAC"></a>MAC</h2><p>MAC（Media Access Control），即媒体访问控制子层协议。该协议位于OSI七层协议中数据链路层的下半部分，实现了数据链路层。支持 10Mbit/s 或 100Mbit/s 两种速率。主要负责控制与连接物理层的物理介质。在发送数据的时候，MAC协议可以事先判断是否可以发送数据，如果可以发送将给数据加上一些控制信息，最终将数据以及控制信息以规定的格式发送到物理层;在接收数据的时候，MAC协议首先判断输入的信息并是否发生传输错误,如果没有错误,则去掉控制信息发送至LLC层。该层协议是以太网MAC由IEEE-802.3以太网标准定义。</p>
-<p><img src="/images/net/eth/mac.png" alt="OSI-MAC"></p>
-<p>最新的MAC同时支持 10Mbps和100Mbps两种速率。以太网数据链路层其实包含MAC(介质访问控制)子层和LLC(逻辑链路控制)。</p>
-<p>目标的MAC地址由ARP协议确定。第一次传送某个目的IP地址的数据的时候，先会发出一个ARP包，其MAC的目标地址是广播地址，因为是广播包，所有这个局域网的主机都收到了这个ARP请求。收到请求的主机将这个IP地址和自己的相比较，如果不相同就不予理会，如果相同就发出ARP响应包。这个IP地址的主机收到这个ARP请求包后回复的ARP响应。这个包里面就包括了他的MAC地址。以后的给这个IP地址的帧的目标MAC地址就被确定了。</p>
-<p>IP地址和MAC地址之间的关联关系保存在主机系统里面，叫做ARP表。</p>
-<p><img src="/images/net/eth/MAC.jpg" alt="MAC"></p>
-<p>以太网MAC芯片的一端接计算机PCI总线，另外一端就接到PHY芯片上。CPU上有两组寄存器用与MAC。一组用户数据的收发，对应上面的DMA；一组用户MIIM，用户对PHY进行配置，两组寄存器由于都在CPU上，配置方式与其他CPU上寄存器一样，直接读写即可。数据的转发通过DMA完成。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/rootfs/rootfs/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/rootfs/rootfs/" class="post-title-link" itemprop="url">rootfs of file system</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/rootfs/" itemprop="url" rel="index"><span itemprop="name">rootfs</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="flash文件系统"><a href="#flash文件系统" class="headerlink" title="flash文件系统"></a>flash文件系统</h2><p>flash芯片可以被划分为多个分区，各分区可以采用不同的文件系统。flash文件系统是基于MTD驱动层的，MTD(Memory Technology Device,存储技术设备)为底层硬件(闪存)和上层(文件系统)之间提供一个统一的抽象接口，专门针对各种非易失性存储器设计，因而对Flash有更好的支持、管理和基于扇区的擦除、读/写操作接口。</p>
-<h3 id="jffs"><a href="#jffs" class="headerlink" title="jffs"></a>jffs</h3><p>JFFS文件系统最早是由瑞典Axis Communications公司基于Linux2.0的内核为嵌入式系统开发的文件系统。JFFS2是RedHat公司基于JFFS开发的闪存文件系 统，最初是针对RedHat公司的嵌入式产品eCos开发的嵌入式文件系统，所以JFFS2也可以用在Linux, uCLinux中。</p>
-<p>Jffs2: 日志闪存文件系统版本2 (Journalling Flash FileSystem v2)</p>
-<p>主要用于NOR型闪存，基于MTD驱动层，特点是：<strong>可读写</strong>的、支持数据压缩的、基于哈希表的日志型文件系统，并提供了崩溃/掉电安全保护，提供“写平衡”支持等。缺点主要是当文件系统已满或接近满时，因为垃圾收集的关系而使jffs2的运行速度大大放慢。</p>
-<p>目前jffs3正在开发中。关于jffs系列文件系统的使用详细文档，可参考MTD补丁包中mtd-jffs-HOWTO.txt。</p>
-<p><em>jffsx不适合用于NAND闪存</em>主要是因为NAND闪存的容量一般较大，这样导致jffs为维护日志节点所占用的内存空间迅速增大，另 外，jffsx文件系统在挂载时需要扫描整个FLASH的内容，以找出所有的日志节点，建立文件结构，对于大容量的NAND闪存会耗费大量时间。</p>
-<h4 id="mkfs-jffs2"><a href="#mkfs-jffs2" class="headerlink" title="mkfs.jffs2"></a>mkfs.jffs2</h4><p>直接安装<code>mkfs.jffs2</code>工具：sudo apt-get install mtd-utils，或编译源码。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install liblzo2-2 libuuid1 zlib1g liblzo2-dev uuid-dev libacl1-dev  zlib1g-dev</span><br><span class="line">./configure --prefix=/home/luo_u/usr</span><br><span class="line">make </span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
-
-<p><em>使用说明</em>:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">./mkfs.jffs2 -v -d rootfs/ -l -s 256 -e 4096 -m none -o root.jffs2</span><br><span class="line"></span><br><span class="line">-p, --pad[=SIZE]        使用0xff填充文件系统到指定大小，不指定则只填充完最后一个擦除块</span><br><span class="line">-r, -d, --root=DIR      使用指定的目录内容构建文件系统</span><br><span class="line">-s, --pagesize=SIZE     使用指定的页大小（最大数据节点大小） (default: 4KiB)</span><br><span class="line">-e, --eraseblock=SIZE   指定擦除块的大小 (default: 64KiB)</span><br><span class="line">-c, --cleanmarker=SIZE  擦除标记的大小 (default 12)</span><br><span class="line">-m, --compr-mode=MODE   选择压缩模式(default: priortiry)</span><br><span class="line">-x, --disable-compressor=COMPRESSOR_NAME  禁用指定的压缩算法</span><br><span class="line">-X, --enable-compressor=COMPRESSOR_NAME   启用指定的压缩算法</span><br><span class="line">-y, --compressor-priority=PRIORITY:COMPRESSOR_NAME  设置压缩算法的优先级</span><br><span class="line">-L, --list-compressors  列出可用的压缩算法</span><br><span class="line">-t, --test-compression  测试压缩算法</span><br><span class="line">-n, --no-cleanmarkers   不添加擦除标记到擦除块</span><br><span class="line">-o, --output=FILE       指定输出镜像文件名称</span><br><span class="line">-l, --little-endian     创建一个小端的文件系统</span><br><span class="line">-b, --big-endian        创建一个大端的文件系统</span><br><span class="line">-q, --squash            压缩权限和设置所有文件的拥有者为root</span><br><span class="line">-U, --squash-uids       设置所有文件的拥有者为root</span><br><span class="line">-P, --squash-perms      压缩所有文件的权限</span><br><span class="line">-v  可视操作</span><br></pre></td></tr></table></figure>
-
-<p><em>挂载分区</em>:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount -t jffs2 /dev/mtdblock1 /mnt</span><br></pre></td></tr></table></figure>
-
-<h3 id="yaffs"><a href="#yaffs" class="headerlink" title="yaffs"></a>yaffs</h3><p>yaffs/yaffs2(Yet Another Flash File System)是专为嵌入式系统使用NAND型闪存而设计的一种日志型文件系统。与jffs2相比，它减少了一些功能(例如不支持数 据压缩)，所以速度更快，挂载时间很短，对内存的占用较小。另外，它还是跨平台的文件系统，除了Linux和eCos，还支持WinCE, pSOS和ThreadX等。</p>
-<p>yaffs/yaffs2自带NAND芯片的驱动，并且为嵌入式系统提供了直接访问文件系统的API，用户可以不使用Linux中的MTD与VFS，直接对文件系统操作。当然，yaffs也可与MTD驱动程序配合使用。</p>
-<p>yaffs与yaffs2的主要区别在于，前者仅支持小页(512 Bytes) NAND闪存，后者则可支持大页(2KB) NAND闪存。同时，yaffs2在内存空间占用、垃圾回收速度、读/写速度等方面均有大幅提升。</p>
-<p><a target="_blank" rel="noopener" href="https://yaffs.net/documents/how-yaffs-works">https://yaffs.net/documents/how-yaffs-works</a></p>
-<h3 id="cramfs"><a href="#cramfs" class="headerlink" title="cramfs"></a>cramfs</h3><p>Cramfs(Compressed ROM File System)是Linux的创始人 Linus Torvalds参与开发的一种只读的压缩文件系统。它也基于MTD驱动程序。</p>
-<p>在cramfs文件系统中，每一页(4KB)被单独压缩，可以随机页访问，其压缩比高达2:1,为嵌入式系统节省大量的Flash存储空间，使系统可通过更低容量的FLASH存储相同的文件，从而降低系统成本。</p>
-<p>Cramfs文件系统以压缩方式存储，在运行时解压缩，所以不支持应用程序以XIP方式运行，所有的应用程序要求被拷到RAM里去运行，但这并 不代表比Ramfs需求的RAM空间要大一点，因为Cramfs是采用分页压缩的方式存放档案，在读取档案时，不会一下子就耗用过多的内存空间，只针对目 前实际读取的部分分配内存，尚没有读取的部分不分配内存空间，当我们读取的档案不在内存时，Cramfs文件系统自动计算压缩后的资料所存的位置，再即时 解压缩到RAM中。</p>
-<p>另外，它的速度快，效率高，其只读的特点有利于保护文件系统免受破坏，提高了系统的可靠性。由于以上特性，Cramfs在嵌入式系统中应用广泛。但是它的<strong>只读</strong>属性同时又是它的一大缺陷，使得用户无法对其内容对进扩充。Cramfs映像通常是放在Flash中，但是也能放在别的文件系统里，使用loopback 设备可以把它安装别的文件系统里。</p>
-<p>单个文件大小不能超过16MB、文件系统大小略大于256MB（最后一个文件允许超过256MB空间范围，即文件系统总大小不超过272MB）。CramFS的gid只保存8位，mkcramfs会简单的将gid截断保留最后8位。CramFS支持硬链接，但是被硬链接的文件引用计数不会增加。CramFS文件没有时间戳，所有文件的创建/访问时间戳都是1970年1月1日 0:00:00 GMT。CramFS的镜像只支持被同样字节对齐方式的机器创建和挂载使用，页面大小只支持4KB。</p>
-<h3 id="romfs"><a href="#romfs" class="headerlink" title="romfs"></a>romfs</h3><p>传统型的Romfs文件系统是一种简单的、紧凑的、只读的文件系统，不支持动态擦写保存，按顺序存放数据，因而支持应用程序以 XIP(eXecute In Place，片内运行)方式运行，在系统运行时，节省RAM空间。uClinux系统通常采用Romfs文件系统。<br>　　<br>其他文件系统：fat/fat32也可用于实际嵌入式系统的扩展存储器(例如PDA, Smartphone, 数码相机等的SD卡)，这主要是为了更好的与最流行的Windows桌面操作系统相兼容。ext2也可以作为嵌入式Linux的文件系统，不过将它用于 FLASH闪存会有诸多弊端。</p>
-<h3 id="squashfs"><a href="#squashfs" class="headerlink" title="squashfs"></a>squashfs</h3><p>SquashFS [1]  是一套基于Linux内核使用的压缩<strong>只读</strong>文件系统。该文件系统能够压缩系统内的文档,inode以及目录，文件最大支持2^64字节。<br>-　Squashfs 4.2 : 最新的版本，并适用于2.6.29版本以后的Linux内核。<br>-　Squashfs 4.1 : 支持XZ压缩，并适用于2.6.29版本以后的Linux内核。<br>-　Squashfs 3.4 : 该版本是3.X的最后一个版本，并适用于2.6.29版本之前的内核。</p>
-<p>安装<code>mksquashfs</code>工具：sudo apt-get install squashfs-tools</p>
-<p><em>使用说明</em></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mksquashfs rootfs/usr usr.sqsh4 -noappend -comp xz</span><br></pre></td></tr></table></figure>
-
-<p><em>挂载分区</em></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount -t squashfs /dev/mtdblock6 /usr</span><br></pre></td></tr></table></figure>
-
-<h3 id="RAM文件系统"><a href="#RAM文件系统" class="headerlink" title="RAM文件系统"></a>RAM文件系统</h3><h4 id="ramdisk"><a href="#ramdisk" class="headerlink" title="ramdisk"></a>ramdisk</h4><p>Ramdisk是将一部分固定大小的内存当作分区来使用。它并非一个实际的文件系统，而是一种将实际的文件系统装入内存的机制，并且可以作为根文件系统。将一些经常被访问而又不会更改的文件(如只读的根文件系统)通过Ramdisk放在内存中，可以明显地提高系统的性能。</p>
-<p>在Linux的启动阶段，initrd提供了一套机制，可以将内核映像和根文件系统一起载入内存。</p>
-<h4 id="ramfs-tmpfs"><a href="#ramfs-tmpfs" class="headerlink" title="ramfs/tmpfs"></a>ramfs/tmpfs</h4><p>Ramfs是Linus Torvalds开发的一种基于内存的文件系统，工作于虚拟文件系统(VFS)层，不能格式化，可以创建多个，在创建时可以指定其最大能使用的内存大 小。(实际上，VFS本质上可看成一种内存文件系统，它统一了文件在内核中的表示方式，并对磁盘文件系统进行缓冲。)</p>
-<p>Ramfs/tmpfs文件系统把所有的文件都放在RAM中，所以读/写操作发生在RAM中，可以用ramfs/tmpfs来存储一些临时性或经常要修改的数据，例如/tmp和/var目录，这样既避免了对Flash存储器的读写损耗，也提高了数据读写速度。</p>
-<p>Ramfs/tmpfs相对于传统的Ramdisk的不同之处主要在于：不能格式化，文件系统大小可随所含文件内容大小变化。</p>
-<p>Tmpfs的一个缺点是当系统重新引导时会丢失所有数据。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/rootfs/buildroot/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/rootfs/buildroot/" class="post-title-link" itemprop="url">buildroot</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/rootfs/" itemprop="url" rel="index"><span itemprop="name">rootfs</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>下载地址：　<a target="_blank" rel="noopener" href="https://buildroot.org/">https://buildroot.org/</a></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">├── arch: 存放CPU架构相关的配置脚本</span><br><span class="line">├── board</span><br><span class="line">├── boot</span><br><span class="line">├── CHANGES</span><br><span class="line">├── Config.in</span><br><span class="line">├── Config.in.legacy</span><br><span class="line">├── configs: 放置开发板的一些配置参数. </span><br><span class="line">├── COPYING</span><br><span class="line">├── DEVELOPERS</span><br><span class="line">├── dl: 存放下载的源代码及应用软件的压缩包. </span><br><span class="line">├── docs: 存放相关的参考文档. </span><br><span class="line">├── fs: 放各种文件系统的源代码. </span><br><span class="line">├── linux: 存放着Linux kernel的自动构建脚本. </span><br><span class="line">├── Makefile</span><br><span class="line">├── Makefile.legacy</span><br><span class="line">├── output: 是编译出来的输出文件夹. </span><br><span class="line">│   ├── build: 存放解压后的各种软件包编译完成后的现场.</span><br><span class="line">│   ├── host: 存放着制作好的编译工具链，如gcc、arm-linux-gcc等工具.</span><br><span class="line">│   ├── images: 存放着编译好的uboot.bin, zImage, rootfs等镜像文件，可烧写到板子里, 让linux系统跑起来.</span><br><span class="line">│   ├── staging</span><br><span class="line">│   └── target: 存放Linux系统基本的目录结构，以及编译好的应用库和bin可执行文件</span><br><span class="line">├── package：下面放着应用软件的配置文件，每个应用软件的配置文件有Config.in和soft_name.mk。</span><br><span class="line">├── README</span><br><span class="line">├── support</span><br><span class="line">├── system</span><br><span class="line">└── toolchain</span><br></pre></td></tr></table></figure>
-
-<p> Buildroot提供了构建流程的框架。开发者按照格式写脚本，提供必要的构建细节，配置整个系统，最后自动构建出你的系统。</p>
-<p> package/pkg-generic.mk中通过调用同目录下的pkg-download.mk、pkg-utils.mk文件，已经帮你自动实现了下载、解压、依赖包下载编译等一系列流程。你只要需要按照格式写Makefile脚app_pkg.mk，填充下载地址，链接依赖库的名字等一些特有的构建细节即可。</p>
-<p><img src="/images/rootfs/build.png" alt="构建流程框架"></p>
-<p>Buildroot代码仓库默认只包含一个编译框架，真正构建rootfs需要的各种代码包是根据配置选项，在编译的时候才开始下载的。</p>
-<p>通过<code>make help</code>可以看到buildroot下make的使用细节，包括对package、uclibc、busybox、linux以及文档生成等配置。</p>
-<p>执行命令<code>make list-defconfigs</code>查看buildroot中支持的开发板</p>
-<p>设置 toolchain 的版本和内核头文件的内核的版本</p>
-<p>System configuration-&gt;Run a getty(login prompt) after boot选项中配置 TTY Port 为 ttyAMA0。否则文件系统挂载后无法进入控制台。</p>
-<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p><strong>Target options</strong>：目标板的配置</p>
-<ul>
-<li><p>Target Architecture：目标架构，这里选择 ARM(little endian)，ARM小端模式</p>
-</li>
-<li><p>Target Binary Format：二进制格式，为 ELF</p>
-</li>
-<li><p>Target Architecture Variant：架构变体为 arm920t，内核类型</p>
-</li>
-<li><p>Target ABI：应用程序二进制接口，为EABI</p>
-</li>
-<li><p>Floating point strategy：浮点数的策略，选择为 Soft float</p>
-</li>
-<li><p>ARM instruction set：arm 汇编指令集，选择  ARM</p>
-</li>
-<li><p><strong>Build　options</strong></p>
-</li>
-</ul>
-<p>主要是一些编译时用到的选项，比如dl的路径，下载代码包使用的路径，同时运行多个编译的上限，是否使能编译器缓冲区等。</p>
-<p><strong>Toolchain</strong>：工具链选项</p>
-<ul>
-<li>Toolchain type：Buildroot提供两种方式使用toolchain<ul>
-<li>external toolthain：非Buildroot提供的交叉编译器</li>
-<li>Buildroot toolchain：Buildroot本身编译生成的Buildroot toolchain</li>
-</ul>
-</li>
-<li>custom toolchain vendor name：填上S3C2440</li>
-<li>C library：C库选择，选择 glibc</li>
-<li>Kernel Headers：内核头文件，Linux 4.9.x kernel headers</li>
-<li>glibc version：glibc版本选择，2.24</li>
-<li>Binutils Version：binutils版本：2.27</li>
-<li>Additional binutils options：附加的 binutils 选择，不填即可</li>
-<li>GCC compiler Version：GCC版本选择，gcc 6.x</li>
-<li>Additional gcc options：附件的GCC选项</li>
-<li>Enable C++ support：使能C++支持，选上</li>
-<li>Enable Fortran support：使能Fortran语言支持，不选</li>
-<li>Enable compiler link-time-optimization support：是否支持LTO，不选</li>
-<li>Enable compiler OpenMP support：是否支持OpenMP，OpenMP用于共享内存并行系统的多处理器程序设计，<br>不适合需要复杂的线程间同步和互斥的场合，OpenMp的另一个缺点是不能在非共享内存系统如计算机集群上使用。不选择</li>
-<li>Enable graphite support ：是否支持graphite。Graphite是应用WEB应用的一套开源的编程接口。不选择。</li>
-<li>Build cross gdb for the host：主机上运行gdb进行调试，不选</li>
-<li>Copy gconv libraries：拷贝 gconv库，gconv库用于在不同字符集之间进行转换。默认不选</li>
-<li>Enable MMU support：使能 MMU，S3C2440支持MMU，选上</li>
-<li>Target Optimizations：不选</li>
-<li>Target linker options：不选</li>
-<li>Register toolchain within Eclipse Buildroot plug-in：eclipse插件支持，不选</li>
-</ul>
-<p><strong>System configuration</strong>：系统配置</p>
-<ul>
-<li>Root FS skeleton：</li>
-<li>System hostname：填写JZ2440</li>
-<li>System banner</li>
-<li>Passwords encoding</li>
-<li>Init system：系统初始化，选择 BusyBox</li>
-<li>/dev management：设备文件管理，选择Dynamic using devtmpfs + mdev，即使用mdev动态加载设备节点的方式</li>
-<li>Path to the permission tables：设备节点的配置表设置，一定要选择system/device_table_dev.txt，否则后面在dev目录下将不会生成各种设备节点。当然我们也可以手动的配置该文件，添加必要的节点或删除不需要的节点。</li>
-<li>support extended attributes in device tables</li>
-<li>Use symlinks to /usr for /bin, /sbin and /lib</li>
-<li>Enable root login with password</li>
-<li>Root password：进入linux控制台终端后的密码，为空则登录时不需要密码，默认登录用户名为root。</li>
-<li>/bin/sh (busybox’ default shell)</li>
-<li>Run a getty (login prompt) after boot：保持默认，默认为选中。<ul>
-<li>TTY port：控制台打印串口</li>
-<li>Baudrate ：波特率，配置为 115200</li>
-<li>TERM environment variable：默认即可</li>
-<li>other options to pass to getty：默认即可</li>
-</ul>
-</li>
-<li>remount root filesystem read-write during boot</li>
-<li>Network interface to configure through DHCP</li>
-<li>Purge unwanted locales</li>
-<li>Locales to keep</li>
-<li>Generate locale data</li>
-<li>Install timezone info</li>
-<li>Path to the users tables</li>
-<li>Root filesystem overlay directories：</li>
-<li>Custom scripts to run before creating filesystem images</li>
-<li>Custom scripts to run inside the fakeroot environment</li>
-<li>Custom scripts to run after creating filesystem images</li>
-</ul>
-<p><strong>Kernel</strong>：内核配置</p>
-<ul>
-<li><p>Kernel version：内核版本，选择用户自定义Custom version</p>
-</li>
-<li><p>Kernel version：填上自己所需要的版本，4.14.12</p>
-</li>
-<li><p>Custom kernel patches：自定义的内核补丁</p>
-</li>
-<li><p>Kernel configuration：内核配置，选择 Using an in-tree defconfig file</p>
-</li>
-<li><p>Defconfig name：填写为 mini2440</p>
-</li>
-<li><p>Additional configuration fragment files：暂且不填写</p>
-</li>
-<li><p>Kernel binary format：内核二进制文件格式，zImage</p>
-</li>
-<li><p>Kernel compression format：内核压缩格式，选择gzip</p>
-</li>
-<li><p>Build a Device Tree Blob：设备树？暂且不填写</p>
-</li>
-<li><p>Install kernel image to /boot in target：暂且不填</p>
-</li>
-<li><p>Linux Kernel Extensions：内核扩展，默认不选择</p>
-</li>
-<li><p>Linux Kernel Tools：内核工具，默认不选择</p>
-</li>
-<li><p><strong>Target packages</strong></p>
-</li>
-<li><p>Filesystem images：文件系统选择，选择 yaffs2 root filesystem</p>
-</li>
-<li><p><strong>Bootloaders</strong></p>
-</li>
-<li><p>Build system：u-boot系统选择为Kconfig</p>
-<ul>
-<li>legacy：若是选择2015.04之前的u-boot 选择此项</li>
-<li>Kconfig：2015.04之后的 u-boot 选择此项，勾选此项　　</li>
-</ul>
-</li>
-<li><p>U-boot Version：U-boot版本，默认为 2017.01，选择为Custom version</p>
-</li>
-<li><p>U-Boot version：填写为2017.11</p>
-</li>
-<li><p>Custom U-boot patches：U-boot补丁，不添加</p>
-</li>
-<li><p>U-Boot configuration：U-boot配置，暂时还没有U-BOOT，所以选择为：Using an in-tree board defconfig file</p>
-</li>
-<li><p>Board defconfig：板子的配置，选择与架构一样的板子的默认文件，mini2440。后期再修改</p>
-</li>
-<li><p>U-boot needs dtc：是否需要设备树，默认，后期调试</p>
-</li>
-<li><p>U-boot needs OpenSSL：是否需要 OpenSSL，默认，后期调试修改</p>
-</li>
-<li><p>U-boot binary format：二进制文件，选择 .bin文件</p>
-</li>
-<li><p>produce a .ift signed image：默认</p>
-</li>
-<li><p>Install U-boot SPL binary image：默认</p>
-</li>
-<li><p>Environment image：默认</p>
-</li>
-<li><p><strong>Host utilities</strong></p>
-</li>
-<li><p><strong>Legacy config options</strong></p>
-</li>
-</ul>
-<h2 id="编译性能"><a href="#编译性能" class="headerlink" title="编译性能"></a>编译性能</h2><p>buildroot还提供了一些命令，用于分析buildroot编译过程中耗时、依赖关系、文件系统尺寸等。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Documentation:</span><br><span class="line">  manual               　 * build manual in all formats</span><br><span class="line">  manual-html          　 * build manual in HTML</span><br><span class="line">  manual-split-html      * build manual in split HTML</span><br><span class="line">  manual-pdf             * build manual in PDF</span><br><span class="line">  manual-text            * build manual in text</span><br><span class="line">  manual-epub            * build manual in ePub</span><br><span class="line">  graph-build            * generate graphs of the build times</span><br><span class="line">  graph-depends          * generate graph of the dependency tree</span><br><span class="line">  graph-size             * generate stats of the filesystem size</span><br><span class="line">  list-defconfigs        * list all defconfigs (pre-configured minimal systems)</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/rootfs/busybox/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/rootfs/busybox/" class="post-title-link" itemprop="url">BusyBox</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/rootfs/" itemprop="url" rel="index"><span itemprop="name">rootfs</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><a target="_blank" rel="noopener" href="https://busybox.net/downloads/">下载地址</a></p>
-<p><a target="_blank" rel="noopener" href="https://salsa.debian.org/installer-team/busybox">https://salsa.debian.org/installer-team/busybox</a></p>
-<p>修改顶层Makefile，修改交叉编译器和芯片平台：</p>
+          <h2 id="计算机组成"><a href="#计算机组成" class="headerlink" title="计算机组成"></a>计算机组成</h2><p><strong>计算机由控制器、存储器、运算器、输入设备和输出设备5个部件组成</strong>。</p>
+<p>度量计算机性能的指标有响应时间和吞吐率，<strong>响应时间</strong>是指完成一个任务所需的总时间，<strong>吞吐量</strong>表示单位时间内完成的任务数量。</p>
+<p>集成电路主要用的是CMOS，其主要能耗来源是晶体管开头过程中产生的动态能耗，其値取决于每个晶体管的负载电容和工作电压：能耗 = 负载电容 x 电压^2^ 。每个晶体管需要的功耗是一个翻转能耗和开头频率的乘积： 功耗 = 负载电容 x 电压^2^ x 开头频率。</p>
+<h2 id="计算机设计思想"><a href="#计算机设计思想" class="headerlink" title="计算机设计思想"></a>计算机设计思想</h2><ol>
+<li>面向摩尔定律的设计，摩尔定律是指单芯片上的集成度每18 -24月翻一番。设计者必须预测其设计完成时的工艺水平。</li>
+<li>使用抽象简化设计，用抽象表示不同的设计层次，在高层次中看不到低层次的细节。</li>
+<li>加速大概率事件远比优化小概率事件更能提高性能。</li>
+<li>并行执行提高性能。</li>
+<li>通过流水线提高性能。</li>
+<li>通过预测提高性能。</li>
+<li>通过使用冗余部件提高系统的可靠性。比如汽车的备用轮胎。</li>
+<li>存储器层次结构，较快的存储器靠近处理器。</li>
+</ol>
+<h2 id="存储器结构"><a href="#存储器结构" class="headerlink" title="存储器结构"></a>存储器结构</h2><h3 id="冯诺依曼结构"><a href="#冯诺依曼结构" class="headerlink" title="冯诺依曼结构"></a>冯诺依曼结构</h3><p>冯·诺依曼结构，又称为普林斯顿体系结构，是一种将程序指令存储器和数据存储器合并在一起的存储器结构。取指令和取操作数都在同一总线上，通过分时复用的方式进行；缺点是在高速运行时，不能达到同时取指令和取操作数，从而形成了传输过程的瓶颈。由于程序指令存储地址和数据存储地址指向同一个存储器的不同物理位置，因此程序指令和数据的宽度相同。</p>
+<p><img src="/images/cpu/Princeton.jpg" alt="img"></p>
+<h3 id="哈佛结构"><a href="#哈佛结构" class="headerlink" title="哈佛结构"></a>哈佛结构</h3><p>哈佛结构是一种将程序指令存储和数据存储分开的存储器结构，它的主要特点是将程序和数据存储在不同的存储空间中，即程序存储器和数据存储器是两个独立的存储器，每个存储器独立编址、独立访问，目的是为了减轻程序运行时的访存瓶颈。</p>
+<p><img src="/images/cpu/Harvard.jpg" alt="img"></p>
+<p>哈佛结构的中央处理器首先到程序指令储存器中读取程序指令内容，解码后得到数据地址，再到相应的数据储存器中读取数据。程序指令储存和数据储存分开，数据和指令的储存可以同时进行，可以使指令和数据有不同的数据宽度。</p>
+<h2 id="算术运算"><a href="#算术运算" class="headerlink" title="算术运算"></a>算术运算</h2><h3 id="补码"><a href="#补码" class="headerlink" title="补码"></a>补码</h3><p><strong>原码</strong>：用第一位表示符号，其余位表示值，负数符号位为1。</p>
+<p><strong>反码</strong>：正数的反码是其本身，负数的反码是在其原码的基础上，符号位不变，其余各个位取反。</p>
+<p><strong>补码</strong>：正数的补码就是其本身，负数的补码是在其原码的基础上，符号位不变，其余各位取反，最后+1。</p>
 <blockquote>
-<p>CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm</p>
+<p>[+1] = [00000001]原 = [00000001]反 = [00000001]补</p>
+<p>[-1] = [10000001]原 = [11111110]反 = [11111111]补</p>
 </blockquote>
-<p><code>make defconfig</code>，busybox提供了3种配置：defconfig (缺省配置)、allyesconfig（最大配置）、 allnoconfig（最小配置）。</p>
-<p><code>make menuconfig</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Busybox Settings  ---&gt;</span><br><span class="line">    Build Options  ---&gt;</span><br><span class="line">        [*]Build shared libbusybox</span><br><span class="line">        [ ] Build BusyBox as a static binary (no shared libs) (NEW)</span><br><span class="line"></span><br><span class="line">    (arm-anykav200-linux-uclibcgnueabi-) Cross compiler prefix 　//设置编译器</span><br><span class="line">        </span><br><span class="line">    Installation Options (&quot;make install&quot; behavior)  ---&gt;</span><br><span class="line">        (../rootfs) Destination path for &#x27;make install&#x27;   // 设置编译生成文件的存放路径</span><br><span class="line">        What kind of applet links to install (as soft-links)  ---&gt;　//设置生成后的命令是指向busybox的软链接</span><br><span class="line">  </span><br><span class="line">  Busybox Library Tuning  ---&gt;</span><br><span class="line">      (255) History size </span><br><span class="line">      [*]   History saving (NEW)   // 支持历史记录</span><br><span class="line">      [*]   Tab completion (NEW)   // 支持Tab补全操作</span><br></pre></td></tr></table></figure>
-
-<p><code>make; make install</code></p>
-<p>添加相应的库，用<code>readelf -d busybox</code>，查看依赖的库，将交叉编译环境下sysroot/lib目录下库拷贝到/lib。</p>
+<p><strong>移码</strong>：将符号位取反的补码（不区分正负）。</p>
+<p>原码使数字有了正负概念，但是计算不正确，正负相加不等于0，而且存在+0和-0。反码解决了正负相加不等于0的问题。为了追求连续性和唯一性，补码修复了存在两个0编码的问题，而且还能够多表示一个最低数，所以1个字节能表示的范围为[-128, 127]。</p>
+<p>用[0000 0000]表示0, 而以前出现问题的-0则不存在了.而且可以用[1000 0000]表示-128:</p>
+<blockquote>
+<p>(-1) + (-127) = [1000 0001]原 + [1111 1111]原 = [1111 1111]补 + [1000 0001]补 = [1000 0000]补</p>
+</blockquote>
+<h3 id="加法"><a href="#加法" class="headerlink" title="加法"></a>加法</h3><h3 id="乘法"><a href="#乘法" class="headerlink" title="乘法"></a>乘法</h3><h3 id="除法"><a href="#除法" class="headerlink" title="除法"></a>除法</h3><h3 id="浮点运算"><a href="#浮点运算" class="headerlink" title="浮点运算"></a>浮点运算</h3><h4 id="浮点表示"><a href="#浮点表示" class="headerlink" title="浮点表示"></a>浮点表示</h4><p><img src="/images/pc/float_mem.jpg" alt="浮点表示"></p>
+<ul>
+<li>第一段 占 1bit，表示符号位。0代表正数，1代表负数。</li>
+<li>第二段 占 8bits，表示指数。代称为 E(Exponent)。</li>
+<li>第三段 占 23bits，表示尾数。代称为 M(Mantissa)。</li>
+</ul>
+<p>浮点数在计算机存储使用二进制科学计数法。如小数 78.375，符号位为0，指数为6，尾数是001110011。</p>
+<blockquote>
+<p>整数部分：(78)<del>10</del> = (100 1110)<del>2</del><br>小数部分：(0.375)<del>10</del>　=　3/8 = 1/4 + 1/8 = 2^-2^ + 2^-3^ = (0.01)<del>2</del> + (0.001)<del>2</del> = (0.011)<del>2</del><br>(78.375)<del>10</del> = (1001110.011)<del>2</del> = 1.001110011 * 2^6^</p>
+</blockquote>
+<p>对于 int 和 float 变量类型不能使用强制类型转换，要通过float指针来转换。</p>
+<h4 id="浮点加法"><a href="#浮点加法" class="headerlink" title="浮点加法"></a>浮点加法</h4><h4 id="浮点乘法"><a href="#浮点乘法" class="headerlink" title="浮点乘法"></a>浮点乘法</h4><h2 id="时钟"><a href="#时钟" class="headerlink" title="时钟"></a>时钟</h2><p>时钟周期也叫振荡周期或晶振周期，即晶振的单位时间发出的脉冲数。是计算机中最基本的、最小的时间单位。</p>
+<p>机器周期：在计算机中，为了便于管理，常把一条指令的执行过程划分为若干个阶段，每一阶段完成一项工作。例如，取指令、存储器读、存储器写等，这每一项工作称为一个基本操作。完成一个基本操作所需要的时间称为机器周期。8051单片机的机器周期由6个状态周期组成，也就是说一个机器周期=6个状态周期=12个时钟周期。机器周期也是单片机定时器和计数器的时间基准。例如一个单片机选择了12MHZ晶振，那么当定时器的数值加1时，实际经过的时间就是1us。</p>
+<p>指令周期是执行一条指令所需要的时间，一般由若干个机器周期组成。指令不同，所需的机器周期数也不同。</p>
+<p>系统时钟就是CPU指令运行的频率，系统时钟由晶振或内部RC产生。</p>
 
       
     </div>
@@ -1336,7 +563,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/datatype/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/cpu/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1350,7 +577,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/c/datatype/" class="post-title-link" itemprop="url">c语言数据类型</a>
+            <a href="/2022/06/07/hardware/cpu/" class="post-title-link" itemprop="url">各种处理器介绍</a>
         </h1>
 
         <div class="post-meta">
@@ -1367,7 +594,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-17 19:44:05" itemprop="dateModified" datetime="2022-06-17T19:44:05+08:00">2022-06-17</time>
+                <time title="修改时间：2022-06-08 20:34:03" itemprop="dateModified" datetime="2022-06-08T20:34:03+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1375,7 +602,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
                 </span>
             </span>
 
@@ -1390,107 +617,627 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <table>
+          <p><img src="/images/cpu/cpu.jpg" alt="img"></p>
+<p>cpu内部由控制器、运算器、寄存器、时钟4部分组成。</p>
+<h2 id="处理器架构"><a href="#处理器架构" class="headerlink" title="处理器架构"></a>处理器架构</h2><h3 id="CISC"><a href="#CISC" class="headerlink" title="CISC"></a>CISC</h3><p>CISC（Complex Instruction Set Computer，复杂指令集计算机）是一种微处理器指令集架构（ISA），每个指令可执行若干低阶操作，诸如从内存读取、储存、和计算操作，全部集于单一指令之中。CISC特点：</p>
+<ul>
+<li>指令系统庞大，指令功能复杂，指令格式、寻址方式多；</li>
+<li>绝大多数指令需多个机器周期完成；</li>
+<li>各种指令都可访问存储器；</li>
+<li>采用微程序控制；</li>
+<li>有专用寄存器，少量；</li>
+<li>难以用优化编译技术生成高效的目标代码程序；</li>
+</ul>
+<p>在CISC指令集的各种指令中，大约有20%的指令会被反复使用，占整个程序代码的80%。而余下的80%的指令却不经常使用，在程序设计中只占20%。</p>
+<h3 id="RISC"><a href="#RISC" class="headerlink" title="RISC"></a>RISC</h3><p>RISC（Reduced Instruction Set Computer，精简指令集计算机）对指令数目和寻址方式都做了精简，使其实现更容易，指令并行执行程度更好，编译器的效率更高。它能够以更快的速度执行操作。现在的RISC指令集也达到数百条，运行周期也不再固定。RISC设计的根本原则—针对流水线化的处理器优化。RISC特点：</p>
+<ul>
+<li>统一指令编码（例如，所有指令中的op-code永远位于同样的位元位置、等长指令），可快速解译；</li>
+<li>泛用的暂存器，所有暂存器可用于所有内容，以及编译器设计的单纯化（不过暂存器中区分了整数和浮点数）；</li>
+<li>单纯的寻址模式（复杂寻址模式以简单计算指令序列取代）；</li>
+<li>硬件中支援少数资料型别（例如，一些CISC电脑中存有处理字节字串的指令。这在RISC电脑中不太可能出现）。</li>
+<li>　所有计算都要在寄存器中完成。而寄存器和内存的通信则由单独的指令完成。</li>
+<li>有非常多的通用寄存器，并采用了重叠寄存器窗口和寄存器堆等技术使寄存器资源得到充分的利用。</li>
+</ul>
+<p>**[区别]**：</p>
+<p>CISC和RISC是当前CPU的两种架构。它们的区别在于不同的CPU设计理念和方法。早期的CPU全部是CISC架构，它的设计目的是用最少的机器语言指令来完成所需的计算任务。它们的差异主要有：</p>
+<ol>
+<li><p>指令系统：RISC设计者把主要精力放在那些经常使用的指令上，尽量使它们具有简单高效的特色。对不常用的功能，常通过组合指令来完成。因此，在RISC机器上实现特殊功能时，效率可能较低。但可以利用流水技术和超标量技术加以改进和弥补。而CISC计算机的指令系统比较丰富，有专用指令来完成特定的功能。因此，处理特殊任务效率较高。</p>
+</li>
+<li><p>存储器操作：RISC对存储器操作有限制，使控制简单化；而CISC机器的存储器操作指令多，操作直接。</p>
+</li>
+<li><p>程序：RISC汇编语言程序一般需要较大的内存空间，实现特殊功能时程序复杂，不易设计；而CISC汇编语言程序编程相对简单，科学计算及复杂操作的程序社设计相对容易，效率较高。</p>
+</li>
+<li><p>中断：RISC机器在一条指令执行的适当地方可以响应中断；而CISC机器是在一条指令执行结束后响应中断。</p>
+</li>
+<li><p>CPU：RISCCPU包含有较少的单元电路，因而面积小、功耗低；而CISCCPU包含有丰富的电路单元，因而功能强、面积大、功耗大。</p>
+</li>
+<li><p>设计周期：RISC微处理器结构简单，布局紧凑，设计周期短，且易于采用最新技术；CISC微处理器结构复杂，设计周期长。</p>
+</li>
+<li><p>用户使用：RISC微处理器结构简单，指令规整，性能容易把握，易学易用；CISC微处理器结构复杂，功能强大，实现特殊功能容易。</p>
+</li>
+<li><p>应用范围：由于RISC指令系统的确定与特定的应用领域有关，故RISC机器更适合于专用机；而CISC机器则更适合于通用机。</p>
+</li>
+</ol>
+<h3 id="x86"><a href="#x86" class="headerlink" title="x86"></a>x86</h3><p>x86或80x86是英特尔首先开发制造的一种微处理器体系结构的泛称。该系列较早期的处理器名称是以数字来表示，并以“86”作为结尾，包括Intel 8086、80186、80286、80386以及80486，因此其架构被称为“x86”。成为了个人电脑的标准平台</p>
+<p>x86架构于1978年推出的Intel 8086中央处理器中首度出现，它是从Intel 8008处理器中发展而来的，而8008则是发展自Intel 4004的。8086在三年后为IBM PC所选用，之后x86便，成为了历来最成功的CPU架构。</p>
+<p>8086是16位元处理器；直到1985年32位元的80386的开发，这个架构都维持是16位元。接着一系列的处理器表示了32位元架构的细微改进，推出了数种的扩充，直到2003年AMD对于这个架构发展了64位元的扩充，并命名为AMD64。后来Intel也推出了与之兼容的处理器，并命名为Intel 64。两者一般被统称为x86-64或x64，开创了x86的64位时代。</p>
+<p>x86架构是重要地可变指令长度的CISC。字组（word, 4字节）长度的内存存取允许不对齐内存位址，字组是以低位字节在前的顺序储存在内存中。向后相容性一直都是在x86架构的发展背后一股驱动力量。但在较新的微架构中，x86处理器会把x86指令转换为更像RISC的微指令再予执行，从而获得可与RISC比拟的超标量性能，而仍然保持向前兼容。</p>
+<p>X86指令集只有8个通用寄存器。所以，CISC的CPU执行是大多数时间是在访问存储器中的数据，而不是寄存器中的。这就拖慢了整个系统的速度。</p>
+<h3 id="ARM"><a href="#ARM" class="headerlink" title="ARM"></a>ARM</h3><p>ARM架构（进阶精简指令集机器（AdvancedRISC Machine），是一个32位RISC处理器架构，广泛地使用在许多嵌入式系统设计。由于节能的特点，ARM处理器非常适用于移动通讯领域，符合其主要设计目标为低耗电的特性。</p>
+<p>ARM采用的RISC体系最大特点是指令长度固定，指令格式种类少，寻址方式种类少，大多数是简单指令且都能在一个时钟周期内完成，易于设计超标量与流水线，寄存器数量多，大量操作在寄存器之间进行，因此有较快运行速度。</p>
+<p>ARM指令集的特点：</p>
+<ul>
+<li>体积小，低功耗，低成本，高性能；</li>
+<li>支持 Thumb（16位）/ARM（32位）双指令集，能很好的兼容8位/16位器件；</li>
+<li>大量使用寄存器，指令执行速度更快，大多数数据操作都在寄存器中完成；</li>
+<li>寻址方式灵活简单，执行效率高；</li>
+<li>指令长度固定，流水线处理方式</li>
+</ul>
+<h3 id="MIPS"><a href="#MIPS" class="headerlink" title="MIPS"></a>MIPS</h3><p>MIPS架构（无内部互锁流水级的微处理器，Microprocessorwithout Interlocked Pipeline Stages），是一种采取精简指令集的处理器架构，1981年出现，由MIPS科技公司开发并授权，广泛被使用在许多电子产品、网络设备、个人娱乐装置与商业装置上。其机制是尽量利用软件办法避免流水线中的数据相关问题。它最早是在80年代初期由斯坦福大学Hennessy教授领导的研究小组研制出来的。MIPS公司的R系列就是在此基础上开发的RISC工业产品的微处理器。这些系列产品为很多计算机公司采用构成各种工作站和计算机系统。</p>
+<p>MIPS是出现最早的商业RISC架构芯片之一。MIPS的系统结构及设计理念比较先进，强调软硬件协同提高性能，同时简化硬件设计。</p>
+<p>**[ARM与MIPS对比]**：</p>
+<p>MIPS架构的优势：</p>
+<ol>
+<li><p>MIPS支持64bit指令和操作，ARM目前只到32bit。</p>
+</li>
+<li><p>MIPS有专门的除法器，可以执行除法指令。</p>
+</li>
+<li><p>MIPS的内核寄存器比ARM多一倍，所以同样的性能下MIPS的功耗会比ARM更低，同样功耗下性能比ARM更高。</p>
+</li>
+<li><p>MIPS指令比ARM稍微多一点，稍微灵活一点。</p>
+</li>
+<li><p>ARM很昂贵，而且不能随意自行更改内核。而MIPS就要开放的多了。</p>
+</li>
+</ol>
+<p>MIPS架构的不足：</p>
+<ol>
+<li><p>MIPS的内存地址起始有问题，这导致了MIPS在内存和cache的支持方面都有限制，现在的MIPS处理器单内核面对高容量内存时有问题</p>
+</li>
+<li><p>MIPS今后的发展方向是并行线程，类似INTEL的超线程，而ARM未来的发展方向是物理多核，目前看来物理多核占优。由此来看，我国的龙芯向多核发展还是颇具远见的。</p>
+</li>
+<li><p>MIPS虽然结构更加简单，但是到现在还是顺序单发射，ARM已经进化到了乱序双发射，甚至NV的丹佛已经是乱序三发射了。</p>
+</li>
+</ol>
+<h2 id="各种处理器"><a href="#各种处理器" class="headerlink" title="各种处理器"></a>各种处理器</h2><p>DSP – Digital Signal Processor，是一种专用于数字信号处理的微处理器。内部采用程序和数据分开的哈佛结构，具有专门的硬件乘法器，广泛采用流水线操作，提供特殊的DSP指令，可以用来快速的实现各种数字信号处理算法。功耗更低。</p>
+<p>FPGA – Field－Programmable Gate Array，现场可编程门阵列。</p>
+<p>APU – Accelerated Processing Unit, 加速处理器，AMD公司推出加速图像处理芯片产品。</p>
+<p>BPU – Brain Processing Unit, 地平线公司主导的嵌入式处理器架构。</p>
+<p>CPU – Central Processing Unit，中央处理器。CPU主要包括控制器、运算器，其中还包括高速缓冲存储器及实现它们之间联系的数据、控制的总线。主要功能为处理指令、执行操作、控制时间、处理数据。</p>
+<p>DPU – Deep learning Processing Unit, 深度学习处理器，最早由国内深鉴科技提出；另说有Dataflow Processing Unit 数据流处理器， Wave Computing 公司提出的AI架构；Data storage Processing Unit，深圳大普微的智能固态硬盘处理器。</p>
+<p>FPU – Floating Processing Unit 浮点计算单元，通用处理器中的浮点运算模块。</p>
+<p>GPU – Graphics Processing Unit，图形处理单元，采用多线程SIMD架构，为图形处理而生。它是显卡的处理器，专为执行复杂的数学和几何计算而设计的，这些计算是图形渲染所必需的。</p>
+<p>HPU – Holographics Processing Unit 全息图像处理器， 微软出品的全息计算芯片与设备。</p>
+<p>IPU – Intelligence Processing Unit， Deep Mind投资的Graphcore公司出品的AI处理器产品。</p>
+<p>MCU – Microcontroller Unit，微控制单元，又称单片机，是把CPU的频率与规格做适当缩减，并将内存、计数器、USB、A/D转换、UART、PLC、DMA等周边接口，甚至LCD驱动电路都整合在单一芯片上，形成芯片级的计算机。</p>
+<p>NPU – Neural Network Processing Unit，神经网络处理单元，是基于神经网络算法与加速的新型处理器总称。</p>
+<p>RPU – Radio Processing Unit, 无线电处理器， Imagination Technologies 公司推出的集合集Wifi/蓝牙/FM/处理器为单片的处理器。</p>
+<p>TPU – Tensor Processing Unit 张量处理器， Google 公司推出的为机器学习而定制的芯片，经过了专门深度机器学习方面的训练，它有更高效能（每瓦计算能力）。目前一代TPU面向Inference，二代面向训练。</p>
+<p>VPU – Vector Processing Unit 矢量处理器，Intel收购的Movidius公司推出的图像处理与人工智能的专用芯片的加速计算核心。</p>
+<p>WPU – Wearable Processing Unit， 可穿戴处理器，Ineda Systems公司推出的可穿戴片上系统产品，包含GPU/MIPS CPU等IP。</p>
+<p>XPU – 百度与Xilinx公司在2017年Hotchips大会上发布的FPGA智能云加速，含256核。</p>
+<p>ZPU – Zylin Processing Unit, 由挪威Zylin 公司推出的一款32位开源处理器。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/memory/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/hardware/memory/" class="post-title-link" itemprop="url">memory and disk</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:34:18" itemprop="dateModified" datetime="2022-06-08T20:34:18+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="ROM"><a href="#ROM" class="headerlink" title="ROM"></a>ROM</h2><p><strong>ROM</strong> (Read Only Memory)程序存储器，在掉电之后仍然可以保持数据，用于存储各种固化程序和数据。</p>
+<p><strong>PROM</strong> (Programmable ROM，可编程ROM)，写入时，烧录器通过高电压在芯片内永久地烧断或者建立内部连接（熔丝或反熔丝），因此只能一次编程。</p>
+<p><strong>EPROM</strong> (Erasable Programmable ROM，可擦去可编程ROM)，使用紫外线照射此类型的ROM可以抹去其中的数据。</p>
+<p><strong>EEPROM</strong> (Electrically Erasable Programmable ROM，电可擦去可编程ROM)，使用电来对其进行擦写，常用于电脑系统的BIOS。</p>
+<h2 id="RAM"><a href="#RAM" class="headerlink" title="RAM"></a>RAM</h2><p><strong>RAM</strong> (Random Access Memory)随机访问存储器，存储单元的内容可按照需要随机取出或存入，且存取的速度与存储单元的位置无关。在掉电之后就丢失数据，主要用来存储程序中用到的变量。随机存储器主要分两种：静态随机存储器SRAM和动态随机存储器DRAM。</p>
+<p><strong>DRAM</strong> (Dynamic RAM/DRAM)动态随机存储器，DRAM保留数据的时间很短，需要周期性地刷新。计算机内存就是DRAM的。</p>
+<p>DRAM利用MOS管的栅电容上的电荷来存储信息，存储单元存储的是0还是1取决于电容是否有电荷，有电荷代表1，无电荷代表0。由于栅极会漏电，所以每隔一定的时间就需要一个刷新机构给这些栅电容补充电荷，这个就叫动态刷新。刷新操作定期对电容进行检查，若电量大于满电量的1/2，则认为其代表1，并把电容充满电；若电量小于1/2，则认为其代表0，并把电容放电，以此来保持数据的连续性。</p>
+<p><strong>SRAM</strong> (Static Random-Access Memory)静态随机存取存储器，只要保持通电，里面储存的数据就可以一直保持，对任何数据访问的时间都是固定的。SRAM的优点是只要器件不掉电，存储内容就不丢失，工作速度快。缺点是集成度低、功耗大、价格高。CPU Cache采用的就是这种技术。</p>
+<h2 id="Flash"><a href="#Flash" class="headerlink" title="Flash"></a>Flash</h2><p>Flash 存储器（FLASH EEPROM）又称闪存，快闪。它是EEPROM的一种。它结合了ROM和RAM的长处。不仅具备EEPROM的性能，还不会断电丢失数据同时可以快速读取数据。它于EEPROM的最大区别是，FLASH按扇区操作，而EEPROM按照字节操作。FLASH的电路结构较简单，同样容量占芯片面积较小，成本自然比EEPROM低，因此适合用于做程序存储器。</p>
+<p>flash是非易失存储器，可以对称为块的存储器单元块进行擦写和再编程。任何flash器件的写入操作只能在空或已擦除的单元内进行，所以在进行写入操作之前必须先执行擦除。擦除的过程就是把所有位都写为1的过程，块内的所有字节变为0xFF。擦除是以块为单位进行的。</p>
+<h3 id="Nor-Flash"><a href="#Nor-Flash" class="headerlink" title="Nor Flash"></a>Nor Flash</h3><p>Nor Flash支持随机访问，具有XIP（eXecute In Place）特性，可以像普通ROM一样执行程序。所存储的内容可以直接映射到 CPU 地址空间，不需要拷贝到 RAM 中即可被 CPU 访问。容量小，读操作快，但擦除和写操作慢，块大小范围：64~128KB。NOR flash带有SRAM接口，有足够的地址引脚来寻址，可以很容易地存取其内部的每一个字节。</p>
+<p>Nor Flash根据数据传输的位数可以分为并行（Parallel，即地址线和数据线直接和处理器相连）和串行（SPI，即通过SPI接口和处理器相连）。早期Norflash的接口是parallel的形式，即把数据线和地址线并排与IC的管脚连接。但是后来发现不同容量的Norflash不能硬件上兼容（数据线和地址线的数量不一样），并且封装比较大，占用了较大的PCB板位置，后来逐渐被串行接口的SPI Norflash所取代，至于现在说起NOR flash都直接以SPI flash来代称。</p>
+<p>spi flash 接口定义：</p>
+<ul>
+<li>Standard SPI: CLK, /CS, DI, DO, /WP, /Hold</li>
+<li>Dual SPI: CLK, /CS, IO0, IO1, /WP, /Hold</li>
+<li>Quad SPI: CLK, /CS, IO0, IO1, IO2, IO3</li>
+</ul>
+<h3 id="Nand-Flash"><a href="#Nand-Flash" class="headerlink" title="Nand Flash"></a>Nand Flash</h3><p>Nand Flash是串行接口，容量大，擦除和写都快。块大小范围：8~64KB。没有采取内存的随机读取技术，读和写操作都采用512字节的块。</p>
+<p>Nor的读速度比Nand稍快一些，Nand的写入速度比Nor快很多。</p>
+<p>Nand闪存中每个块的最大擦写次数是一百万次，而Nor的擦写次数是十万次。</p>
+<p><img src="/images/memory/nor_nand.jpg" alt="nor_nand"></p>
+<p>由于Flash固有的电器特性，在读写数据过程中会偶然产生1位或几位数据错误，即位反转。Nand Flash发生位反转的几率要远大于Nor Flash。位反转无法避免，因此使用 Nand Flash 的同时，应采用错误探测/错误更正(EDC/ECC)算法。</p>
+<h2 id="硬盘"><a href="#硬盘" class="headerlink" title="硬盘"></a>硬盘</h2><p>硬盘(Hard Disk Drive，HDD)靠磁性盘片记录二进制数据。</p>
+<p><img src="/images/memory/disk/hdd.jpg" alt="img"></p>
+<p>Track Sector：磁道扇面      Head：磁头      Actuator Arm：悬浮磁臂。</p>
+<p>当磁盘旋转时，磁头若保持在一个位置上，则每个磁头都会在磁盘表面划出一个圆形轨迹，这些圆形轨迹就叫做磁道(Track)。划分分区时，分区大小必须以磁道为参考，一个分区必须包含一个或多个整数磁道，不能只占半个磁道。也就是说如果磁盘有两个磁道，最多只能分成2个分区。</p>
+<p>在有多个盘片构成的盘组中，由不同盘片的面，但处于同一半径圆的多个磁道组成的一个圆柱面(Cylinder)。</p>
+<p>磁盘上的每个磁道被等分为若干个弧段，这些弧段便是硬盘的扇区(Sector)。硬盘的第一个扇区，叫做引导扇区。磁盘上数据读写的最小单位。</p>
+<p>硬盘片的盘面上有一层涂得很薄的磁性材料。写入数据时，通电的磁头会形成磁场，在磁性材料层上留下一个一个小磁化区，每个被磁化的区域代表二进制的1。读取数据时，磁头扫过磁化区的时候能感受到微小的磁场变化。</p>
+<p>操作系统内核中的文件管理系统会将硬盘的扇区组合成<strong>簇</strong>(Data Cluster)，操作系统会记录文件所在簇的编号(文件数据分布在哪几个扇区)，方便查找并读写。</p>
+<p>机械硬盘通过磁头读取旋转的盘片来传输数据，而盘片的转速RPM(Round Per Minute，每分钟的转数)直接决定了硬盘读取和写入数据的速度。目前主流的机械硬盘，转速在6000~7500RPM左右。磁盘在写入数据时，会使用磁盘缓存暂时存储数据。</p>
+<p><strong>磁盘缓存</strong>(Disk Cache)，就是将下载到的数据先保存于系统为软件分配的内存空间中，当保存到内存池中的数据达到一个程度时，便将数据保存到硬盘中。这样可以减少实际的磁盘操作，有效的保护磁盘免于重复的读写操作而导致的损坏。目前主流的500G机械硬盘大都装载64MB的缓存。</p>
+<p>硬盘的主控芯片主要负责：</p>
+<ul>
+<li>控制磁头的读取</li>
+<li>温度检测</li>
+<li>为操作系统的文件管理系统提供逻辑接口</li>
+<li>负责纠错，磁头读写时会使用磁信号，而磁信号的误码率非常高，大约每记录0.6KB的数据就会出现一个bit的错误。</li>
+<li>负责将数据从RAM/硬盘缓存写入，或者将硬盘读出的数据写回RAM。</li>
+</ul>
+<h3 id="RAID"><a href="#RAID" class="headerlink" title="RAID"></a>RAID</h3><p>RAID(独立硬盘冗余阵列，Redundant Array of Independent Disks)，简称磁盘阵列。利用虚拟化存储技术把多个硬盘组合起来，成为一个或多个硬盘阵列组，目的为提升性能或数据冗余，或是两者同时提升。</p>
+<ul>
+<li><strong>RAID0</strong></li>
+</ul>
+<p>RAID0 是一种非常简单的的方式，它将多块磁盘组合在一起形成一个大容量的存储。当我们要写数据的时候，会将数据分为N份，以独立的方式实现N块磁盘的读写，那么这N份数据会同时并发的写到磁盘中，读写性能理论上是单块磁盘的N倍。</p>
+<p>但RAID0的问题是，它并不提供数据校验或冗余备份，因此一旦某块磁盘损坏了，数据就直接丢失，无法恢复了。因此RAID0就不可能用于高要求的业务中，但可以用在对可靠性要求不高，对读写性能要求高的场景中。</p>
+<ul>
+<li><strong>RAID1</strong></li>
+</ul>
+<p>RAID1 是磁盘阵列中单位成本最高的一种方式。因为它的原理是在往磁盘写数据的时候，将同一份数据无差别的写两份到磁盘，分别写到工作磁盘和镜像磁盘，对数据做了冗余备份，但它的实际空间使用率只有50%了，是一种比较昂贵的方案。</p>
+<ul>
+<li><strong>RAID3</strong></li>
+</ul>
+<p>RAID3的方式是：将数据按照RAID0的形式，分成多份同时写入多块磁盘，但是还会另外留出一块磁盘用于写奇偶校验码，一旦某一块磁盘坏掉了，就可以利用那块校验码磁盘去恢复数据。但是由于任何数据的写入都会要去更新这块磁盘，导致这块磁盘的读写是最频繁的，也就非常的容易损坏。</p>
+<ul>
+<li><strong>RAID5</strong></li>
+</ul>
+<p>RAID5对RAID3进行了改进，是一种存储性能、数据安全、存储成本兼顾的方案。</p>
+<p>在RAID5模式中，不再需要用单独的磁盘写校验码了。它把校验码信息分布到各个磁盘上。例如，总共有N块磁盘，那么会将要写入的数据分成N份，并发的写入到N块磁盘中，同时还将数据的校验码信息也写入到这N块磁盘中，数据与对应的校验码信息必须得分开存储在不同的磁盘上。一旦某一块磁盘损坏了，就可以用剩下的数据和对应的奇偶校验码信息去恢复损坏的数据。</p>
+<p><img src="/images/memory/disk/RAID5.jpg" alt="img"></p>
+<p>RAID5的方式，最少需要三块磁盘来组建磁盘阵列，允许最多同时坏一块磁盘。如果有两块磁盘同时损坏了，那数据就无法恢复了。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/usb_if/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/hardware/usb_if/" class="post-title-link" itemprop="url">usb接口</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 18:03:15" itemprop="dateModified" datetime="2022-06-08T18:03:15+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="/images/usb/usb-if2.png" alt="usb接口"></p>
+<p><img src="/images/usb/usb-if3.png" alt="usb接口"></p>
+<p><img src="/images/usb/usb_if.bmp" alt="usb接口"></p>
+<p><img src="/images/usb/usb-if.png" alt="usb接口"></p>
+<p>标准USB接口使用标记为D+(绿线)和D-(白线) 的双绞线传输，它们各自使用半双工的差分信号并协同工作，以抵消长导线的电磁干扰。</p>
+<p>Mini USB接口把第4针作为ID线，用来标识身份，mini-A插头的ID引脚接地，而mini-B插头悬空。<strong>USB OTG根据ID线状态判断是主机还是从机，接地为主机，悬空为从机</strong>。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/usb/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/hardware/usb/" class="post-title-link" itemprop="url">usb协议</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 18:03:22" itemprop="dateModified" datetime="2022-06-08T18:03:22+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="USB规范"><a href="#USB规范" class="headerlink" title="USB规范"></a>USB规范</h2><p>USB最初是由英特尔与微软公司倡导发起，其最大的特点是支持热插拔(Hot plug)和即插即用(Plug&amp;Play)。</p>
+<p><strong>电压范围4.75 ~ 5.25V</strong>，普通USB接口<strong>最大提供500mA电流</strong>，USB符号后有一个“+”号的，输出电流可达1A。</p>
+<p><strong>一个USB主控制器最多可连接127个设备，各设备之间的距离不超过5米</strong>。</p>
+<table>
 <thead>
 <tr>
-<th align="center">Data Type</th>
-<th align="center">ILP32</th>
-<th align="center">LP32</th>
-<th align="center">ILP64</th>
-<th align="center">LP64</th>
-<th align="center">LLP64</th>
+<th align="left">USB版本</th>
+<th align="left">速率称号</th>
+<th align="left">传输速率</th>
+<th align="left">理论速度</th>
 </tr>
 </thead>
 <tbody><tr>
-<td align="center">宏定义</td>
-<td align="center">_</td>
-<td align="center">_</td>
-<td align="center">_</td>
-<td align="center"><strong>LP64</strong></td>
-<td align="center"><strong>LLP64</strong></td>
+<td align="left">USB 3.2</td>
+<td align="left">超高速+  Super-Speed+</td>
+<td align="left">20Gbps</td>
+<td align="left">2560MB/s</td>
 </tr>
 <tr>
-<td align="center">平台</td>
-<td align="center">Win32 API  / Unix 和 Unix 类的系统 （Linux，Mac OS X）</td>
-<td align="center">Win16 API</td>
-<td align="center"></td>
-<td align="center">Unix 和 Unix 类的系统 （Linux，Mac OS X)</td>
-<td align="center">Win64 API</td>
+<td align="left">USB 3.1 Gen2</td>
+<td align="left">超高速+  Super-Speed+</td>
+<td align="left">10Gbps</td>
+<td align="left">1280MB/s</td>
 </tr>
 <tr>
-<td align="center">char</td>
-<td align="center">8</td>
-<td align="center">8</td>
-<td align="center">8</td>
-<td align="center">8</td>
-<td align="center">8</td>
+<td align="left">USB 3.1 Gen1</td>
+<td align="left">超高速 Super-Speed</td>
+<td align="left">5Gbps</td>
+<td align="left">640MB/s</td>
 </tr>
 <tr>
-<td align="center">short</td>
-<td align="center">16</td>
-<td align="center">16</td>
-<td align="center">16</td>
-<td align="center">16</td>
-<td align="center">16</td>
+<td align="left">USB 2.0</td>
+<td align="left">高速 Hi-Speed</td>
+<td align="left">480Mbps</td>
+<td align="left">60MB/s</td>
 </tr>
 <tr>
-<td align="center">int</td>
-<td align="center">32</td>
-<td align="center">16</td>
-<td align="center">64</td>
-<td align="center">32</td>
-<td align="center">32</td>
+<td align="left">USB 1.1</td>
+<td align="left">全速 Full-Speed</td>
+<td align="left">12Mbps</td>
+<td align="left">1.5MB/s</td>
 </tr>
 <tr>
-<td align="center">long</td>
-<td align="center">32</td>
-<td align="center">32</td>
-<td align="center">64</td>
-<td align="center">64</td>
-<td align="center">32</td>
-</tr>
-<tr>
-<td align="center">long long</td>
-<td align="center">64</td>
-<td align="center">64</td>
-<td align="center">64</td>
-<td align="center">64</td>
-<td align="center">64</td>
-</tr>
-<tr>
-<td align="center">pointer</td>
-<td align="center">32</td>
-<td align="center">32</td>
-<td align="center">64</td>
-<td align="center">64</td>
-<td align="center">64</td>
-</tr>
-<tr>
-<td align="center">float</td>
-<td align="center">32</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center">32</td>
-<td align="center"></td>
-</tr>
-<tr>
-<td align="center">double</td>
-<td align="center">64</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center">64</td>
-<td align="center"></td>
+<td align="left">USB 1.0</td>
+<td align="left">低速 Low-Speed</td>
+<td align="left">1.5Mbps</td>
+<td align="left">0.192MB/s</td>
 </tr>
 </tbody></table>
-<ol>
-<li>格式化打印，long使用%ld或%lx，指针使用%p</li>
-<li>对于long类型，常量要加L，如：long a = 1L&lt;&lt;32</li>
-<li>ssize_t在32位机器上等同与int，在64位机器上等同与long，size_t是无符号型的ssize_t。</li>
-<li>指针大小在32位机器上是4字节，64位是8字节。指针p+1 = p + sizeof(p指向的数据类型)。</li>
-<li>int, short, long都是signed的，char可能是signed的，也可能是unsigned的，由编译器决定，一般x86上是有符号，arm上是无符号的。</li>
-</ol>
-<p>stdint.h 里定义了一些数据类型的别名和范围。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">signed</span> <span class="type">char</span>    <span class="type">int8_t</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">short</span> <span class="type">int</span>      <span class="type">int16_t</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">int</span>            <span class="type">int32_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> __WORDSIZE == 64</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">int</span>       <span class="type">int64_t</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> <span class="type">int</span>    <span class="type">int64_t</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">char</span>        <span class="type">uint8_t</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span>   <span class="type">uint16_t</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">int</span>         <span class="type">uint32_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> __WORDSIZE == 64</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span>   <span class="type">uint64_t</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span> <span class="type">int</span>  <span class="type">uint64_t</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> __WORDSIZE == 64</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">int</span>            <span class="type">intptr_t</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span>   <span class="type">uintptr_t</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">int</span>                 <span class="type">intptr_t</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">int</span>        <span class="type">uintptr_t</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> INT8_MIN        (-128)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> INT16_MIN       (-32767-1)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> INT32_MIN       (-2147483647-1)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> INT64_MIN       (-__INT64_C(9223372036854775807)-1)</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> INT8_MAX        (127)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> INT16_MAX       (32767)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> INT32_MAX       (2147483647)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> INT64_MAX       (__INT64_C(9223372036854775807))</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> UINT8_MAX        (255)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> UINT16_MAX       (65535)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> UINT32_MAX       (4294967295U)</span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> UINT64_MAX       (__UINT64_C(18446744073709551615))</span></span><br></pre></td></tr></table></figure>
+<p>USB2.0 支持 3 种传输速度:低速模式(1.5Mb/s)、全速模式(12Mb/s)和高速模式(480Mb/s)。在低速和全速模式中，采用的是电压传输模式；高速模式下，是电流传输模式。</p>
+<p>USB2.0 规范要求集线器必须支持高速模式，USB2.0 设备则没有这个要求。一个高速的上行收发器不能支持低速信号传输模式。而 USB2.0 下行收发器必须支持高速、全速和低速模式。</p>
+<h3 id="插入检测机制"><a href="#插入检测机制" class="headerlink" title="插入检测机制"></a>插入检测机制</h3><p>在 USB 集线器的每个下游端口的 D+和 D-上，分别接了一个 15kΩ的下拉电阻。当集线器端口没有设备插入时，输入端被这两个下拉电阻拉到了低电平。而在USB 设备端，在 D+或者 D-上，接了一个 1.5kΩ的上拉电阻到 3.3V 的电源。<strong>对于高速设备和全速设备，上拉电阻接在 D+上；低速设备，上拉电阻接在 D-上</strong>。</p>
+<p>当设备插入到集线器时，接了上拉电阻的数据线的电压由 1.5kΩ的上拉电阻和 15kΩ的下拉电阻分压，大概 3V 左右。这是一个高电平信号。集线器检测到该状态后就上报给 Host控制器，这样就检测到设备插入。通过检测高电平的数据线是 D+还是 D-来判断设备是什么速度类型。</p>
+<p>高速设备会首先被判断为全速设备，然后通过集线器和设备两者确认，切换到高速模式下。高速模式下是电流传输模式，此时需要把 D+的上拉电阻断开。</p>
+<h2 id="USB结构"><a href="#USB结构" class="headerlink" title="USB结构"></a>USB结构</h2><p><img src="/images/usb/bus-topology.png" alt="usb拓扑结构"></p>
+<p>USB是一种主从结构的系统，主机叫做Host，从机叫做设备。USB的设计为非对称式的，它由一个主机(host)控制器和若干通过集线器设备以树形连接的设备组成。以根集线器为起点，最多支持7层，也就是说在USB系统中最多允许5个hub级联。一个USB主控制器最多连接127个设备，这是因为协议规定每个USB设备具有一个7bit的地址，地址0是保留给未初始化的设备使用。</p>
+<h3 id="USB-Host"><a href="#USB-Host" class="headerlink" title="USB Host"></a>USB Host</h3><p>主机具有一个或多个usb主控制器和根集线器(root hub)。主控制器负责数据处理。根集线器则提供一个连接主控制器与设备之间的接口和通道，它集成在主机控制器里，不占用地址。</p>
+<p>Host 主要负责:</p>
+<ul>
+<li>检测 USB 设备拔插</li>
+<li>管理 Host 和 Device 之间的控制流、数据流</li>
+<li>收集 USB 总线状态和活动数据信息</li>
+<li>为连入 USB 总线的设备供电</li>
+</ul>
+<h3 id="USB-Device"><a href="#USB-Device" class="headerlink" title="USB Device"></a>USB Device</h3><p>USB 设备通过 HUB 连接到 USB 总线上，此时 HUB 上的接入点称为端口(Port)。连接到 Hub 上的设备可能是单个设备，也可以是复合设备(Compound<br>Device)。每一个 USB 设备提供不同的功能，又被称作 Function。</p>
+<p>USB 设备支持热插拔。USB 设备通过 HUB 连接到 USB 总线。Hub 有一个状态位，标记 USB 设备是插入还是拔出。Host 会查询 Hub 端口的状态位，当检测到设备插入时，Host 将使能该 Hub 对应的 port，并通过默认地址(0)从设备控制管道为设备分配地址。当一个设备从 Hub 的某个 port 拔出时，Hub 将禁能该 port 并报告给 Host。</p>
+<p>从 USB 系统角度而言，一个逻辑上的 USB 设备是一个端点的集合。分组的端点构成一个接口(Interface)。USB 系统通过管道来管理接口，通过 Host 上的 Buffer 和 USB 设备上的端点来请求数据。 Host Controller 打包数据并将数据包发送出去。</p>
+<h3 id="USB-Hub"><a href="#USB-Hub" class="headerlink" title="USB Hub"></a>USB Hub</h3><p>USB集线器是一种可以对原有的USB口在数量上进行扩展的设备。hub提供了设备连接检测和设备移除检测的能力，并给各下行端口供电。 可以单独使能下行端口，不同端口可以工作在不同的速度等级。</p>
+<h2 id="USB通信协议"><a href="#USB通信协议" class="headerlink" title="USB通信协议"></a>USB通信协议</h2><h3 id="字节顺序"><a href="#字节顺序" class="headerlink" title="字节顺序"></a>字节顺序</h3><p>数据在 USB 线里传送是低位在前高位在后。USB 采用 NRZI(非归零编码)对发送的数据包进行编码，即:输入数据 0，编码成“电平翻转”；输入数据 1，编码成“电平保持”。</p>
+<p><img src="/images/usb/NRZI.png" alt="NRZI编码"></p>
+<p>USB提供了4 种传输方式：</p>
+<ul>
+<li>控制(Control)传输方式。双向传输，数据量通常较小，主要用来进行查询、配置和给 USB 设备发送通用的命令。</li>
+<li>同步(Synchronization)传输方式。提供了确定的带宽和间隔时间，它被用于时间严格并具有较强容错性的流数据传输，或者用于要求恒定的数据传送率的即时应用。例如进行语音业务传输时，使用同步传输方式是很好的选择</li>
+<li>中断(Interrupt)传输方式。传送是单向的，对于 USB 主机而言，只有输入。中断传输方式主要用于定时查询设备是否有中断数据要传送，该传输方式应用在少量的、分散的、不可预测的数据传输场合，键盘、游戏杆和鼠标属于这一类型。</li>
+<li>批量(Bulk)传输方式。主要应用在没有带宽和间隔时间要求的批量数据的传送和接收，它要求保证传输打印机和扫描仪属于这种类型。</li>
+</ul>
+<h2 id="USB协议"><a href="#USB协议" class="headerlink" title="USB协议"></a>USB协议</h2><p>USB 是一种轮询总线，由 Host 发起所有的数据传输。总线传输包含 3 个包(packet)。每个传输都由 Host 先发出令牌包(Token Packet)，明确传输类型、传输方向、USB 设备地址和端点号。对应地址的 USB 设备接收并解析包。一次传输可以由 Host 发向设备，也可以由设备发送至 Host，方向由令牌包说明。</p>
+<h3 id="USB数据包"><a href="#USB数据包" class="headerlink" title="USB数据包"></a>USB数据包</h3><ul>
+<li><strong>USB数据包格式</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center">偏移量</th>
+<th align="center">类型</th>
+<th align="center">大小</th>
+<th align="center">值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">0</td>
+<td align="center">HeaderChksum</td>
+<td align="center">1</td>
+<td align="center">利用添加包头进行效验，不包括包头本身的校验。</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">HeaderSize</td>
+<td align="center">1</td>
+<td align="center">包头的大小，包括可用的字符串。</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="center">Signature</td>
+<td align="center">2</td>
+<td align="center">数据值为0x1234</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="center">VendorID</td>
+<td align="center">2</td>
+<td align="center">USB提供商的ID</td>
+</tr>
+<tr>
+<td align="center">6</td>
+<td align="center">ProductID</td>
+<td align="center">2</td>
+<td align="center">USB产品ID</td>
+</tr>
+<tr>
+<td align="center">8</td>
+<td align="center">ProductVersion</td>
+<td align="center">1</td>
+<td align="center">产品版本号</td>
+</tr>
+<tr>
+<td align="center">9</td>
+<td align="center">FirmwareVersion</td>
+<td align="center">1</td>
+<td align="center">固件版本号</td>
+</tr>
+<tr>
+<td align="center">10</td>
+<td align="center">USB属性</td>
+<td align="center">1</td>
+<td align="center">USB Attribute: Bit 0：如果设为1，包头包括以下三个字符串：语言、制造商、产品字符串；如果设为0，包头不包括任何字符串。 Bit 2：如果设为1，设备自带电源；如果设为0，无自带电源。 Bit 3：如果设为1，设备可以通过总线供电；如果设为0，无法通过总线供电。 Bits 1 and 4—7：保留。</td>
+</tr>
+<tr>
+<td align="center">11</td>
+<td align="center">最大电力</td>
+<td align="center">1</td>
+<td align="center">设备需要的最大电力，以2mA为单位。</td>
+</tr>
+<tr>
+<td align="center">12</td>
+<td align="center">设备属性</td>
+<td align="center">1</td>
+<td align="center">Device Attributes: Bit 0：如果设为1，CPU运行在24 MHz；如果设为0，CPU运行在12 MHz。 Bit 3：如果设为1，设备的EEPROM可以支持400 MHz；如果设为0，不支持400 MHz。 Bits 1, 2 and 4 … 7：保留。</td>
+</tr>
+<tr>
+<td align="center">13</td>
+<td align="center">WPageSize</td>
+<td align="center">1</td>
+<td align="center">I2C的最大写入页面大小</td>
+</tr>
+<tr>
+<td align="center">14</td>
+<td align="center">数据类型</td>
+<td align="center">1</td>
+<td align="center">该数值定义设备是软件EEPROM还是硬件EEPROM。0x02：硬件EEPROM 其它数值无效。</td>
+</tr>
+<tr>
+<td align="center">15</td>
+<td align="center">RpageSize</td>
+<td align="center">1</td>
+<td align="center">I2C最大读取页面大小。如果值为0，整个负载大小由一个I2C读取设备读取。</td>
+</tr>
+<tr>
+<td align="center">16</td>
+<td align="center">PayLoadSize</td>
+<td align="center">2</td>
+<td align="center">如果将EEPROM作为软件EEPROM使用，表示软件的大小；除此之外该值都是0。</td>
+</tr>
+<tr>
+<td align="center">0xxx</td>
+<td align="center">Language string</td>
+<td align="center">4</td>
+<td align="center">语言字符串。以标准USB字符串格式表示。（非必要字段）</td>
+</tr>
+<tr>
+<td align="center">0xxx</td>
+<td align="center">Manufacture string</td>
+<td align="center">…</td>
+<td align="center">制造商字符串。以标准USB字符串格式表示。（非必要字段）</td>
+</tr>
+<tr>
+<td align="center">0xxx</td>
+<td align="center">Product string</td>
+<td align="center">…</td>
+<td align="center">产品字符串，以标准USB字符串格式表示。（非必要字段）</td>
+</tr>
+<tr>
+<td align="center">0xxx</td>
+<td align="center">Application Code</td>
+<td align="center">…</td>
+<td align="center">表示应用代码。以标准USB字符串格式表示。（非必要字段）</td>
+</tr>
+</tbody></table>
+<h2 id="USB设备"><a href="#USB设备" class="headerlink" title="USB设备"></a>USB设备</h2><h3 id="设备分类"><a href="#设备分类" class="headerlink" title="设备分类"></a>设备分类</h3><p>依附在总线上的设备可以是需要特定的驱动程序的完全定制的设备，也可能属于某个设备类别。这些类别定义设备的行为和接口描述符，这样一个驱动程序可能用于所有此种类别的设备。一般操作系统都为支持这些设备类别，为其提供通用驱动程序。设备分类由USB设计论坛设备工作组决定，并分配ID。</p>
+<p>如果一个设备类型属于整个设备，该设备的描述符的bDeviceClass域保存类别ID；如果它这是设备的一个接口，其ID保存在接口描述符的bInterfaceClass域。他们都占用一个字节，所以最多有253种设备类别。（0x00和0xFF保留）。当bDeviceClass设为0x00，操作系统会检查每个接口的bInterfaceClass以确定其类别。</p>
+<p>常用设备类别和ID有：<br>|  ID  |       设备        |                             例子                             |<br>| :–: | :—————:| :———————————————————-: |<br>| 0x00 | 保留值       |                              无                              |<br>| 0x01 | 音效设备      |                             声卡                             |<br>| 0x02 | USB通信控制设备   |                  网卡、调制解调器、串列端口                   |<br>| 0x03 | 人机界面设备(HID)  |                          键盘、鼠标                          |<br>| 0x05 | 物理接口设备      |        控制杆    |<br>| 0x06 | 静止图像捕捉设备  | 影像扫描仪、Picture Transfer Protocol |<br>| 0x07 |  打印设备        |        打印机      |<br>| 0x08 | 大容量访问设备    | U盘、移动硬盘、存储卡读卡器、数字相机 |<br>| 0x09 | 集线器       |                            集线器                            |<br>| 0x0A | 通信设备      | 调制解调器、网络卡、ISD、传真 |<br>| 0x0B | 智能卡设备     |                            读卡器                            |<br>| 0x0E | 影像设备    |      摄像头   |<br>| 0xE0 | 无线传输设备   |          蓝牙   |<br>| 0xFE | 特殊的应用    |                       红外线资料桥接器                       |<br>| 0xFF | 定制设备      |                                                              |</p>
+<h3 id="lsusb"><a href="#lsusb" class="headerlink" title="lsusb"></a>lsusb</h3><p>显示本机的usb设备列表，可以显示出usb的详细信息，包括设备的读取速度和描述符。</p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-v</td>
+<td>告诉lsusb详细显示所示设备的详细信息。这包括设备当前速度的配置描述符。如果可用，类描述符将显示USB设备类，包括集线器、音频、HID、通信和芯片卡。</td>
+</tr>
+<tr>
+<td>-s [[bus]:][devnum]</td>
+<td>显示指定总线和设备号的设备信息，总线和设备号用十进制标识。格式：lsusb –s 00:01</td>
+</tr>
+<tr>
+<td>-d [vendor]:[product]</td>
+<td>显示指定厂商和产品编号的设备，用十六进制表示编号。格式：lsusb –d 8086:</td>
+</tr>
+<tr>
+<td>-D</td>
+<td>显示指定设备文件的设备信息，例如：<code>lsusb –D /proc/bus/usb/001/001</code>。只有root用户才可以使用这个选项</td>
+</tr>
+<tr>
+<td>-t</td>
+<td>以树状结构显示</td>
+</tr>
+<tr>
+<td>-V</td>
+<td>指令版本信息</td>
+</tr>
+</tbody></table>
 
       
     </div>
@@ -1510,7 +1257,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/media/audio/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/modbus/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1524,7 +1271,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/media/audio/" class="post-title-link" itemprop="url">audio</a>
+            <a href="/2022/06/07/hardware/modbus/" class="post-title-link" itemprop="url">modbus协议</a>
         </h1>
 
         <div class="post-meta">
@@ -1541,8 +1288,17 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:32:36" itemprop="dateModified" datetime="2022-06-08T17:32:36+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:57:34" itemprop="dateModified" datetime="2022-06-08T17:57:34+08:00">2022-06-08</time>
               </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
+                </span>
+            </span>
 
           
 
@@ -1555,68 +1311,608 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h2><h3 id="声音"><a href="#声音" class="headerlink" title="声音"></a>声音</h3><p>声音三要素：音调、响度、音色。<br>-　音调：声音的高低，由频率决定，频率越高音调越高。<br>-　响度：又称音量、音强，由振幅和距离声源的距离决定。<br>-　音色：又称音品，由发声物体本身材料、结构决定。</p>
-<p>分贝用于度量声音强度，单位是dB。</p>
-<p><img src="/images/media/audio/dB.png" alt="分贝"></p>
-<h3 id="采样率"><a href="#采样率" class="headerlink" title="采样率"></a>采样率</h3><p>采样率（sample rate）表示单位时间内对声音信号的采样次数，单位Hz。在当今的主流采集卡上，采样频率一般共分为 22.05KHz、44.1KHz、48KHz三个等级，对于高于48KHz的采样频率人耳已无法辨别出来了。</p>
-<p><img src="/images/media/audio/sample_rate.png" alt="采样率"></p>
-<h3 id="位深度"><a href="#位深度" class="headerlink" title="位深度"></a>位深度</h3><p>位深度也叫采样位数就是采样值用多少位0和1来表示，也叫采样精度，代表取样中对声音强度记录的精细程度。音频的位深度决定动态范围。采样声波时，为每个采样指定最接近原始声波振幅的振幅值。较高的位深度可提供更多可能的振幅值，产生更大的动态范围、更低的噪声基准和更高的保真度。</p>
-<p><img src="/images/media/audio/bit_deep.png" alt="位深"></p>
-<h3 id="声道"><a href="#声道" class="headerlink" title="声道"></a>声道</h3><p>声道（channel）分为单声道mono；立体声stereo；还可以是多声道，叫环绕立体声。如果是单声道的文件，采样数据按时间的先后顺序依次存入。如果是双声道的文件，采样数据按时间先后顺序交叉的存入。</p>
-<p><img src="/images/media/audio/pcm.png" alt="PCM格式"></p>
-<h3 id="比特率"><a href="#比特率" class="headerlink" title="比特率"></a>比特率</h3><p>比特率（bitrate）也叫码率，表示压缩编码后每秒的音频数据量大小。比特率 = 采样率 x 采样精度 x 声道数（单位kbps，这里的k为1000）</p>
-<h3 id="音频帧"><a href="#音频帧" class="headerlink" title="音频帧"></a>音频帧</h3><p>音频数据是流式的，本身没有明确的一帧帧的概念，在实际的应用中，为了音频算法处理/传输的方便，一般约定俗成取2.5ms~60ms为单位的数据量为一帧音频。这个时间被称之为“采样时间”，其长度没有特别的标准，它是根据编解码器和具体应用的需求来决定的。</p>
-<h3 id="码率模式"><a href="#码率模式" class="headerlink" title="码率模式"></a>码率模式</h3><p>VBR（VariableBitrate）动态比特率。也就是没有固定的比特率，压缩软件在压缩时根据音频数据即时确定使用什么比特率。这是新发展的算法，他们将一首歌的复杂部分用高Bitrate编码，简单部分用低Bitrate编码。主意虽然不错，可惜新编码器的VBR算法很差，音质与CBR相去甚远。幸运的是， Lame完美地优化了VBR算法，使之成为MP3的最佳编码模式。这是以质量为前提兼顾文件大小的方式时推荐的编码模式。</p>
-<p>ABR（Average Bitrate）平均比特率，是VBR的一种插值参数。Lame针对CBR不佳的文件体积比和VBR生成文件大小不定的特点独创了这种编码模式。ABR也被称为“Safe VBR”，它是在指定的平均Bitrate内，以每50帧（30帧约1秒）为一段，低频和不敏感频率使用相对低的流量，高频和大动态表现时使用高流量。举例来说，当指定用192kbps ABR对一段wav文件进行编码时，Lame会将该文件的85%用192kbps固定编码，然后对剩余15%进行动态优化：复杂部分用高于192kbps 来编码、简单部分用低于192kbps来编码。与192kbps CBR相比，192kbps ABR在文件大小上相差不多，音质却提高不少。ABR编码在速度上是VBR编码的2到3倍，在128-256kbps范围内质量要好于CBR。可以做为 VBR和CBR的一种折衷选择。</p>
-<p>CBR（ConstantBitrate），常数比特率，指文件从头到尾都是一种位速率。相对于VBR和ABR来讲，它压缩出来的文件体积很大，但音质却不会有明显的提高。</p>
-<h2 id="音频编码"><a href="#音频编码" class="headerlink" title="音频编码"></a>音频编码</h2><p>根据编码方式的不同，音频编码技术分为三种：波形编码、参数编码和混合编码。波形编码的话音质量高，但编码速率也很高；参数编码的编码速率很低，产生的合成语音的音质不高；混合编码使用参数编码技术和波形编码技术，编码速率和音质介于它们之间。</p>
-<p> PCM 即脉冲编码调制(Pulse Code Modulation)。 在PCM 过程中，将输入的模拟信号进行采样、量化和编码，用二进制进行编码的数来代表模拟信号的幅度；接收端再将这些编码还原为原来的模拟信号。</p>
-<h3 id="音频数据格式"><a href="#音频数据格式" class="headerlink" title="音频数据格式"></a>音频数据格式</h3><p>PCM数据是最原始的音频数据完全无损，所以PCM数据虽然音质优秀但体积庞大，为了解决这个问题先后诞生了一系列的音频格式，这些音频格式运用不同的方法对音频数据进行压缩，其中有无损压缩（WAV，PCM，ALS，TAK，WavPack　ALAC、APE、FLAC）和有损压缩（MP3、AAC、OGG、WMA）两种。</p>
-<h4 id="WAV"><a href="#WAV" class="headerlink" title="WAV"></a>WAV</h4><p>WAV是WaveFom的简写，也称为波形文件，可直接存储声音波形。WAV格式支持MSADPCM、CCITT A律、CCITT μ律和其他压缩算法，支持多种音频位数、采样频率和声道；但其文件尺寸较大，多用于存储简短的声音片段</p>
-<h4 id="MIDI"><a href="#MIDI" class="headerlink" title="MIDI"></a>MIDI</h4><p>MIDI是Musical InstrumentDigital Interface的缩写，又称作乐器数字接口，是数字音乐/电子合成乐器的统一国际标准。它定义了计算机音乐程序、数字合成器及其它电子设备交换音乐信号的方式，规定了不同厂家的电子乐器与计算机连接的电缆和硬件及设备间数据传输的协议，可以模拟多种乐器的声音。MIDI文件就是MIDI格式的文件，在MIDI文件中存储的是一些指令。把这些指令发送给声卡，由声卡按照指令将声音合成出来。</p>
-<h4 id="WMA"><a href="#WMA" class="headerlink" title="WMA"></a>WMA</h4><p>Windows Media Audio是微软公司开发的一种声音文件格式，也叫波形声音文件，压缩率低。 所需频宽 320～112kbps（压缩10～12倍），当Bitrate小于128K时，WMA最为出色且编码后得到的音频文件很小 ，当Bitrate大于128K时，WMA音质损失过大。WMA标准不开放。</p>
-<h4 id="MP1"><a href="#MP1" class="headerlink" title="MP1"></a>MP1</h4><p>MPEG-1 audio layer 1声音压缩编码是国际上第一个高保真声音数据压缩的国际标准，编码简单，用于数字盒式录音磁带，2声道，VCD中使用的音频压缩方案就是MPEG-1层Ⅰ。所需频宽：384kbps（压缩4倍）。压缩方式相对时域压缩技术而言要复杂得多，同时编码效率、声音质量也大幅提高，编码延时相应增加。可以达到“完全透明”的声音质量（EBU音质标准）。</p>
-<h4 id="MUSICAM"><a href="#MUSICAM" class="headerlink" title="MUSICAM"></a>MUSICAM</h4><p>MPEG-1 audio layer 2（MP2），所需频宽：256～192kbps（压缩6～8倍），算法复杂度中等，用于数字音频广播(DAB)和VCD等，2声道，而MUSICAM由于其适当的复杂程度和优秀的声音质量，在数字演播室、DAB、DVB等数字节目的制作、交换、存储、传送中得到广泛应用。</p>
-<h4 id="MP3"><a href="#MP3" class="headerlink" title="MP3"></a>MP3</h4><p>MP3全称是动态影像专家压缩标准音频层面3（Moving Picture Experts Group Audio Layer III）。是一种有损压缩的音频格式，设计这种格式的目的就是为了大幅度的减小音频的数据量，它舍弃PCM音频数据中人类听觉不敏感的部分。所需频宽：128～112kbps（压缩10～12倍），编码复杂，用于互联网上的高质量声音的传输，如MP3音乐压缩10倍，2声道。MP3是在综合MUSICAM和ASPEC的优点的基础上提出的混合压缩技术，在当时的技术条件下，MP3的复杂度显得相对较高，编码不利于实时，但由于MP3在低码率条件下高水准的声音质量，使得它成为软解压及网络广播的宠儿。优点：压缩比高，适合用于互联网上的传播，缺点：MP3在128KBitrate及以下时，会出现明显的高频丢失。</p>
-<p>所谓的MP3也就是指的是MPEG标准中的音频部分，也就是MPEG音频层。根据压缩质量和编码处理的不同分为3层，分别对应mp1/mp2/mp3这3种声音文件。需要提醒大家注意的地方是：MPEG音频文件的压缩是一种有损压缩，MPEG3音频编码具有10：1~12：1的高压缩率，同时基本保持低音频部分不失真，但是牺牲了声音文件中12KHz到16KHz高音频这部分的质量来换取文件的尺寸，相同长度的音乐文件，用*.mp3格式来储存，一般只有*.wav文件的1/10，而音质要次于CD格式或WAV格式的声音文件。由于其文件尺寸小，音质好;所以在它问世之初还没有什么别的音频格式可以与之匹敌，因而为*.mp3格式的发展提供了良好的条件。</p>
-<p>MP3格式中的数据通常由两部分组成，一部分为ID3用来存储歌名、演唱者、专辑、音轨数等信息，另一部分为音频数据。音频数据部分以帧(frame)为单位存储，每个音频都有自己的帧头，如图所示就是一个MP3文件帧结构图（图片同样来自互联网）。MP3中的每一个帧都有自己的帧头，其中存储了采样率等解码必须的信息，所以每一个帧都可以独立于文件存在和播放，这个特性加上高压缩比使得MP3文件成为了音频流播放的主流格式。帧头之后存储着音频数据，这些音频数据是若干个PCM数据帧经过压缩算法压缩得到的，对CBR的MP3数据来说每个帧中包含的PCM数据帧是固定的，而VBR是可变的。</p>
-<p><img src="/images/media/audio/mp3_format.webp" alt="mp3文件格式"></p>
-<h4 id="AAC"><a href="#AAC" class="headerlink" title="AAC"></a>AAC</h4><p>AAC实际上是高级音频编码(Advanced Audio Coding–AAC)的缩写。AAC是由Fraunhofer IIS-A、杜比和AT&amp;T共同开发的一种音频格式，它是MPEG-2规范的一部分。成为继MPEG-2音频标准（ISO/IEC13818-3）之后的新一代音频压缩标准。制定者：MPEG，所需频宽：96-128 kbps。</p>
-<p>AAC所采用的运算法则与MP3的运算法则有所不同，AAC通过结合其他的功能来提高编码效率。AAC的音频算法在压缩能力上远远超过了以前的一些压缩算法。它还同时支持多达48个音轨、15个低频音轨、更多种采样率和比特率、多种语言的兼容能力、更高的解码效率。总之，AAC可以在比MP3文件缩小30%的前提下提供更好的音质。</p>
-<p>AAC支持多声道，可提供1到48路之间任意数目的音频声道组合、包括15路低频效果声道、配音/多语音声道，以及15路数据。它可同时传送16套节目，每套节目的音频及数据结构可任意规定。最高支持96KHz的采样频率。</p>
-<p>AAC主要可能的应用范围集中在因特网网络传播、数字音频广播，包括卫星直播和数字AM、以及数字电视及影院系统等方面。AAC使用了一种非常灵活的熵编码核心去传输编码频谱数据。具有48个主要音频通道，16 个低频增强通道，16 个集成数据流, 16 个配音，16 种编排。</p>
-<h4 id="GSM-AMR"><a href="#GSM-AMR" class="headerlink" title="GSM-AMR"></a>GSM-AMR</h4><p>GSM-ASM(Adaptive Multi-Rate)是一种广泛使用在GPRS和W-CDMA网络上的音频标准。在规范ETSI GSM06.90中对GSM-AMR进行了定义。AMR语音编码是GSM 2+和WCDMA的默认编码标准，是第三代无线通讯系统的语音编码标准。GSM-AMR标准基于ACELP（代数激励线性预测）编码。它能在广泛的传输条件下提供高品质的语音效果。制定者：飞利浦，所需频宽：8Kbps(4.75 Kbps~12.2 Kbps)，可以对语音进行替换和消音，平滑噪音，支持间断式传输，对语音进行动态侦查。能在各种网络条件下提供优质的语音效果。</p>
-<h4 id="EVRC"><a href="#EVRC" class="headerlink" title="EVRC"></a>EVRC</h4><p>Enhanced Variable Rate Coder，增强型可变速率编码器广泛使用于CDMA网络。EVRC标准遵循规范TIA IS-127的内容。EVRC编码基于RCELP（松弛码激励线性预测）标准。该编码可以以Rate 1（171bits/packet），Rate 1/2（80bits/packet）或是Rate 1/8（16bits/packet）的容量进行操作。在要求下，它也能产生空包（0bits/packet）。制定者：Qualcomm，所需频宽：8Kbps或13Kbps，支持三种码率（9.6 Kbps, 4.8 Kbps 和 1.2 Kbps），噪声抑制，邮件过滤。能在各种网络条件下提供优质的语音效果。</p>
-<h4 id="ADPCM"><a href="#ADPCM" class="headerlink" title="ADPCM"></a>ADPCM</h4><p>ADPCM(adaptive difference pulse code modulation，　自适应差分PCM)综合了APCM的自适应特性和DPCM系统的差分特性，是一种性能比较好的波形编码。它的核心想法是利用自适应的思想改变量化阶的大小，即使用小的量化阶(step-size)去编码小的差值，使用大的量化阶去编码大的差值；使用过去的样本值估算下一个输入样本的预测值，使实际样本值和预测值之间的差值总是最小。针对 16bit (或者更高) 声音波形数据的一种有损压缩算法, 它将声音流中每次采样的 16bit 数据以 4bit 存储, 所以压缩比 1:4. 而压缩/解压缩算法非常的简单, 所以是一种低空间消耗,高质量声音获得的好途径。制定者：ITU-T，所需频宽：32Kbps，优点：算法复杂度低，压缩比小（CD音质&gt;400kbps），编解码延时最短。，缺点：声音质量一般</p>
-<h4 id="MP3Pro"><a href="#MP3Pro" class="headerlink" title="MP3Pro"></a>MP3Pro</h4><p>MP3Pro是由瑞典Coding科技公司开发的，其中包含了两大技术：一是来自于Coding科技公司所特有的解码技术，二是由MP3的专利持有者法国汤姆森多媒体公司和德国Fraunhofer集成电路协会共同研究的一项译码技术。MP3Pro可以在基本不改变文件大小的情况下改善原先的MP3音乐音质。它能够在用较低的比特率压缩音频文件的情况下，最大程度地保持压缩前的音质。</p>
-<h4 id="RealAudio"><a href="#RealAudio" class="headerlink" title="RealAudio"></a>RealAudio</h4><p>RealAudio是由Real Networks公司推出的一种文件格式，最大的特点就是可以实时传输音频信息，尤其是在网速较慢的情况下，仍然可以较为流畅地传送数据，因此RealAudio主要适用于网络上的在线播放。现在的RealAudio文件格式主要有RA(RealAudio)、RM（RealMedia，RealAudio G2）、RMX(RealAudio Secured)等三种，这些文件的共同性在于随着网络带宽的不同而改变声音的质量，在保证大多数人听到流畅声音的前提下，令带宽较宽敞的听众获得较好的音质。</p>
-<p>RA采用的是有损压缩技术，由于它的压缩比相当高，因此音质相对较差，但是文件也是最小的，因此在高压缩比条件下表现好，但若在中、低压缩比条件下时，表现却反而不及其他同类型档案格式了。此外RA可以随网络带宽的不同而改变声音质量，以使用户在得到流畅声音的前提下，尽可能高地提高声音质量。由于RA格式的这些特点，因此特别适合在网络传输速度较低的互联网上使用，互联网上许多的网络电台、音乐网站的歌曲试听都在使用这种音频格式。</p>
-<h4 id="Ogg-Vorbis"><a href="#Ogg-Vorbis" class="headerlink" title="Ogg Vorbis"></a>Ogg Vorbis</h4><p>Ogg Vorbis 是一种新的音频压缩格式，类似于MP3等现有的音乐格式。但有一点不同的是，它是完全免费、开放和没有专利限制的。Vorbis 是这种音频压缩机制的名字，而Ogg则是一个计划的名字，该计划意图设计一个完全开放性的多媒体系统。VORBIS也是有损压缩，但通过使用更加先进的声学模型去减少损失，因此，同样位速率(Bit Rate)编码的OGG与MP3相比听起来更好一些。</p>
-<h4 id="APE"><a href="#APE" class="headerlink" title="APE"></a>APE</h4><p>APE是Monkey’s Audio提供的一种无损压缩格式,是一种无损压缩音频格式,在音质不降低的前提下，大小压缩到传统无损格式 WAV 文件的一半,而且可以无须解压而直接播放。APE的采样率最高可达1400kbps，接近于音乐CD格式。</p>
-<h4 id="FLAC"><a href="#FLAC" class="headerlink" title="FLAC"></a>FLAC</h4><p>FLAC即是Free Lossless AudioCodec的缩写，是一套著名的自由音频无损压缩编码，其特点是无损压缩。</p>
-<h2 id="音频处理"><a href="#音频处理" class="headerlink" title="音频处理"></a>音频处理</h2><p>音频处理是指对PCM数据进行处理，从而达到想要的效果。对音频编码前的PCM数据进行处理叫音频前处理，主要用于语音中，来去除各种干扰，使声音更清晰，主要有回声消除、噪声抑制、增益控制等。对音频解码后的PCM数据进行处理叫音频后处理，主要用于音乐中，来产生各种音效，使音乐更动听，主要有均衡器、混响等。</p>
-<h3 id="重采样"><a href="#重采样" class="headerlink" title="重采样"></a>重采样</h3><p>音频输入和音频输出模块支持对音频数据实施重采样。如果启用 AI 重采样功能，内部将会先执行重采样处理，再返回处理后的数据。如果启用了 AO 重采样功能，则音频数据在发送给 AO 之前，内部先执行重采样处理，处理完成后再发送给 AO 通道进行播放。重采样仅支持处理单声道。</p>
-<h3 id="ANR"><a href="#ANR" class="headerlink" title="ANR"></a>ANR</h3><p>ANR 为语音降噪（ Audio Noise Reduction ）模块，主要工作在需要去除外界噪声，保<br>留语音输入的场景下。与 RNR 算法比起来， ANR 更讲究噪声处理的干净程度。 ANR 会滤除一些环境声音，主要保留语音数据，并会带来一定的细节丢失。所以 ANR 算法更适用于 NVR 和 IPC<br>场景。在这两个场景下，我们更希望能够着重保留人声，滤除其他噪声。</p>
-<h3 id="RNR"><a href="#RNR" class="headerlink" title="RNR"></a>RNR</h3><p>RNR 为录音噪声消除（ Record Noise Reduction ）模块，主要工作在需要去除环境噪声，但保留小信号输入的场景下。与 ANR 算法比起来， RNR 更讲究细节输入（小信号）的保留度， RNR 会在降噪的同时保留小信号的输入，所以降噪力度会低一点，但能更多的保留现场声音，真实还原场景，适用于运动 DV 场景。</p>
-<h3 id="AEC"><a href="#AEC" class="headerlink" title="AEC"></a>AEC</h3><p>AEC 为回声抵消（ Acoustic Echo Cancellation ）模块，主要工作在需要进行去除回声的<br>场景下：如 IPC 对讲，远端语音数据在 AO 设备上播放，此时在本地通过 MIC 采集语<br>音数据，它支持消除录制的语音数据中的 AO 设备播放的声音（回声）。</p>
-<h3 id="AGC"><a href="#AGC" class="headerlink" title="AGC"></a>AGC</h3><p>AGC 为自动增益控制（ Auto Gain Control ）模块，主要负责增益控制输出电平，在声音输入音量有大小变化时，能将输出音量控制在比较一致的范围内，主要工作在需要保证声音不至于过大或过小的场景下。AGC 更多起到的作用是放大输入源的声音，以保证音源过小时，经过算法处理后的声音依然很大。</p>
-<h3 id="DRC"><a href="#DRC" class="headerlink" title="DRC"></a>DRC</h3><p>DRC 为动态压缩控制（ Dynamic Range Control ）模块，负责控制输出电平，将输出增益控制在一个范围，主要工作在需要保证声音不至于过大或过小的场景下。DRC 与 AGC 作用相似，但算法实现及调节力度不同。其配合 RNR 使用在运动 DV 场景，与 AEC/ANR 互斥。</p>
-<h3 id="HDR"><a href="#HDR" class="headerlink" title="HDR"></a>HDR</h3><p>HDR 为高动态范围（ High Dynamic Range ）模块，主要用于 Codec 输入音量控制，通过动态调节 Codec 增益控制 Codec 音量在合理范围内，保证声音不至于过大或过小。</p>
-<h3 id="HPF"><a href="#HPF" class="headerlink" title="HPF"></a>HPF</h3><p>HPF 为高通滤波（ high-pass filte ）模块，主要负责去除低频噪声。</p>
-<h3 id="PEQ"><a href="#PEQ" class="headerlink" title="PEQ"></a>PEQ</h3><p>PEQ 为参量均衡器（ Parameter Equalizer ）模块，主要对音频数据进行均衡处理，以调节音频数据中各频段声音的增益。PEQ 与 EQ 均为均衡处理器，但是 PEQ 调节方式更灵活，适用于运动 DV 场景。</p>
-<h3 id="EQ"><a href="#EQ" class="headerlink" title="EQ"></a>EQ</h3><p>EQ 模块为均衡处理器（ Equalizer ）模块，主要对音频数据进行均衡处理，以调节音频数据中各频段声音的增益。</p>
-<p>均衡器的调整方法：</p>
+          <h2 id="Modbus"><a href="#Modbus" class="headerlink" title="Modbus"></a>Modbus</h2><p>Modbus协议是一种广泛应用于工业控制领域的通用通讯协议，使用的是主从通讯技术，即由主设备主动查询和操作从设备。通讯物理接口可以选用串口（包括RS232、RS485和RS422），也可以选择以太网口。有三种通信方式：</p>
 <ul>
-<li>超低音： 20Hz-40Hz，适当时声音强而有力。能控制雷声、低音鼓、管风琴和贝司的声音。过度提升会使音乐变得混浊不清</li>
-<li>低音： 40Hz-150Hz，是声音的基础部份，其能量占整个音频能量的70%，是表现音乐风格的重要成份。适当时，低音张弛得宜，声音丰满柔和，不足时声音单薄，150Hz，过度提升时会使声音发闷，明亮度下降，鼻音增强</li>
-<li>中低音： 150Hz-500Hz，是声音的结构部分，人声位于这个位置，不足时，演唱声会被音乐淹没，声音软而无力，适当提升时会感到浑厚有力，提高声音的力度和响度。提升过度时会使低音变得生硬，300Hz处过度提升3-6dB，如再加上混响，则会严重影响声音的清晰度</li>
-<li>中音： 500Hz-2KHz，包含大多数乐器的低次谐波和泛音，是小军鼓和打击乐器的特征音。适当时声音透彻明亮，不足时声音朦胧。过度提升时会产生类似电话的声音</li>
-<li>中高音： 2KHz-5KHz，是弦乐的特征音（拉弦乐的弓与弦的摩搡声，弹拔乐的手指触弦的声音某）。不足时声音的穿透力下降，过强时会掩蔽语言音节的识别</li>
-<li>高音： 7KHz-8KHz，是影响声音层次感的频率。过度提升会使短笛、长笛声音突出，语言的齿音加重和音色发毛</li>
-<li>极高音： 8KHz-10KHz 合适时，三角铁和立*的金属感通透率高，沙钟的节奏清晰可辨。过度提升会使声音不自然，易烧毁高频单元。</li>
+<li>以太网：对应的通信模式是MODBUS TCP/IP。</li>
+<li>异步串行传输（各种介质如有线RS-232-/422/485/；光纤、无线等），对应的通信模式是MODBUS RTU或MODBUS ASCII。</li>
+<li>高速令牌传递网络：对应的通信模式是Modbus PLUS</li>
 </ul>
-<h2 id="耳机插头"><a href="#耳机插头" class="headerlink" title="耳机插头"></a>耳机插头</h2><p><img src="/images/media/audio/hp1.png" alt="耳机插头"></p>
-<p><img src="/images/media/audio/hp2.png" alt="耳机插头"></p>
+<h3 id="ASCII模式"><a href="#ASCII模式" class="headerlink" title="ASCII模式"></a>ASCII模式</h3><p><img src="/images/uart/Modbus-frame-structure-ASCII-mode.jpg" alt="Modbus帧结构-ASCII模式"></p>
+<p>在ASCII模式下，消息以冒号（:）字符（ASCII码 3AH）开始，以回车换行符结束（ASCII码 0DH,0AH）。其它域可以使用的传输字符是十六进制的0…9,A…F。网络上的设备不断侦测“:”字符，当有一个冒号接收到时，每个设备都解码地址域来判断是否发给自己的。消息中字符间发送的时间间隔最长不能超过1秒，否则接收的设备将认为传输错误。</p>
+<p>错误检测域包含两个ASCII字符，使用LRC（纵向冗长检测）方法对消息内容计算得出的，不包括开始的冒号符及回车换行符。</p>
+<h3 id="RTU模式"><a href="#RTU模式" class="headerlink" title="RTU模式"></a>RTU模式</h3><p><img src="/images/uart/RTU.bmp" alt="RTU报文帧"></p>
+<p><img src="/images/uart/1.5T.jpg" alt="img"></p>
+<p>RTU模式规定消息发送至少要以3.5个字符时间的停顿间隔开始。至少3.5个字符时间的停顿标定了消息的结束。消息帧内字节间隔为1.5个字符时间。</p>
+<p>从设备的地址范围是1~247，地址0是用作广播地址。主设备通过将要联络的从设备的地址放入消息中的地址域来选通从设备。当从设备发送回应消息时，它把自己的地址放入回应的地址域中，以便主设备知道是哪一个设备作出回应。</p>
+<h3 id="功能码"><a href="#功能码" class="headerlink" title="功能码"></a>功能码</h3><p>Modbus的操作对象有四种：线圈、离散输入、输入寄存器、保持寄存器。</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>线圈</td>
+<td>1bit，ON或OFF，可读可写，有效的地址范围是1-9999</td>
+</tr>
+<tr>
+<td>离散量</td>
+<td>1bit，ON或OFF，只读，有效地址范围是10001-19999</td>
+</tr>
+<tr>
+<td>输入寄存器</td>
+<td>16位的寄存器，只读，可以用作模拟量或16位打包输入点，有效地址范围是30001-39999</td>
+</tr>
+<tr>
+<td>保持寄存器</td>
+<td>16位的寄存器，可读可写，既可以是一个模拟量或16位打包输入点，也可以是模拟量或16位打包输出点，有效地址范围是40001-49999</td>
+</tr>
+</tbody></table>
+<p>Modbus的功能码有：</p>
+<table>
+<thead>
+<tr>
+<th>功能码</th>
+<th>名称</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>01</td>
+<td>读线圈状态</td>
+<td>读位（读N个bit）—读从机线圈寄存器，位操作</td>
+</tr>
+<tr>
+<td>02</td>
+<td>读输入离散量</td>
+<td>读位（读N个bit）—读离散输入寄存器，位操作</td>
+</tr>
+<tr>
+<td>03</td>
+<td>读多个寄存器</td>
+<td>读整型、字符型、状态字、浮点型（读N个words）—读保持寄存器，字节操作</td>
+</tr>
+<tr>
+<td>04</td>
+<td>读输入寄存器</td>
+<td>读整型、状态字、浮点型（读N个words）—读输入寄存器，字节操作</td>
+</tr>
+<tr>
+<td>05</td>
+<td>写单个线圈</td>
+<td>写位（写一个bit）—写线圈寄存器，位操作</td>
+</tr>
+<tr>
+<td>06</td>
+<td>写单个保持寄存器</td>
+<td>写整型、字符型、状态字、浮点型（写一个word）—写保持寄存器，字节操作</td>
+</tr>
+<tr>
+<td>07</td>
+<td>读取异常状态</td>
+<td>取得8个内部线圈的通断状态，这8个线圈的地址由控制器决定，用户逻辑可以将这些线圈定义，以说明从机状态，短报文适宜于迅速读取状态</td>
+</tr>
+<tr>
+<td>08</td>
+<td>回送诊断校验</td>
+<td>把诊断校验报文送从机，以对通信处理进行评鉴</td>
+</tr>
+<tr>
+<td>09</td>
+<td>编程（只用于484）</td>
+<td>使主机模拟编程器作用，修改PC从机逻辑</td>
+</tr>
+<tr>
+<td>0A</td>
+<td>控询（只用于484）</td>
+<td>可使主机与一台正在执行长程序任务从机通信，探询该从机是否已完成其操作任务，仅在含有功能码9的报文发送后，本功能码才发送</td>
+</tr>
+<tr>
+<td>0B</td>
+<td>读取事件计数</td>
+<td>可使主机发出单询问，并随即判定操作是否成功，尤其是该命令或其他应答产生通信错误时</td>
+</tr>
+<tr>
+<td>0C</td>
+<td>读取通讯事件记录</td>
+<td>可是主机检索每台从机的ModBus事务处理通信事件记录。如果某项事务处理完成，记录会给出有关错误</td>
+</tr>
+<tr>
+<td>0D</td>
+<td>编程（184/384/484/584）</td>
+<td>可使主机模拟编程器功能修改PC从机逻辑</td>
+</tr>
+<tr>
+<td>0E</td>
+<td>探询（184/384/484/584）</td>
+<td>可使主机与正在执行任务的从机通信，定期控询该从机是否已完成其程序操作，仅在含有功能13的报文发送后，本功能码才得发送</td>
+</tr>
+<tr>
+<td>0F</td>
+<td>写多个线圈</td>
+<td>可以写多个线圈—强置一串连续逻辑线圈的通断</td>
+</tr>
+<tr>
+<td>10</td>
+<td>写多个保持寄存器</td>
+<td>写多个保持寄存器—把具体的二进制值装入一串连续的保持寄存器</td>
+</tr>
+<tr>
+<td>11</td>
+<td>报告从机标识</td>
+<td>可使主机判断编址从机的类型及该从机运行指示灯的状态</td>
+</tr>
+<tr>
+<td>12</td>
+<td>（884和MICRO84）</td>
+<td>可使主机模拟编程功能，修改PC状态逻辑</td>
+</tr>
+<tr>
+<td>13</td>
+<td>重置通信链路</td>
+<td>发生非可修改错误后，是从机复位于已知状态，可重置顺序字节</td>
+</tr>
+<tr>
+<td>14</td>
+<td>读取通用参数（584L）</td>
+<td>显示扩展存储文件中的数据信息</td>
+</tr>
+<tr>
+<td>15</td>
+<td>写入通用参数（584L）</td>
+<td>把通用参数写入扩展存储文件</td>
+</tr>
+<tr>
+<td>16~40</td>
+<td>保留做扩展功能备用</td>
+<td></td>
+</tr>
+<tr>
+<td>41~48</td>
+<td>保留以备用户功能所用</td>
+<td>留作用户功能的扩展编码</td>
+</tr>
+<tr>
+<td>49~77</td>
+<td>非法功能</td>
+<td></td>
+</tr>
+<tr>
+<td>78~7F</td>
+<td>保留</td>
+<td>留作内部作用</td>
+</tr>
+<tr>
+<td>80~FF</td>
+<td>保留</td>
+<td>用于异常应答</td>
+</tr>
+</tbody></table>
+<p>常用功能码如下：</p>
+<table>
+<thead>
+<tr>
+<th>功能码</th>
+<th>名称</th>
+<th>功能</th>
+<th>对应的地址类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>01</td>
+<td>读线圈状态</td>
+<td>读位（读N个bit）—读从机线圈寄存器，位操作</td>
+<td>0x</td>
+</tr>
+<tr>
+<td>02</td>
+<td>读输入离散量</td>
+<td>读位（读N个bit）—读离散输入寄存器，位操作</td>
+<td>1x</td>
+</tr>
+<tr>
+<td>03</td>
+<td>读多个寄存器</td>
+<td>读整型、字符型、状态字、浮点型（读N个words）—读保持寄存器，字节操作</td>
+<td>4X</td>
+</tr>
+<tr>
+<td>04</td>
+<td>读输入寄存器</td>
+<td>读整型、状态字、浮点型（读N个words）—读输入寄存器，字节操作</td>
+<td>3x</td>
+</tr>
+<tr>
+<td>05</td>
+<td>写单个线圈</td>
+<td>写位（写一个bit）—写线圈寄存器，位操作</td>
+<td>0x</td>
+</tr>
+<tr>
+<td>06</td>
+<td>写单个保持寄存器</td>
+<td>写整型、字符型、状态字、浮点型（写一个word）—写保持寄存器，字节操作</td>
+<td>4x</td>
+</tr>
+<tr>
+<td>0F</td>
+<td>写多个线圈</td>
+<td>写位（写n个bit）—强置一串连续逻辑线圈的通断</td>
+<td>0x</td>
+</tr>
+<tr>
+<td>10</td>
+<td>写多个保持寄存器</td>
+<td>写整形、字符型、状态字、浮点型（写n个word）—把具体的二进制值装入一串连续的保持寄存器</td>
+<td>4x</td>
+</tr>
+</tbody></table>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/spi-bus/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/hardware/spi-bus/" class="post-title-link" itemprop="url">spi总线</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:55:21" itemprop="dateModified" datetime="2022-06-08T17:55:21+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>SPI(Serial Peripheral Interface)串行外设接口是一种用于芯片通信的串行同步传输总线协议，最初由Motorola在2000年提出。</p>
+<ul>
+<li><p>SPI允许传输单个bit数据，甚至允许暂停，因为SCK时钟线由主控设备控制，当没有时钟跳变时，从设备不采集或传送数据。</p>
+</li>
+<li><p>支持全双工通信，每个从设备需要独立的使能信号。</p>
+</li>
+<li><p>推挽输出的驱动性能相比开漏输出信号完整性更好，支持高速应用（100MHz以上）。</p>
+</li>
+<li><p>协议支持字长不限于8bits，可根据应用特点灵活选择消息字长。</p>
+</li>
+<li><p>相比I2C和SMbus节省上拉电阻，不需要仲裁机制。</p>
+</li>
+<li><p>没有寻址机制，只能靠设备片选选择不同从设备，故没有数据流控制和应答机制。</p>
+</li>
+<li><p>SPI没有规定最大传输速率，通常能达到10Mbps。</p>
+</li>
+</ul>
+<p><strong>Dual SPI</strong>是针对SPI Flash而言，不是针对所有SPI外设。对于SPI Flash，全双工并不常用，因此修改了mosi和miso的用法，使其工作在半双工，能够加倍传输数据。也就是说对于Dual SPI Flash，可以发送一个命令字节进入dual mode，这样mosi变成SIO0，mosi变成SIO1，这样一个时钟周期内就能传输2个bit数据。</p>
+<p><strong>Qual SPI</strong>也是针对SPI Flash，Qual SPI 在Dual SPI基础上增加了两根线（SIO2、SIO3），目的是一个时钟内能传输4个bit数据。</p>
+<h2 id="信号定义"><a href="#信号定义" class="headerlink" title="信号定义"></a>信号定义</h2><p><strong>MOSI</strong>：主设备数据输出，从设备数据输入。</p>
+<p><strong>MISO</strong>：主设备数据输入，从设备数据输出。</p>
+<p><strong>SCLK</strong>：时钟信号，由主设备产生。</p>
+<p><strong>CS/SS</strong>：片选，从设备使能信号，由主设备控制。</p>
+<p>SPI总线定义两个及以上设备间的数据传输，提供时钟的设备为主设备，接收时钟的设备为从设备。片选信号SS通常低电平有效。SPI数据传输原理是基于主从设备内部移位寄存器的数据交换。在主设备SCK的控制下，待传数据由各自设备的数据寄存器传输到移位寄存器，再通过MOSI和MISO信号线完成主从设备间的数据交换。</p>
+<p><img src="/images/spi/spi_ms_mod_reg.png" alt="spi框图"></p>
+<h2 id="传输模式"><a href="#传输模式" class="headerlink" title="传输模式"></a>传输模式</h2><p>SPI有4种操作模式，每种模式由一对参数决定，主从设备必须使用相同的工作参数，才能正常工作。</p>
+<p>CPOL时钟极性(clock polarity)，决定时钟空闲时的电平为高或低，对于SPI数据传输格式没有显著影响。</p>
+<ul>
+<li>0 : 时钟高电平时有效，空闲时为低。</li>
+<li>1 : 时钟低电平时有效，空闲时为高。</li>
+</ul>
+<p>CPHA时钟相位(clock phase)，定义时钟脉冲在哪条边沿转换输出信号，哪条边沿采样输入信号。</p>
+<ul>
+<li>0 : 数据采样发生在时钟奇数边沿。</li>
+<li>1 : 数据采样发生在时钟偶数边沿。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Mode 0</td>
+<td>SCLK 空闲是为低电平，数据在上升沿有效</td>
+</tr>
+<tr>
+<td>Mode 1</td>
+<td>SCLK 空闲是为低电平，数据在下降沿有效</td>
+</tr>
+<tr>
+<td>Mode 2</td>
+<td>SCLK 空闲是为高电平，数据在下降沿有效</td>
+</tr>
+<tr>
+<td>Mode 3</td>
+<td>SCLK 空闲是为高电平，数据在上升沿有效</td>
+</tr>
+</tbody></table>
+<p><img src="/images/spi/4mode.png" alt="4种模式"></p>
+<p><img src="/images/spi/timing_diagram.png" alt="时序"></p>
+<h2 id="多个从设备"><a href="#多个从设备" class="headerlink" title="多个从设备"></a>多个从设备</h2><ul>
+<li><strong>片选方式</strong></li>
+</ul>
+<p>每个从设备都需要单独的片选信号，主设备每次只能选择其中一个从设备进行通信。因为所有从设备的SCK、MOSI、MISO都是连在一起的，未被选中从设备的MISO要表现为高阻状态以避免数据传输错误。由于每个设备都需要单独的片选信号，如果需要的片选信号过多，可以使用译码器产生所有的片选信号。</p>
+<p><img src="/images/spi/multiple-slaves.png" alt="主设备以片选方式控制多个从设备"></p>
+<ul>
+<li><strong>菊花链方式</strong></li>
+</ul>
+<p>数据信号经过主从设备所有的移位寄存器构成闭环。数据通过主设备发送（绿色线）经过从设备返回（蓝色线）到主设备。在这种方式下，片选和时钟同时接到所有从设备。</p>
+<p>菊花链式连接常用于仅需主设备发送数据而不需要接收返回数据的场合，如LED驱动器。在这种应用下，主设备MISO可以不连。如果需要接收从设备的返回数据，则需要连接主设备的MISO形成闭环。同样地，切记要发送足够多的接收指令以确保数据移位送达主设备。</p>
+<p><img src="/images/spi/multiple-slaves2.png" alt="主设备以菊花链方式控制多个从设备"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/i2c-bus/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/hardware/i2c-bus/" class="post-title-link" itemprop="url">i2c总线</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:56:48" itemprop="dateModified" datetime="2022-06-08T17:56:48+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p><a target="_blank" rel="noopener" href="https://www.i2c-bus.org/">https://www.i2c-bus.org/</a></p>
+<p>I2C总线(Inter Integrated-Circuit)是由PHILIPS公司在上世纪80年代发明的一种电路板级串行总线标准，通过时钟线SCL和数据线SDA即可完成主从机的单工通信，广泛应用于电路板级的内部通信。</p>
+<ul>
+<li><p>总线上的所有设备通过软件寻址且具有唯一的地址。</p>
+</li>
+<li><p>总线上所有器件都具有自动应答功能，保证数据传输的正确性；</p>
+</li>
+<li><p>主机和从机的区别在于对SCL的发送权，只有主机才能发送SCL；</p>
+</li>
+<li><p>I2C数据传输速率有标准模式(100 kbps)、快速模式(400 kbps)和高速模式(3.4 Mbps)。</p>
+</li>
+</ul>
+<p><img src="/images/i2c/i2c-bus.png" alt=" I2C连接示意图"></p>
+<p>I2C总线上所有器件的SDA、SCL引脚输出驱动都为漏极开路结构，因此SDA和SCL可以被拉低为低电平，但是不能被驱动为高电平，低电平输出电压最大为0.4V，上拉电阻一般为4.7KΩ。通过外接上拉电阻实现总线上所有节点SDA、SCL信号的线与逻辑关系。<strong>线与</strong>的意思是只要总线上有一个设备输出底电平，总线信号就会被拉底。线与的作用在于可以实现总线的仲裁控制，总线的控制权会交给最后一个输出低电平的设备，其它设备(输出为高)通过检测总线上的电平状态(表现为低)，对比与自己输出状态不一致，则自动退出对总线的控制请求。</p>
+<p>漏极开路/集电极开路的缺点是对于一个距离长的数据线，信号传输速率得不到有效保证。更长的走线对于输出驱动器表现为更大的容性负载，等效容性负载C和信号线的上拉电阻R构成RC振荡器。RC越大，意味着反射和振荡越强，从而影响总线的信号完整性。所以I2C总线允许挂载最多的设备数量取决于总线上最大电容值，一般为400pf(Hs模式100pf)。</p>
+<h2 id="时序"><a href="#时序" class="headerlink" title="时序"></a>时序</h2><p><img src="/images/i2c/i2c-data.webp" alt="数据序列"></p>
+<h3 id="数据有效性"><a href="#数据有效性" class="headerlink" title="数据有效性"></a>数据有效性</h3><p>协议没有规定I2C逻辑1和0的电平值。每传输一比特数据SDA，对应产生一个时钟脉冲SCL。<strong>SCL为高时，SDA不允许变化；只有在SCL为低时，SDA才可以变化</strong>。</p>
+<p><img src="/images/i2c/bit.png" alt="位的传输"></p>
+<h3 id="开始-结束条件"><a href="#开始-结束条件" class="headerlink" title="开始/结束条件"></a>开始/结束条件</h3><p>如果I2C总线空闲，那么SCL和SDA信号线将都为高电平。<strong>在SCL为高电平时，将SDA由高到低电平跳变，作为起始信号，SDA由低到高电平跳变，作为结束信号</strong>。</p>
+<p><img src="/images/i2c/start-stop.png" alt="开始和结束条件"></p>
+<p>开始/结束条件总是由主机发起的。主机发出开始条件后，总线处于忙的状态；主机发出结束条件后，总线处于空闲状态。如果两个主机在同一时刻都希望获得总线的所有权，那么谁先将SDA拉低，谁就赢得了总线的控制权。</p>
+<p>当所有数据都发送完成时，主设备需要产生一个停止信号，告诉从设备自己已经操作完成。停止信号在SDA置于低电平时，将SCL拉高并保持高电平，然后将SDA拉高。在正常传输数据过程中，当SCL处于高电平时，SDA上的值不应该变化，防止意外产生一个停止信号。</p>
+<p>在操作中，如果主机发出重复开始条件而非结束条件，则总线仍处于忙的状态。也就是说重复开始条件和开始条件在功能上是相同的。</p>
+<h3 id="传输数据"><a href="#传输数据" class="headerlink" title="传输数据"></a>传输数据</h3><p>在地址帧发送之后，就可以开始传输数据了。主设备负责产生时钟，并且在时钟上升沿之前准备好数据。每个数据帧8bits，数据帧的数量可以是任意的，直到产生停止条件。每一帧数据传输之后，接收方就需要回复一个ACK或NACK。数据传输过程中，<strong>先发送高位，再发送低位</strong>。</p>
+<p>如果在数据传输过程中，从机如果没有准备好接收或发送下一个字节（比如内部中断需要处理等），它可以通过拉低SCL强制主机进入等待状态。直到从机释放SCL，主机才开始下一个字节的发送或接收。</p>
+<p><img src="/images/i2c/tu4.png" alt="I2C总线的数据传输"></p>
+<h3 id="应答"><a href="#应答" class="headerlink" title="应答"></a>应答</h3><p><img src="/images/i2c/ack.png" alt="I2C总线的数据应答"></p>
+<p>当主设备发送完地址帧之后，在应答时钟周期内，会放弃SDA总线控制权，让从设备获得SDA控制权，这样从设备才能通过将SDA拉低通知发送器数据已被成功接收。此时从设备应该在第9个时钟脉冲之前回复一个ACK以表示接收正常。SCL为高的时候，SDA数据才是有效的，因此接收器发送ACK时，要保证SCL为高的同时，SDA为低电平；建立和保持时间也要满足规范要求。</p>
+<p>如果在第9个时钟周期，SDA为高，表明接收设备无应答（NACK）。主机可以据此发出结束条件命令结束此次传输，或发起重传请求重新传输数据。有5种情况可能导致无应答：</p>
+<ul>
+<li>总线上没有报文中所指定地址的设备不存在。</li>
+<li>接收器件尚未准备好与主机的通信。</li>
+<li>接收器件无法解析读取的数据。</li>
+<li>接收器件无法收取更多的数据，比如程序或者芯片内置缓冲区已经满了。</li>
+<li>主机作为接收器时，在读取从机发出的最后一个字节数据后，发出NACK通知从发送器释放数据线SDA，以便主机发起结束或重传指令。</li>
+</ul>
+<p>主机作为发送器和接收器在写和读情况下的数据格式：</p>
+<h3 id="重复开始信号"><a href="#重复开始信号" class="headerlink" title="重复开始信号"></a>重复开始信号</h3><p>主设备可以发起多个开始信号来完成数据的传输，只要不发停止信号，总线上的其他主设备就不能占据这条总线，有时候发送完一组数据后，希望重新发数据，所以就有了重复开始信号。重复的开始信号为，SDA在SCL低电平时拉高，然后SCL拉高。重复开始条件的传输时序如下图所示：</p>
+<p><img src="/images/i2c/restart.jpg" alt="重复开始条件的传输时序"></p>
+<h2 id="时钟同步和仲裁"><a href="#时钟同步和仲裁" class="headerlink" title="时钟同步和仲裁"></a>时钟同步和仲裁</h2><p>I2C的一大特点是可以在同一条总线上接多个主机，当两个及以上的主机同时发起传输请求时，需要通过某种机制确定哪个主机获得总线的使用权；另外，每个主机都独立产生时钟，时钟速率可能千差万别，这也需要某种机制解决时钟速率不一致的问题。这种机制就是时钟同步（Clock Synchronization）和仲裁（Arbitration）。在单主机的I2C系统中，不需要时钟同步和仲裁。</p>
+<h3 id="时钟同步"><a href="#时钟同步" class="headerlink" title="时钟同步"></a>时钟同步</h3><p>每个I2C的主机内部都有两个计数器，分别计数SCL上高电平和低电平的时间。如果总线上只有一个主机，则这两个计数器的值取决于系统时钟速率。当多个主机存在时，不同设备的计数器速度可能不一致，因此涉及时钟同步的概念。</p>
+<p>时钟同步是通过I2C接口的“线与”逻辑实现的。SCL信号线由高变低时，所有连接在SCL上的主机都开始计数低电平的时间（低电平计数器复位），由线与的逻辑可知：只有当SCL总线上所有主机的时钟输出端都为高时，SCL总线才会由低变高。SCL的低电平时间由总线上低电平时间最长的主机决定。时钟端口先跳变为高的其它主机进入等待状态。这样所有主机的时钟输出和SCL线上的状态保持相同；当SCL由低变高后，所有主机（高电平计数器）开始计数SCL高电平的时间；最早由高跳变到低的主机再次将SCL拉低。通过这种方式产生的同步时钟：其低电平时间是所有主机时钟中最长的低电平时间，其高电平时间是所有主机时钟中最短的高电平时间。</p>
+<p><img src="/images/i2c/clock_sync.png" alt="仲裁阶段的时钟同步"></p>
+<h3 id="仲裁"><a href="#仲裁" class="headerlink" title="仲裁"></a>仲裁</h3><p>当总线上有一个以上的主机时，协议通过仲裁的方法确定哪个主机获得总线的使用权。从机不参与仲裁的过程。</p>
+<p>当总线处于空闲状态时，在最小的保持时间内，多个主机都可能发起开始条件在总线上传输数据。仲裁用来判断哪个主机的传输可以正常进行。</p>
+<p>仲裁是按位进行的。仲裁开始时，对于每一位数据，SCL为高时，每个主机都检测SDA上的数据是否和自己发送的数据相同。可能需要进行多个位的比较，主机才开始检测到SDA上数据和自己发送的不一致。实际上，只要SDA上的数据和主机发送的数据一致，这些主机就可以将数据一致发送下去。当主机发送为HIGH，检测SDA上电平却为LOW，那么该主机就在仲裁中失去主控权，并将其SDA输出关闭。余下的主机获得总线控制权并继续数据的传输。如图8，当主机1在检测到SDA数据和它自身的输出DATA1不一致时，将自动关闭DATA1的输出，停止向总线上发送数据。</p>
+<p>由此可见，在仲裁过程中胜出的主机是没有丢失数据的。在仲裁中失去总线控制权的主机在本次字节传输结束后继续产生时钟，并在总线空闲时开始上次数据的重传。如果同一个器件可以工作在主从两种模式，它在仲裁过程中失去总线控制权，那么有可能是仲裁胜出的主机将要访问该器件，该器件应该立即切换到从机模式。</p>
+<p><img src="/images/i2c/arbitration.png" alt="两个主机的仲裁过程"></p>
+<p>从上面的原理分析可知，I2C不存在核心主机，是没有优先级的概念的。总线的控制权仅取决于主机在SDA上的竞争（SDA包含地址和数据）。</p>
+<p>在仲裁过程中，存在以下未定条件会导致不可预期的结果：</p>
+<ul>
+<li>主机1在主机2发送数据的过程中发出重复开始条件</li>
+<li>主机1在主机2发送数据的过程中发出结束条件</li>
+<li>主机1在主机发出结束条件的过程中发出重复开始条件</li>
+</ul>
+<h3 id="时钟拉伸"><a href="#时钟拉伸" class="headerlink" title="时钟拉伸"></a>时钟拉伸</h3><p>如果主设备发送的速度比从设备接收的速度快，因为是同步传输，可能就会出现问题，这时候，从设备可以通过控制时钟线，要求主设备线暂停传输，这就叫时钟拉伸(clock stretching)。</p>
+<p>时钟拉伸通过拉低SCL延迟数据的传输。从机在主机释放SCL后，将SCL主动拉低并保持，此时主机停止在SCL上产生脉冲以及在SDA上发送数据，直到slave释放SCL，让SCL变成高电平。之后，主机便可以继续正常的数据传输了。可见时钟拉伸实际上是利用了时钟同步的机制，只是时钟由从机产生。</p>
+<p>时钟拉伸是可选功能，实际上许多从机不包括SCL驱动器，因此也无法拉伸时钟。</p>
+<p>包含时钟拉伸的I2C数据传输时序图为：</p>
+<h2 id="地址"><a href="#地址" class="headerlink" title="地址"></a>地址</h2><h3 id="7位地址"><a href="#7位地址" class="headerlink" title="7位地址"></a>7位地址</h3><p>7位从机地址，其高4位为设备类型地址，由生产厂家制定，低3位为器件引脚定义地址，由使用者定义。</p>
+<p>8位地址的第0位是数据方向控制位：为0表示主机写数据，1表示主机读数据。</p>
+<p>主机发送结束条件（P）终止一次传输。主机也可以通过发起重复开始条件（Sr）进行一次新的传输，而不需要先产生结束条件（P）。在一次传输过程中，可能存在多种读写组合，包括：</p>
+<ul>
+<li>主机作为发送，向从机发送（写）数据，传输的方向不变；</li>
+</ul>
+<p><img src="/images/i2c/tu10.png" alt="7位地址主发从收模式"></p>
+<ul>
+<li>主机发送开始条件（S）以及其后的第一个字节，立即改为从总线上读取状态。收到从机的应答（ACK）后，主机由主发模式切换到主收模式，从机由从收模式切换到从发模式。第一个应答是从机发出的。主机先发送NACK，再发送结束条件（P）结束本次传输；</li>
+</ul>
+<p><img src="/images/i2c/tu11.png" alt="主机在第一个字节后立即读取从机内容"></p>
+<p><img src="/images/i2c/tu12.png" alt="混合模式"></p>
+<h3 id="10位地址"><a href="#10位地址" class="headerlink" title="10位地址"></a>10位地址</h3><p>任何I2C设备都有一个7位地址，理论上，现实中只能有127种不同的IIC设备。实际上，已有IIC的设备种类远远多于这个限制，在一条总线上出现相同的地址的IIC设备的概率相当高。为了突破这个限制，很多设备使用了双重地址，7位地址加引脚地址。IIC 标准也预知了这种限制，提出10位的地址方案。</p>
+<p>在10-bit地址的I2C系统中，需要两帧来传输slave的地址。第一个帧的前<strong>5个bit固定为b11110</strong>，后接slave地址的高2位，第8位仍然是R/W位，接着是一个ACK位，然后再发送另外8bit的地址，发送完后从设备会给出应答。</p>
+<p><img src="/images/i2c/10-addr.bmp" alt="10位地址"></p>
+<p><img src="/images/i2c/tu13.png" alt="主发送器寻址从接收器"></p>
+<p>主接收器读取10位地址的从发送器发送的数据。数据传送方向在第二个R/W后发生改变。如图15所示，A2之前的操作和主发送器向从接收器写数据没有区别。通过Sr，匹配地址的从机得知它就是被寻址的设备，接下来从机检测Sr后的七个比特是否和先前START后的七比特一致（1111 0XX），并检测第八位（R/W）是否为1。如果是，则从机据此判断它被寻址并将要作为发送器往总线上发送数据，此时从机产生响应A3。从机一直占用总线，直到接收到STOP或Sr指向另一个从机地址。收到Sr信号后，所有从机都会对比Sr后第一个字节的前七位（1111 0XX），并检测该字节的第八位（R/W）。对于10位地址设备R/W=1，对于7位地址设备，地址（1111 0XX）不匹配，因此这些设备都不会响应Sr，不会被寻址。</p>
+<p><img src="/images/i2c/tu14.png" alt="主接收器寻址从发送器"></p>
+<h3 id="保留地址"><a href="#保留地址" class="headerlink" title="保留地址"></a>保留地址</h3><table>
+<thead>
+<tr>
+<th align="left">设备地址</th>
+<th align="left">读写位</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">0000 000</td>
+<td align="left">0</td>
+<td align="left">广播地址</td>
+</tr>
+<tr>
+<td align="left">0000 000</td>
+<td align="left">1</td>
+<td align="left">启动字节</td>
+</tr>
+<tr>
+<td align="left">0000 001</td>
+<td align="left">X</td>
+<td align="left">CBUS 地址</td>
+</tr>
+<tr>
+<td align="left">0000 010</td>
+<td align="left">X</td>
+<td align="left">预留给不同的总线格式</td>
+</tr>
+<tr>
+<td align="left">0000 011</td>
+<td align="left">X</td>
+<td align="left">预留未来扩展使用</td>
+</tr>
+<tr>
+<td align="left">0000 1XX</td>
+<td align="left">1</td>
+<td align="left">Hs-mode 主代码</td>
+</tr>
+<tr>
+<td align="left">1111 1XX</td>
+<td align="left">1</td>
+<td align="left">设备 ID</td>
+</tr>
+<tr>
+<td align="left">1111 0XX</td>
+<td align="left">X</td>
+<td align="left">10 位从地址</td>
+</tr>
+</tbody></table>
+<h3 id="通用广播地址"><a href="#通用广播地址" class="headerlink" title="通用广播地址"></a>通用广播地址</h3><p>通用广播地址是为了寻址总线上所有设备。如果一个设备不需要使用广播功能，可以不响应广播。如果设备需要使用广播功能，则它在检测到广播地址后发送响应，并作为从接收器读取总线上发送的数据。主机不知道总线上有多少从机发送响应。总线上所有可以响应广播的从机读取广播地址后的第二个及后面的字节。不能处理这些广播数据的从机通过不发送响应的方式忽略它。同样地，如果有一个或一个以上的从机发送响应，则主机就检测不到总线上其它没有响应的设备。广播消息的含义总是定义在第二个字节。</p>
+<p><img src="/images/i2c/tu15.png" alt="广播消息格式"></p>
+<p>有两种可能情况：</p>
+<ul>
+<li>最低位“B”为0</li>
+<li>最低位“B”为1</li>
+</ul>
+<p><strong>“B”为0</strong>，第二个字节包括以下定义：</p>
+<ul>
+<li><strong>0000 0110（06h）</strong>：复位并通过硬件写内容到从机的可编程部分。所有可以响应此类广播的从机，收到此两字节后，进行复位并进入它们地址的可编程部分。注意确保设备在加电后不会将SDA或SCL拉低，因为这些低电平会阻塞总线；</li>
+<li><strong>0000 0100（04h）</strong>：通过硬件写内容到从机的可编程部分，作用类似（06h），但设备不会复位；</li>
+<li><strong>0000 0000（00h）</strong>：这个不应该作为第二个字节用。</li>
+</ul>
+<p>编程时序参考相应设备的DATASHEET。</p>
+<p><strong>“B”为1</strong>，两字节广播定义为“硬件广播”。主机（如键盘扫描器）在编程后，可以发送既定的从机地址到总线上，构成两字节序列的“硬件广播”。既然主机可能并不知道总线上从机的地址，它只能通过硬件广播的方式，将自身地址通知给系统。</p>
+<p><img src="/images/i2c/tu16.png" alt="主发送器的数据传输格式"></p>
+<p>硬件广播的第二个字节的前七位包括主机的地址。总线上的智能设备如微控制器，读取此地址并接收主机发送的其它信息。如果主机也可以作为从机使用，则以上读取的主机地址实际上也就是（切换主从模式后的）从机地址。</p>
+<p>在系统中，一种可能是系统复位后设备由主机发送模式切换到从机接收模式，这时由系统主机先告诉硬件主机数据应送往的从机地址，这样当硬件主机发送数据时就可以直接向指定从机地址发送数据了。</p>
+<p><strong>软件复位</strong></p>
+<p>通用广播地址0000 0000后发送0000 0110（06h）可以使总线上设备进入复位过程。该功能是可选的，所有预留该功能的设备在收到该两字节序列（00 06h）后，开始响应（复位），并进入它们地址的可编程部分。注意确保设备在加电后不会将SDA或SCL拉低，因为这些低电平会阻塞总线。</p>
 
       
     </div>
@@ -1636,7 +1932,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/15/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><a class="extend next" rel="next" href="/page/17/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/15/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><a class="extend next" rel="next" href="/page/17/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1701,20 +1997,20 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">183</span>
+          <span class="site-state-item-count">202</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-count">21</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-count">35</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

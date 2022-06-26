@@ -176,7 +176,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/lcd/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/AbstractFactory/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -190,7 +190,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/hardware/lcd/" class="post-title-link" itemprop="url">液晶显示器原理</a>
+            <a href="/2022/06/07/code/design-patterns/AbstractFactory/" class="post-title-link" itemprop="url">抽象工厂模式</a>
         </h1>
 
         <div class="post-meta">
@@ -209,6 +209,15 @@
                 <span class="post-meta-item-text">更新于</span>
                 <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
               </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
 
           
 
@@ -221,17 +230,20 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="LCD"><a href="#LCD" class="headerlink" title="LCD"></a>LCD</h3><p>液晶（Liquid Crystal）是一种介于液态与结晶态之间的一种物质状态的高分子材料。液晶具有双折射性，使得能对偏振光选择性透过。</p>
-<p>LCD是英文Liquid Crystal Display 的简称，指的是液晶显示屏。主要有TFT、UFB、TFD、STN等几种类型。其构造包括塑料球、玻璃球、边框胶、玻璃基板、上偏光片、定向层、液晶、导电ITO图案、导通点、IPO电极和下偏光片。</p>
-<p><img src="/images/lcd/LCD-struct.jpeg" alt="TN"></p>
-<p>两块偏光板相互垂直时光线就完全无法通过，液晶显示器就是在上下两片栅栏之间互垂直的偏光板之间充满液晶，利用电场控制液晶分子产生扭曲，从而对穿越其中的光线进行有规则的折射，来改变光的行进方向，如此一来，不同的电场大小，就会形成不同颜色。</p>
-<p>因为液晶材料本身并不发光，所以在显示屏两边都设有作为光源的灯管，而在液晶显示屏背面有一块背光板和反光膜，背光板是由荧光物质组成的可以发射光线，其作用主要是提供均匀的背景光源。</p>
-<p>液晶显示的原理基于液晶的透光率随其所施电压大小而变化的特性。当光通过下偏振片后，变成线性偏振光，偏振方向与偏振片振动方向一致，与上下玻璃基板上面液晶分子排列顺序一致。当光通过液晶层时，由于受液晶折射，线性偏振光被分解为两束光。又由于这两束光传播速度不同（相位相同），因而当两束光合成后，必然使振光的振动方向发生变化。通过液晶层的光，则被逐渐扭曲。当光达到上偏振片时，其光轴振动方向被扭曲了90度，且与上偏振片的振动方向保持一致。这样，光线通过上偏振片形成亮场。加上电压以后，液晶在电场作用下取向，扭曲消失。这时，通过下偏振片的线性偏振光，在液晶层不再旋转，无法通过上偏振片而形成暗场。可见液晶本身不发光，在外光源的调制下，才能显示，在整个显示过程中，液晶起到一个电压控制的光阀作用。</p>
-<p>LCD依据驱动方式可分为静态驱动、简单矩阵驱动以及主动<br>矩阵驱动 3 种。其中简单矩阵型又可再细分扭转向列型(TN)和超扭转式向列型(STN)两种，而主动矩阵型则以薄膜式晶体管型(TFT)为主流。</p>
-<p>NW(Normally white)是指当液晶面板不施加电压时，面板是亮的画面。另外一种， 液晶面板不施加电压时，面板无法透光, 看起来是黑色的，就称之为NB(Normally black)。</p>
-<p><strong>可视角度</strong>指的是使用者能从不一样的方位清晰地看见荧幕上所有显示内容的角度。液晶显示器的可视角度左右对称，而上下则不一定对称。当背光源的入射光通过偏光板、液晶及取向膜后，输出光便具备了特定的方向特性。假如从一个非常斜的角度观看一个全白的画面，我们可能会看到黑色或是色彩失真。一般来说，上下角度要小于或等于左右角度。现在有些厂商就开发出各种广视角技术，试图改善液晶显示器的视角特性，如：IPS(In Plane Switching)、MVA(Multidomain Vertical Alignment)、TN+FILM。</p>
-<h3 id="TFT"><a href="#TFT" class="headerlink" title="TFT"></a>TFT</h3><h2 id="OLED"><a href="#OLED" class="headerlink" title="OLED"></a>OLED</h2><p>OLED是Organic Light-Emitting Diode 的简称，中文名是有机发光二极管。</p>
-<p>不同于LCD需要通过背光板照射才能显示，OLED是自发光。</p>
+          <h2 id="抽象工厂模式"><a href="#抽象工厂模式" class="headerlink" title="抽象工厂模式"></a>抽象工厂模式</h2><p>抽象工厂模式（Abstract Factory Pattern）是对工厂的抽象，生产一系列相关或相互依赖产品，考虑的是一类产品的生产，而无须指定它们具体的类。</p>
+<p><img src="/images/code/design-pattern/%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82.jpg" alt="抽象工厂"></p>
+<ul>
+<li>抽象工厂（AbstractFactory）：它声明了一组用于创建一族产品的方法，每一个方法对应一种产品。</li>
+<li>具体工厂（ConcreteFactory）：它实现了在抽象工厂中声明的创建产品的方法，生成一组具体产品，这些产品构成了一个产品族。</li>
+<li>抽象产品（AbstractProduct）：它为每种产品声明接口，在抽象产品中声明了产品所具有的业务方法。</li>
+<li>具体产品（ConcreteProduct）：它定义具体工厂生产的具体产品对象，实现抽象产品接口中声明的业务方法。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//抽象产品类A</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AbstractProductA</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//抽象方法：</span></span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="comment">//具体产品类A</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteProductA</span> :<span class="keyword">public</span> AbstractProductA</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//具体实现方法</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//抽象产品类B</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AbstractProductB</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//抽象方法：</span></span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="comment">//具体产品类B</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteProductB</span> :<span class="keyword">public</span> AbstractProductB</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//具体实现方法</span></span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="comment">//抽象工厂类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AbstractFactory</span> </span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//抽象方法生产产品A：</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> AbstractProductA *<span class="title">createProductA</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> AbstractProductB *<span class="title">createProductB</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="comment">//具体工厂类A</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteFactoryA</span> :<span class="keyword">public</span> AbstractFactory</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//具体工厂生产具体产品</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//具体工厂类B</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteFactoryB</span> :<span class="keyword">public</span> AbstractFactory</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//具体工厂生产具体产品</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>抽象工厂和工厂方法不同的地方在于，生产产品的工厂是抽象的。举例，可口可乐公司生产可乐的同时，也需要生产装可乐的瓶子和箱子，瓶子和箱子也是可口可乐专属定制的，同样百事可乐公司也会有这个需求。这个时候我们的工厂不仅仅是生产可乐饮料的工厂，还必须同时生产同一主题的瓶子和箱子，所以它是一个抽象的主题工厂，专门生产同一主题的不同商品。</p>
+<h2 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 可乐抽象类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Cola</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">What</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 可口可乐产品类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CocaCola</span> : <span class="keyword">public</span> Cola</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">What</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;CocaCola&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 百事可乐产品类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PesiCola</span> : <span class="keyword">public</span> Cola</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">What</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;PesiCola&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 瓶子抽象类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Buttle</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">What</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 可口可乐瓶子产品类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CocaColaButtle</span> : <span class="keyword">public</span> Buttle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">What</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;CocaCola Buttle&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 百事可乐瓶子产品类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PesiColaButtle</span> : <span class="keyword">public</span> Buttle</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">What</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;PesiCola Buttle&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 工厂抽象类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Factory</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Cola *<span class="title">CreateColo</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Buttle *<span class="title">CreateButtle</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 可口可乐主题工厂</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CocaFactory</span> : <span class="keyword">public</span> Factory</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Cola *<span class="title">CreateColo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">CocaCola</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Buttle *<span class="title">CreateButtle</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">CocaColaButtle</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 百事可乐主题工厂</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PesiFactory</span> : <span class="keyword">public</span> Factory</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Cola *<span class="title">CreateColo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">PesiCola</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Buttle *<span class="title">CreateButtle</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">PesiColaButtle</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    CocaFactory factory1;</span><br><span class="line">    Cola *cola = factory1.<span class="built_in">CreateColo</span>();</span><br><span class="line">    cola-&gt;<span class="built_in">What</span>();</span><br><span class="line">    Buttle *buttle = factory1.<span class="built_in">CreateButtle</span>();</span><br><span class="line">    buttle-&gt;<span class="built_in">What</span>();</span><br><span class="line"></span><br><span class="line">    PesiFactory factory2;</span><br><span class="line">    cola = factory2.<span class="built_in">CreateColo</span>();</span><br><span class="line">    cola-&gt;<span class="built_in">What</span>();</span><br><span class="line">    buttle = factory1.<span class="built_in">CreateButtle</span>();</span><br><span class="line">    buttle-&gt;<span class="built_in">What</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> cola;</span><br><span class="line">    <span class="keyword">delete</span> buttle;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><p>具体产品在应用层代码隔离，不需要关心产品细节。只需要知道自己需要的产品是属于哪个工厂的即可，当一个产品族中的多个对象被设计成一起工作时，它能够保证客户端始终只使用同一个产品族中的对象。</p>
 
       
     </div>
@@ -251,7 +263,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/mipi/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/Singleton/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -265,7 +277,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/hardware/mipi/" class="post-title-link" itemprop="url">mipi接口</a>
+            <a href="/2022/06/07/code/design-patterns/Singleton/" class="post-title-link" itemprop="url">单例模式</a>
         </h1>
 
         <div class="post-meta">
@@ -282,7 +294,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:56:37" itemprop="dateModified" datetime="2022-06-08T17:56:37+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -290,7 +302,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
                 </span>
             </span>
 
@@ -305,1322 +317,360 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>MIPI (Mobile Industry Processor Interface) 是2003年由ARM, Nokia, ST ,TI等公司成立的一个联盟，目的是把手机内部的接口如摄像头、显示屏接口、射频/基带接口等标准化，从而减少手机设计的复杂程度和增加设计灵活性。</p>
-<p>MIPI联盟下面有不同的WorkGroup，分别定义了一系列的手机内部接口标准，比如摄像头接口CSI、显示接口DSI、射频接口DigRF、麦克风 /喇叭接口SLIMbus等。统一接口标准的好处是手机厂商根据需要可以从市面上灵活选择不同的芯片和模组，更改设计和功能时更加快捷方便。下图是按照 MIPI的规划下一代智能手机的内部架构。</p>
-<p><img src="/images/mipi/MIPI-Protocol-865x1024.png" alt="img"></p>
-<h2 id="MIPI规范"><a href="#MIPI规范" class="headerlink" title="MIPI规范"></a>MIPI规范</h2><p>已经完成和正在计划中的规范如下:<br><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/MIPI#cite_note-Working_Groups:_Overview-1">https://zh.wikipedia.org/wiki/MIPI#cite_note-Working_Groups:_Overview-1</a></p>
-<table>
+          <h2 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h2><p>单例模式（Singleton Pattern）确保在一个系统中只允许一个类的一个实例，定义一个getInstance()获取实例的静态方法来返回其所属类的一个相同实例，此方法必须是获取单例对象的唯一方式。</p>
+<p><img src="/images/code/design-pattern/Singleton.jpg" alt="单例"></p>
+<ul>
+<li>单例的构造析构函数必须对外隐藏，不能为public属性。</li>
+<li>禁用拷贝构造和赋値运算符。</li>
+<li>在多线程下要避免多次创建单例对象。</li>
+</ul>
+<h2 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">static</span> std::mutex mutex_;</span><br><span class="line">    <span class="built_in">Singleton</span>(<span class="type">const</span> Singleton &amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    Singleton &amp;<span class="keyword">operator</span>= (<span class="type">const</span> Singleton &amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="built_in">Singleton</span>() = <span class="keyword">default</span>;</span><br><span class="line">    ~<span class="built_in">Singleton</span>() = <span class="keyword">default</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton <span class="title">GetInstance</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="function">std::lock_guard&lt;std::mutex&gt; <span class="title">lock</span><span class="params">(mutex_)</span></span>;</span><br><span class="line">        <span class="type">static</span> Singleton ins &#123;&#125;;</span><br><span class="line">        <span class="keyword">return</span> ins;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><p>单例类提供了对唯一实例的受控访问，在系统内存中只存在一个对象，所以可以节约系统资源。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/c-object/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/design-patterns/c-object/" class="post-title-link" itemprop="url">c语言实现面向对象</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>面向对象语言有三个最重要的特点，即继承、封装、多态，其中类可以用结构体实现。</p>
+<h2 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h2><p>把基类结构体作为派生类结构体的第一个成员，这样就可以对基类进行访问与强转。 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">parent</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">int</span> data_parent;</span><br><span class="line"> </span><br><span class="line">&#125;Parent;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">Child</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">parent</span> <span class="title">parent</span>;</span></span><br><span class="line">    <span class="type">int</span> data_child;</span><br><span class="line"> </span><br><span class="line">&#125;Child;</span><br></pre></td></tr></table></figure>
+
+<h2 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h2><p>封装的意义在于函数和数据是绑在一起的，其中将该对象结构体指针作为函数的参数，相当于类的this指针，这样就可以遍历类中的所有函数和成员。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">Data</span>;</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">typedef</span>  <span class="title function_">void</span> <span class="params">(*func)</span><span class="params">(<span class="keyword">struct</span> _Data* pData)</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">Data</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">int</span> value;</span><br><span class="line">    func pfunc;</span><br><span class="line">&#125;Data;</span><br></pre></td></tr></table></figure>
+
+<h2 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h2><p>多态就是实现同一接口处理不同的事情，可以用函数指针来实现，通过给函数指针赋于不同的値。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">Play</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">void</span>* pData;</span><br><span class="line">    <span class="type">void</span> (*start_play)(<span class="keyword">struct</span> _Play* pPlay);</span><br><span class="line">&#125;Play;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/uml/uml_class/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/uml/uml_class/" class="post-title-link" itemprop="url">UML class diagram</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-26 15:57:54" itemprop="dateModified" datetime="2022-06-26T15:57:54+08:00">2022-06-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/UML/" itemprop="url" rel="index"><span itemprop="name">UML</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>uml</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/06/07/code/uml/uml_class/">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/find/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/algo/find/" class="post-title-link" itemprop="url">查找算法</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <table>
 <thead>
 <tr>
-<th><strong>工作组</strong></th>
-<th><strong>规范名称</strong></th>
+<th>查找算法</th>
+<th>平均时间复杂度</th>
+<th>空间复杂度</th>
+<th>查找条件</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Camera工作组</td>
-<td>MIPI Camera Serial Interface 2 (MIPI CSI-2) v2.0 (March 2017)MIPI Camera Serial Interface 3 (MIPI CSI-3) v1.1 (March 2014)MIPI Camera Command Set (MIPI CCS) v1.0 (October 2017)</td>
+<td>顺序查找</td>
+<td>O(n)</td>
+<td>O(1)</td>
+<td>无序或有序</td>
 </tr>
 <tr>
-<td>Device Descriptor Block工作组</td>
-<td>暂无</td>
+<td>二分查找</td>
+<td>O(log<sub>2</sub>n)</td>
+<td>O(1)</td>
+<td>有序</td>
 </tr>
 <tr>
-<td>DigRF工作组</td>
-<td>DigRF Baseband/RF Digital Interface Specification v4 (Feb. 2014)</td>
+<td>插值查找</td>
+<td>O(log<sub>2</sub>(log<sub>2</sub>n))</td>
+<td>O(1)</td>
+<td>有序</td>
 </tr>
 <tr>
-<td>Display工作组</td>
-<td>DBI-2DPI-2DSI-2 v1.0 (January 2016)DCS</td>
+<td>斐波那契查找</td>
+<td>O(log<sub>2</sub>n)</td>
+<td>O(1)</td>
+<td>有序</td>
 </tr>
 <tr>
-<td>高速同步接口工作组</td>
-<td>HSI 1.0</td>
+<td>哈希查找</td>
+<td>O(1)</td>
+<td>O(n)</td>
+<td>无序或有序</td>
 </tr>
 <tr>
-<td>接口管理框架工作组</td>
-<td>暂无</td>
-</tr>
-<tr>
-<td>低速多点连接工作组</td>
-<td>SLIMbus v2.0 (August 2015)SoundWire v1.1 (August 2016)</td>
-</tr>
-<tr>
-<td>NAND软件工作组</td>
-<td>暂无</td>
-</tr>
-<tr>
-<td>物理层工作组</td>
-<td>C-PHY v1.2 (March 2017)D-PHY v2.1 (March 2017)M-PHY v4.1 (March 2017)</td>
-</tr>
-<tr>
-<td>软件工作组</td>
-<td>暂无</td>
-</tr>
-<tr>
-<td>系统电源管理工作组</td>
-<td>SPMI v2.0 (August 2012)</td>
-</tr>
-<tr>
-<td>检测与调试工作组</td>
-<td>暂无</td>
-</tr>
-<tr>
-<td>统一协议工作组</td>
-<td>UniPro 1 point-to-point v1.61 (October 2015)PIE</td>
-</tr>
-</tbody></table>
-<h3 id="DSI-CSI"><a href="#DSI-CSI" class="headerlink" title="DSI/CSI"></a>DSI/CSI</h3><p>MIPI是一个比较新的标准，其规范也在不断修改和改进，目前比较成熟的接口应用有DSI(显示接口)和CSI（摄像头接口）。CSI/DSI分别是指其承载的是针对Camera或Display应用，都有复杂的协议结构。以DSI为例，其协议层结构如下：</p>
-<p><img src="/images/mipi/MIPI-DSI.png" alt="img"></p>
-<p>CSI/DSI的物理层（Phy Layer）由专门的WorkGroup负责制定，其目前的标准是D-PHY。D-PHY采用1对源同步的差分时钟和1～4对差分数据线来进行数据传输。数据传输采用DDR方式，即在时钟的上下边沿都有数据传输。</p>
-<p>D-PHY的物理层支持HS(High Speed)和LP(Low Power)两种工作模式。HS模式下采用低压差分信号，功耗较大，但是可以传输很高的数据速率（数据速率为80M～1Gbps）； LP模式下采用单端信号，数据速率很低（&lt;10Mbps），但是相应的功耗也很低。两种模式的结合保证了MIPI总线在需要传输大量数据（如图像） 时可以高速传输，而在不需要大数据量传输时又能够减少功耗。</p>
-<p><img src="/images/mipi/MIPI-DPHY.png" alt="img"></p>
-<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/100476927">https://zhuanlan.zhihu.com/p/100476927</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/sensor/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/sensor/" class="post-title-link" itemprop="url">sensor</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:55:37" itemprop="dateModified" datetime="2022-06-08T17:55:37+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>Sensor 将从 lens 上传导过来的光线转换为电信号，再经过内部AD转换为数字信号。每个pixel像素点只能感受R、G、B中的一种，因此每个像素点中存放的数据是单色光，像素表示的就是有多少个感光点，每个感光点只能感应一种光，这些最原始的感光数据我们称为RAW Data。Raw Data数据要经过ISP的处理才能还原出三原色，也就是说如果一个像素点感应为R值，那么ISP会根据该感光点周围的G、B的值，通过插值和特效处理等，计算出该R点的G、B值，这样该点的RGB就被还原了。目前常用的sensor有两种，一种是CCD（电荷耦合）；一种是CMOS（金属氧化物导体）。</p>
-<ul>
-<li>CCD（Charge Coupled Device），电荷耦合器件传感器：使用一种高感光度的半导体材料制成，能把光线转变成电荷，通过模数转换器芯片转换成电信号。CCD由许多独立的感光单位组成，通常以百万像素为单位。当CCD表面受到光照时，每个感光单位都会将电荷反映在组件上，所有的感光单位产生的信号加在一起，就构成了一幅完整的图像。CCD传感器以日本厂商为主导，全球市场上有90%被日本厂商垄断，索尼、松下、夏普是龙头。</li>
-<li>CMOS（Complementary Metal-Oxide Semiconductor），互补性氧化金属半导体：主要是利用硅和锗做成的半导体，使其在CMOS上共存着带N(-)和P(+)级的半导体，这两个互补效应所产生的电流可以被处理芯片记录并解读成影像。CMOS传感器主要以美国、韩国和中国台湾为主导，主要生产厂家是美国的OmnVison、Agilent、Micron，中国台湾的锐像、原相、泰视等，韩国的三星、现代。</li>
-</ul>
-<h2 id="ISP"><a href="#ISP" class="headerlink" title="ISP"></a>ISP</h2><p>ISP 是图像信号处理器（Image Sensor Processor）。一般用来处理Image Sensor（图像传感器）的输出数据，如做AE（自动曝光）、AGC（自动增益控制）、AWB（自动白平衡）、色彩校正、Lens Shading、Gamma 校正、祛除坏点、Auto Black Level、Auto White Level 等等功能的处理。</p>
-<h3 id="AE"><a href="#AE" class="headerlink" title="AE"></a>AE</h3><p>自动曝光（Auto Exposure），根据外界光线的强弱自动调整曝光量和增益，防止曝光过度或者不足。AE 算法的主要调控对象一般是光圈、sensor增益（包含模拟增益和数字增益）、ISP数字增益这三个参数。</p>
-<p>影响曝光的因素有曝光时间；光圈大小；Sensor的ISO感光度。</p>
-<p>帧曝光时间Ft和帧率f的关系为：f = 1 / Ft，曝光时间的计算方法由sensor厂商提供。</p>
-<p>EV曝光值（exposure value），摄影技术中定义的曝光值参数，代表能够给出同样曝光的所有相机光圈组合。它的定义是：$EV = \log(N^2 \div t)$<br>其中N是光圈的f-stop值；t是曝光时间，单位为秒。</p>
-<p>EV0 对应于ISO100，曝光时间为1秒，光圈为f/1.0，以及与之等效的所有曝光组合，这些组合可以使18%的中性灰卡在所处光照条件下获得合适的曝光。因此曝光值主要体现了拍摄场景的亮度，同时在一定程度上也能反映相机的灵敏度。</p>
-<p>曝光值每增加1称为增加一挡曝光，也就是将曝光量减半，比如将曝光时间或光圈面积减半，因此可以从EV0出发，按照光圈、快门加倍或减半的方式推导出其余的曝光档位，一般常用的档位在-6~20之间。</p>
-<p>如果已知使画面正确曝光的EV值，则可以在下表中选择一个合适的曝光时间+光圈组合。举例来说，假设已知某拍摄场景正确曝光需要EV2，在固定ISO100的前提下，光圈和快门组合只能在（1s,f/2），（1/2s,f/1.4），（1/4s,f/1）这三个方案中选择一个。</p>
-<p><img src="/images/sensor/v2-c02e83e125e4c8ef22e1ed881274f0a0_b.jpg" alt="img"></p>
-<p>下表给出了EV0~EV20的典型场景。<br><img src="/images/sensor/v2-6e533fff18f0d918e10799c77da24350_b.jpg" alt="img"></p>
-<p>下表给出了更完整的EV数据，同时包含了ISO，光圈和快门值<br><img src="/images/sensor/v2-fdcf59270dee877d6e1b9d79bf9c625f_b.jpg" alt="img"></p>
-<p>光圈、快门、增益都可以影响画面亮度，但是这三者在效能上并不是完全等价的。摄影领域常用一个曝光三角形来形象地阐释三者之间的关系。<br><img src="/images/sensor/v2-af09e43949d8c5d8dc36214597209286_b.jpg" alt="img"></p>
-<p>光圈（aperture）的副作用主要是影响景深。快门的副作用主要是影响运动模糊。一般而言，当曝光时间大于15ms时，画面中速度大于40km/h的车辆就会开始变模糊。当曝光时间大于30ms时，画面中走动的人就会变模糊。因此拍摄对象的预期移动速度基本上决定了曝光时间的上限。增益的副作用主要表现为画面噪声，尤其是数字增益会引入较大的噪声，显著降低图像质量。<br><img src="/images/sensor/v2-ed7c2425f86f43612ef449e0bff2ce4a_b.jpg" alt="img"></p>
-<h3 id="AWB"><a href="#AWB" class="headerlink" title="AWB"></a>AWB</h3><p>色温随可见光的光谱成分变化而变化，在低色温光源下，白色物体偏红，在高色温光源下，白色物体偏蓝。人眼可根据大脑的记忆判断，识别物体的真实颜色，AWB（自动白平衡调整Auto White Balance ） 算法的功能是降低外界光源对物体真实颜色的影响，使得我们采集的颜色信息转变为在理想日光光源下的无偏色信息。要求在不同色温环境下，照白色的物体，屏幕中的图像应也是白色的。</p>
-<ul>
-<li><p>色温的定义：将黑体从绝对零度开始加温，当温度升高到一定程度时候，黑体便辐射出可见光，其光谱成份以及给人的感觉也会着温度的不断升高发生相应的变化。于是，就把黑体辐射一定色光的温度定为发射相同色光光源的色温。</p>
-</li>
-<li><p>白平衡：在不同色温的光源下，白色在传感器中的响应会偏蓝或偏红。白平衡算法通过调整 R, G, B 三个颜色通道的强度，使白色真实呈现。</p>
-</li>
-</ul>
-<h3 id="3DNR"><a href="#3DNR" class="headerlink" title="3DNR"></a>3DNR</h3><p>2D降噪：只在2维空间域上进行降噪处理。对一个像素将其与周围像素平均，平均后噪声降低，但缺点是会造成画面模糊，特别是物体边缘部分。因此对这种算法的改进主要是进行边缘检测，边缘部分的像素不用来进行模糊。</p>
-<p>3D降噪即3D DNR（3D Digital Noise Reducer），通过对比相邻的几帧图像，将图像信号中不重叠的噪波自动滤出。目前比较普遍的是进行Y/C分离，即从视频信号中将亮度信号（Y）和颜色信号（C）分离，然后对Y信号，C信号进行3维数字降噪。3D降噪增添了时域处理，因此变为3维。和2D降噪的不同在于，2D降噪只考虑一帧图像，而3D降噪进一步考虑帧与帧之间的时域关系，对每个像素进行时域上的平均，故计算量大，耗时更长。</p>
-<h3 id="BLC"><a href="#BLC" class="headerlink" title="BLC"></a>BLC</h3><p>BLC（Black Level Correction）/ Black Level Compensate (OBC) ：黑电平校正。黑电平是在没有外界光线输入时，理想情况下像素值应该是0，但是实际中因为sensor暗电流作用仍会输出的亮度值。ISP 需要减去这个亮度值（这一个值会受到AWBGain，CCM，Gamma的影响）。</p>
-<h3 id="LSC"><a href="#LSC" class="headerlink" title="LSC"></a>LSC</h3><p>LSC（Lens Shading Correction）/Color Shading ：阴影校正。Lens Shading是由于镜片从边缘到中心对入射光线的反射程度不同，镜头中心接收的光强大，边缘接收的光强较少， 造成图像从中心到边缘亮度逐渐变暗。Color Shading是由于Lens从中心到边缘，其R、G、B变暗的速率不一样，总体表现就是Gb/Gr像素值差异较大，两个像素之间有细微纹理。</p>
-<h3 id="CCM"><a href="#CCM" class="headerlink" title="CCM"></a>CCM</h3><p>CCM（Color Correction Matrix/ DSC color calibration）：颜色校正矩阵。sensor 对光谱的响应在 RGB 各分量上与人眼对光谱的响应通常是有偏差的，拍摄color checker24色板，将相机拍摄图片值与色板标准值之间进行对比，得出一组能将拍摄值校正到最接近标准值的3x3矩阵。通常通过一个色彩校正矩阵对所有相机拍摄的图片进行颜色校正，使图像与人眼视觉在色彩上保持一致。</p>
-<p><img src="/images/sensor/image-20200221200943546.png" alt="image-20200221200943546"><br>m<del>RR</del> + m<del>RG</del> + m<del>RB</del> = 256<br>m<del>GR</del> + m<del>GG</del> + m<del>GB</del> = 256<br>m<del>BR</del> + m<del>BG</del> + m<del>BB</del> = 256</p>
-<p>（2）DPC/BPD（Defect Pixel Correction/Bad Pixel Detect）：坏点校正/坏点检测。相机中成像坏点一般是白色或者黑色的点，和周围像素点的差异明显。</p>
-<p>（3）FPN（Fix Pattern Noise）：固定模式噪声。由于CMOS每个感光二极体旁都搭配一个ADC 放大器，如果以百万像素计，那么就需要百万个以上的 ADC 放大器，但是每个像素结构中的光电二极管的尺寸、掺杂浓度、生产过程中的沾污以及MOS场效应管的参数的偏差等都会造成像素输出信号的变化。对于给定的单个像素它是固定的。通常消除固定模式噪声采用“双采样降噪”方法，这是CMOS 感光器件特有的一种降噪方式。在光线较暗的环境下使用时，画面会有明显的噪声，这时通过对景物进行两次不同曝光率和敏感度的采样，然后将两次采样的结果进行综合处理，就可以有效解决低照度下的图像噪声问题。</p>
-<p>（5）Flare offset：光学上称Flare也叫stray light,耀斑补偿。镜片的表面反射或镜筒、反光镜组的内面所引起的反射光，到达底面后造成画面整体或一部份产生了雾蒙，降低了图像的鲜锐度。镜片的镀膜及内面防反射处理的加强，固然可以大幅度地减少光斑，但被摄体的状况并不相同，不可能完全消除。</p>
-<p>因此，在相机里面设计都是黑色的，且其内侧表明设计都是粗糙的，目前就是为了减小flare。flare如何修正？做直方图，然后每阶的亮度都往下降，这样是否会影响颜色呢？因此，flare一定要是在linear domain去做，不能在RGB domain去做。</p>
-<p>（9）DM（Demosaicing/Color Filter Array Interpolation/CFA插值）：CMOS Sensor出来的RawData是Bayer格式的图像，每个像素只有一个通道的信息。DM是将Bayer格式的图像恢复成每个像素用RGB三通道表示的方式。DM的主要依据是图像在平滑的局部区域，各分量的ratio是相等的。插值算法的好坏会影响图片的细节，如摩尔纹。</p>
-<p>（12）EE（Edge Enhancement/Edge Sharpening）：锐化，边缘增强。通过滤波器获取图像的高频分量，按照一定的比例将高频部分和原图进行加权求和获取锐化后的图像。</p>
-<p>（13）DRC/HDR（Dynamic Range Compression/ High-Dynamic Range）：宽动态。高动态图像的拍摄出来的结果通常会有，亮部太亮，暗部太暗的问题。DRC是调整图像暗部亮度使之变亮，调整亮部亮度使之变暗，而且保持图像的对比度。</p>
-<p>（14）PCA/VDE：Hue，Saturation，Contrast，Brightness调试。单独针对Hue，Saturation，Contrast，Brightness各图像分量进行调节。</p>
-<p>（15）Histogram：直方图均衡化。重新分布图片的亮度。使图片的亮度分布更加均匀。</p>
-<p>（16）FlashLight Control：闪光灯控制</p>
-<p>（17）Cross talk：Optical cross-talk是当主光线进光角度过大，导致光线不能有效地进入本像素的Microlens内，而是进入相邻像素单元或其他无效区域内的现象。</p>
-<p>Electric cross-talk：相邻单元之间的光生少数载流子通过衬底扩散和漏电相互影响造成相邻单元的现象。</p>
-<p>上述原因导致结果都是图像在对角线上相邻两个像素的Gr和Gb value差异较大而产生不平滑的纹理状。</p>
-<p>（18）Gradation Control（GDC）：可能是对图像数据精度进行的操作</p>
-<p>（19）Scaler：对图像进行缩放，缩放的过程中采样和插值直接影响图像的细节质量。</p>
-<p>（20）Adaptive tone scale：(这个没有办法处理多种场景)进来的影像，根据histogram，可以调节，让其明暗亮度的曲线比较好看。因此，它最重要的就是histogram equalization，其关键是在哪个domain去做。目前我们的做法应该是在L*做histogram，但只做edge的histogram，这样就ok了。</p>
-<p>（21）Dynamic Range Compression：就是把暗的地方变亮一些，亮的地方变暗一些。AE的主要目的是避免亮度饱和的pixels，其余exposure的pixel可以通过DRC校准回来。</p>
-<h2 id="Iris"><a href="#Iris" class="headerlink" title="Iris"></a>Iris</h2><p>光圈是镜头上的一个组件，由机械或电压控制，可通过控制通光孔的开合程度，控制进光量的大小，光圈的进光量与其f值的平方成反比。DC-Iris不能精确定位，P-Iris能精确定位。</p>
-<p>计量光学系统的通光量时使用f-stop作为计量单位，f-stop = f （镜头焦距）/ D（光圈孔径），f-stop值越大表示光圈孔径越小，常用的f-stop值一般在1.4~22之间,如下图所示。<br><img src="/images/sensor/v2-910b34243ef1be1dfba55f6f564290a0_720w.jpg" alt="img"></p>
-<p>由于f-stop反比于光圈孔径，根据圆面积公式S=πD^2/4，镜头的实际通光量与f-stop的平方成反比，它们之间名义上的对应关系如下。<br><img src="/images/sensor/v2-907684804fe2f746a039be86ab42a9cf_720w.jpg" alt="img"></p>
-<p>一般来说，光圈f值从f1.8<del>f22较常见， 其中 f1.8</del>f5.4，室内用得多一些；而f5.0以上室外用得多，暗场景一般使用最小的f值光圈以获得较大的通光量。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/pc/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/pc/" class="post-title-link" itemprop="url">计算机组成原理</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:39:27" itemprop="dateModified" datetime="2022-06-08T20:39:27+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="计算机组成"><a href="#计算机组成" class="headerlink" title="计算机组成"></a>计算机组成</h2><p><strong>计算机由控制器、存储器、运算器、输入设备和输出设备5个部件组成</strong>。</p>
-<p>度量计算机性能的指标有响应时间和吞吐率，<strong>响应时间</strong>是指完成一个任务所需的总时间，<strong>吞吐量</strong>表示单位时间内完成的任务数量。</p>
-<p>集成电路主要用的是CMOS，其主要能耗来源是晶体管开头过程中产生的动态能耗，其値取决于每个晶体管的负载电容和工作电压：能耗 = 负载电容 x 电压^2^ 。每个晶体管需要的功耗是一个翻转能耗和开头频率的乘积： 功耗 = 负载电容 x 电压^2^ x 开头频率。</p>
-<h2 id="计算机设计思想"><a href="#计算机设计思想" class="headerlink" title="计算机设计思想"></a>计算机设计思想</h2><ol>
-<li>面向摩尔定律的设计，摩尔定律是指单芯片上的集成度每18 -24月翻一番。设计者必须预测其设计完成时的工艺水平。</li>
-<li>使用抽象简化设计，用抽象表示不同的设计层次，在高层次中看不到低层次的细节。</li>
-<li>加速大概率事件远比优化小概率事件更能提高性能。</li>
-<li>并行执行提高性能。</li>
-<li>通过流水线提高性能。</li>
-<li>通过预测提高性能。</li>
-<li>通过使用冗余部件提高系统的可靠性。比如汽车的备用轮胎。</li>
-<li>存储器层次结构，较快的存储器靠近处理器。</li>
-</ol>
-<h2 id="存储器结构"><a href="#存储器结构" class="headerlink" title="存储器结构"></a>存储器结构</h2><h3 id="冯诺依曼结构"><a href="#冯诺依曼结构" class="headerlink" title="冯诺依曼结构"></a>冯诺依曼结构</h3><p>冯·诺依曼结构，又称为普林斯顿体系结构，是一种将程序指令存储器和数据存储器合并在一起的存储器结构。取指令和取操作数都在同一总线上，通过分时复用的方式进行；缺点是在高速运行时，不能达到同时取指令和取操作数，从而形成了传输过程的瓶颈。由于程序指令存储地址和数据存储地址指向同一个存储器的不同物理位置，因此程序指令和数据的宽度相同。</p>
-<p><img src="/images/cpu/Princeton.jpg" alt="img"></p>
-<h3 id="哈佛结构"><a href="#哈佛结构" class="headerlink" title="哈佛结构"></a>哈佛结构</h3><p>哈佛结构是一种将程序指令存储和数据存储分开的存储器结构，它的主要特点是将程序和数据存储在不同的存储空间中，即程序存储器和数据存储器是两个独立的存储器，每个存储器独立编址、独立访问，目的是为了减轻程序运行时的访存瓶颈。</p>
-<p><img src="/images/cpu/Harvard.jpg" alt="img"></p>
-<p>哈佛结构的中央处理器首先到程序指令储存器中读取程序指令内容，解码后得到数据地址，再到相应的数据储存器中读取数据。程序指令储存和数据储存分开，数据和指令的储存可以同时进行，可以使指令和数据有不同的数据宽度。</p>
-<h2 id="算术运算"><a href="#算术运算" class="headerlink" title="算术运算"></a>算术运算</h2><h3 id="补码"><a href="#补码" class="headerlink" title="补码"></a>补码</h3><p><strong>原码</strong>：用第一位表示符号，其余位表示值，负数符号位为1。</p>
-<p><strong>反码</strong>：正数的反码是其本身，负数的反码是在其原码的基础上，符号位不变，其余各个位取反。</p>
-<p><strong>补码</strong>：正数的补码就是其本身，负数的补码是在其原码的基础上，符号位不变，其余各位取反，最后+1。</p>
-<blockquote>
-<p>[+1] = [00000001]原 = [00000001]反 = [00000001]补</p>
-<p>[-1] = [10000001]原 = [11111110]反 = [11111111]补</p>
-</blockquote>
-<p><strong>移码</strong>：将符号位取反的补码（不区分正负）。</p>
-<p>原码使数字有了正负概念，但是计算不正确，正负相加不等于0，而且存在+0和-0。反码解决了正负相加不等于0的问题。为了追求连续性和唯一性，补码修复了存在两个0编码的问题，而且还能够多表示一个最低数，所以1个字节能表示的范围为[-128, 127]。</p>
-<p>用[0000 0000]表示0, 而以前出现问题的-0则不存在了.而且可以用[1000 0000]表示-128:</p>
-<blockquote>
-<p>(-1) + (-127) = [1000 0001]原 + [1111 1111]原 = [1111 1111]补 + [1000 0001]补 = [1000 0000]补</p>
-</blockquote>
-<h3 id="加法"><a href="#加法" class="headerlink" title="加法"></a>加法</h3><h3 id="乘法"><a href="#乘法" class="headerlink" title="乘法"></a>乘法</h3><h3 id="除法"><a href="#除法" class="headerlink" title="除法"></a>除法</h3><h3 id="浮点运算"><a href="#浮点运算" class="headerlink" title="浮点运算"></a>浮点运算</h3><h4 id="浮点表示"><a href="#浮点表示" class="headerlink" title="浮点表示"></a>浮点表示</h4><p><img src="/images/pc/float_mem.jpg" alt="浮点表示"></p>
-<ul>
-<li>第一段 占 1bit，表示符号位。0代表正数，1代表负数。</li>
-<li>第二段 占 8bits，表示指数。代称为 E(Exponent)。</li>
-<li>第三段 占 23bits，表示尾数。代称为 M(Mantissa)。</li>
-</ul>
-<p>浮点数在计算机存储使用二进制科学计数法。如小数 78.375，符号位为0，指数为6，尾数是001110011。</p>
-<blockquote>
-<p>整数部分：(78)<del>10</del> = (100 1110)<del>2</del><br>小数部分：(0.375)<del>10</del>　=　3/8 = 1/4 + 1/8 = 2^-2^ + 2^-3^ = (0.01)<del>2</del> + (0.001)<del>2</del> = (0.011)<del>2</del><br>(78.375)<del>10</del> = (1001110.011)<del>2</del> = 1.001110011 * 2^6^</p>
-</blockquote>
-<p>对于 int 和 float 变量类型不能使用强制类型转换，要通过float指针来转换。</p>
-<h4 id="浮点加法"><a href="#浮点加法" class="headerlink" title="浮点加法"></a>浮点加法</h4><h4 id="浮点乘法"><a href="#浮点乘法" class="headerlink" title="浮点乘法"></a>浮点乘法</h4><h2 id="时钟"><a href="#时钟" class="headerlink" title="时钟"></a>时钟</h2><p>时钟周期也叫振荡周期或晶振周期，即晶振的单位时间发出的脉冲数。是计算机中最基本的、最小的时间单位。</p>
-<p>机器周期：在计算机中，为了便于管理，常把一条指令的执行过程划分为若干个阶段，每一阶段完成一项工作。例如，取指令、存储器读、存储器写等，这每一项工作称为一个基本操作。完成一个基本操作所需要的时间称为机器周期。8051单片机的机器周期由6个状态周期组成，也就是说一个机器周期=6个状态周期=12个时钟周期。机器周期也是单片机定时器和计数器的时间基准。例如一个单片机选择了12MHZ晶振，那么当定时器的数值加1时，实际经过的时间就是1us。</p>
-<p>指令周期是执行一条指令所需要的时间，一般由若干个机器周期组成。指令不同，所需的机器周期数也不同。</p>
-<p>系统时钟就是CPU指令运行的频率，系统时钟由晶振或内部RC产生。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/cpu/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/cpu/" class="post-title-link" itemprop="url">各种处理器介绍</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:34:03" itemprop="dateModified" datetime="2022-06-08T20:34:03+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><img src="/images/cpu/cpu.jpg" alt="img"></p>
-<p>cpu内部由控制器、运算器、寄存器、时钟4部分组成。</p>
-<h2 id="处理器架构"><a href="#处理器架构" class="headerlink" title="处理器架构"></a>处理器架构</h2><h3 id="CISC"><a href="#CISC" class="headerlink" title="CISC"></a>CISC</h3><p>CISC（Complex Instruction Set Computer，复杂指令集计算机）是一种微处理器指令集架构（ISA），每个指令可执行若干低阶操作，诸如从内存读取、储存、和计算操作，全部集于单一指令之中。CISC特点：</p>
-<ul>
-<li>指令系统庞大，指令功能复杂，指令格式、寻址方式多；</li>
-<li>绝大多数指令需多个机器周期完成；</li>
-<li>各种指令都可访问存储器；</li>
-<li>采用微程序控制；</li>
-<li>有专用寄存器，少量；</li>
-<li>难以用优化编译技术生成高效的目标代码程序；</li>
-</ul>
-<p>在CISC指令集的各种指令中，大约有20%的指令会被反复使用，占整个程序代码的80%。而余下的80%的指令却不经常使用，在程序设计中只占20%。</p>
-<h3 id="RISC"><a href="#RISC" class="headerlink" title="RISC"></a>RISC</h3><p>RISC（Reduced Instruction Set Computer，精简指令集计算机）对指令数目和寻址方式都做了精简，使其实现更容易，指令并行执行程度更好，编译器的效率更高。它能够以更快的速度执行操作。现在的RISC指令集也达到数百条，运行周期也不再固定。RISC设计的根本原则—针对流水线化的处理器优化。RISC特点：</p>
-<ul>
-<li>统一指令编码（例如，所有指令中的op-code永远位于同样的位元位置、等长指令），可快速解译；</li>
-<li>泛用的暂存器，所有暂存器可用于所有内容，以及编译器设计的单纯化（不过暂存器中区分了整数和浮点数）；</li>
-<li>单纯的寻址模式（复杂寻址模式以简单计算指令序列取代）；</li>
-<li>硬件中支援少数资料型别（例如，一些CISC电脑中存有处理字节字串的指令。这在RISC电脑中不太可能出现）。</li>
-<li>　所有计算都要在寄存器中完成。而寄存器和内存的通信则由单独的指令完成。</li>
-<li>有非常多的通用寄存器，并采用了重叠寄存器窗口和寄存器堆等技术使寄存器资源得到充分的利用。</li>
-</ul>
-<p>**[区别]**：</p>
-<p>CISC和RISC是当前CPU的两种架构。它们的区别在于不同的CPU设计理念和方法。早期的CPU全部是CISC架构，它的设计目的是用最少的机器语言指令来完成所需的计算任务。它们的差异主要有：</p>
-<ol>
-<li><p>指令系统：RISC设计者把主要精力放在那些经常使用的指令上，尽量使它们具有简单高效的特色。对不常用的功能，常通过组合指令来完成。因此，在RISC机器上实现特殊功能时，效率可能较低。但可以利用流水技术和超标量技术加以改进和弥补。而CISC计算机的指令系统比较丰富，有专用指令来完成特定的功能。因此，处理特殊任务效率较高。</p>
-</li>
-<li><p>存储器操作：RISC对存储器操作有限制，使控制简单化；而CISC机器的存储器操作指令多，操作直接。</p>
-</li>
-<li><p>程序：RISC汇编语言程序一般需要较大的内存空间，实现特殊功能时程序复杂，不易设计；而CISC汇编语言程序编程相对简单，科学计算及复杂操作的程序社设计相对容易，效率较高。</p>
-</li>
-<li><p>中断：RISC机器在一条指令执行的适当地方可以响应中断；而CISC机器是在一条指令执行结束后响应中断。</p>
-</li>
-<li><p>CPU：RISCCPU包含有较少的单元电路，因而面积小、功耗低；而CISCCPU包含有丰富的电路单元，因而功能强、面积大、功耗大。</p>
-</li>
-<li><p>设计周期：RISC微处理器结构简单，布局紧凑，设计周期短，且易于采用最新技术；CISC微处理器结构复杂，设计周期长。</p>
-</li>
-<li><p>用户使用：RISC微处理器结构简单，指令规整，性能容易把握，易学易用；CISC微处理器结构复杂，功能强大，实现特殊功能容易。</p>
-</li>
-<li><p>应用范围：由于RISC指令系统的确定与特定的应用领域有关，故RISC机器更适合于专用机；而CISC机器则更适合于通用机。</p>
-</li>
-</ol>
-<h3 id="x86"><a href="#x86" class="headerlink" title="x86"></a>x86</h3><p>x86或80x86是英特尔首先开发制造的一种微处理器体系结构的泛称。该系列较早期的处理器名称是以数字来表示，并以“86”作为结尾，包括Intel 8086、80186、80286、80386以及80486，因此其架构被称为“x86”。成为了个人电脑的标准平台</p>
-<p>x86架构于1978年推出的Intel 8086中央处理器中首度出现，它是从Intel 8008处理器中发展而来的，而8008则是发展自Intel 4004的。8086在三年后为IBM PC所选用，之后x86便，成为了历来最成功的CPU架构。</p>
-<p>8086是16位元处理器；直到1985年32位元的80386的开发，这个架构都维持是16位元。接着一系列的处理器表示了32位元架构的细微改进，推出了数种的扩充，直到2003年AMD对于这个架构发展了64位元的扩充，并命名为AMD64。后来Intel也推出了与之兼容的处理器，并命名为Intel 64。两者一般被统称为x86-64或x64，开创了x86的64位时代。</p>
-<p>x86架构是重要地可变指令长度的CISC。字组（word, 4字节）长度的内存存取允许不对齐内存位址，字组是以低位字节在前的顺序储存在内存中。向后相容性一直都是在x86架构的发展背后一股驱动力量。但在较新的微架构中，x86处理器会把x86指令转换为更像RISC的微指令再予执行，从而获得可与RISC比拟的超标量性能，而仍然保持向前兼容。</p>
-<p>X86指令集只有8个通用寄存器。所以，CISC的CPU执行是大多数时间是在访问存储器中的数据，而不是寄存器中的。这就拖慢了整个系统的速度。</p>
-<h3 id="ARM"><a href="#ARM" class="headerlink" title="ARM"></a>ARM</h3><p>ARM架构（进阶精简指令集机器（AdvancedRISC Machine），是一个32位RISC处理器架构，广泛地使用在许多嵌入式系统设计。由于节能的特点，ARM处理器非常适用于移动通讯领域，符合其主要设计目标为低耗电的特性。</p>
-<p>ARM采用的RISC体系最大特点是指令长度固定，指令格式种类少，寻址方式种类少，大多数是简单指令且都能在一个时钟周期内完成，易于设计超标量与流水线，寄存器数量多，大量操作在寄存器之间进行，因此有较快运行速度。</p>
-<p>ARM指令集的特点：</p>
-<ul>
-<li>体积小，低功耗，低成本，高性能；</li>
-<li>支持 Thumb（16位）/ARM（32位）双指令集，能很好的兼容8位/16位器件；</li>
-<li>大量使用寄存器，指令执行速度更快，大多数数据操作都在寄存器中完成；</li>
-<li>寻址方式灵活简单，执行效率高；</li>
-<li>指令长度固定，流水线处理方式</li>
-</ul>
-<h3 id="MIPS"><a href="#MIPS" class="headerlink" title="MIPS"></a>MIPS</h3><p>MIPS架构（无内部互锁流水级的微处理器，Microprocessorwithout Interlocked Pipeline Stages），是一种采取精简指令集的处理器架构，1981年出现，由MIPS科技公司开发并授权，广泛被使用在许多电子产品、网络设备、个人娱乐装置与商业装置上。其机制是尽量利用软件办法避免流水线中的数据相关问题。它最早是在80年代初期由斯坦福大学Hennessy教授领导的研究小组研制出来的。MIPS公司的R系列就是在此基础上开发的RISC工业产品的微处理器。这些系列产品为很多计算机公司采用构成各种工作站和计算机系统。</p>
-<p>MIPS是出现最早的商业RISC架构芯片之一。MIPS的系统结构及设计理念比较先进，强调软硬件协同提高性能，同时简化硬件设计。</p>
-<p>**[ARM与MIPS对比]**：</p>
-<p>MIPS架构的优势：</p>
-<ol>
-<li><p>MIPS支持64bit指令和操作，ARM目前只到32bit。</p>
-</li>
-<li><p>MIPS有专门的除法器，可以执行除法指令。</p>
-</li>
-<li><p>MIPS的内核寄存器比ARM多一倍，所以同样的性能下MIPS的功耗会比ARM更低，同样功耗下性能比ARM更高。</p>
-</li>
-<li><p>MIPS指令比ARM稍微多一点，稍微灵活一点。</p>
-</li>
-<li><p>ARM很昂贵，而且不能随意自行更改内核。而MIPS就要开放的多了。</p>
-</li>
-</ol>
-<p>MIPS架构的不足：</p>
-<ol>
-<li><p>MIPS的内存地址起始有问题，这导致了MIPS在内存和cache的支持方面都有限制，现在的MIPS处理器单内核面对高容量内存时有问题</p>
-</li>
-<li><p>MIPS今后的发展方向是并行线程，类似INTEL的超线程，而ARM未来的发展方向是物理多核，目前看来物理多核占优。由此来看，我国的龙芯向多核发展还是颇具远见的。</p>
-</li>
-<li><p>MIPS虽然结构更加简单，但是到现在还是顺序单发射，ARM已经进化到了乱序双发射，甚至NV的丹佛已经是乱序三发射了。</p>
-</li>
-</ol>
-<h2 id="各种处理器"><a href="#各种处理器" class="headerlink" title="各种处理器"></a>各种处理器</h2><p>DSP – Digital Signal Processor，是一种专用于数字信号处理的微处理器。内部采用程序和数据分开的哈佛结构，具有专门的硬件乘法器，广泛采用流水线操作，提供特殊的DSP指令，可以用来快速的实现各种数字信号处理算法。功耗更低。</p>
-<p>FPGA – Field－Programmable Gate Array，现场可编程门阵列。</p>
-<p>APU – Accelerated Processing Unit, 加速处理器，AMD公司推出加速图像处理芯片产品。</p>
-<p>BPU – Brain Processing Unit, 地平线公司主导的嵌入式处理器架构。</p>
-<p>CPU – Central Processing Unit，中央处理器。CPU主要包括控制器、运算器，其中还包括高速缓冲存储器及实现它们之间联系的数据、控制的总线。主要功能为处理指令、执行操作、控制时间、处理数据。</p>
-<p>DPU – Deep learning Processing Unit, 深度学习处理器，最早由国内深鉴科技提出；另说有Dataflow Processing Unit 数据流处理器， Wave Computing 公司提出的AI架构；Data storage Processing Unit，深圳大普微的智能固态硬盘处理器。</p>
-<p>FPU – Floating Processing Unit 浮点计算单元，通用处理器中的浮点运算模块。</p>
-<p>GPU – Graphics Processing Unit，图形处理单元，采用多线程SIMD架构，为图形处理而生。它是显卡的处理器，专为执行复杂的数学和几何计算而设计的，这些计算是图形渲染所必需的。</p>
-<p>HPU – Holographics Processing Unit 全息图像处理器， 微软出品的全息计算芯片与设备。</p>
-<p>IPU – Intelligence Processing Unit， Deep Mind投资的Graphcore公司出品的AI处理器产品。</p>
-<p>MCU – Microcontroller Unit，微控制单元，又称单片机，是把CPU的频率与规格做适当缩减，并将内存、计数器、USB、A/D转换、UART、PLC、DMA等周边接口，甚至LCD驱动电路都整合在单一芯片上，形成芯片级的计算机。</p>
-<p>NPU – Neural Network Processing Unit，神经网络处理单元，是基于神经网络算法与加速的新型处理器总称。</p>
-<p>RPU – Radio Processing Unit, 无线电处理器， Imagination Technologies 公司推出的集合集Wifi/蓝牙/FM/处理器为单片的处理器。</p>
-<p>TPU – Tensor Processing Unit 张量处理器， Google 公司推出的为机器学习而定制的芯片，经过了专门深度机器学习方面的训练，它有更高效能（每瓦计算能力）。目前一代TPU面向Inference，二代面向训练。</p>
-<p>VPU – Vector Processing Unit 矢量处理器，Intel收购的Movidius公司推出的图像处理与人工智能的专用芯片的加速计算核心。</p>
-<p>WPU – Wearable Processing Unit， 可穿戴处理器，Ineda Systems公司推出的可穿戴片上系统产品，包含GPU/MIPS CPU等IP。</p>
-<p>XPU – 百度与Xilinx公司在2017年Hotchips大会上发布的FPGA智能云加速，含256核。</p>
-<p>ZPU – Zylin Processing Unit, 由挪威Zylin 公司推出的一款32位开源处理器。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/memory/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/memory/" class="post-title-link" itemprop="url">memory and disk</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:34:18" itemprop="dateModified" datetime="2022-06-08T20:34:18+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="ROM"><a href="#ROM" class="headerlink" title="ROM"></a>ROM</h2><p><strong>ROM</strong> (Read Only Memory)程序存储器，在掉电之后仍然可以保持数据，用于存储各种固化程序和数据。</p>
-<p><strong>PROM</strong> (Programmable ROM，可编程ROM)，写入时，烧录器通过高电压在芯片内永久地烧断或者建立内部连接（熔丝或反熔丝），因此只能一次编程。</p>
-<p><strong>EPROM</strong> (Erasable Programmable ROM，可擦去可编程ROM)，使用紫外线照射此类型的ROM可以抹去其中的数据。</p>
-<p><strong>EEPROM</strong> (Electrically Erasable Programmable ROM，电可擦去可编程ROM)，使用电来对其进行擦写，常用于电脑系统的BIOS。</p>
-<h2 id="RAM"><a href="#RAM" class="headerlink" title="RAM"></a>RAM</h2><p><strong>RAM</strong> (Random Access Memory)随机访问存储器，存储单元的内容可按照需要随机取出或存入，且存取的速度与存储单元的位置无关。在掉电之后就丢失数据，主要用来存储程序中用到的变量。随机存储器主要分两种：静态随机存储器SRAM和动态随机存储器DRAM。</p>
-<p><strong>DRAM</strong> (Dynamic RAM/DRAM)动态随机存储器，DRAM保留数据的时间很短，需要周期性地刷新。计算机内存就是DRAM的。</p>
-<p>DRAM利用MOS管的栅电容上的电荷来存储信息，存储单元存储的是0还是1取决于电容是否有电荷，有电荷代表1，无电荷代表0。由于栅极会漏电，所以每隔一定的时间就需要一个刷新机构给这些栅电容补充电荷，这个就叫动态刷新。刷新操作定期对电容进行检查，若电量大于满电量的1/2，则认为其代表1，并把电容充满电；若电量小于1/2，则认为其代表0，并把电容放电，以此来保持数据的连续性。</p>
-<p><strong>SRAM</strong> (Static Random-Access Memory)静态随机存取存储器，只要保持通电，里面储存的数据就可以一直保持，对任何数据访问的时间都是固定的。SRAM的优点是只要器件不掉电，存储内容就不丢失，工作速度快。缺点是集成度低、功耗大、价格高。CPU Cache采用的就是这种技术。</p>
-<h2 id="Flash"><a href="#Flash" class="headerlink" title="Flash"></a>Flash</h2><p>Flash 存储器（FLASH EEPROM）又称闪存，快闪。它是EEPROM的一种。它结合了ROM和RAM的长处。不仅具备EEPROM的性能，还不会断电丢失数据同时可以快速读取数据。它于EEPROM的最大区别是，FLASH按扇区操作，而EEPROM按照字节操作。FLASH的电路结构较简单，同样容量占芯片面积较小，成本自然比EEPROM低，因此适合用于做程序存储器。</p>
-<p>flash是非易失存储器，可以对称为块的存储器单元块进行擦写和再编程。任何flash器件的写入操作只能在空或已擦除的单元内进行，所以在进行写入操作之前必须先执行擦除。擦除的过程就是把所有位都写为1的过程，块内的所有字节变为0xFF。擦除是以块为单位进行的。</p>
-<h3 id="Nor-Flash"><a href="#Nor-Flash" class="headerlink" title="Nor Flash"></a>Nor Flash</h3><p>Nor Flash支持随机访问，具有XIP（eXecute In Place）特性，可以像普通ROM一样执行程序。所存储的内容可以直接映射到 CPU 地址空间，不需要拷贝到 RAM 中即可被 CPU 访问。容量小，读操作快，但擦除和写操作慢，块大小范围：64~128KB。NOR flash带有SRAM接口，有足够的地址引脚来寻址，可以很容易地存取其内部的每一个字节。</p>
-<p>Nor Flash根据数据传输的位数可以分为并行（Parallel，即地址线和数据线直接和处理器相连）和串行（SPI，即通过SPI接口和处理器相连）。早期Norflash的接口是parallel的形式，即把数据线和地址线并排与IC的管脚连接。但是后来发现不同容量的Norflash不能硬件上兼容（数据线和地址线的数量不一样），并且封装比较大，占用了较大的PCB板位置，后来逐渐被串行接口的SPI Norflash所取代，至于现在说起NOR flash都直接以SPI flash来代称。</p>
-<p>spi flash 接口定义：</p>
-<ul>
-<li>Standard SPI: CLK, /CS, DI, DO, /WP, /Hold</li>
-<li>Dual SPI: CLK, /CS, IO0, IO1, /WP, /Hold</li>
-<li>Quad SPI: CLK, /CS, IO0, IO1, IO2, IO3</li>
-</ul>
-<h3 id="Nand-Flash"><a href="#Nand-Flash" class="headerlink" title="Nand Flash"></a>Nand Flash</h3><p>Nand Flash是串行接口，容量大，擦除和写都快。块大小范围：8~64KB。没有采取内存的随机读取技术，读和写操作都采用512字节的块。</p>
-<p>Nor的读速度比Nand稍快一些，Nand的写入速度比Nor快很多。</p>
-<p>Nand闪存中每个块的最大擦写次数是一百万次，而Nor的擦写次数是十万次。</p>
-<p><img src="/images/memory/nor_nand.jpg" alt="nor_nand"></p>
-<p>由于Flash固有的电器特性，在读写数据过程中会偶然产生1位或几位数据错误，即位反转。Nand Flash发生位反转的几率要远大于Nor Flash。位反转无法避免，因此使用 Nand Flash 的同时，应采用错误探测/错误更正(EDC/ECC)算法。</p>
-<h2 id="硬盘"><a href="#硬盘" class="headerlink" title="硬盘"></a>硬盘</h2><p>硬盘(Hard Disk Drive，HDD)靠磁性盘片记录二进制数据。</p>
-<p><img src="/images/memory/disk/hdd.jpg" alt="img"></p>
-<p>Track Sector：磁道扇面      Head：磁头      Actuator Arm：悬浮磁臂。</p>
-<p>当磁盘旋转时，磁头若保持在一个位置上，则每个磁头都会在磁盘表面划出一个圆形轨迹，这些圆形轨迹就叫做磁道(Track)。划分分区时，分区大小必须以磁道为参考，一个分区必须包含一个或多个整数磁道，不能只占半个磁道。也就是说如果磁盘有两个磁道，最多只能分成2个分区。</p>
-<p>在有多个盘片构成的盘组中，由不同盘片的面，但处于同一半径圆的多个磁道组成的一个圆柱面(Cylinder)。</p>
-<p>磁盘上的每个磁道被等分为若干个弧段，这些弧段便是硬盘的扇区(Sector)。硬盘的第一个扇区，叫做引导扇区。磁盘上数据读写的最小单位。</p>
-<p>硬盘片的盘面上有一层涂得很薄的磁性材料。写入数据时，通电的磁头会形成磁场，在磁性材料层上留下一个一个小磁化区，每个被磁化的区域代表二进制的1。读取数据时，磁头扫过磁化区的时候能感受到微小的磁场变化。</p>
-<p>操作系统内核中的文件管理系统会将硬盘的扇区组合成<strong>簇</strong>(Data Cluster)，操作系统会记录文件所在簇的编号(文件数据分布在哪几个扇区)，方便查找并读写。</p>
-<p>机械硬盘通过磁头读取旋转的盘片来传输数据，而盘片的转速RPM(Round Per Minute，每分钟的转数)直接决定了硬盘读取和写入数据的速度。目前主流的机械硬盘，转速在6000~7500RPM左右。磁盘在写入数据时，会使用磁盘缓存暂时存储数据。</p>
-<p><strong>磁盘缓存</strong>(Disk Cache)，就是将下载到的数据先保存于系统为软件分配的内存空间中，当保存到内存池中的数据达到一个程度时，便将数据保存到硬盘中。这样可以减少实际的磁盘操作，有效的保护磁盘免于重复的读写操作而导致的损坏。目前主流的500G机械硬盘大都装载64MB的缓存。</p>
-<p>硬盘的主控芯片主要负责：</p>
-<ul>
-<li>控制磁头的读取</li>
-<li>温度检测</li>
-<li>为操作系统的文件管理系统提供逻辑接口</li>
-<li>负责纠错，磁头读写时会使用磁信号，而磁信号的误码率非常高，大约每记录0.6KB的数据就会出现一个bit的错误。</li>
-<li>负责将数据从RAM/硬盘缓存写入，或者将硬盘读出的数据写回RAM。</li>
-</ul>
-<h3 id="RAID"><a href="#RAID" class="headerlink" title="RAID"></a>RAID</h3><p>RAID(独立硬盘冗余阵列，Redundant Array of Independent Disks)，简称磁盘阵列。利用虚拟化存储技术把多个硬盘组合起来，成为一个或多个硬盘阵列组，目的为提升性能或数据冗余，或是两者同时提升。</p>
-<ul>
-<li><strong>RAID0</strong></li>
-</ul>
-<p>RAID0 是一种非常简单的的方式，它将多块磁盘组合在一起形成一个大容量的存储。当我们要写数据的时候，会将数据分为N份，以独立的方式实现N块磁盘的读写，那么这N份数据会同时并发的写到磁盘中，读写性能理论上是单块磁盘的N倍。</p>
-<p>但RAID0的问题是，它并不提供数据校验或冗余备份，因此一旦某块磁盘损坏了，数据就直接丢失，无法恢复了。因此RAID0就不可能用于高要求的业务中，但可以用在对可靠性要求不高，对读写性能要求高的场景中。</p>
-<ul>
-<li><strong>RAID1</strong></li>
-</ul>
-<p>RAID1 是磁盘阵列中单位成本最高的一种方式。因为它的原理是在往磁盘写数据的时候，将同一份数据无差别的写两份到磁盘，分别写到工作磁盘和镜像磁盘，对数据做了冗余备份，但它的实际空间使用率只有50%了，是一种比较昂贵的方案。</p>
-<ul>
-<li><strong>RAID3</strong></li>
-</ul>
-<p>RAID3的方式是：将数据按照RAID0的形式，分成多份同时写入多块磁盘，但是还会另外留出一块磁盘用于写奇偶校验码，一旦某一块磁盘坏掉了，就可以利用那块校验码磁盘去恢复数据。但是由于任何数据的写入都会要去更新这块磁盘，导致这块磁盘的读写是最频繁的，也就非常的容易损坏。</p>
-<ul>
-<li><strong>RAID5</strong></li>
-</ul>
-<p>RAID5对RAID3进行了改进，是一种存储性能、数据安全、存储成本兼顾的方案。</p>
-<p>在RAID5模式中，不再需要用单独的磁盘写校验码了。它把校验码信息分布到各个磁盘上。例如，总共有N块磁盘，那么会将要写入的数据分成N份，并发的写入到N块磁盘中，同时还将数据的校验码信息也写入到这N块磁盘中，数据与对应的校验码信息必须得分开存储在不同的磁盘上。一旦某一块磁盘损坏了，就可以用剩下的数据和对应的奇偶校验码信息去恢复损坏的数据。</p>
-<p><img src="/images/memory/disk/RAID5.jpg" alt="img"></p>
-<p>RAID5的方式，最少需要三块磁盘来组建磁盘阵列，允许最多同时坏一块磁盘。如果有两块磁盘同时损坏了，那数据就无法恢复了。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/usb_if/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/usb_if/" class="post-title-link" itemprop="url">usb接口</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 18:03:15" itemprop="dateModified" datetime="2022-06-08T18:03:15+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><img src="/images/usb/usb-if2.png" alt="usb接口"></p>
-<p><img src="/images/usb/usb-if3.png" alt="usb接口"></p>
-<p><img src="/images/usb/usb_if.bmp" alt="usb接口"></p>
-<p><img src="/images/usb/usb-if.png" alt="usb接口"></p>
-<p>标准USB接口使用标记为D+(绿线)和D-(白线) 的双绞线传输，它们各自使用半双工的差分信号并协同工作，以抵消长导线的电磁干扰。</p>
-<p>Mini USB接口把第4针作为ID线，用来标识身份，mini-A插头的ID引脚接地，而mini-B插头悬空。<strong>USB OTG根据ID线状态判断是主机还是从机，接地为主机，悬空为从机</strong>。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/usb/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/usb/" class="post-title-link" itemprop="url">usb协议</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 18:03:22" itemprop="dateModified" datetime="2022-06-08T18:03:22+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="USB规范"><a href="#USB规范" class="headerlink" title="USB规范"></a>USB规范</h2><p>USB最初是由英特尔与微软公司倡导发起，其最大的特点是支持热插拔(Hot plug)和即插即用(Plug&amp;Play)。</p>
-<p><strong>电压范围4.75 ~ 5.25V</strong>，普通USB接口<strong>最大提供500mA电流</strong>，USB符号后有一个“+”号的，输出电流可达1A。</p>
-<p><strong>一个USB主控制器最多可连接127个设备，各设备之间的距离不超过5米</strong>。</p>
-<table>
-<thead>
-<tr>
-<th align="left">USB版本</th>
-<th align="left">速率称号</th>
-<th align="left">传输速率</th>
-<th align="left">理论速度</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">USB 3.2</td>
-<td align="left">超高速+  Super-Speed+</td>
-<td align="left">20Gbps</td>
-<td align="left">2560MB/s</td>
-</tr>
-<tr>
-<td align="left">USB 3.1 Gen2</td>
-<td align="left">超高速+  Super-Speed+</td>
-<td align="left">10Gbps</td>
-<td align="left">1280MB/s</td>
-</tr>
-<tr>
-<td align="left">USB 3.1 Gen1</td>
-<td align="left">超高速 Super-Speed</td>
-<td align="left">5Gbps</td>
-<td align="left">640MB/s</td>
-</tr>
-<tr>
-<td align="left">USB 2.0</td>
-<td align="left">高速 Hi-Speed</td>
-<td align="left">480Mbps</td>
-<td align="left">60MB/s</td>
-</tr>
-<tr>
-<td align="left">USB 1.1</td>
-<td align="left">全速 Full-Speed</td>
-<td align="left">12Mbps</td>
-<td align="left">1.5MB/s</td>
-</tr>
-<tr>
-<td align="left">USB 1.0</td>
-<td align="left">低速 Low-Speed</td>
-<td align="left">1.5Mbps</td>
-<td align="left">0.192MB/s</td>
-</tr>
-</tbody></table>
-<p>USB2.0 支持 3 种传输速度:低速模式(1.5Mb/s)、全速模式(12Mb/s)和高速模式(480Mb/s)。在低速和全速模式中，采用的是电压传输模式；高速模式下，是电流传输模式。</p>
-<p>USB2.0 规范要求集线器必须支持高速模式，USB2.0 设备则没有这个要求。一个高速的上行收发器不能支持低速信号传输模式。而 USB2.0 下行收发器必须支持高速、全速和低速模式。</p>
-<h3 id="插入检测机制"><a href="#插入检测机制" class="headerlink" title="插入检测机制"></a>插入检测机制</h3><p>在 USB 集线器的每个下游端口的 D+和 D-上，分别接了一个 15kΩ的下拉电阻。当集线器端口没有设备插入时，输入端被这两个下拉电阻拉到了低电平。而在USB 设备端，在 D+或者 D-上，接了一个 1.5kΩ的上拉电阻到 3.3V 的电源。<strong>对于高速设备和全速设备，上拉电阻接在 D+上；低速设备，上拉电阻接在 D-上</strong>。</p>
-<p>当设备插入到集线器时，接了上拉电阻的数据线的电压由 1.5kΩ的上拉电阻和 15kΩ的下拉电阻分压，大概 3V 左右。这是一个高电平信号。集线器检测到该状态后就上报给 Host控制器，这样就检测到设备插入。通过检测高电平的数据线是 D+还是 D-来判断设备是什么速度类型。</p>
-<p>高速设备会首先被判断为全速设备，然后通过集线器和设备两者确认，切换到高速模式下。高速模式下是电流传输模式，此时需要把 D+的上拉电阻断开。</p>
-<h2 id="USB结构"><a href="#USB结构" class="headerlink" title="USB结构"></a>USB结构</h2><p><img src="/images/usb/bus-topology.png" alt="usb拓扑结构"></p>
-<p>USB是一种主从结构的系统，主机叫做Host，从机叫做设备。USB的设计为非对称式的，它由一个主机(host)控制器和若干通过集线器设备以树形连接的设备组成。以根集线器为起点，最多支持7层，也就是说在USB系统中最多允许5个hub级联。一个USB主控制器最多连接127个设备，这是因为协议规定每个USB设备具有一个7bit的地址，地址0是保留给未初始化的设备使用。</p>
-<h3 id="USB-Host"><a href="#USB-Host" class="headerlink" title="USB Host"></a>USB Host</h3><p>主机具有一个或多个usb主控制器和根集线器(root hub)。主控制器负责数据处理。根集线器则提供一个连接主控制器与设备之间的接口和通道，它集成在主机控制器里，不占用地址。</p>
-<p>Host 主要负责:</p>
-<ul>
-<li>检测 USB 设备拔插</li>
-<li>管理 Host 和 Device 之间的控制流、数据流</li>
-<li>收集 USB 总线状态和活动数据信息</li>
-<li>为连入 USB 总线的设备供电</li>
-</ul>
-<h3 id="USB-Device"><a href="#USB-Device" class="headerlink" title="USB Device"></a>USB Device</h3><p>USB 设备通过 HUB 连接到 USB 总线上，此时 HUB 上的接入点称为端口(Port)。连接到 Hub 上的设备可能是单个设备，也可以是复合设备(Compound<br>Device)。每一个 USB 设备提供不同的功能，又被称作 Function。</p>
-<p>USB 设备支持热插拔。USB 设备通过 HUB 连接到 USB 总线。Hub 有一个状态位，标记 USB 设备是插入还是拔出。Host 会查询 Hub 端口的状态位，当检测到设备插入时，Host 将使能该 Hub 对应的 port，并通过默认地址(0)从设备控制管道为设备分配地址。当一个设备从 Hub 的某个 port 拔出时，Hub 将禁能该 port 并报告给 Host。</p>
-<p>从 USB 系统角度而言，一个逻辑上的 USB 设备是一个端点的集合。分组的端点构成一个接口(Interface)。USB 系统通过管道来管理接口，通过 Host 上的 Buffer 和 USB 设备上的端点来请求数据。 Host Controller 打包数据并将数据包发送出去。</p>
-<h3 id="USB-Hub"><a href="#USB-Hub" class="headerlink" title="USB Hub"></a>USB Hub</h3><p>USB集线器是一种可以对原有的USB口在数量上进行扩展的设备。hub提供了设备连接检测和设备移除检测的能力，并给各下行端口供电。 可以单独使能下行端口，不同端口可以工作在不同的速度等级。</p>
-<h2 id="USB通信协议"><a href="#USB通信协议" class="headerlink" title="USB通信协议"></a>USB通信协议</h2><h3 id="字节顺序"><a href="#字节顺序" class="headerlink" title="字节顺序"></a>字节顺序</h3><p>数据在 USB 线里传送是低位在前高位在后。USB 采用 NRZI(非归零编码)对发送的数据包进行编码，即:输入数据 0，编码成“电平翻转”；输入数据 1，编码成“电平保持”。</p>
-<p><img src="/images/usb/NRZI.png" alt="NRZI编码"></p>
-<p>USB提供了4 种传输方式：</p>
-<ul>
-<li>控制(Control)传输方式。双向传输，数据量通常较小，主要用来进行查询、配置和给 USB 设备发送通用的命令。</li>
-<li>同步(Synchronization)传输方式。提供了确定的带宽和间隔时间，它被用于时间严格并具有较强容错性的流数据传输，或者用于要求恒定的数据传送率的即时应用。例如进行语音业务传输时，使用同步传输方式是很好的选择</li>
-<li>中断(Interrupt)传输方式。传送是单向的，对于 USB 主机而言，只有输入。中断传输方式主要用于定时查询设备是否有中断数据要传送，该传输方式应用在少量的、分散的、不可预测的数据传输场合，键盘、游戏杆和鼠标属于这一类型。</li>
-<li>批量(Bulk)传输方式。主要应用在没有带宽和间隔时间要求的批量数据的传送和接收，它要求保证传输打印机和扫描仪属于这种类型。</li>
-</ul>
-<h2 id="USB协议"><a href="#USB协议" class="headerlink" title="USB协议"></a>USB协议</h2><p>USB 是一种轮询总线，由 Host 发起所有的数据传输。总线传输包含 3 个包(packet)。每个传输都由 Host 先发出令牌包(Token Packet)，明确传输类型、传输方向、USB 设备地址和端点号。对应地址的 USB 设备接收并解析包。一次传输可以由 Host 发向设备，也可以由设备发送至 Host，方向由令牌包说明。</p>
-<h3 id="USB数据包"><a href="#USB数据包" class="headerlink" title="USB数据包"></a>USB数据包</h3><ul>
-<li><strong>USB数据包格式</strong></li>
-</ul>
-<table>
-<thead>
-<tr>
-<th align="center">偏移量</th>
-<th align="center">类型</th>
-<th align="center">大小</th>
-<th align="center">值</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">0</td>
-<td align="center">HeaderChksum</td>
-<td align="center">1</td>
-<td align="center">利用添加包头进行效验，不包括包头本身的校验。</td>
-</tr>
-<tr>
-<td align="center">1</td>
-<td align="center">HeaderSize</td>
-<td align="center">1</td>
-<td align="center">包头的大小，包括可用的字符串。</td>
-</tr>
-<tr>
-<td align="center">2</td>
-<td align="center">Signature</td>
-<td align="center">2</td>
-<td align="center">数据值为0x1234</td>
-</tr>
-<tr>
-<td align="center">4</td>
-<td align="center">VendorID</td>
-<td align="center">2</td>
-<td align="center">USB提供商的ID</td>
-</tr>
-<tr>
-<td align="center">6</td>
-<td align="center">ProductID</td>
-<td align="center">2</td>
-<td align="center">USB产品ID</td>
-</tr>
-<tr>
-<td align="center">8</td>
-<td align="center">ProductVersion</td>
-<td align="center">1</td>
-<td align="center">产品版本号</td>
-</tr>
-<tr>
-<td align="center">9</td>
-<td align="center">FirmwareVersion</td>
-<td align="center">1</td>
-<td align="center">固件版本号</td>
-</tr>
-<tr>
-<td align="center">10</td>
-<td align="center">USB属性</td>
-<td align="center">1</td>
-<td align="center">USB Attribute: Bit 0：如果设为1，包头包括以下三个字符串：语言、制造商、产品字符串；如果设为0，包头不包括任何字符串。 Bit 2：如果设为1，设备自带电源；如果设为0，无自带电源。 Bit 3：如果设为1，设备可以通过总线供电；如果设为0，无法通过总线供电。 Bits 1 and 4—7：保留。</td>
-</tr>
-<tr>
-<td align="center">11</td>
-<td align="center">最大电力</td>
-<td align="center">1</td>
-<td align="center">设备需要的最大电力，以2mA为单位。</td>
-</tr>
-<tr>
-<td align="center">12</td>
-<td align="center">设备属性</td>
-<td align="center">1</td>
-<td align="center">Device Attributes: Bit 0：如果设为1，CPU运行在24 MHz；如果设为0，CPU运行在12 MHz。 Bit 3：如果设为1，设备的EEPROM可以支持400 MHz；如果设为0，不支持400 MHz。 Bits 1, 2 and 4 … 7：保留。</td>
-</tr>
-<tr>
-<td align="center">13</td>
-<td align="center">WPageSize</td>
-<td align="center">1</td>
-<td align="center">I2C的最大写入页面大小</td>
-</tr>
-<tr>
-<td align="center">14</td>
-<td align="center">数据类型</td>
-<td align="center">1</td>
-<td align="center">该数值定义设备是软件EEPROM还是硬件EEPROM。0x02：硬件EEPROM 其它数值无效。</td>
-</tr>
-<tr>
-<td align="center">15</td>
-<td align="center">RpageSize</td>
-<td align="center">1</td>
-<td align="center">I2C最大读取页面大小。如果值为0，整个负载大小由一个I2C读取设备读取。</td>
-</tr>
-<tr>
-<td align="center">16</td>
-<td align="center">PayLoadSize</td>
-<td align="center">2</td>
-<td align="center">如果将EEPROM作为软件EEPROM使用，表示软件的大小；除此之外该值都是0。</td>
-</tr>
-<tr>
-<td align="center">0xxx</td>
-<td align="center">Language string</td>
-<td align="center">4</td>
-<td align="center">语言字符串。以标准USB字符串格式表示。（非必要字段）</td>
-</tr>
-<tr>
-<td align="center">0xxx</td>
-<td align="center">Manufacture string</td>
-<td align="center">…</td>
-<td align="center">制造商字符串。以标准USB字符串格式表示。（非必要字段）</td>
-</tr>
-<tr>
-<td align="center">0xxx</td>
-<td align="center">Product string</td>
-<td align="center">…</td>
-<td align="center">产品字符串，以标准USB字符串格式表示。（非必要字段）</td>
-</tr>
-<tr>
-<td align="center">0xxx</td>
-<td align="center">Application Code</td>
-<td align="center">…</td>
-<td align="center">表示应用代码。以标准USB字符串格式表示。（非必要字段）</td>
-</tr>
-</tbody></table>
-<h2 id="USB设备"><a href="#USB设备" class="headerlink" title="USB设备"></a>USB设备</h2><h3 id="设备分类"><a href="#设备分类" class="headerlink" title="设备分类"></a>设备分类</h3><p>依附在总线上的设备可以是需要特定的驱动程序的完全定制的设备，也可能属于某个设备类别。这些类别定义设备的行为和接口描述符，这样一个驱动程序可能用于所有此种类别的设备。一般操作系统都为支持这些设备类别，为其提供通用驱动程序。设备分类由USB设计论坛设备工作组决定，并分配ID。</p>
-<p>如果一个设备类型属于整个设备，该设备的描述符的bDeviceClass域保存类别ID；如果它这是设备的一个接口，其ID保存在接口描述符的bInterfaceClass域。他们都占用一个字节，所以最多有253种设备类别。（0x00和0xFF保留）。当bDeviceClass设为0x00，操作系统会检查每个接口的bInterfaceClass以确定其类别。</p>
-<p>常用设备类别和ID有：<br>|  ID  |       设备        |                             例子                             |<br>| :–: | :—————:| :———————————————————-: |<br>| 0x00 | 保留值       |                              无                              |<br>| 0x01 | 音效设备      |                             声卡                             |<br>| 0x02 | USB通信控制设备   |                  网卡、调制解调器、串列端口                   |<br>| 0x03 | 人机界面设备(HID)  |                          键盘、鼠标                          |<br>| 0x05 | 物理接口设备      |        控制杆    |<br>| 0x06 | 静止图像捕捉设备  | 影像扫描仪、Picture Transfer Protocol |<br>| 0x07 |  打印设备        |        打印机      |<br>| 0x08 | 大容量访问设备    | U盘、移动硬盘、存储卡读卡器、数字相机 |<br>| 0x09 | 集线器       |                            集线器                            |<br>| 0x0A | 通信设备      | 调制解调器、网络卡、ISD、传真 |<br>| 0x0B | 智能卡设备     |                            读卡器                            |<br>| 0x0E | 影像设备    |      摄像头   |<br>| 0xE0 | 无线传输设备   |          蓝牙   |<br>| 0xFE | 特殊的应用    |                       红外线资料桥接器                       |<br>| 0xFF | 定制设备      |                                                              |</p>
-<h3 id="lsusb"><a href="#lsusb" class="headerlink" title="lsusb"></a>lsusb</h3><p>显示本机的usb设备列表，可以显示出usb的详细信息，包括设备的读取速度和描述符。</p>
-<table>
-<thead>
-<tr>
-<th>选项</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>-v</td>
-<td>告诉lsusb详细显示所示设备的详细信息。这包括设备当前速度的配置描述符。如果可用，类描述符将显示USB设备类，包括集线器、音频、HID、通信和芯片卡。</td>
-</tr>
-<tr>
-<td>-s [[bus]:][devnum]</td>
-<td>显示指定总线和设备号的设备信息，总线和设备号用十进制标识。格式：lsusb –s 00:01</td>
-</tr>
-<tr>
-<td>-d [vendor]:[product]</td>
-<td>显示指定厂商和产品编号的设备，用十六进制表示编号。格式：lsusb –d 8086:</td>
-</tr>
-<tr>
-<td>-D</td>
-<td>显示指定设备文件的设备信息，例如：<code>lsusb –D /proc/bus/usb/001/001</code>。只有root用户才可以使用这个选项</td>
-</tr>
-<tr>
-<td>-t</td>
-<td>以树状结构显示</td>
-</tr>
-<tr>
-<td>-V</td>
-<td>指令版本信息</td>
-</tr>
-</tbody></table>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/modbus/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/modbus/" class="post-title-link" itemprop="url">modbus协议</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:57:34" itemprop="dateModified" datetime="2022-06-08T17:57:34+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Modbus"><a href="#Modbus" class="headerlink" title="Modbus"></a>Modbus</h2><p>Modbus协议是一种广泛应用于工业控制领域的通用通讯协议，使用的是主从通讯技术，即由主设备主动查询和操作从设备。通讯物理接口可以选用串口（包括RS232、RS485和RS422），也可以选择以太网口。有三种通信方式：</p>
-<ul>
-<li>以太网：对应的通信模式是MODBUS TCP/IP。</li>
-<li>异步串行传输（各种介质如有线RS-232-/422/485/；光纤、无线等），对应的通信模式是MODBUS RTU或MODBUS ASCII。</li>
-<li>高速令牌传递网络：对应的通信模式是Modbus PLUS</li>
-</ul>
-<h3 id="ASCII模式"><a href="#ASCII模式" class="headerlink" title="ASCII模式"></a>ASCII模式</h3><p><img src="/images/uart/Modbus-frame-structure-ASCII-mode.jpg" alt="Modbus帧结构-ASCII模式"></p>
-<p>在ASCII模式下，消息以冒号（:）字符（ASCII码 3AH）开始，以回车换行符结束（ASCII码 0DH,0AH）。其它域可以使用的传输字符是十六进制的0…9,A…F。网络上的设备不断侦测“:”字符，当有一个冒号接收到时，每个设备都解码地址域来判断是否发给自己的。消息中字符间发送的时间间隔最长不能超过1秒，否则接收的设备将认为传输错误。</p>
-<p>错误检测域包含两个ASCII字符，使用LRC（纵向冗长检测）方法对消息内容计算得出的，不包括开始的冒号符及回车换行符。</p>
-<h3 id="RTU模式"><a href="#RTU模式" class="headerlink" title="RTU模式"></a>RTU模式</h3><p><img src="/images/uart/RTU.bmp" alt="RTU报文帧"></p>
-<p><img src="/images/uart/1.5T.jpg" alt="img"></p>
-<p>RTU模式规定消息发送至少要以3.5个字符时间的停顿间隔开始。至少3.5个字符时间的停顿标定了消息的结束。消息帧内字节间隔为1.5个字符时间。</p>
-<p>从设备的地址范围是1~247，地址0是用作广播地址。主设备通过将要联络的从设备的地址放入消息中的地址域来选通从设备。当从设备发送回应消息时，它把自己的地址放入回应的地址域中，以便主设备知道是哪一个设备作出回应。</p>
-<h3 id="功能码"><a href="#功能码" class="headerlink" title="功能码"></a>功能码</h3><p>Modbus的操作对象有四种：线圈、离散输入、输入寄存器、保持寄存器。</p>
-<table>
-<thead>
-<tr>
-<th>对象</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>线圈</td>
-<td>1bit，ON或OFF，可读可写，有效的地址范围是1-9999</td>
-</tr>
-<tr>
-<td>离散量</td>
-<td>1bit，ON或OFF，只读，有效地址范围是10001-19999</td>
-</tr>
-<tr>
-<td>输入寄存器</td>
-<td>16位的寄存器，只读，可以用作模拟量或16位打包输入点，有效地址范围是30001-39999</td>
-</tr>
-<tr>
-<td>保持寄存器</td>
-<td>16位的寄存器，可读可写，既可以是一个模拟量或16位打包输入点，也可以是模拟量或16位打包输出点，有效地址范围是40001-49999</td>
-</tr>
-</tbody></table>
-<p>Modbus的功能码有：</p>
-<table>
-<thead>
-<tr>
-<th>功能码</th>
-<th>名称</th>
-<th>功能</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>01</td>
-<td>读线圈状态</td>
-<td>读位（读N个bit）—读从机线圈寄存器，位操作</td>
-</tr>
-<tr>
-<td>02</td>
-<td>读输入离散量</td>
-<td>读位（读N个bit）—读离散输入寄存器，位操作</td>
-</tr>
-<tr>
-<td>03</td>
-<td>读多个寄存器</td>
-<td>读整型、字符型、状态字、浮点型（读N个words）—读保持寄存器，字节操作</td>
-</tr>
-<tr>
-<td>04</td>
-<td>读输入寄存器</td>
-<td>读整型、状态字、浮点型（读N个words）—读输入寄存器，字节操作</td>
-</tr>
-<tr>
-<td>05</td>
-<td>写单个线圈</td>
-<td>写位（写一个bit）—写线圈寄存器，位操作</td>
-</tr>
-<tr>
-<td>06</td>
-<td>写单个保持寄存器</td>
-<td>写整型、字符型、状态字、浮点型（写一个word）—写保持寄存器，字节操作</td>
-</tr>
-<tr>
-<td>07</td>
-<td>读取异常状态</td>
-<td>取得8个内部线圈的通断状态，这8个线圈的地址由控制器决定，用户逻辑可以将这些线圈定义，以说明从机状态，短报文适宜于迅速读取状态</td>
-</tr>
-<tr>
-<td>08</td>
-<td>回送诊断校验</td>
-<td>把诊断校验报文送从机，以对通信处理进行评鉴</td>
-</tr>
-<tr>
-<td>09</td>
-<td>编程（只用于484）</td>
-<td>使主机模拟编程器作用，修改PC从机逻辑</td>
-</tr>
-<tr>
-<td>0A</td>
-<td>控询（只用于484）</td>
-<td>可使主机与一台正在执行长程序任务从机通信，探询该从机是否已完成其操作任务，仅在含有功能码9的报文发送后，本功能码才发送</td>
-</tr>
-<tr>
-<td>0B</td>
-<td>读取事件计数</td>
-<td>可使主机发出单询问，并随即判定操作是否成功，尤其是该命令或其他应答产生通信错误时</td>
-</tr>
-<tr>
-<td>0C</td>
-<td>读取通讯事件记录</td>
-<td>可是主机检索每台从机的ModBus事务处理通信事件记录。如果某项事务处理完成，记录会给出有关错误</td>
-</tr>
-<tr>
-<td>0D</td>
-<td>编程（184/384/484/584）</td>
-<td>可使主机模拟编程器功能修改PC从机逻辑</td>
-</tr>
-<tr>
-<td>0E</td>
-<td>探询（184/384/484/584）</td>
-<td>可使主机与正在执行任务的从机通信，定期控询该从机是否已完成其程序操作，仅在含有功能13的报文发送后，本功能码才得发送</td>
-</tr>
-<tr>
-<td>0F</td>
-<td>写多个线圈</td>
-<td>可以写多个线圈—强置一串连续逻辑线圈的通断</td>
-</tr>
-<tr>
-<td>10</td>
-<td>写多个保持寄存器</td>
-<td>写多个保持寄存器—把具体的二进制值装入一串连续的保持寄存器</td>
-</tr>
-<tr>
-<td>11</td>
-<td>报告从机标识</td>
-<td>可使主机判断编址从机的类型及该从机运行指示灯的状态</td>
-</tr>
-<tr>
-<td>12</td>
-<td>（884和MICRO84）</td>
-<td>可使主机模拟编程功能，修改PC状态逻辑</td>
-</tr>
-<tr>
-<td>13</td>
-<td>重置通信链路</td>
-<td>发生非可修改错误后，是从机复位于已知状态，可重置顺序字节</td>
-</tr>
-<tr>
-<td>14</td>
-<td>读取通用参数（584L）</td>
-<td>显示扩展存储文件中的数据信息</td>
-</tr>
-<tr>
-<td>15</td>
-<td>写入通用参数（584L）</td>
-<td>把通用参数写入扩展存储文件</td>
-</tr>
-<tr>
-<td>16~40</td>
-<td>保留做扩展功能备用</td>
+<td>二叉查找树</td>
+<td>O(log<sub>2</sub>n)</td>
+<td></td>
 <td></td>
 </tr>
 <tr>
-<td>41~48</td>
-<td>保留以备用户功能所用</td>
-<td>留作用户功能的扩展编码</td>
-</tr>
-<tr>
-<td>49~77</td>
-<td>非法功能</td>
+<td>红黑树</td>
+<td>O(log<sub>2</sub>n)</td>
+<td></td>
 <td></td>
 </tr>
 <tr>
-<td>78~7F</td>
-<td>保留</td>
-<td>留作内部作用</td>
+<td>2-3树</td>
+<td>O(log<sub>2</sub>n - log<sub>3</sub>n)</td>
+<td></td>
+<td></td>
 </tr>
 <tr>
-<td>80~FF</td>
-<td>保留</td>
-<td>用于异常应答</td>
+<td>B树/B+树</td>
+<td>O(log<sub>2</sub>n)</td>
+<td></td>
+<td></td>
 </tr>
 </tbody></table>
-<p>常用功能码如下：</p>
-<table>
+<h3 id="图搜索算法"><a href="#图搜索算法" class="headerlink" title="图搜索算法"></a>图搜索算法</h3><table>
 <thead>
 <tr>
-<th>功能码</th>
-<th>名称</th>
-<th>功能</th>
-<th>对应的地址类型</th>
+<th>图搜索算法</th>
+<th>数据结构</th>
+<th>遍历时间复杂度</th>
+<th>空间复杂度</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>01</td>
-<td>读线圈状态</td>
-<td>读位（读N个bit）—读从机线圈寄存器，位操作</td>
-<td>0x</td>
+<td>BFS广度优先搜索</td>
+<td>邻接矩阵<br/>邻接链表</td>
+<td>O(|v|<sup>2</sup>)<br/>O(|v|+|E|)</td>
+<td>O(|v|<sup>2</sup>)<br/>O(|v|+|E|)</td>
 </tr>
 <tr>
-<td>02</td>
-<td>读输入离散量</td>
-<td>读位（读N个bit）—读离散输入寄存器，位操作</td>
-<td>1x</td>
+<td>DFS深度优先搜索</td>
+<td>邻接矩阵<br/>邻接链表</td>
+<td>O(|v|<sup>2</sup>)<br/>O(|v|+|E|)</td>
+<td>O(|v|<sup>2</sup>)<br/>O(|v|+|E|)</td>
+</tr>
+</tbody></table>
+<h3 id="其他算法"><a href="#其他算法" class="headerlink" title="其他算法"></a>其他算法</h3><table>
+<thead>
+<tr>
+<th>算法</th>
+<th>思想</th>
+<th>应用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>[分治法</td>
+<td>把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并</td>
+<td>循环赛日程安排问题、排序算法（快速排序、归并排序）</td>
 </tr>
 <tr>
-<td>03</td>
-<td>读多个寄存器</td>
-<td>读整型、字符型、状态字、浮点型（读N个words）—读保持寄存器，字节操作</td>
-<td>4X</td>
+<td>动态规划</td>
+<td>通过把原问题分解为相对简单的子问题的方式求解复杂问题的方法，适用于有重叠子问题和最优子结构性质的问题</td>
+<td>背包问题、斐波那契数列</td>
 </tr>
 <tr>
-<td>04</td>
-<td>读输入寄存器</td>
-<td>读整型、状态字、浮点型（读N个words）—读输入寄存器，字节操作</td>
-<td>3x</td>
-</tr>
-<tr>
-<td>05</td>
-<td>写单个线圈</td>
-<td>写位（写一个bit）—写线圈寄存器，位操作</td>
-<td>0x</td>
-</tr>
-<tr>
-<td>06</td>
-<td>写单个保持寄存器</td>
-<td>写整型、字符型、状态字、浮点型（写一个word）—写保持寄存器，字节操作</td>
-<td>4x</td>
-</tr>
-<tr>
-<td>0F</td>
-<td>写多个线圈</td>
-<td>写位（写n个bit）—强置一串连续逻辑线圈的通断</td>
-<td>0x</td>
-</tr>
-<tr>
-<td>10</td>
-<td>写多个保持寄存器</td>
-<td>写整形、字符型、状态字、浮点型（写n个word）—把具体的二进制值装入一串连续的保持寄存器</td>
-<td>4x</td>
+<td>贪心法</td>
+<td>一种在每一步选择中都采取在当前状态下最好或最优（即最有利）的选择，从而希望导致结果是最好或最优的算法</td>
+<td>旅行推销员问题（最短路径问题）、最小生成树、哈夫曼编码</td>
 </tr>
 </tbody></table>
 
@@ -1642,7 +692,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/spi-bus/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/sort/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1656,7 +706,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/hardware/spi-bus/" class="post-title-link" itemprop="url">spi总线</a>
+            <a href="/2022/06/07/algo/sort/" class="post-title-link" itemprop="url">排序算法</a>
         </h1>
 
         <div class="post-meta">
@@ -1673,7 +723,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:55:21" itemprop="dateModified" datetime="2022-06-08T17:55:21+08:00">2022-06-08</time>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1681,7 +731,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
+                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
                 </span>
             </span>
 
@@ -1696,79 +746,546 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>SPI(Serial Peripheral Interface)串行外设接口是一种用于芯片通信的串行同步传输总线协议，最初由Motorola在2000年提出。</p>
+          <p><img src="/images/code/algo/sort/sort_algo.png" alt="排序算法"></p>
+<p>排序算法执行效率的评判标准：</p>
 <ul>
-<li><p>SPI允许传输单个bit数据，甚至允许暂停，因为SCK时钟线由主控设备控制，当没有时钟跳变时，从设备不采集或传送数据。</p>
-</li>
-<li><p>支持全双工通信，每个从设备需要独立的使能信号。</p>
-</li>
-<li><p>推挽输出的驱动性能相比开漏输出信号完整性更好，支持高速应用（100MHz以上）。</p>
-</li>
-<li><p>协议支持字长不限于8bits，可根据应用特点灵活选择消息字长。</p>
-</li>
-<li><p>相比I2C和SMbus节省上拉电阻，不需要仲裁机制。</p>
-</li>
-<li><p>没有寻址机制，只能靠设备片选选择不同从设备，故没有数据流控制和应答机制。</p>
-</li>
-<li><p>SPI没有规定最大传输速率，通常能达到10Mbps。</p>
-</li>
+<li>最好情况、最坏情况、平均情况时间复杂度</li>
+<li>时间复杂度</li>
+<li>空间复杂度</li>
+<li>比较次数和交换或移动次数</li>
 </ul>
-<p><strong>Dual SPI</strong>是针对SPI Flash而言，不是针对所有SPI外设。对于SPI Flash，全双工并不常用，因此修改了mosi和miso的用法，使其工作在半双工，能够加倍传输数据。也就是说对于Dual SPI Flash，可以发送一个命令字节进入dual mode，这样mosi变成SIO0，mosi变成SIO1，这样一个时钟周期内就能传输2个bit数据。</p>
-<p><strong>Qual SPI</strong>也是针对SPI Flash，Qual SPI 在Dual SPI基础上增加了两根线（SIO2、SIO3），目的是一个时钟内能传输4个bit数据。</p>
-<h2 id="信号定义"><a href="#信号定义" class="headerlink" title="信号定义"></a>信号定义</h2><p><strong>MOSI</strong>：主设备数据输出，从设备数据输入。</p>
-<p><strong>MISO</strong>：主设备数据输入，从设备数据输出。</p>
-<p><strong>SCLK</strong>：时钟信号，由主设备产生。</p>
-<p><strong>CS/SS</strong>：片选，从设备使能信号，由主设备控制。</p>
-<p>SPI总线定义两个及以上设备间的数据传输，提供时钟的设备为主设备，接收时钟的设备为从设备。片选信号SS通常低电平有效。SPI数据传输原理是基于主从设备内部移位寄存器的数据交换。在主设备SCK的控制下，待传数据由各自设备的数据寄存器传输到移位寄存器，再通过MOSI和MISO信号线完成主从设备间的数据交换。</p>
-<p><img src="/images/spi/spi_ms_mod_reg.png" alt="spi框图"></p>
-<h2 id="传输模式"><a href="#传输模式" class="headerlink" title="传输模式"></a>传输模式</h2><p>SPI有4种操作模式，每种模式由一对参数决定，主从设备必须使用相同的工作参数，才能正常工作。</p>
-<p>CPOL时钟极性(clock polarity)，决定时钟空闲时的电平为高或低，对于SPI数据传输格式没有显著影响。</p>
-<ul>
-<li>0 : 时钟高电平时有效，空闲时为低。</li>
-<li>1 : 时钟低电平时有效，空闲时为高。</li>
-</ul>
-<p>CPHA时钟相位(clock phase)，定义时钟脉冲在哪条边沿转换输出信号，哪条边沿采样输入信号。</p>
-<ul>
-<li>0 : 数据采样发生在时钟奇数边沿。</li>
-<li>1 : 数据采样发生在时钟偶数边沿。</li>
-</ul>
+<p><strong>原地排序算法</strong>就是特指空间复杂度是 O(1) 的排序算法。</p>
+<p>排序算法的<strong>稳定性</strong>，如果待排序的序列中存在值相等的元素，经过排序之后，相等元素之间原有的先后顺序不变。</p>
 <table>
 <thead>
 <tr>
-<th>模式</th>
-<th>状态</th>
+<th>排序算法</th>
+<th>平均时间复杂度</th>
+<th>最差时间复杂度</th>
+<th>最差时间复杂度</th>
+<th>空间复杂度</th>
+<th>数据对象稳定性</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Mode 0</td>
-<td>SCLK 空闲是为低电平，数据在上升沿有效</td>
+<td>冒泡排序</td>
+<td>O(n<sup>2</sup>)</td>
+<td>O(n<sup>2</sup>)</td>
+<td>O(n)</td>
+<td>O(1)</td>
+<td>稳定</td>
 </tr>
 <tr>
-<td>Mode 1</td>
-<td>SCLK 空闲是为低电平，数据在下降沿有效</td>
+<td>选择排序</td>
+<td>O(n<sup>2</sup>)</td>
+<td>O(n<sup>2</sup>)</td>
+<td>O(n<sup>2</sup>)</td>
+<td>O(1)</td>
+<td>数组不稳定、链表稳定</td>
 </tr>
 <tr>
-<td>Mode 2</td>
-<td>SCLK 空闲是为高电平，数据在下降沿有效</td>
+<td>插入排序</td>
+<td>O(n<sup>2</sup>)</td>
+<td>O(n<sup>2</sup>)</td>
+<td>O(n)</td>
+<td>O(1)</td>
+<td>稳定</td>
 </tr>
 <tr>
-<td>Mode 3</td>
-<td>SCLK 空闲是为高电平，数据在上升沿有效</td>
+<td>快速排序</td>
+<td>O(n*log<sub>2</sub>n)</td>
+<td>O(n<sup>2</sup>)</td>
+<td>O(n*log<sub>2</sub>n)</td>
+<td>O(log<sub>2</sub>n)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td>堆排序</td>
+<td>O(n*log<sub>2</sub>n)</td>
+<td>O(n*log<sub>2</sub>n)</td>
+<td>O(n*log<sub>2</sub>n)</td>
+<td>O(1)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td>归并排序</td>
+<td>O(n*log<sub>2</sub>n)</td>
+<td>O(n*log<sub>2</sub>n)</td>
+<td>O(n*log<sub>2</sub>n)</td>
+<td>O(n)</td>
+<td>稳定</td>
+</tr>
+<tr>
+<td>希尔排序</td>
+<td>O(n*log<sup>2</sup>n)</td>
+<td>O(n<sup>2</sup>)</td>
+<td>O(n)</td>
+<td>O(1)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td>计数排序</td>
+<td>O(n+m)</td>
+<td>O(n+m)</td>
+<td>O(n+m)</td>
+<td>O(n+m)</td>
+<td>稳定</td>
+</tr>
+<tr>
+<td>桶排序</td>
+<td>O(n)</td>
+<td>O(n)</td>
+<td>O(n)</td>
+<td>O(m)</td>
+<td>稳定</td>
+</tr>
+<tr>
+<td>基数排序</td>
+<td>O(k*n)</td>
+<td>O(n<sup>2</sup>)</td>
+<td>O(k*n)</td>
+<td></td>
+<td>稳定</td>
 </tr>
 </tbody></table>
-<p><img src="/images/spi/4mode.png" alt="4种模式"></p>
-<p><img src="/images/spi/timing_diagram.png" alt="时序"></p>
-<h2 id="多个从设备"><a href="#多个从设备" class="headerlink" title="多个从设备"></a>多个从设备</h2><ul>
-<li><strong>片选方式</strong></li>
-</ul>
-<p>每个从设备都需要单独的片选信号，主设备每次只能选择其中一个从设备进行通信。因为所有从设备的SCK、MOSI、MISO都是连在一起的，未被选中从设备的MISO要表现为高阻状态以避免数据传输错误。由于每个设备都需要单独的片选信号，如果需要的片选信号过多，可以使用译码器产生所有的片选信号。</p>
-<p><img src="/images/spi/multiple-slaves.png" alt="主设备以片选方式控制多个从设备"></p>
+<h2 id="冒泡排序"><a href="#冒泡排序" class="headerlink" title="冒泡排序"></a>冒泡排序</h2><p>冒泡排序（Bubble Sort）只会操作相邻的两个数据。每次冒泡操作都会对相邻的两个元素进行比较，看是否满足大小关系要求。如果不满足就让它俩互换。一次冒泡会让至少一个元素移动到它应该在的位置，重复 n 次，就完成了 n 个数据的排序工作。</p>
+<p><img src="/images/code/algo/sort/bubble.gif" alt="冒泡排序"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">sort_bubble</span><span class="params">(<span class="type">int</span> *<span class="built_in">array</span>, <span class="type">size_t</span> size)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i, j;</span><br><span class="line">    <span class="type">bool</span> swap_flag = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; size; i++) &#123;</span><br><span class="line">        swap_flag = <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">for</span> (j = <span class="number">1</span>; j &lt; size - i; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="built_in">array</span>[j<span class="number">-1</span>] &gt; <span class="built_in">array</span>[j]) &#123;     <span class="comment">// 相邻元素两两对比</span></span><br><span class="line">                SWAP(<span class="built_in">array</span>[j<span class="number">-1</span>], <span class="built_in">array</span>[j]);</span><br><span class="line">                swap_flag = <span class="literal">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 通过设置哨兵，提前感知前面的序列已经是排序好的，就直接跳出完成排序</span></span><br><span class="line">        <span class="keyword">if</span> (!swap_flag) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>冒泡排序的过程只涉及数据的交换操作，所以它的空间复杂度为 O(1)，是一个原地排序算法。当有相邻的两个元素大小相等时不做交换，所以是稳定的排序算法。</p>
+<p>最好情况下，要排序的数据已经是有序的了，只需要进行一次冒泡操作，所以最好情况时间复杂度是 O(n)。而最坏的情况是，要排序的数据刚好是倒序排列的，我们需要进行 n 次冒泡操作，所以最坏情况时间复杂度为 O(n2)。</p>
+<h2 id="选择排序"><a href="#选择排序" class="headerlink" title="选择排序"></a>选择排序</h2><p>选择排序(Selection-sort)首先在未排序序列中找到最小元素，存放到排序序列的起始位置，然后，再从剩余未排序元素中继续寻找最小元素，然后放到已排序序列的末尾，直到所有元素均排序完毕。<br>￼<br><img src="/images/code/algo/sort/select.gif" alt="选择排序"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">sort_selection</span><span class="params">(<span class="type">int</span> *<span class="built_in">array</span>, <span class="type">size_t</span> size)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> min = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; size - <span class="number">1</span>; i++) &#123;</span><br><span class="line">        min = i;</span><br><span class="line">        <span class="keyword">for</span> (j = i + <span class="number">1</span>; j &lt; size; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="built_in">array</span>[j] &lt; <span class="built_in">array</span>[min]) &#123;</span><br><span class="line">                min = j;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        SWAP(<span class="built_in">array</span>[i], <span class="built_in">array</span>[min]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>选择排序是一种原地排序算法。每次都要找剩余未排序元素中的最小值，并和前面的元素交换位置，这样破坏了稳定性，不是稳定的排序算法。最好情况时间复杂度、最坏情况和平均情况时间复杂度都为 O(n2)。</p>
+<h2 id="插入排序"><a href="#插入排序" class="headerlink" title="插入排序"></a>插入排序</h2><p>插入排序（Insertion Sort）取未排序区间中元素，将其插入已经排序的有序表中，并保证已排序区间数据一直有序。重复这个过程，直到未排序区间中元素为空。就跟打扑克摸牌放牌一样。</p>
+<p><img src="/images/code/algo/sort/insertion.gif" alt="插入排序"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">sort_insertion</span><span class="params">(<span class="type">int</span> *<span class="built_in">array</span>, <span class="type">size_t</span> size)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i, j, tmp;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt; size; i++) &#123;</span><br><span class="line">        tmp = <span class="built_in">array</span>[i];</span><br><span class="line">        <span class="keyword">for</span> (j = i - <span class="number">1</span>; j &gt;= <span class="number">0</span>; j--) &#123;</span><br><span class="line">            <span class="keyword">if</span> (tmp &lt; <span class="built_in">array</span>[j]) &#123;</span><br><span class="line">                <span class="built_in">array</span>[j+<span class="number">1</span>] = <span class="built_in">array</span>[j];  <span class="comment">// 数据移动</span></span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">array</span>[j+<span class="number">1</span>] = tmp;  <span class="comment">// 插入数据</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>插入排序算法的运行并不需要额外的存储空间，所以空间复杂度是 O(1)，是一个原地排序算法。</p>
+<p>在插入排序中，对于值相同的元素，我们可以选择将后面出现的元素，插入到前面出现元素的后面，这样就可以保持原有的前后顺序不变，所以插入排序是稳定的排序算法。</p>
+<p>最好情况时间复杂度是 O(n)，而最坏情况时间复杂度为 O(n2)。</p>
+<h2 id="希尔排序"><a href="#希尔排序" class="headerlink" title="希尔排序"></a>希尔排序</h2><p>希尔排序（Shell Sort）1959年Shell发明，第一个突破O(n2)的排序算法，是简单插入排序的改进版。它与插入排序的不同之处在于，它会优先比较距离较远的元素，又叫缩小增量排序。</p>
+<p><img src="/images/code/algo/sort/shell.gif" alt="希尔排序"></p>
+<h2 id="快速排序"><a href="#快速排序" class="headerlink" title="快速排序"></a>快速排序</h2><p><img src="/images/code/algo/sort/quick.gif" alt="快速排序"></p>
+<h2 id="堆排序"><a href="#堆排序" class="headerlink" title="堆排序"></a>堆排序</h2><p><img src="/images/code/algo/sort/heap.gif" alt="堆排序"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/graph/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/algo/graph/" class="post-title-link" itemprop="url">数据结构-图</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="图的定义"><a href="#图的定义" class="headerlink" title="图的定义"></a>图的定义</h2><p>图（Graph）是由顶点的有穷非空集合和顶点之间边的集合组成，通常为：G(V,E)，其中，G表示一个图，V是图G中顶点的集合，E是图G中边的集合。</p>
+<p><strong>无向边</strong>：顶点vi到vj之间的边没有方向。则称这条边为无向边（Edge），用无序偶对(Vi,Vj)来表示。</p>
+<p><strong>无向图</strong>：图中的任意两个顶点之间的边都是无向边。</p>
+<p><img src="/images/code/algo/graph/undir.png" alt="无向图"></p>
+<p>上图的无向图G1，可以表示成：G1=(V1,{E1})，其中顶点集合V1={A,B,C,D}；边集合E1={(A,B),(B,C)(C,D),(D,A),(A,C)}</p>
+<p><strong>有向边</strong>：顶点vi到vj的边有方向。 也称为<strong>弧（Arc）</strong>。有向边用带尖括号的有序偶对&lt;vi,vj&gt;来表示。其中vi称为弧尾（Tail），vj称为弧头（Head）。</p>
+<p><strong>有向图</strong>：图中任意两个顶点之间都是有向边。</p>
+<p><img src="/images/code/algo/graph/dir.png" alt="有向图"></p>
+<p>上图的有向图G2，可以表示成：G2=(V2,{E2})，其中顶点集合V2={A,B,C,D}；弧集合E2={(A,D),(B,A)(C,A),(B,C)}</p>
+<p><strong>简单图</strong>：在图中，如果不存在顶点到其自身的边，且同一条边不重复出现。</p>
+<p><strong>无向完全图</strong>：在无向图中，任意两个顶点之间都存在边，也就是说每个顶点都要与除它以外的顶点连线。此时边的数量公式为：n(n-1)/2 。</p>
+<p><img src="/images/code/algo/graph/allundir.png" alt="无向完全图"></p>
+<p><strong>有向完全图</strong>：在有向图中，任意两个顶点之间都存在方向互为相反的两条弧。此时弧的数量公式为：n(n-1)。</p>
+<p><img src="/images/code/algo/graph/alldir.png" alt="有向完全图"></p>
+<p>对于一个具有n个顶点和e条边的图，存在这样的边界：无向图：0&lt;=e&lt;=n(n-1)/2，有向图：0&lt;=e&lt;=n(n-1)。</p>
+<p>有很少条边或弧的图称为<strong>稀疏图</strong>，反之称为<strong>稠密图</strong>，这是一个很模糊的概念。</p>
+<p><strong>子图（Subgraph）</strong>：假设两个图G=(V,{E})和G’=(V’,{E’})，如果集合V’⊆V，且集合E’⊆E，则称G’是G的子图。</p>
+<p>与图的边或弧相关的数叫做<strong>权（Weigh）</strong>，带权的图称为<strong>网（Network）</strong>。</p>
+<h2 id="边与顶点的关系"><a href="#边与顶点的关系" class="headerlink" title="边与顶点的关系"></a>边与顶点的关系</h2><p>对于无向图G=(V,{E})，如果边(v,v’)∈E，则称顶点v和v’互为邻接点（Adjacent），即v和v’相邻接，边(v,v’)依附（incident）于顶点v和v’，或者说(v,v’)与顶点v和v’相关联。<strong>顶点v的度</strong>（Degree）是和v相关联的边的数目，记为TD(v)。图中边的个数是各个顶点度数之和的一半：e=1/2∑TD(vi)。</p>
+<p>对于有向图G=(V,{E})，如果弧&lt;v,v’&gt;∈E，则称顶点v邻接到顶点v’，顶点v’邻接自顶点v。弧&lt;v,v’&gt;和顶点v,v’相关联，以顶点为头的弧的数目称为<strong>顶点v的入度</strong>（InDegree），记为ID(v)，以v为尾的弧的数目称为<strong>顶点v的出度</strong>（OutDegree），记为OD(v)；顶点v的度为TD(v)=ID(v)+OD(v)。边的个数为：e=∑ID(vi)=∑OD(vi)。</p>
+<h2 id="路径"><a href="#路径" class="headerlink" title="路径"></a>路径</h2><p><strong>路径（Path）</strong>：图中从顶点v到v’的顶点序列。在树中根结点到任意结点的路径是唯一的，但在图中顶点与顶点之间的路径并不唯一。</p>
+<p><strong>路径长度</strong>：路径上的边或弧的数目。</p>
+<p><strong>回路（Cycle）</strong>：路径中第一个顶点到最后一个顶都是同一个顶点。<strong>简单路径</strong>：路径中不存在重复出现顶点。<strong>简单回路</strong>：除了第一个顶点和最后一个顶点，路径中不存在重复出现顶点，也称<strong>简单环</strong>。</p>
+<h2 id="连通图"><a href="#连通图" class="headerlink" title="连通图"></a>连通图</h2><p>在无向图中如果顶点v到顶点v’有路径，则称v和v’是连通的。如果图中任意两个顶点vi、vj∈E，且vi和vj都是连通的。则称该图为<strong>连通图（connected graph）</strong>。无向图中的极大连通子图称为<strong>连通分量</strong>，它强调：</p>
 <ul>
-<li><strong>菊花链方式</strong></li>
+<li>要是子图</li>
+<li>子图要是连通的</li>
+<li>连通子图含有极大顶点数</li>
+<li>具有极大顶点数的连通子图包含依附于这些顶点的所有边</li>
 </ul>
-<p>数据信号经过主从设备所有的移位寄存器构成闭环。数据通过主设备发送（绿色线）经过从设备返回（蓝色线）到主设备。在这种方式下，片选和时钟同时接到所有从设备。</p>
-<p>菊花链式连接常用于仅需主设备发送数据而不需要接收返回数据的场合，如LED驱动器。在这种应用下，主设备MISO可以不连。如果需要接收从设备的返回数据，则需要连接主设备的MISO形成闭环。同样地，切记要发送足够多的接收指令以确保数据移位送达主设备。</p>
-<p><img src="/images/spi/multiple-slaves2.png" alt="主设备以菊花链方式控制多个从设备"></p>
+<p>任何连通图的连通分量只有一个，即是其自身，非连通的无向图有多个连通分量。</p>
+<p>在有向图G中，如果对于每一对、∈V、≠，从到和从到都存在路径，则称G是<strong>强连通图</strong>。有向图中的极大强连通子图称做有向图的<strong>强连通分量</strong>。</p>
+<h3 id="连通图生成树"><a href="#连通图生成树" class="headerlink" title="连通图生成树"></a>连通图生成树</h3><p><strong>生成树</strong>(SpanningTree)是连通图的包含图中的所有顶点的极小连通子图。即生成树包含图中的全部的n个顶点，但只有足以构成一棵树的n-1条边。图的生成树不惟一。从不同的顶点出发进行遍历，可以得到不同的生成树。</p>
+<p>如果一个有向图恰有一个顶点的入度为0（根结点），其余顶点的入度均为1，则是一棵<strong>有向树</strong>。一个有向图的生成森林由若干棵有向树组成，含有图中全部顶点，但只有足以构成若干棵不相交的有向树的弧。</p>
+<h2 id="图的存储结构"><a href="#图的存储结构" class="headerlink" title="图的存储结构"></a>图的存储结构</h2><h3 id="邻接矩阵"><a href="#邻接矩阵" class="headerlink" title="邻接矩阵"></a>邻接矩阵</h3>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/tree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/algo/tree/" class="post-title-link" itemprop="url">数据结构-树</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="树的定义"><a href="#树的定义" class="headerlink" title="树的定义"></a>树的定义</h2><p>树是 n (n &gt;= 0)个结点的有限集合，当n = 0 时称为空树。在任意一棵非空树中都应满足：</p>
+<blockquote>
+<ol>
+<li>有且仅有一个根结点。</li>
+<li>当 n &gt; 1 时，其余结点可分为 m ( m &gt; 0)个互不相交的有限集合T1,T2,T3, …. Tm ，其中每一个集合本身又是一棵树，并且称为根结点的子树。</li>
+</ol>
+</blockquote>
+<ul>
+<li>结点深度：对任意结点x，x结点的深度表示为根结点到x结点的路径长度。所以根结点深度为0，第二层结点深度为1，以此类推</li>
+<li>结点高度：对任意结点x，叶子结点到x结点的路径长度就是结点x的高度</li>
+<li>树的深度：一棵树中结点的最大深度就是树的深度，也称为高度</li>
+<li>父结点：若一个结点含有子结点，则这个结点称为其子结点的父结点</li>
+<li>子结点：一个结点含有的子树的根结点称为该结点的子结点</li>
+<li>结点的层次：从根结点开始，根结点为第一层，根的子结点为第二层，以此类推</li>
+<li>兄弟结点：拥有共同父结点的结点互称为兄弟结点</li>
+<li>度：结点的子树数目就是结点的度</li>
+<li>叶子结点：度为零的结点就是叶子结点</li>
+<li>祖先：对任意结点x，从根结点到结点x的所有结点都是x的祖先（结点x也是自己的祖先）</li>
+<li>后代：对任意结点x，从结点x到叶子结点的所有结点都是x的后代（结点x也是自己的后代）</li>
+<li>森林：m颗互不相交的树构成的集合就是森林</li>
+</ul>
+<p><img src="/images/code/algo/tree/struct.png" alt="树定义"><br><img src="/images/code/algo/tree/struct2.png" alt="树定义"></p>
+<h2 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h2><p>二叉树(Binary Tree)是 n (n &gt;= 0)个结点的有限集合，当n = 0 时称为空二叉树，或者由1个根结节和2棵互不相交的，分别称为左子树和右子树组成。</p>
+<ul>
+<li>每个结点至多包含两棵子树，度小于2。</li>
+<li>二叉树的第i层上至多有2^i-1^个结点(i&gt;=1)。</li>
+<li>深度为k的二叉树至多有2^k^-1个结点(k&gt;=1)。</li>
+<li>对任何一棵二叉树，如果其终端结点数为n<del>0</del>，度为2的结点数为n<del>2</del>，则n<del>0</del> = n<del>2</del> + 1。</li>
+<li>具有n个结点的完全二叉树的深度为|log2^n^|+1 (|x|表示不大于x的最大整数)。</li>
+</ul>
+<h3 id="树的存储结构"><a href="#树的存储结构" class="headerlink" title="树的存储结构"></a>树的存储结构</h3><p><img src="/images/code/algo/tree/list.jpg" alt="链式存储"><br><img src="/images/code/algo/tree/array2.jpg" alt="顺序存储"><br><img src="/images/code/algo/tree/array.jpg" alt="顺序存储"></p>
+<h3 id="二叉树的遍历"><a href="#二叉树的遍历" class="headerlink" title="二叉树的遍历"></a>二叉树的遍历</h3><p><img src="/images/code/algo/tree/foreach.jpg" alt="二叉树的遍历"></p>
+<p>前序遍历规则是若树为空，则空操作返回，否则先访问根结点，然后依次访问的左子树和右子树。</p>
+<p>中序遍历规则是若树为空，则空操作返回，否则从根结点开始，先遍历根结点的左子树，然后访问根结点，最后访问右子树。</p>
+<p>后序遍历规则是若树为空，则空操作返回，否则从左到右先叶子后结点的方式遍历访问左右子树，最后访问根结点。</p>
+<p>层序遍历规则是若树为空，则空操作返回，否则从树的第一层，也就是根结点开始访问，从上而下逐层遍历，在同一层中，按从左到右的顺序对结点逐个访问。</p>
+<p><img src="/images/code/algo/tree/foreach2.png" alt="二叉树的遍历"></p>
+<h3 id="满二叉树"><a href="#满二叉树" class="headerlink" title="满二叉树"></a>满二叉树</h3><p>叶子节点都在同一层并且除叶子节点外的所有节点都有两个子节点的二叉树。<br><img src="/images/code/algo/tree/fulltree.png" alt="满二叉树"></p>
+<h3 id="完全二叉树"><a href="#完全二叉树" class="headerlink" title="完全二叉树"></a>完全二叉树</h3><p>对于一颗二叉树，假设其深度为d（d&gt;1）。除第d层外的所有节点构成满二叉树，且第d层所有节点从左向右连续地紧密排列，这样的二叉树被称为完全二叉树。</p>
+<p>对一颗具有n个结点的二叉树按层序编号，如果编号为i(1 &lt;= i &lt;= n)的结点与同样深度的满二叉树中编号为i的结点在二叉树中位置完全相同，则棵二叉树称为完全二叉树。</p>
+<p><img src="/images/code/algo/tree/alltree.png" alt="完全二叉树"></p>
+<ol>
+<li>叶子结点只能出现在最下两层。</li>
+<li>最下层的叶子一定集中在左部连续位置。</li>
+<li>倒数二层，若有叶子结点，一定都在右部连续位置。</li>
+<li>如果结点度数为1,则该结点只有左子树，即不存在只有右子树的情况。</li>
+<li>同样结点数的二叉树，完全二叉树的深度最小。</li>
+</ol>
+<h3 id="平衡二叉树-AVL"><a href="#平衡二叉树-AVL" class="headerlink" title="平衡二叉树(AVL)"></a>平衡二叉树(AVL)</h3><p>它是一棵空树或它的左右两个子树的高度差的绝对值不超过1，并且左右两个子树都是一棵平衡二叉树，同时平衡二叉树必定是二叉搜索树。</p>
+<h3 id="二叉搜索树"><a href="#二叉搜索树" class="headerlink" title="二叉搜索树"></a>二叉搜索树</h3><ul>
+<li>若任意节点的左子树不空，则左子树上所有节点的值均小于它的根节点的值；</li>
+<li>若任意节点的右子树不空，则右子树上所有节点的值均大于它的根节点的值；</li>
+<li>任意节点的左、右子树也分别为二叉查找树；</li>
+<li>没有键值相等的节点。</li>
+</ul>
+<h3 id="霍夫曼树"><a href="#霍夫曼树" class="headerlink" title="霍夫曼树"></a>霍夫曼树</h3><p>带权路径最短的二叉树称为哈夫曼树或最优二叉树。</p>
+<h3 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h3><p>红黑树是一颗特殊的二叉查找树，除了二叉查找树的要求外，它还具有以下特性：</p>
+<ul>
+<li>每个节点或者是黑色，或者是红色。</li>
+<li>根节点是黑色。</li>
+<li>每个叶子节点是黑色。<br>如果一个节点是红色的，则它的子节点必须是黑色的。</li>
+<li>从一个节点到该节点的子孙节点的所有路径上包含相同数目的黑节点。</li>
+</ul>
+<h3 id="B-tree"><a href="#B-tree" class="headerlink" title="B-tree"></a>B-tree</h3><p>一颗m阶B树的特性：</p>
+<ul>
+<li>根结点至少有两个子女（如果B树只有一个根节点，这个根节点的key的数量可以为[1~m-1]）</li>
+<li>每个非根节点所包含的关键字个数 j 满足：⌈m/2⌉ - 1 &lt;= j &lt;= m - 1，节点的值按非降序方式存放，即从左到右依次增加</li>
+<li>除根结点以及叶子节点以外的所有结点的度数正好是关键字总数加1，故内部节点的子树个数 k 满足：⌈m/2⌉ &lt;= k &lt;= m</li>
+<li>所有的叶子结点都位于同一层</li>
+</ul>
+<h3 id="B-树"><a href="#B-树" class="headerlink" title="B+树"></a>B+树</h3><p>m阶B+树是m阶B-tree的变体，它的定义大致跟B-tree一致，不过有以下几点不同：</p>
+<ul>
+<li>有n棵子树的结点中含有n个关键字，每个关键字不保存数据，只用来索引，所有数据都保存在叶子节点，其中⌈m/2⌉ &lt;= n &lt;= m</li>
+<li>所有的叶子结点中包含了全部关键字的信息，及指向含这些关键字记录的指针，且叶子结点本身依关键字的大小自小而大顺序链接</li>
+<li>所有的非终端结点可以看成是索引部分，结点中仅含其子树（根结点）中的最大（或最小）关键字</li>
+<li>通常在B+树上有两个头指针，一个指向根结点，一个指向关键字最小的叶子结点</li>
+</ul>
+<h3 id="B-树-1"><a href="#B-树-1" class="headerlink" title="B*树"></a>B*树</h3><p>B*树是B+树的变体，除了B+树的要求之外，还有以下特性：</p>
+<ul>
+<li>⌈m*2/3⌉ &lt;= n &lt;=m 这里的n是除根节点之外的内部节点的键</li>
+<li>增加内部节点中兄弟节点的指针，由左边指向右边</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/binary/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/algo/binary/" class="post-title-link" itemprop="url">二分法的标准写法</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>对于二分法，我们常用的取中位数的算法是这样的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mid = (min + max) / <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<p>但当 min 和 max 很大的时候，会出现溢出的情况，从而导致数组访问出错。改进的办法是将加法变成减法。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="type">static</span> <span class="type">int</span> <span class="title">binary</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> data)</span> </span>&#123;</span><br><span class="line">        <span class="type">int</span> min = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> max = arr.length - <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> mid;</span><br><span class="line">        <span class="keyword">while</span> (min &lt;= max) &#123;</span><br><span class="line">            <span class="comment">// 防止溢出</span></span><br><span class="line">            mid =  min + (max - min) / <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span> (arr[mid] &gt; data) &#123;</span><br><span class="line">                max = mid - <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[mid] &lt; data) &#123;</span><br><span class="line">                min = mid + <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> mid;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>还有一种更高效的办法是使用位运算。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="type">static</span> <span class="type">int</span> <span class="title">binary</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> data)</span> </span>&#123;</span><br><span class="line">       <span class="type">int</span> min = <span class="number">0</span>;</span><br><span class="line">       <span class="type">int</span> max = arr.length - <span class="number">1</span>;</span><br><span class="line">       <span class="type">int</span> mid;</span><br><span class="line">       <span class="keyword">while</span> (min &lt;= max) &#123;</span><br><span class="line">           <span class="comment">// 无符号位运算符的优先级较低，先括起来</span></span><br><span class="line">           mid =  min + ((max - min) &gt;&gt;&gt; <span class="number">1</span>);</span><br><span class="line">           <span class="keyword">if</span> (arr[mid] &gt; data) &#123;</span><br><span class="line">               max = mid - <span class="number">1</span>;</span><br><span class="line">           &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[mid] &lt; data) &#123;</span><br><span class="line">               min = mid + <span class="number">1</span>;</span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               <span class="keyword">return</span> mid;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/array/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/algo/array/" class="post-title-link" itemprop="url">线性表</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="/images/code/algo/sqlist.jpeg" alt="线性表"></p>
+<p>数组（Array）是一种线性表数据结构，用来存储一组具有相同类型的数据，它的内存空间是连续的，支持随机访问，但插入与删除操作需要移动大量结点，同时不能预先确定分配的空间大小，会造成空间的浪费。</p>
 
       
     </div>
@@ -1788,7 +1305,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/13/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><span class="page-number current">14</span><a class="page-number" href="/page/15/">15</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><a class="extend next" rel="next" href="/page/15/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/13/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><span class="page-number current">14</span><a class="page-number" href="/page/15/">15</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><a class="extend next" rel="next" href="/page/15/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1853,20 +1370,20 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">183</span>
+          <span class="site-state-item-count">202</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-count">21</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-count">35</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
