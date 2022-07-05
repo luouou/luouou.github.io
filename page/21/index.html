@@ -176,128 +176,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/linux/core_dump/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/linux/core_dump/" class="post-title-link" itemprop="url">core dump</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 15:46:32" itemprop="dateCreated datePublished" datetime="2022-06-07T15:46:32+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><strong>设置core文件大小</strong></p>
-<p>使用<code>ulimit -c</code>命令可查看core文件大小，若结果为0，则表示不会生成core文件。</p>
-<p>使用<code>ulimit -c filesize</code>命令，可以限制core文件的大小，filesize的单位为kbyte。若设置为<code>ulimit -c unlimited</code>则表示core文件的大小不受限制。</p>
-<p>永久设置，修改/etc/security/limits.conf文件：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#*               soft    core            0</span><br></pre></td></tr></table></figure>
-
-<p>修改成：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*                soft    core            unlimited</span><br></pre></td></tr></table></figure>
-
-<p><strong>查询coredump文件路径</strong></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cat /proc/sys/kernel/core_pattern</span><br><span class="line"></span><br><span class="line">/sbin/sysctl kernel.core_pattern</span><br></pre></td></tr></table></figure>
-
-<p><strong>修改coredump文件路径</strong></p>
-<ul>
-<li>临时修改</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;/tmp/core_%e_%p_%t&quot; &gt; /proc/sys/kernel/core_pattern</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>永久修改</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/sbin/sysctl -w kernel.core_pattern=/var/log/%e.core.%p</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>永久设置, 修改<code>/etc/sysctl.conf</code>配置文件，添加一行，然后执行<code>sysctl -p</code>生效。</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kernel.core_pattern = %e.core.%p</span><br></pre></td></tr></table></figure>
-
-<p>可通过以下参数来丰富core文件的命名：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">%% 单个%字符</span><br><span class="line">%p 所dump进程的进程ID</span><br><span class="line">%u 所dump进程的实际用户ID</span><br><span class="line">%g 所dump进程的实际组ID</span><br><span class="line">%s 导致本次core dump的信号</span><br><span class="line">%t core dump的时间 (由1970年1月1日计起的秒数)</span><br><span class="line">%h 主机名</span><br><span class="line">%e 程序文件名</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>core文件带pid</li>
-</ul>
-<ol>
-<li>修改<code>/proc/sys/kernel/core_uses_pid</code>，如果这个文件的内容被配置成1，即使core_pattern中没有设置%p，最后生成的core dump文件名仍会加上进程ID。</li>
-<li>永久设置, 修改/etc/sysctl.conf配置文件，添加一行，然后执行<code>sysctl -p</code></li>
-</ol>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kernel.core_uses_pid = 1</span><br></pre></td></tr></table></figure>
-
-<p><em>注意</em>：</p>
-<ol>
-<li><p>要保证存放coredump文件的目录存在，且进程对该目录有写权限。</p>
-</li>
-<li><p>若程序调用了seteuid()/setegid()改变了进程的有效用户或组，则在默认情况下系统不会为这些进程生成coredump文件。需要将<code>/proc/sys/fs/suid_dumpable</code>文件的内容设为1。</p>
-</li>
-<li><p>在普通用户下运行调用了setuid的程序，要将<code>/proc/sys/fs/suid_dumpable</code>设置为2才能生成coredump文件。</p>
-</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/dev/i2c_tools/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -437,7 +315,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">202</span>
+          <span class="site-state-item-count">201</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

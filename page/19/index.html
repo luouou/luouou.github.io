@@ -176,136 +176,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/media/image/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/media/image/" class="post-title-link" itemprop="url">image</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:36:12" itemprop="dateModified" datetime="2022-06-08T17:36:12+08:00">2022-06-08</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="像素"><a href="#像素" class="headerlink" title="像素"></a>像素</h2><h3 id="RGB"><a href="#RGB" class="headerlink" title="RGB"></a>RGB</h3><p>在RGB 颜色空间上，当任何一个基色的亮度值为零时，即在原点处，就显示为黑色。当三种基色都达到最高亮度时，就表现为白色。在连接黑色与白色的对角线上，是亮度等量的三基色混合而成的灰色，该线称为灰色线。<a target="_blank" rel="noopener" href="http://www.fourcc.org/rgb.php">详细</a></p>
-<ul>
-<li>RGB565格式每一个像素用16个bit来表示。 R, G, B分别用5， 6， 5个bit来表示。</li>
-<li>RGB55格式每一个像素用16个bit，但是最高位不用，R, G, B分别用5个bit来表示。</li>
-<li>RGB24每一个像素用24个bit来表示，R, G， B分量分别用8个bit来表示。</li>
-<li>RGB32每一个像素用32个bit表示，R, G, B分量分别用8个bit表示，存储顺序为B, G, R，最后8个字节保留。</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">R = Y + <span class="number">1.402</span> (Cr<span class="number">-128</span>)</span><br><span class="line">G = Y * <span class="number">0.34414</span> (Cb<span class="number">-128</span>) * <span class="number">0.71414</span> (Cr<span class="number">-128</span>)</span><br><span class="line">B = Y + <span class="number">1.772</span> (Cb<span class="number">-128</span>)</span><br></pre></td></tr></table></figure>
-
-<h3 id="YUV"><a href="#YUV" class="headerlink" title="YUV"></a>YUV</h3><p>YUV是一种颜色编码方法，主要用于电视系统以及模拟视频领域，它将亮度信息（Y）与色彩信息（UV）分离，没有UV信息一样可以显示完整的图像，只不过是黑白的，这样的设计很好地解决了彩色电视机与黑白电视的兼容问题。并且，YUV不像RGB那样要求三个独立的视频信号同时传输，YUV是数据总尺寸小于RGB格式（但用YUV444的话，和RGB888一样都是24bits），所以用YUV方式传送占用极少的频宽。</p>
-<p>YUV，分为三个分量，“Y”表示明亮度（Luminance或Luma），也就是灰度值；而“U”和“V” 表示的则是色度（Chrominance或Chroma），作用是描述影像色彩及饱和度，用于指定像素的颜色。</p>
-<p><img src="/images/media/image/yuv.jpg" alt="彩色，Y分量，V分量，U分量"></p>
-<p>YUV细分的话有Y’UV，YUV，YCbCr，YPbPr等类型，其中YCbCr主要用于数字信号。Y’CbCr也称为YUV，是YUV的压缩版本，不同之处在于Y’CbCr用于数字图像领域，YUV用于模拟信号领域，MPEG、DVD、摄像机中常说的YUV其实就是Y’CbCr。</p>
-<p>其中，Cr反映了RGB输入信号红色部分与RGB信号亮度值之间的差异，而Cb反映的是RGB输入信号蓝色部分与RGB信号亮度值之间的差异，此即所谓的色差信号。<a target="_blank" rel="noopener" href="http://www.fourcc.org/yuv.php">详细</a></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Y = <span class="number">0.30</span>R + <span class="number">0.59</span>G + <span class="number">0.11B</span></span><br><span class="line">U = <span class="number">0.493</span>(B-Y) = <span class="number">-0.15</span>R - <span class="number">0.29</span>G + <span class="number">0.44B</span></span><br><span class="line">V = <span class="number">0.877</span>(R-Y) = <span class="number">0.62</span>R - <span class="number">0.52</span>G - <span class="number">0.10B</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="采样方式"><a href="#采样方式" class="headerlink" title="采样方式"></a>采样方式</h4><p>YUV的采样有许多种，常用的有444，422，420，411等。用三个图来直观地表示采集的方式，以黑点表示采样该像素点的Y分量，以空心圆圈表示采用该像素点的UV分量。<br><img src="/images/media/image/yuv_sample.webp" alt="YUV常用采样"></p>
-<ul>
-<li>4:4:4采样，每一个Y对应一组UV分量，24 Bits per Pixel</li>
-<li>4:2:2采样，每两个Y共用一组UV分量，16 Bits per Pixel</li>
-<li>4:2:0采样，每四个Y共用一组UV分量，12 Bits per Pixel</li>
-</ul>
-<h4 id="存储格式"><a href="#存储格式" class="headerlink" title="存储格式"></a>存储格式</h4><p>对于packed的YUV格式，每个像素点的Y,U,V是连续交错存储的。</p>
-<ul>
-<li><p>UYVY422<br><img src="/images/media/image/UYVY422.webp" alt="img"></p>
-</li>
-<li><p>YUV420<br><img src="/images/media/image/YUV420.webp" alt="img"></p>
-</li>
-</ul>
-<p>对于planar的YUV格式，先连续存储所有像素点的Y，紧接着存储所有像素点的U，随后是所有像素点的V。</p>
-<ul>
-<li><p>YUV422P<br><img src="/images/media/image/YUV422P.webp" alt="img"></p>
-</li>
-<li><p>YUV420P<br><img src="/images/media/image/YUV420P.webp" alt="img"></p>
-</li>
-</ul>
-<p>对于SemiPlanar，则是先连续存储所有像素点的Y，再连续交错U和V。</p>
-<ul>
-<li><p>YUV422SP<br><img src="/images/media/image/YUV422SP.webp" alt="img"></p>
-</li>
-<li><p>YUV420SP<br><img src="/images/media/image/YUV420SP.webp" alt="img"></p>
-</li>
-</ul>
-<h3 id="OSD字模"><a href="#OSD字模" class="headerlink" title="OSD字模"></a>OSD字模</h3><ul>
-<li>单色字模，1个像素对应1bit，1个8×8的字模对应的是8个字节的数据。</li>
-<li>4色字模，1个像素对应2bit，1个8×8的字模对应的是8x2个字节的数据。</li>
-<li>16色字模，1个像素对应4bit，1个8×8的字模对应的是8x4个字节的数据。</li>
-</ul>
-<h2 id="图像处理"><a href="#图像处理" class="headerlink" title="图像处理"></a>图像处理</h2><p>在图像处理中，常见的颜色模型包括HSB（色相、饱和度、亮度）、RGB（红色、绿色、蓝色）、CMYK（青色、品红、黄色、黑色）和CIE L<em>a</em>b*等，因此，相应的颜色模式也就有RGB、CMYK、Lab等。在HSB颜色模型中，色相、饱和度、亮度是对图像属性的基本描述。</p>
-<p><strong>图象亮度</strong>（brightness）是指画面的明亮程度，单位是堪德拉每平米(cd/m2)或称nits。</p>
-<p><strong>对比度</strong>（contrast）指的是图像暗和亮的落差值，即图像最大灰度级和最小灰度级之间的差值。</p>
-<p><strong>饱和度</strong>（saturation）指的是图像颜色种类的多少， 上面提到图像的灰度级是[L<del>min</del>，L<del>max</del>]，则在L<del>min</del>、L<del>max</del> 的中间值越多，便代表图像的颜色种类多，饱和度也就更高，外观上看起来图像会更鲜艳，调整饱和度可以修正过度曝光或者未充分曝光的图片，使图像看上去更加自然。</p>
-<p><strong>色相</strong>（hue）是从物体反射或透过物体传播的颜色。在0°到360°的标准色轮上，按位置度量色相。</p>
-<p><strong>锐度</strong>（sharpness）是图像清晰度和图像边缘锐利程度。图像锐化是补偿图像的轮廓，增强图像的边缘及灰度跳变的部分，使图像变得清晰。在做图像平滑，图像滤波处理的时候经过会把丢失图像的边缘信息，通过图像锐化便能够增强突出图像的边缘轮廓。</p>
-<p><strong>灰度</strong>是图像上每个像素的颜色值，指黑白图像中点的颜色深度，范围一般从0到255，白色为255，黑色为0。</p>
-<ul>
-<li><p>最大值法：将彩色图像中的三分量亮度的最大值作为灰度图的灰度值，这种方法转换的灰度图亮度很高。</p>
-</li>
-<li><p>平均值法：将彩色图像中的三分量亮度求平均得到一个灰度值，这种方法产生的灰度图像比较柔和。</p>
-</li>
-<li><p>加权平均值法：以不同的权值对R，G，B的值加权平均，由于人眼对绿色最为敏感，对蓝色的敏感性最低，因此得到的灰度图像效果最好。$gray = 0.299<em>R + 0.578</em>G + 0.114*B$。</p>
-</li>
-</ul>
-<p><strong>灰阶</strong>（gray scale）在YUV空间，将UV分量丢弃，只保留Y分量，得到的黑白图像。</p>
-<p><strong>复古</strong>（绿，蓝）（sepia / sepiagreen / sepiablue）就是在灰阶的基础上，对UV值额外再做了一个offset，将灰度图转换成某种颜色的梯度图。为了获得蓝色效果，应该增加蓝色差信号，减小红色差信号，即增大U，减小V。</p>
-<p><strong>负片</strong>（Negative Film）就是将图像的颜色反转，看起来就像是在看胶片底片时的效果。在RGB空间，取其补色，就是用255分别减去RGB得到新的RGB值。<br><img src="/images/media/image/complementary.jpg" alt="img"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/char-encode/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -11321,6 +11191,102 @@
   
   
 
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/bus/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/kernel/bus/" class="post-title-link" itemprop="url">bus device driver</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Linux内核分别使用 bus_type、device_driver 和 device 来描述总线、驱动和设备，这三个结构体定义于 include/linux/device.h 头文件中。</p>
+<h2 id="bus"><a href="#bus" class="headerlink" title="bus"></a>bus</h2><p>在linux设备模型中，总线用 bus_type 结构体表示。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">bus_type</span> &#123;</span></span><br><span class="line">    <span class="type">char</span> *name;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">subsystem</span> <span class="title">subsys</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">kset</span> <span class="title">drivers</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">kset</span> <span class="title">devices</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">bus_attribute</span>    *<span class="title">bus_attrs</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_attribute</span> *<span class="title">dev_attrs</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">driver_attribute</span> *<span class="title">drv_attrs</span>;</span></span><br><span class="line">    <span class="type">int</span> (*match)(<span class="keyword">struct</span> device *dev, <span class="keyword">struct</span> device_driver *drv);</span><br><span class="line">    <span class="type">int</span> (*hotplug) (<span class="keyword">struct</span> device *dev, <span class="type">char</span> **envp, </span><br><span class="line">                    <span class="type">int</span> num_envp, <span class="type">char</span> *buffer, <span class="type">int</span> buffer_size);</span><br><span class="line">    <span class="type">int</span> (*suspend)(<span class="keyword">struct</span> device *dev, <span class="type">pm_message_t</span> state);</span><br><span class="line">    <span class="type">int</span> (*resume)(<span class="keyword">struct</span> device *dev);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>match()成员函数将分开注册的设备和驱动捆绑在一起。</p>
+<h3 id="bus-register"><a href="#bus-register" class="headerlink" title="bus_register()"></a>bus_register()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">bus_register</span><span class="params">(<span class="keyword">struct</span> bus_type *bus)</span></span><br><span class="line">&#123;</span><br><span class="line">   <span class="type">int</span> retval;</span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">subsys_private</span> *<span class="title">priv</span>;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">lock_class_key</span> *<span class="title">key</span> =</span> &amp;bus-&gt;lock_key;</span><br><span class="line"></span><br><span class="line">   priv = kzalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> subsys_private), GFP_KERNEL);</span><br><span class="line"></span><br><span class="line">   priv-&gt;bus = bus;</span><br><span class="line">   bus-&gt;p = priv;</span><br><span class="line"></span><br><span class="line">   BLOCKING_INIT_NOTIFIER_HEAD(&amp;priv-&gt;bus_notifier);</span><br><span class="line"></span><br><span class="line">   retval = kobject_set_name(&amp;priv-&gt;subsys.kobj, <span class="string">&quot;%s&quot;</span>, bus-&gt;name);</span><br><span class="line"></span><br><span class="line">   priv-&gt;subsys.kobj.kset = bus_kset;</span><br><span class="line">   priv-&gt;subsys.kobj.ktype = &amp;bus_ktype;</span><br><span class="line">   priv-&gt;drivers_autoprobe = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">   retval = kset_register(&amp;priv-&gt;subsys);</span><br><span class="line"></span><br><span class="line">   retval = bus_create_file(bus, &amp;bus_attr_uevent);</span><br><span class="line"></span><br><span class="line">   priv-&gt;devices_kset = kset_create_and_add(<span class="string">&quot;devices&quot;</span>, <span class="literal">NULL</span>, &amp;priv-&gt;subsys.kobj);</span><br><span class="line">   priv-&gt;drivers_kset = kset_create_and_add(<span class="string">&quot;drivers&quot;</span>, <span class="literal">NULL</span>, &amp;priv-&gt;subsys.kobj);</span><br><span class="line"></span><br><span class="line">   INIT_LIST_HEAD(&amp;priv-&gt;interfaces);</span><br><span class="line">   __mutex_init(&amp;priv-&gt;mutex, <span class="string">&quot;subsys mutex&quot;</span>, key);</span><br><span class="line">   klist_init(&amp;priv-&gt;klist_devices, klist_devices_get, klist_devices_put);</span><br><span class="line">   klist_init(&amp;priv-&gt;klist_drivers, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">   retval = add_probe_files(bus);</span><br><span class="line"></span><br><span class="line">   retval = bus_add_groups(bus, bus-&gt;bus_groups);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="bus-attribute"><a href="#bus-attribute" class="headerlink" title="bus_attribute"></a>bus_attribute</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">bus_attribute</span> &#123;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">attribute</span>   <span class="title">attr</span>;</span></span><br><span class="line">   <span class="type">ssize_t</span> (*show)(<span class="keyword">struct</span> bus_type *bus, <span class="type">char</span> *buf);</span><br><span class="line">   <span class="type">ssize_t</span> (*store)(<span class="keyword">struct</span> bus_type *bus, <span class="type">const</span> <span class="type">char</span> *buf, <span class="type">size_t</span> count);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BUS_ATTR(_name, _mode, _show, _store)   \</span></span><br><span class="line"><span class="meta">   struct bus_attribute bus_attr_##_name = __ATTR(_name, _mode, _show, _store)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">bus_create_file</span><span class="params">(<span class="keyword">struct</span> bus_type *bus, <span class="keyword">struct</span> bus_attribute *attr)</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">bus_remove_file</span><span class="params">(<span class="keyword">struct</span> bus_type *bus, <span class="keyword">struct</span> bus_attribute *attr)</span></span><br></pre></td></tr></table></figure>
+
+<p>可用BUS_ATTR宏来初始化一个 bus_attribute 结构体。调用 bus_create_file() 函数创建总线属性。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">show_bus_version</span><span class="params">(<span class="keyword">struct</span> bus_type *bus, <span class="type">char</span> *buf)</span></span><br><span class="line">&#123;</span><br><span class="line">   <span class="keyword">return</span> <span class="built_in">snprintf</span>(buf, PAGE_SIZE, <span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;revision: 1.0&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="title function_">BUS_ATTR</span><span class="params">(version, S_IRUGO, show_bus_version, <span class="literal">NULL</span>)</span>;</span><br><span class="line"></span><br><span class="line">bus_create_file(&amp;my_bus_type, &amp;bus_attr_version)</span><br></pre></td></tr></table></figure>
+
+<h2 id="device"><a href="#device" class="headerlink" title="device"></a>device</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">device</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device</span>  *<span class="title">parent</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_private</span> *<span class="title">p</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">kobject</span> <span class="title">kobj</span>;</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>  *init_name; <span class="comment">/* initial name of the device */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_type</span> *<span class="title">type</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mutex</span>  <span class="title">mutex</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">bus_type</span> *<span class="title">bus</span>;</span>  <span class="comment">/* type of bus device is on */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_driver</span> *<span class="title">driver</span>;</span> <span class="comment">/* which driver has allocated this device */</span></span><br><span class="line">    <span class="type">void</span>  *platform_data; <span class="comment">/* Platform specific data, device core doesn&#x27;t touch it */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dev_pm_info</span> <span class="title">power</span>;</span></span><br><span class="line">    u64  *dma_mask;</span><br><span class="line">    u64  coherent_dma_mask;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_dma_parameters</span> *<span class="title">dma_parms</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">dma_pools</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dma_coherent_mem</span> *<span class="title">dma_mem</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dev_archdata</span> <span class="title">archdata</span>;</span></span><br><span class="line">    <span class="type">dev_t</span>   devt; <span class="comment">/* dev_t, creates the sysfs &quot;dev&quot; */</span></span><br><span class="line">    <span class="type">spinlock_t</span>  devres_lock;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">devres_head</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">klist_node</span> <span class="title">knode_class</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="keyword">class</span>  *<span class="keyword">class</span>;</span></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">attribute_group</span> **<span class="title">groups</span>;</span> <span class="comment">/* optional groups */</span></span><br><span class="line">    <span class="type">void</span> (*release)(<span class="keyword">struct</span> device *dev);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="device-register"><a href="#device-register" class="headerlink" title="device_register()"></a>device_register()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">device_register</span><span class="params">(<span class="keyword">struct</span> device *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">   device_initialize(dev);</span><br><span class="line">   <span class="keyword">return</span> device_add(dev);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">device_initialize</span><span class="params">(<span class="keyword">struct</span> device *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">   dev-&gt;kobj.kset = devices_kset;</span><br><span class="line">   kobject_init(&amp;dev-&gt;kobj, &amp;device_ktype);</span><br><span class="line">   INIT_LIST_HEAD(&amp;dev-&gt;dma_pools);</span><br><span class="line">   mutex_init(&amp;dev-&gt;mutex);</span><br><span class="line">   lockdep_set_novalidate_class(&amp;dev-&gt;mutex);</span><br><span class="line">   spin_lock_init(&amp;dev-&gt;devres_lock);</span><br><span class="line">   INIT_LIST_HEAD(&amp;dev-&gt;devres_head);</span><br><span class="line">   device_pm_init(dev);</span><br><span class="line">   set_dev_node(dev, <span class="number">-1</span>);</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_GENERIC_MSI_IRQ</span></span><br><span class="line">   INIT_LIST_HEAD(&amp;dev-&gt;msi_list);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">   INIT_LIST_HEAD(&amp;dev-&gt;links.consumers);</span><br><span class="line">   INIT_LIST_HEAD(&amp;dev-&gt;links.suppliers);</span><br><span class="line">   dev-&gt;links.status = DL_DEV_NO_DRIVER;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">device_add</span><span class="params">(<span class="keyword">struct</span> device *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">device</span> *<span class="title">parent</span>;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">kobject</span> *<span class="title">kobj</span>;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">class_interface</span> *<span class="title">class_intf</span>;</span></span><br><span class="line">   <span class="type">int</span> error = -EINVAL;</span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">kobject</span> *<span class="title">glue_dir</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">   dev = get_device(dev);</span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> (!dev-&gt;p) &#123;</span><br><span class="line">      error = device_private_init(dev);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> (dev-&gt;init_name) &#123;</span><br><span class="line">      dev_set_name(dev, <span class="string">&quot;%s&quot;</span>, dev-&gt;init_name);</span><br><span class="line">      dev-&gt;init_name = <span class="literal">NULL</span>;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">/* subsystems can specify simple device enumeration */</span></span><br><span class="line">   <span class="keyword">if</span> (!dev_name(dev) &amp;&amp; dev-&gt;bus &amp;&amp; dev-&gt;bus-&gt;dev_name)</span><br><span class="line">      dev_set_name(dev, <span class="string">&quot;%s%u&quot;</span>, dev-&gt;bus-&gt;dev_name, dev-&gt;id);</span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> (!dev_name(dev)) &#123;</span><br><span class="line">      error = -EINVAL;</span><br><span class="line">      <span class="keyword">goto</span> name_error;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   parent = get_device(dev-&gt;parent);</span><br><span class="line">   kobj = get_device_parent(dev, parent);</span><br><span class="line">   <span class="keyword">if</span> (kobj)</span><br><span class="line">      dev-&gt;kobj.parent = kobj;</span><br><span class="line"></span><br><span class="line">   <span class="comment">/* use parent numa_node */</span></span><br><span class="line">   <span class="keyword">if</span> (parent &amp;&amp; (dev_to_node(dev) == NUMA_NO_NODE))</span><br><span class="line">      set_dev_node(dev, dev_to_node(parent));</span><br><span class="line"></span><br><span class="line">   error = kobject_add(&amp;dev-&gt;kobj, dev-&gt;kobj.parent, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">   <span class="comment">/* notify platform of device entry */</span></span><br><span class="line">   error = device_platform_notify(dev, KOBJ_ADD);</span><br><span class="line"></span><br><span class="line">   error = device_create_file(dev, &amp;dev_attr_uevent);</span><br><span class="line"></span><br><span class="line">   error = device_add_class_symlinks(dev);</span><br><span class="line">   error = device_add_attrs(dev);</span><br><span class="line">   error = bus_add_device(dev);</span><br><span class="line">   error = dpm_sysfs_add(dev);</span><br><span class="line">   device_pm_add(dev);</span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> (MAJOR(dev-&gt;devt)) &#123;</span><br><span class="line">      error = device_create_file(dev, &amp;dev_attr_dev);</span><br><span class="line"></span><br><span class="line">      error = device_create_sys_dev_entry(dev);</span><br><span class="line"></span><br><span class="line">      devtmpfs_create_node(dev);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> (dev-&gt;bus)</span><br><span class="line">      blocking_notifier_call_chain(&amp;dev-&gt;bus-&gt;p-&gt;bus_notifier,</span><br><span class="line">                    BUS_NOTIFY_ADD_DEVICE, dev);</span><br><span class="line"></span><br><span class="line">   kobject_uevent(&amp;dev-&gt;kobj, KOBJ_ADD);</span><br><span class="line">   bus_probe_device(dev);</span><br><span class="line">   <span class="keyword">if</span> (parent)</span><br><span class="line">      klist_add_tail(&amp;dev-&gt;p-&gt;knode_parent,</span><br><span class="line">                &amp;parent-&gt;p-&gt;klist_children);</span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> (dev-&gt;class) &#123;</span><br><span class="line">      mutex_lock(&amp;dev-&gt;class-&gt;p-&gt;mutex);</span><br><span class="line">      <span class="comment">/* tie the class to the device */</span></span><br><span class="line">      klist_add_tail(&amp;dev-&gt;knode_class,</span><br><span class="line">                &amp;dev-&gt;class-&gt;p-&gt;klist_devices);</span><br><span class="line"></span><br><span class="line">      <span class="comment">/* notify any interfaces that the device is here */</span></span><br><span class="line">      list_for_each_entry(class_intf,</span><br><span class="line">                &amp;dev-&gt;class-&gt;p-&gt;interfaces, node)</span><br><span class="line">         <span class="keyword">if</span> (class_intf-&gt;add_dev)</span><br><span class="line">            class_intf-&gt;add_dev(dev, class_intf);</span><br><span class="line">      mutex_unlock(&amp;dev-&gt;class-&gt;p-&gt;mutex);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="device-attribute"><a href="#device-attribute" class="headerlink" title="device_attribute"></a>device_attribute</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">device_attribute</span> &#123;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">attribute</span>   <span class="title">attr</span>;</span></span><br><span class="line">   <span class="type">ssize_t</span> (*show)(<span class="keyword">struct</span> device *dev, <span class="keyword">struct</span> device_attribute *attr,</span><br><span class="line">         <span class="type">char</span> *buf);</span><br><span class="line">   <span class="type">ssize_t</span> (*store)(<span class="keyword">struct</span> device *dev, <span class="keyword">struct</span> device_attribute *attr,</span><br><span class="line">          <span class="type">const</span> <span class="type">char</span> *buf, <span class="type">size_t</span> count);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEVICE_ATTR(_name, _mode, _show, _store) \</span></span><br><span class="line"><span class="meta">   struct device_attribute dev_attr_##_name = __ATTR(_name, _mode, _show, _store)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">device_create_file</span><span class="params">(<span class="keyword">struct</span> device *dev, <span class="type">const</span> <span class="keyword">struct</span> device_attribute *attr)</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">device_remove_file</span><span class="params">(<span class="keyword">struct</span> device *dev, <span class="keyword">struct</span> device_attribute *attr)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="device-driver"><a href="#device-driver" class="headerlink" title="device_driver"></a>device_driver</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">device_driver</span> &#123;</span></span><br><span class="line">    <span class="comment">/* 驱动程序的名称 */</span></span><br><span class="line">    <span class="type">char</span>   *name;</span><br><span class="line">    <span class="comment">/* 指向总线描述符的指针。 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">bus_type</span>  *<span class="title">bus</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 禁止卸载设备驱动程序的信号量。 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">semaphore</span> <span class="title">unload_sem</span>;</span></span><br><span class="line">    <span class="comment">/* 内嵌kobject */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">kobject</span>  <span class="title">kobj</span>;</span></span><br><span class="line">    <span class="comment">/* 驱动程序所支持的所有设备组成的链表的首部。 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">devices</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 驱动程序所在模块（如果有的话） */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">module</span>   *<span class="title">owner</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 探测设备的方法 */</span></span><br><span class="line">    <span class="type">int</span> (*probe) (<span class="keyword">struct</span> device *dev);</span><br><span class="line">    <span class="comment">/* 移走设备的方法（检测设备驱动程序是否可以控制该设备） */</span></span><br><span class="line">    <span class="type">int</span>  (*remove) (<span class="keyword">struct</span> device *dev);</span><br><span class="line">    <span class="comment">/* 设备断电时调用的方法。 */</span></span><br><span class="line">    <span class="type">void</span> (*shutdown) (<span class="keyword">struct</span> device *dev);</span><br><span class="line">    <span class="comment">/* 设备置于低功率状态时所调用的方法 */</span></span><br><span class="line">    <span class="type">int</span> (*suspend) (<span class="keyword">struct</span> device *dev, u32 state, u32 level);</span><br><span class="line">    <span class="comment">/* 设备恢复正常状态时所调用的方法 */</span></span><br><span class="line">    <span class="type">int</span> (*resume) (<span class="keyword">struct</span> device *dev, u32 level);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="driver-register"><a href="#driver-register" class="headerlink" title="driver_register()"></a>driver_register()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">driver_register</span><span class="params">(<span class="keyword">struct</span> device_driver *drv)</span></span><br><span class="line">&#123;</span><br><span class="line">   <span class="type">int</span> ret;</span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">device_driver</span> *<span class="title">other</span>;</span></span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> ((drv-&gt;bus-&gt;probe &amp;&amp; drv-&gt;probe) ||</span><br><span class="line">       (drv-&gt;bus-&gt;remove &amp;&amp; drv-&gt;remove) ||</span><br><span class="line">       (drv-&gt;bus-&gt;shutdown &amp;&amp; drv-&gt;shutdown))</span><br><span class="line">      printk(KERN_WARNING <span class="string">&quot;Driver &#x27;%s&#x27; needs updating - please use &quot;</span></span><br><span class="line">         <span class="string">&quot;bus_type methods\n&quot;</span>, drv-&gt;name);</span><br><span class="line"></span><br><span class="line">   other = driver_find(drv-&gt;name, drv-&gt;bus);</span><br><span class="line"></span><br><span class="line">   ret = bus_add_driver(drv);</span><br><span class="line"></span><br><span class="line">   ret = driver_add_groups(drv, drv-&gt;groups);</span><br><span class="line"></span><br><span class="line">   kobject_uevent(&amp;drv-&gt;p-&gt;kobj, KOBJ_ADD);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="driver-attribute"><a href="#driver-attribute" class="headerlink" title="driver_attribute"></a>driver_attribute</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">driver_attribute</span> &#123;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">attribute</span> <span class="title">attr</span>;</span></span><br><span class="line">   <span class="type">ssize_t</span> (*show)(<span class="keyword">struct</span> device_driver *driver, <span class="type">char</span> *buf);</span><br><span class="line">   <span class="type">ssize_t</span> (*store)(<span class="keyword">struct</span> device_driver *driver, <span class="type">const</span> <span class="type">char</span> *buf, <span class="type">size_t</span> count);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DRIVER_ATTR(_name, _mode, _show, _store)   \</span></span><br><span class="line"><span class="meta">struct driver_attribute driver_attr_##_name =      \</span></span><br><span class="line"><span class="meta">   __ATTR(_name, _mode, _show, _store)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">driver_create_file</span><span class="params">(<span class="keyword">struct</span> device_driver *drv, <span class="type">const</span> <span class="keyword">struct</span> driver_attribute *attr)</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">driver_remove_file</span><span class="params">(<span class="keyword">struct</span> device_driver *drv, <span class="keyword">struct</span> driver_attribute *attr)</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
   </div>
 
   
@@ -11390,7 +11356,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">202</span>
+          <span class="site-state-item-count">201</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
