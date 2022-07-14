@@ -176,6 +176,638 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/linux/proc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/linux/proc/" class="post-title-link" itemprop="url">linux /proc/ directory</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>/proc文件系统是一种虚拟文件系统，以文件系统目录和文件形式，提供一个指向内核数据结构的接口，通过它能够查看和改变各种系统属性，proc目录通常情况下是由系统自动挂载在/proc目录下，也可自行手动挂载。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount -t proc proc /proc</span><br></pre></td></tr></table></figure>
+
+<h2 id="proc-pid"><a href="#proc-pid" class="headerlink" title="/proc/pid/"></a>/proc/pid/</h2><p>这些文件和目录记录的都是pid对应进程的信息。</p>
+<ul>
+<li><p>/proc/pid/attr/  提供了安全相关的属性，可读可写，以支持SELinux等安全模块，需配置CONFIG_SECURITY。</p>
+<ul>
+<li>/proc/pid/attr/current  当前的安全相关的属性。</li>
+<li>/proc/pid/attr/exec  执行命令execve时设置的安全相关的属性。</li>
+<li>/proc/pid/attr/fscreate  代表进程与文件有关的权限，包括open、mkdir、symlink、mknod。</li>
+<li>/proc/pid/attr/keycreate  执行命令add_key时设置的安全相关的属性。</li>
+<li>/proc/pid/attr/prev  最后一次执行命令execve时的安全相关的属性。</li>
+<li>/proc/pid/attr/sockcreate  创建socket时设置的安全相关的属性。</li>
+</ul>
+</li>
+<li><p>/proc/pid/auxv  ELF解释器信息，格式为一个unsigned long类型的ID加一个unsigned long类型的值，最后为两个0（man getauxval）。</p>
+</li>
+<li><p>/proc/pid/cgroup  进程所属的控制组，格式为冒号分隔的三个字段，分别是结构ID、子系统、控制组，需配置CONFIG_CGROUPS。</p>
+</li>
+<li><p>/proc/pid/clear_refs  只写，只用于进程的拥有者，清除用于估算内存使用量的PG_Referenced和ACCESSED/YOUNG，有四种策略，1表示清除相关的所有页，2表示清除相关的匿名页，3表示清除相关的映射文件的页，4表示清除相关的soft-dirty的页，需配置CONFIG_PROC_PAGE_MONITOR。</p>
+</li>
+<li><p>/proc/pid/cmdline  只读，保存启动进程的完整的命令行字符串，如果是僵尸进程，这个文件为空。</p>
+</li>
+<li><p>/proc/pid/comm  进程的命令名，不同的线程（man clone prctl pthread_setname_np）可能有不同的线程名，位置在“task/[tid]/comm”，名字长度超过TASK_COMM_LEN时会被截断。</p>
+</li>
+<li><p>/proc/pid/coredump_filter  coredump过滤器，如00000033（man core），不同的二进制位表示过滤不同的信息。</p>
+</li>
+<li><p>/proc/pid/cpuset  控制CPU和内存的节点（man cpuset）。</p>
+</li>
+<li><p>/proc/pid/cwd  符号链接到当前工作目录。</p>
+</li>
+<li><p>/proc/pid/environ  环境变量。</p>
+</li>
+<li><p>/proc/pid/exe  符号链接到启动进程的完整命令。</p>
+</li>
+<li><p>/proc/pid/fd / 包含当前的fd，这些fd符号链接到真正打开的文件。</p>
+</li>
+<li><p>/proc/pid/fdinfo / 包含当前fd的信息，不同类型的fd信息不同。</p>
+</li>
+<li><p>/proc/pid/io  IO信息。</p>
+</li>
+<li><p>/proc/pid/gid_map  从用户命名空间映射的组ID的信息（man user_namespaces）。</p>
+</li>
+<li><p>/proc/pid/limits  资源软、硬限制（man getrlimit）。</p>
+</li>
+<li><p>/proc/pid/map_files / 包括一些内存映射文件（man mmap），文件名格式为BeginAddress-EndAddress，符号链接到映射的文件，需要配置CONFIG_CHECKPOINT_RESTORE。</p>
+</li>
+<li><p>/proc/pid/maps  当前进程映射的内存区域以及访问权限。</p>
+</li>
+<li><p>/proc/pid/mem  可以通过open、read和lseek访问进程的内存页，不能被用户读取。</p>
+</li>
+<li><p>/proc/pid/mountinfo  挂载信息，格式为<code>36 35 98:0 /mnt1 /mnt2 rw,noatime master:1 - ext3 /dev/root rw,errors=continue</code>，以空格作为分隔符，从左到右各字段的意思分别是唯一挂载ID、父挂载ID、文件系统的设备主从号码、文件系统中挂载的根节点、相对于进程根节点的挂载点、挂载权限等挂载配置、可选配置、短横线表示前面可选配置的结束、文件系统类型、文件系统特有的挂载源或者为none、额外配置。</p>
+</li>
+<li><p>/proc/pid/mounts  挂载在当前进程的文件系统列表，格式参照（man fstab）。</p>
+</li>
+<li><p>/proc/pid/mountstats  挂载信息。</p>
+</li>
+<li><p>/proc/pid/ns / 保存了每个名字空间的入口，详见（man namespaces）。</p>
+</li>
+<li><p>/proc/pid/numa_maps  numa即Non Uniform Memory Access，详见（man numa）。</p>
+</li>
+<li><p>/proc/pid/oom_adj  调整OOM分数，OOM即Out Of Memory，发生OOM时OOM Killer根据OOM分数杀掉分数高的进程，默认值为0，会继承自父进程的设置。</p>
+</li>
+<li><p>/proc/pid/oom_score  OOM分数。</p>
+</li>
+<li><p>/proc/pid/oom_score_adj  OOM分值介于-1000到1000之间。</p>
+</li>
+<li><p>/proc/pid/pagemap  当前进程的虚拟内存页映射信息，需要配置CONFIG_PROC_PAGE_MONITOR。</p>
+</li>
+<li><p>/proc/pid/personality  进行执行域。</p>
+</li>
+<li><p>/proc/pid/root  链接到了当前进程的根目录。</p>
+</li>
+<li><p>/proc/pid/seccomp  seccomp模式下允许的系统调用只有read、write、_exit、sigreturn，Linux 2.6.23已弃用这个文件，由prctl替代。</p>
+</li>
+<li><p>/proc/pid/setgroups  详见（man user_namespaces）。</p>
+</li>
+<li><p>/proc/pid/smaps”  内存映射信息，类似于pmap命令，需要配置CONFIG_PROC_PAGE_MONITOR。</p>
+</li>
+<li><p>/proc/pid/stack  内核空间的函数调用堆栈，需要配置CONFIG_STACKTRACE。</p>
+</li>
+<li><p>/proc/pid/stat  进程状态信息，用于ps命令。</p>
+</li>
+<li><p>/proc/pid/statm  进程内存使用信息，以空格分隔的7个数字，从左到右分别表示程序总大小、常驻内存大小、共享内存页大小、text code、library、data + stack、dirty pages。</p>
+</li>
+<li><p>/proc/pid/status  可读性好的进程相关信息。</p>
+</li>
+<li><p>/proc/pid/syscall  系统调用相关信息，需要配置CONFIG_HAVE_ARCH_TRACEHOOK。</p>
+</li>
+<li><p>/proc/pid/task/  每个线程一个子目录，目录名为线程ID。</p>
+</li>
+<li><p>/proc/pid/timers  POSIT定时器列表，包括定时器ID、信号等信息。</p>
+</li>
+<li><p>/proc/pid/uid_map  用户ID映射信息，详见（man user_namespaces）。</p>
+</li>
+<li><p>/proc/pid/gid_map  组ID映射信息，详见（man user_namespaces）。</p>
+</li>
+<li><p>/proc/pid/wchan  进程休眠时内核中相应位置的符号表示，如do_wait。</p>
+</li>
+</ul>
+<h3 id="proc-pid-maps"><a href="#proc-pid-maps" class="headerlink" title="/proc/pid/maps"></a>/proc/pid/maps</h3><h3 id="proc-pid-status"><a href="#proc-pid-status" class="headerlink" title="/proc/pid/status"></a>/proc/pid/status</h3><h3 id="proc-pid-stat"><a href="#proc-pid-stat" class="headerlink" title="/proc/pid/stat"></a>/proc/pid/stat</h3><p>关于进程的状态信息，主要是用于 ps 命令展示，每一行的含义如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">1. pid %d 进程PID</span><br><span class="line">2. comm %s 可执行文件的文件名</span><br><span class="line">3. state %c 进程的状态,使用RSDZTW其中一个值表示.R表示正在运行,S表示因为中断休眠,D表示进程处于不可中断的睡眠, When a process will go to ‘D’ state?. Z表示僵尸进程,T表示正在被追踪或者停止,W表示现在正在进行叶交换.</span><br><span class="line">4. ppid %d 父进程PID</span><br><span class="line">5. grid %d 进程组ID</span><br><span class="line">6. session %d 进程的session id</span><br><span class="line">7. tty_nr %d 进程的控制终端</span><br><span class="line">8. tpgid %d 进程控制终端的前台进程id</span><br><span class="line">9. minflt %n 进程因为不需要从磁盘加载内存页而造成的次要故障数</span><br><span class="line">10. cminflt %u 进程等待子进程造成的次要故障数</span><br><span class="line">11. majflt %lu 进程需要从磁盘加载内存页造成的故障数</span><br><span class="line">12. cmajflt %lu 进程等待子进程造成的故障数</span><br><span class="line">13. utime %lu 进程在用户模式下被调度的时间</span><br><span class="line">14. stime %lu 进程在内核模式下被调度的时间</span><br><span class="line">15. cutime %ld 进程在用户模式下等待子进程的时间</span><br><span class="line">16. cstime %ld 进程在内核模式下等待子进程的时间</span><br><span class="line">17. nice %ld 参见 setpriority 位于19到-20之间.</span><br><span class="line">18. num_threads %ld 当前进程的线程数量</span><br><span class="line">19. vsize %lu 使用的虚拟内存</span><br><span class="line">20. rss %ld resident set szie的缩写,表示进程在实际内存中的页数,主要是包括了text,data,栈,不包括没有加载到内存中或者已经被换出去的内存大小</span><br><span class="line">21. rsslim %lu 进程rss的限制</span><br></pre></td></tr></table></figure>
+
+<h2 id="proc-net"><a href="#proc-net" class="headerlink" title="/proc/net/"></a>/proc/net/</h2><p>网络伪文件系统相关。</p>
+<ul>
+<li>/proc/net/arp   包含了用于地址解析的内核ARP表的信息。</li>
+<li>/proc/net/dev   dev虚拟文件系统显示网络状态的信息，包括发送和接受的数据包的数量，错误和冲突以及其他的统计信息，可通过ifconfig查看。</li>
+<li>/proc/net/raw   存储的是RAW套接字表的信息。</li>
+<li>/proc/net/snmp  保存的是SNMP代理的IP，ICMP以及UDP的管理信息。</li>
+<li>/proc/net/tcp   保存的是系统中的TCP表的信息。</li>
+<li>/proc/net/udp   保存的是系统中的UDP表的信息。</li>
+<li>/proc/net/unix  显示当前系统所有的UNIX domain socket以及它们的状态信息。</li>
+</ul>
+<h2 id="proc-sys"><a href="#proc-sys" class="headerlink" title="/proc/sys/"></a>/proc/sys/</h2><p>系统变量相关信息</p>
+<h2 id="proc-bus"><a href="#proc-bus" class="headerlink" title="/proc/bus/"></a>/proc/bus/</h2><p>已安装的总线</p>
+<h2 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h2><ul>
+<li>/proc/apm  高级电源管理（APM）版本信息及电池相关状态信息，通常由apm命令使用，需要配置CONFIG_APM。</li>
+<li>/proc/buddyinfo  用于诊断内存碎片问题。</li>
+<li>/proc/cmdline  系统启动时传递给Linux内核的参数，如lilo、grub等boot管理模块。</li>
+<li>/proc/config.gz  内核编译配置选项，需要配置CONFIG_IKCONFIG_PROC。</li>
+<li>/proc/crypto  内核加密API提供的加密列表。</li>
+<li>/proc/cpuinfo  CPU和系统架构信息，lscpu命令使用这个文件。</li>
+<li>/proc/devices  设备相关信息。</li>
+<li>/proc/diskstats  每块磁盘设备的磁盘I/O统计信息列表。</li>
+<li>/proc/dma  正在使用且注册的DMA通道信息列表。</li>
+<li>/proc/driver/rtc  系统运行时配置。</li>
+<li>/proc/execdomains  执行域列表。</li>
+<li>/proc/fb  帧缓冲设备列表文件，包含帧缓冲设备的设备号和相关驱动信息，需要配置CONFIG_FB。</li>
+<li>/proc/filesystems  内核支持的文件系统类型（man filesystems）。</li>
+<li>/proc/fs  挂载的文件系统信息。</li>
+<li>/proc/ide  用于IDE接口。</li>
+<li>/proc/interrupts  每个CPU每个IO的中断信息。</li>
+<li>/proc/iomem  IO内存映射信息。</li>
+<li>/proc/ioports  IO端口信息。</li>
+<li>/proc/kallsyms  用于动态链接和和模块绑定的符号定义。</li>
+<li>/proc/kcore  系统使用的物理内存，以ELF核心文件格式存储，其文件大小为已使用的物理内存加4KB；这个文件用来检查内核数据结构的当前状态，通常由GBD调试工具使用。</li>
+<li>/proc/kmsg  用来保存由内核输出的信息，dmsg命令使用这个文件。</li>
+<li>/proc/kpagecount  每个物理页帧映射的次数，需要配置CONFIG_PROC_PAGE_MONITOR。</li>
+<li>/proc/kpageflags  每个物理页帧的掩码，需要配置CONFIG_PROC_PAGE_MONITOR。</li>
+<li>/proc/ksyms  同kallsyms。</li>
+<li>/proc/loadavg  保存关于CPU和磁盘I/O的负载平均值。</li>
+<li>/proc/locks  保存当前由内核锁定的文件的相关信息。</li>
+<li>/proc/malloc  需要配置CONFIG_DEBUG_MALLOC。</li>
+<li>/proc/mdstat  保存RAID相关的多块磁盘的当前状态信息</li>
+<li>/proc/meminfo  系统内存使用统计，free命令使用了这个文件。</li>
+<li>/proc/modules  系统加载的模块信息，相关命令为lsmod。</li>
+<li>/proc/mounts  链接到了/self/mounts。</li>
+<li>/proc/mtrr  Memory Type Range Registers。</li>
+<li>/proc/partitions  分区信息。</li>
+<li>/proc/pci  PCI接口设备。</li>
+<li>/proc/profile  用于readprofile命令作性能分析。</li>
+<li>/proc/scsi  SCSI接口设备。</li>
+<li>/proc/scsi/scsi</li>
+<li>/proc/scsi/[drivername]</li>
+<li>/proc/self  链接到了当前进程所在的目录。</li>
+<li>/proc/slabinfo  内核缓存信息，需要配置CONFIG_SLAB。</li>
+<li>/proc/stat  系统信息统计。</li>
+<li>/proc/swaps  交换分区及其空间利用信息。</li>
+<li>/proc/sysrq-trigger  可写，触发系统调用。</li>
+<li>/proc/sysvipc  包括msg、sem、shm三个文件，为System V IPC对象。</li>
+<li>/proc/thread-self  链接到了当前进程下的task目录中的线程文件<code>/proc/self/task/tid</code>。</li>
+<li>/proc/timer_list  还在运行着的定时器列表。</li>
+<li>/proc/timer_stats  定时器状态。</li>
+<li>/proc/tty  tty设备相关。</li>
+<li>/proc/uptime  系统更新时间和进程空闲时间，单位是秒。</li>
+<li>/proc/version  内核版本信息。</li>
+<li>/proc/vmstat  虚拟内存统计信息，以键值对形式显示。</li>
+<li>/proc/zoneinfo  内存区块信息，用于分析虚拟内存的行为。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/gcc_warning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/tool/gcc_warning/" class="post-title-link" itemprop="url">gcc warning options</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/gcc/" itemprop="url" rel="index"><span itemprop="name">gcc</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="告警开关"><a href="#告警开关" class="headerlink" title="告警开关"></a>告警开关</h2><p><code>-fsyntax-only</code>  检查代码中的语法错误，但除此之外不要做任何事情。</p>
+<p><code>-w</code>  关闭所有警告消息。以<code>-W</code>开头开启特定的警告，以<code>-Wno-</code>开头关闭特定的警告。</p>
+<p><code>-Werror</code>  将所有的警告当成错误进行处理。<code>-Werror=</code> 将指定的警告转换为错误。<code>-Wno-error</code>  取消编译选项-Werror。</p>
+<p><code>-Wfatal-errors</code>  在发生第一个错误时中止编译。</p>
+<p>具体的选项优先于不特定的选项，与命令行中的位置无关。对于相同特征的选项，最后一个生效。</p>
+<h2 id="Wall"><a href="#Wall" class="headerlink" title="-Wall"></a>-Wall</h2><p>该选项相当于同时使用了下列所有的选项：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">unused-function：遇到仅声明过但尚未定义的静态函数时发出警告。</span><br><span class="line">unused-label：遇到声明过但不使用的标号的警告。</span><br><span class="line">unused-parameter：从未用过的函数参数的警告。</span><br><span class="line">unused-variable：在本地声明但从未用过的变量的警告。</span><br><span class="line">unused-value：仅计算但从未用过的值得警告。</span><br><span class="line">Format：检查对printf和scanf等函数的调用，确认各个参数类型和格式串中的一致。</span><br><span class="line">implicit-int：警告没有规定类型的声明。</span><br><span class="line">implicit-function-：在函数在未经声明就使用时给予警告。</span><br><span class="line">char-subscripts：警告把char类型作为数组下标。这是常见错误，程序员经常忘记在某些机器上char有符号。</span><br><span class="line">missing-braces：聚合初始化两边缺少大括号。</span><br><span class="line">Parentheses：在某些情况下如果忽略了括号，编译器就发出警告。</span><br><span class="line">return-type：如果函数定义了返回类型，而默认类型是int型，编译器就发出警告。同时警告那些不带返回值的 return语句，如果他们所属的函数并非void类型。</span><br><span class="line">sequence-point：出现可疑的代码元素时，发出报警。</span><br><span class="line">Switch：如果某条switch语句的参数属于枚举类型，但是没有对应的case语句使用枚举元素，编译器就发出警告（在switch语句中使用default分支能够防止这个警告）。超出枚举范围的case语句同样会导致这个警告。</span><br><span class="line">strict-aliasing：对变量别名进行最严格的检查。</span><br><span class="line">unknown-pragmas：使用了不允许的#pragma。</span><br><span class="line">Uninitialized：在初始化之前就使用自动变量。</span><br></pre></td></tr></table></figure>
+
+<p>但是以下警告项并不会生效：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">cast-align：一旦某个指针类型强制转换时，会导致目标所需的地址对齐边界扩展，编译器就发出警告。例如，某些机器上只能在2或4字节边界上访问整数，如果在这种机型上把char *强制转换成int *类型， 编译器就发出警告。</span><br><span class="line">sign-compare：将有符号类型和无符号类型数据进行比较时发出警告。</span><br><span class="line">missing-prototypes ：如果没有预先声明函数原形就定义了全局函数，编译器就发出警告。即使函数定义自身提供了函数原形也会产生这个警告。这样做的目的是检查没有在头文件中声明的全局函数。</span><br><span class="line">Packed：当结构体带有packed属性但实际并没有出现紧缩式给出警告。</span><br><span class="line">Padded：如果结构体通过充填进行对齐则给出警告。</span><br><span class="line">unreachable-code：如果发现从未执行的代码时给出警告。</span><br><span class="line">Inline：如果某函数不能内嵌（inline），无论是声明为inline或者是指定了-finline-functions 选项，编译器都将发出警告。</span><br><span class="line">disabled-optimization：当需要太长时间或过多资源而导致不能完成某项优化时给出警告。</span><br></pre></td></tr></table></figure>
+
+<h2 id="Wextra"><a href="#Wextra" class="headerlink" title="-Wextra"></a>-Wextra</h2><p>启用一些额外警告标志。（此选项过去称为-W。）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">-Wclobbered  </span><br><span class="line">-Wcast-function-type  </span><br><span class="line">-Wempty-body  </span><br><span class="line">-Wignored-qualifiers</span><br><span class="line">-Wimplicit-fallthrough=3</span><br><span class="line">-Wmissing-field-initializers  </span><br><span class="line">-Wmissing-parameter-type (C only)  </span><br><span class="line">-Wold-style-declaration (C only)  </span><br><span class="line">-Woverride-init  </span><br><span class="line">-Wsign-compare (C only)</span><br><span class="line">-Wtype-limits  </span><br><span class="line">-Wuninitialized  </span><br><span class="line">-Wshift-negative-value (in C++03 and in C99 and newer)  </span><br><span class="line">-Wunused-parameter (only with -Wunused or -Wall)</span><br><span class="line">-Wunused-but-set-parameter (only with -Wunused or -Wall)</span><br></pre></td></tr></table></figure>
+
+<h2 id="其他告警项"><a href="#其他告警项" class="headerlink" title="其他告警项"></a>其他告警项</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">-Wfatal-errors 发生第一个错误时中止编译</span><br><span class="line"></span><br><span class="line">-Wchkp  警告由指针界限检查器（ -fcheck-pointer-bounds ）发现的无效内存访问。</span><br><span class="line"></span><br><span class="line">-Wno-coverage-mismatch  如果使用-fprofile-use选项时反馈配置文件不匹配，则警告 。 如果在使用-fprofile-gen编译和使用-fprofile-use编译时源文件发生更改，则具有配置文件反馈的文件可能无法与源文件匹配，并且GCC无法使用配置文件反馈信息。 默认情况下，此警告已启用并被视为错误。 -Wno-coverage-mismatch可用于禁用警告或-Wno-error = coverage-mismatch可用于禁用该错误。 禁用此警告的错误可能会导致代码质量不佳，并且仅在非常小的更改情况下才有用，例如修复现有代码库的错误。 不建议完全禁用该警告。</span><br><span class="line"></span><br><span class="line">-Wno-cpp 禁止`#warning`指令发出的警告消息。（仅限于Objective-C，C ++，Objective-C ++和Fortran）</span><br><span class="line"></span><br><span class="line">-Wshadow  当一个局部变量遮盖住了另一个局部变量，或者全局变量时，给出警告。很有用的选项，建议打开。 -Wall 并不会打开此项。</span><br><span class="line"></span><br><span class="line">-Wpointer-arith  对函数指针或者void *类型的指针进行算术操作时给出警告。也很有用。 -Wall 并不会打开此项。</span><br><span class="line"></span><br><span class="line">-Wcast-qual  当强制转化丢掉了类型修饰符时给出警告。 -Wall 并不会打开此项。</span><br><span class="line"></span><br><span class="line">-Waggregate-return  如果定义或调用了返回结构体或联合体的函数，编译器就发出警告。</span><br><span class="line"></span><br><span class="line">-Winline  无论是声明为 inline 或者是指定了-finline-functions 选项，如果某函数不能内联，编译器都将发出警告。如果你的代码含有很多 inline 函数的话，这是很有用的选项。</span><br><span class="line"></span><br><span class="line">-Wundef  当一个没有定义的符号出现在`#if`中时，给出警告。</span><br><span class="line"></span><br><span class="line">-Wredundant-decls  如果在同一个可见域内某定义多次声明，编译器就发出警告，即使这些重复声明有效并且毫无差别。</span><br><span class="line"></span><br><span class="line">-Wstrict-prototypes  如果函数的声明或定义没有指出参数类型，编译器就发出警告。很有用的警告。</span><br><span class="line"></span><br><span class="line">-Wctor-dtor-privacy （C++ only）当一个类没有用时给出警告。因为构造函数和析构函数会被当作私有的。</span><br><span class="line"></span><br><span class="line">-Wnon-virtual-dtor （C++ only）当一个类有多态性，而又没有虚析构函数时，发出警告。-Wall会开启这个选项。</span><br><span class="line"></span><br><span class="line">-Wreorder （C++ only）如果代码中的成员变量的初始化顺序和它们实际执行时初始化顺序不一致，给出警告。</span><br><span class="line"></span><br><span class="line">-Wno-deprecated（C++ only）使用过时的特性时不要给出警告。</span><br><span class="line"></span><br><span class="line">-Woverloaded-virtual（C++ only）如果函数的声明隐藏住了基类的虚函数，就给出警告。</span><br><span class="line"></span><br><span class="line">-Winit-self (C, C++, Objective-C and Objective-C++ only)警告使用自己初始化的未初始化变量。 请注意，此选项只能与-Wuninitialized选项一起使用。</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/time/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/c/time/" class="post-title-link" itemprop="url">linux time function</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="时间"><a href="#时间" class="headerlink" title="时间"></a>时间</h2><p><strong>GMT</strong>格林威治时间(Greenwich Mean Time)。根据地球的自转和公转来计算时间，就是太阳横穿格林威治子午线（本初子午线）时的时间，也是0时区的标准时间，是老的时间计量标准。格林威治子午线是穿过英国伦敦格林威治天文台子午仪中心的一条经线，作为零度参考线。</p>
+<p>UT根据原子钟计算出来的时间。</p>
+<p><strong>UTC</strong>协调世界时(Coordinated Universal Time)。因为地球自转越来越慢，每年都会比前一年多出零点几秒，为了让基于原子钟的世界时和基于天文学的格林威治时间相差不至于太大，每隔几年协调世界时组织都会给世界时+1秒，并将所得到的时间称为UTC，这就是现在使用的世界标准时间。协调世界时不与任何地区位置相关，<strong>本地时间</strong>是 UTC+TimeZone，GMT = UTC+0。</p>
+<p>北京时间(CST)所属时区: UTC/GMT +8。</p>
+<p>Unix<strong>时间戳</strong>是从1970-01-01 00:00:00 +0000至今的秒数，不考虑闰秒。</p>
+<p>世界时区的划分以本初子午线（穿过英国伦敦格林威治天文台子午仪中心的一条经线）为标准，向东12个时区，向西12个时区，子午线所在区为0时区，经度每向东或者向西间隔15°，就划分一个时区，共有24个时区，相邻时区的时间相差一个小时。</p>
+<p>夏令时DST(Daylight Saving Time)，它是为节约能源而人为规定地方时间的制度。一般在天亮早的夏季人为将时间提前一小时。在施行夏令时的国家，一年里面有一天只有23小时（夏令时开始那一天），有一天有25小时（夏令时结束那一天），其他时间每天都是24小时。</p>
+<h2 id="获取时间"><a href="#获取时间" class="headerlink" title="获取时间"></a>获取时间</h2><h3 id="time"><a href="#time" class="headerlink" title="time()"></a>time()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">int</span> <span class="type">time_t</span></span><br><span class="line"></span><br><span class="line"><span class="type">time_t</span> <span class="title function_">time</span><span class="params">(<span class="type">time_t</span> *tloc)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>返回从UTC至今所经过的秒数，如果tloc非空，会将返回值也存到该指针。</p>
+<h3 id="ftime"><a href="#ftime" class="headerlink" title="ftime()"></a>ftime()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/timeb.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timeb</span> &#123;</span></span><br><span class="line">    <span class="type">time_t</span>         time;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> millitm;   <span class="comment">// ms</span></span><br><span class="line">    <span class="type">short</span>          timezonel; <span class="comment">// 为目前时区和Greenwich相差的时间，单位为分钟，东区为负</span></span><br><span class="line">    <span class="type">short</span>          dstflag;   <span class="comment">// 非0代表启用夏时制</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">ftime</span><span class="params">(<span class="keyword">struct</span> timeb *tp)</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="gettimeofday"><a href="#gettimeofday" class="headerlink" title="gettimeofday()"></a>gettimeofday()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> &#123;</span></span><br><span class="line">    <span class="type">time_t</span>      tv_sec;     <span class="comment">/* seconds */</span></span><br><span class="line">    <span class="type">suseconds_t</span> tv_usec;    <span class="comment">/* microseconds */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timezone</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> tz_minuteswest;     <span class="comment">/* minutes west of Greenwich */</span></span><br><span class="line">    <span class="type">int</span> tz_dsttime;         <span class="comment">/* type of DST correction */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*tz_dsttime 所代表的状态如下:*/</span> </span><br><span class="line">   DST_NONE     <span class="comment">/* not on DST */</span></span><br><span class="line">   DST_USA      <span class="comment">/* USA style DST */</span></span><br><span class="line">   DST_AUST     <span class="comment">/* Australian style DST */</span></span><br><span class="line">   DST_WET      <span class="comment">/* Western European DST */</span></span><br><span class="line">   DST_MET      <span class="comment">/* Middle European DST */</span></span><br><span class="line">   DST_EET      <span class="comment">/* Eastern European DST */</span></span><br><span class="line">   DST_CAN      <span class="comment">/* Canada */</span></span><br><span class="line">   DST_GB       <span class="comment">/* Great Britain and Eire */</span></span><br><span class="line">   DST_RUM      <span class="comment">/* Romania */</span></span><br><span class="line">   DST_TUR      <span class="comment">/* Turkey */</span></span><br><span class="line">   DST_AUSTALT  <span class="comment">/* Australian style with shift in 1986 */</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">gettimeofday</span><span class="params">(<span class="keyword">struct</span> timeval *tv, <span class="keyword">struct</span> timezone *tz)</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="clock-gettime"><a href="#clock-gettime" class="headerlink" title="clock_gettime()"></a>clock_gettime()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> &#123;</span></span><br><span class="line">    <span class="type">time_t</span>   tv_sec;        <span class="comment">/* seconds */</span></span><br><span class="line">    <span class="type">long</span>     tv_nsec;       <span class="comment">/* nanoseconds */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">clock_gettime</span><span class="params">(<span class="type">clockid_t</span> clk_id, <span class="keyword">struct</span> timespec *tp)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">clock_getres</span><span class="params">(<span class="type">clockid_t</span> clk_id, <span class="keyword">struct</span> timespec *res)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>clk_id 用于指定计时时钟的类型:</p>
+<ul>
+<li><p><code>CLOCK_REALTIME</code>/<code>CLOCK_REALTIME_COARSE</code> 系统实时时间，即从UTC开始计时的秒数，随系统实时时间改变而改变，包括通过系统函数手动调整系统时间，例如 settime()、settimeofday()，或者通过 adjtime()、adjtimex() 或者 NTP 调整时间。</p>
+</li>
+<li><p><code>CLOCK_MONOTONIC</code>/<code>CLOCK_MONOTONIC_COARSE</code> 从系统启动开始计时，不受系统时间被用户改变的影响，但会受像 adjtime() 或者 NTP 之类渐进调整的影响。</p>
+</li>
+<li><p><code>CLOCK_MONOTONIC_RAW</code> 与上述的 CLOCK_MONOTONIC 相同，只是不会受 adjtime() 以及 NTP 的影响。</p>
+</li>
+<li><p><code>CLOCK_PROCESS_CPUTIME_ID</code> 本进程到当前代码系统 CPU 花费的时间。</p>
+</li>
+<li><p><code>CLOCK_THREAD_CPUTIME_ID</code> 本线程到当前代码系统 CPU 花费的时间。</p>
+</li>
+</ul>
+<h3 id="clock"><a href="#clock" class="headerlink" title="clock()"></a>clock()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回程序执行使用的时钟时间*/</span></span><br><span class="line"><span class="type">clock_t</span> <span class="title function_">clock</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="时间转换"><a href="#时间转换" class="headerlink" title="时间转换"></a>时间转换</h2><h3 id="ctime-asctime"><a href="#ctime-asctime" class="headerlink" title="ctime asctime"></a>ctime asctime</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 转换为本地时间，使用标准格式 */</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">ctime</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep)</span>;</span><br><span class="line"><span class="type">char</span> *<span class="title function_">ctime_r</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep, <span class="type">char</span> *buf)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 将时间格式转为字符串，不修改时区，使用标准格式 */</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">asctime</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> tm *tm)</span>;</span><br><span class="line"><span class="type">char</span> *<span class="title function_">asctime_r</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> tm *tm, <span class="type">char</span> *buf)</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="mktime"><a href="#mktime" class="headerlink" title="mktime()"></a>mktime()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tm</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> tm_sec;         <span class="comment">/* seconds [0, 59] */</span></span><br><span class="line">    <span class="type">int</span> tm_min;         <span class="comment">/* minutes [0, 59] */</span></span><br><span class="line">    <span class="type">int</span> tm_hour;        <span class="comment">/* hours [0, 23] */</span></span><br><span class="line">    <span class="type">int</span> tm_mday;        <span class="comment">/* day of the month [1, 31] */</span></span><br><span class="line">    <span class="type">int</span> tm_mon;         <span class="comment">/* month [0, 11] */</span></span><br><span class="line">    <span class="type">int</span> tm_year;        <span class="comment">/* year now.year - 1900 */</span></span><br><span class="line">    <span class="type">int</span> tm_wday;        <span class="comment">/* day of the week, [0, 6] 0-&gt;sunday */</span></span><br><span class="line">    <span class="type">int</span> tm_yday;        <span class="comment">/* day in the year [0, 365] */</span></span><br><span class="line">    <span class="type">int</span> tm_isdst;       <span class="comment">/* daylight saving time */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">time_t</span> <span class="title function_">mktime</span><span class="params">(<span class="keyword">struct</span> tm *tm)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>tm_isdst是夏令时：</p>
+<ul>
+<li>0 完全不考虑夏令时的问题，直接将日历时间转换为秒数；</li>
+<li>1 考虑夏令时。</li>
+<li>-1 自动根据时区信息进行判断。</li>
+</ul>
+<p>注意在使用前，需要将 struct tm 结构体清空，否则不需要设置的字段 (如 tm_isdst ) 会有脏数据。</p>
+<p>实际上程序比较怕时间回退，那么关于夏令时比较坑的是，夏令时的停止，此时时钟会向后回拨一次，也就是说，同一个小时的时间点出现了两次。</p>
+<p>例如 CET (欧洲中部时间) 在 2016-10-30 02:59:59 下一秒会跳转到 2016-10-30 02:00:00 ，也就是说 02:00:00 到 02:59:59 这一个小时的时间窗出现了两次。</p>
+<p>那么，此时，如果要获取到中间的时间窗，在使用 mktime() 时就需要手动配置其中的 tm_isdst 字段。</p>
+<p>mktime() 会忽略 tm_wday 以及 tm_yday 字段，会使用 tm_isdst 判断是否采用夏令时，同时会根据其它字段来修改 tm_wday tm_yday 字段，同时其它字段如果超过了范围则会修正。</p>
+<h3 id="gmtime-localtime"><a href="#gmtime-localtime" class="headerlink" title="gmtime() localtime()"></a>gmtime() localtime()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 将时间戳转换为GMT时区的标准时间 */</span></span><br><span class="line"><span class="keyword">struct</span> tm *<span class="title function_">gmtime</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep)</span>;</span><br><span class="line"><span class="keyword">struct</span> tm *<span class="title function_">gmtime_r</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep, <span class="keyword">struct</span> tm *result)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 将时间戳转换为本地时区的时间格式 */</span></span><br><span class="line"><span class="keyword">struct</span> tm *<span class="title function_">localtime</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep)</span>;</span><br><span class="line"><span class="keyword">struct</span> tm *<span class="title function_">localtime_r</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep, <span class="keyword">struct</span> tm *result)</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="strftime-strptime"><a href="#strftime-strptime" class="headerlink" title="strftime() strptime()"></a>strftime() strptime()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 将时间按格式化字符串转换为字符串 */</span></span><br><span class="line"><span class="type">size_t</span> <span class="title function_">strftime</span><span class="params">(<span class="type">char</span> *s, <span class="type">size_t</span> max, <span class="type">const</span> <span class="type">char</span> *format, <span class="type">const</span> <span class="keyword">struct</span> tm *tm)</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _XOPEN_SOURCE</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">char</span> *<span class="title function_">strptime</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *s, <span class="type">const</span> <span class="type">char</span> *format, <span class="keyword">struct</span> tm *tm)</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">%a 星期几的简写</span><br><span class="line">%A 星期几的全称</span><br><span class="line">%b 月份的简写</span><br><span class="line">%B 月份的全称</span><br><span class="line">%c 标准的日期的时间串</span><br><span class="line">%C 年份的前两位数字</span><br><span class="line">%d 十进制表示的每月的第几天</span><br><span class="line">%D 月/天/年</span><br><span class="line">%e 在两字符域中，十进制表示的每月的第几天</span><br><span class="line">%F 年-月-日</span><br><span class="line">%g 年份的后两位数字，使用基于周的年</span><br><span class="line">%G 年份，使用基于周的年</span><br><span class="line">%h 简写的月份名</span><br><span class="line">%H 24小时制的小时</span><br><span class="line">%I 12小时制的小时</span><br><span class="line">%j 十进制表示的每年的第几天</span><br><span class="line">%m 十进制表示的月份</span><br><span class="line">%M 十时制表示的分钟数</span><br><span class="line">%n 新行符</span><br><span class="line">%p 本地的AM或PM的等价显示</span><br><span class="line">%r 12小时的时间</span><br><span class="line">%R 显示小时和分钟：hh:mm</span><br><span class="line">%S 十进制的秒数</span><br><span class="line">%t 水平制表符</span><br><span class="line">%T 显示时分秒：hh:mm:ss</span><br><span class="line">%u 每周的第几天，星期一为第一天 （值从1到7，星期一为1）</span><br><span class="line">%U 第年的第几周，把星期日作为第一天（值从0到53）</span><br><span class="line">%V 每年的第几周，使用基于周的年</span><br><span class="line">%w 十进制表示的星期几（值从0到6，星期天为0）</span><br><span class="line">%W 每年的第几周，把星期一做为第一天（值从0到53）</span><br><span class="line">%x 标准的日期串</span><br><span class="line">%X 标准的时间串</span><br><span class="line">%y 不带世纪的十进制年份（值从0到99）</span><br><span class="line">%Y 带世纪部分的十制年份</span><br><span class="line">%z，%Z 时区名称，如果不能得到时区名称则返回空字符。</span><br><span class="line">%% 百分号</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/cpp/time_function.bmp" alt="时间转换函数"></p>
+<h2 id="设置时间"><a href="#设置时间" class="headerlink" title="设置时间"></a>设置时间</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*返回 time1 和 time2 之间相差的秒数 (time1-time2)*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">difftime</span><span class="params">(<span class="type">time_t</span> time1, <span class="type">time_t</span> time2)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">clock_settime</span><span class="params">(<span class="type">clockid_t</span> clk_id, <span class="type">const</span> <span class="keyword">struct</span> timespec *tp)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">settimeofday</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> timeval *tv, <span class="type">const</span> <span class="keyword">struct</span> timezone *tz)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*设置系统的时间，不过需要超级用户的权限*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">stime</span><span class="params">(<span class="type">time_t</span> *t)</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/gcc_options/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/tool/gcc_options/" class="post-title-link" itemprop="url">gcc compile and link options</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/gcc/" itemprop="url" rel="index"><span itemprop="name">gcc</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="编译选项"><a href="#编译选项" class="headerlink" title="编译选项"></a>编译选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">--help</span><br><span class="line">--target-help</span><br><span class="line">显示 gcc 帮助说明。‘target-help’是显示目标机器特定的命令行选项。</span><br><span class="line"></span><br><span class="line">--version</span><br><span class="line">显示 gcc 版本号和版权信息。</span><br><span class="line"></span><br><span class="line">-wall</span><br><span class="line">显示警告信息；</span><br><span class="line"></span><br><span class="line">-o outfile</span><br><span class="line">输出到指定的文件。</span><br><span class="line"></span><br><span class="line">-x language</span><br><span class="line">指明使用的编程语言，包括：c c++ assembler none 。 ‘none’意味着恢复默认行为，即根据文件的扩展名猜测源文件的语言。</span><br><span class="line"></span><br><span class="line">-v</span><br><span class="line">打印较多信息，显示编译器调用的程序。</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">-#</span><span class="language-bash"><span class="comment">##</span></span></span><br><span class="line">与 -v 类似，但选项被引号括住，并且不执行命令。</span><br><span class="line"></span><br><span class="line">-E</span><br><span class="line">仅作预处理，不进行编译、汇编和链接。</span><br><span class="line"></span><br><span class="line">-S</span><br><span class="line">仅编译到汇编语言，不进行汇编和链接。</span><br><span class="line"></span><br><span class="line">-c</span><br><span class="line">仅编译、汇编到目标代码，不进行链接。</span><br><span class="line"></span><br><span class="line">-C</span><br><span class="line">告诉预处理器不要丢弃注释，配合-E选项使用。</span><br><span class="line"></span><br><span class="line">-P</span><br><span class="line">告诉预处理器不要产生#line命令，配合-E选项使用。</span><br><span class="line"></span><br><span class="line">-pipe</span><br><span class="line">使用管道代替临时文件。</span><br><span class="line"></span><br><span class="line">-combine</span><br><span class="line">将多个源文件一次性传递给汇编器。</span><br><span class="line"></span><br><span class="line">-fsanitize=address</span><br><span class="line">gcc从4.8版本起，集成了Address Sanitizer工具，可以用来检查内存访问的错误，编译时指定`-fsanitize=address -g`，可以检测内存泄漏、堆栈和全局内存越界访问、free后继续使用、局部内存被外层使用和Initialization order bugs问题。</span><br></pre></td></tr></table></figure>
+
+<h2 id="链接选项"><a href="#链接选项" class="headerlink" title="链接选项"></a>链接选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">-l library</span><br><span class="line">-llibrary</span><br><span class="line">进行链接时搜索名为library的库。</span><br><span class="line"></span><br><span class="line">-Ldir</span><br><span class="line">把dir 加入到搜索库文件的路径列表中。</span><br><span class="line"></span><br><span class="line">-Idir</span><br><span class="line">把dir 加入到搜索头文件的路径列表中。</span><br><span class="line"></span><br><span class="line">-Dname</span><br><span class="line">预定义一个名为name 的宏，值为1。</span><br><span class="line"></span><br><span class="line">-Dname=definition</span><br><span class="line">预定义名为name ，值为definition 的宏。</span><br><span class="line"></span><br><span class="line">-ggdb</span><br><span class="line">-ggdblevel</span><br><span class="line">为调试器 gdb 生成调试信息。level 可以为1，2，3，默认值为2。</span><br><span class="line"></span><br><span class="line">-g</span><br><span class="line">-glevel</span><br><span class="line">生成操作系统本地格式的调试信息，level 取值同上。</span><br><span class="line"></span><br><span class="line">-s</span><br><span class="line">去除可执行文件中的符号表和重定位信息。用于减小可执行文件的大小。</span><br><span class="line"></span><br><span class="line">-static</span><br><span class="line">禁止使用动态库</span><br><span class="line"></span><br><span class="line">-share</span><br><span class="line">尽量使用动态库</span><br><span class="line"></span><br><span class="line">-nostdlib</span><br><span class="line">不连接系统标准启动文件和标准库文件，只把指定的文件传递给连接器。</span><br><span class="line"></span><br><span class="line">-rdynamic</span><br><span class="line">指示连接器把所有符号都添加到动态符号表（.dynsym）里，以便那些使用符号表的函数使用，如dlopen() 或 backtrace()。</span><br></pre></td></tr></table></figure>
+
+<h2 id="优化项"><a href="#优化项" class="headerlink" title="优化项"></a>优化项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-O0 禁止编译器进行优化。默认为此项。</span><br><span class="line">-O1 尝试优化编译时间和可执行文件大小。</span><br><span class="line"></span><br><span class="line">-O2 更多的优化，会尝试几乎全部的优化功能，但不会进行“空间换时间”的优化方法。</span><br><span class="line"></span><br><span class="line">-O3 在 -O2 的基础上再打开一些优化选项：-finline-functions， -funswitch-loops 和 -fgcse-after-reload。</span><br><span class="line"></span><br><span class="line">-Os 对生成文件大小进行优化。它会打开 -O2 开的全部选项，除了会那些增加文件大小的。</span><br></pre></td></tr></table></figure>
+
+<h2 id="指定标准"><a href="#指定标准" class="headerlink" title="指定标准"></a>指定标准</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">-ansi 支持符合ANSI标准的C程序。这样就会关闭GNU C中某些不兼容ANSI C的特性。</span><br><span class="line"></span><br><span class="line">-std=c89 指明使用标准 ISO C90 作为标准来编译程序。</span><br><span class="line"></span><br><span class="line">-std=c99 指明使用标准 ISO C99 作为标准来编译程序。</span><br><span class="line"></span><br><span class="line">-std=c++98 指明使用标准 C++98 作为标准来编译程序。</span><br><span class="line"></span><br><span class="line">-std=gnu9x 使用 ISO C99 再加上 GNU 的一些扩展。</span><br><span class="line"></span><br><span class="line">-fno-asm 不把asm, inline或typeof当作关键字，因此这些词可以用做标识符。用 __asm__， __inline__和__typeof__能够替代它们。 `-ansi&#x27; 隐含声明了`-fno-asm&#x27;。</span><br><span class="line"></span><br><span class="line">-fgnu89-inline 告诉编译器在 C99 模式下看到 inline 函数时使用传统的 GNU 句法。</span><br></pre></td></tr></table></figure>
+
+<h2 id="C选项"><a href="#C选项" class="headerlink" title="C选项"></a>C选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">-pedantic</span><br><span class="line">以ANSI/ISO C标准列出的所有警告</span><br><span class="line"></span><br><span class="line">-fsigned-char</span><br><span class="line">把char定义为有符号类型，如同signed char。</span><br><span class="line"></span><br><span class="line">-funsigned-char</span><br><span class="line">把char定义为无符号类型，如同unsigned char。</span><br><span class="line"></span><br><span class="line">-traditional</span><br><span class="line">尝试支持传统C编译器的某些方面。详见GNU C手册。</span><br><span class="line"></span><br><span class="line">-fno-builtin</span><br><span class="line">-fno-builtin-function</span><br><span class="line">不接受没有 __builtin_ 前缀的函数作为内建函数。</span><br><span class="line"></span><br><span class="line">-trigraphs</span><br><span class="line">支持ANSI C的三联符（ trigraphs）。-ansi选项隐含声明了此选项。</span><br><span class="line"></span><br><span class="line">-fsigned-bitfields</span><br><span class="line">-funsigned-bitfields</span><br><span class="line">如果没有明确声明signed或unsigned修饰符，这些选项用来定义有符号位域或无符号位域。缺省情况下，位域是有符号的，因为它们继承的基本整数类型，如int，是有符号数。</span><br><span class="line"></span><br><span class="line">-fno-strict-aliasing</span><br><span class="line">启用严格别名规则，“-fno-strict-aliasing”表示禁用严格别名规则，当gcc的编译优化参数为“-O2”、“-O3”和“-Os”时，默认会打开“-fstrict-aliasing”。</span><br></pre></td></tr></table></figure>
+
+<h2 id="C-选项"><a href="#C-选项" class="headerlink" title="C++选项"></a>C++选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-fsyntax-only</span><br><span class="line">检查代码中的语法错误，但除此之外不要做任何事情。</span><br><span class="line"></span><br><span class="line">-ffor-scope</span><br><span class="line">从头开始执行程序，也允许进行重定向。</span><br><span class="line"></span><br><span class="line">-fno-rtti</span><br><span class="line">关闭对 dynamic_cast 和 typeid 的支持。如果你不需要这些功能，关闭它会节省一些空间。</span><br></pre></td></tr></table></figure>
+
+<h2 id="机器选项"><a href="#机器选项" class="headerlink" title="机器选项"></a>机器选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">-mtune=cpu-type</span><br><span class="line">为指定类型的 CPU 生成代码。cpu-type 可以是：i386，i486，i586，pentium，i686，pentium4 等等。</span><br><span class="line"></span><br><span class="line">-msse</span><br><span class="line">-msse2</span><br><span class="line">-mmmx</span><br><span class="line">-mno-sse</span><br><span class="line">-mno-sse2</span><br><span class="line">-mno-mmx</span><br><span class="line">使用或者不使用MMX，SSE，SSE2指令。</span><br><span class="line"></span><br><span class="line">-m32</span><br><span class="line">-m64</span><br><span class="line">生成32位/64位机器上的代码。</span><br><span class="line"></span><br><span class="line">-mpush-args</span><br><span class="line">-mno-push-args</span><br><span class="line">（不）使用 push 指令来进行存储参数。默认是使用。</span><br><span class="line"></span><br><span class="line">-mregparm=num</span><br><span class="line">当传递整数参数时，控制所使用寄存器的个数。</span><br></pre></td></tr></table></figure>
+
+<h2 id="依赖文件"><a href="#依赖文件" class="headerlink" title="依赖文件"></a>依赖文件</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">-M</span><br><span class="line">生成文件的依赖关系，依赖项是源文件中引用的所有头文件，同时也把一些标准库的头文件包含了进来。</span><br><span class="line"></span><br><span class="line">-MM</span><br><span class="line">生成文件的依赖关系，和 -M 类似，但不包含标准库的头文件。</span><br><span class="line"></span><br><span class="line">-MG</span><br><span class="line">要求把缺失的头文件按存在对待，并且假定他们和源文件在同一目录下，必须和`-M`选项一起用。</span><br><span class="line"></span><br><span class="line">-MF [file]</span><br><span class="line">当使用了-M或-MM选项时，则把依赖关系写入名为file的文件中。若同时也使用了-MD或-MMD,-MF将覆写输出的依赖文件的名称 。</span><br><span class="line"></span><br><span class="line">-MD</span><br><span class="line">等同于 -M -MF file，但是默认关闭了 -E 选项。其输出的文件名是基于 -o 选项，若给定了 -o 选项，则输出的文件名是 -o 指定的文件名，并添加 .d 后缀，若没有给定，则输入的文件名作为输出的文件名，并添加 .d 后缀，同时继续指定的编译工作。</span><br><span class="line"></span><br><span class="line">-MMD</span><br><span class="line">类似于-MD”，但是输出的依赖文件中，不包含标准头文件。</span><br><span class="line"></span><br><span class="line">-MP</span><br><span class="line">生成的依赖文件里面，依赖规则中的所有 .h 依赖项都会在该文件中生成一个伪目标，其不依赖任何其他依赖项。该伪规则将避免删除了对应的头文件而没有更新Makefile去匹配新的依赖关系而导致 make 出错的情况出现。</span><br><span class="line"></span><br><span class="line">-MT Target</span><br><span class="line">在生成的依赖文件中，指定依赖规则中的目标。</span><br></pre></td></tr></table></figure>
+
+<h2 id="其他项"><a href="#其他项" class="headerlink" title="其他项"></a>其他项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-finline-functions</span><br><span class="line">把所有简单的函数内联进调用者。编译器会探索式地决定哪些函数足够简单，值得做这种内联。</span><br><span class="line"></span><br><span class="line">-fstrict-aliasing</span><br><span class="line">施加最强的别名规则（aliasing rules）。</span><br><span class="line"></span><br><span class="line">-fPIC</span><br><span class="line">告诉编译器产生与位置无关代码，在产生的代码中，没有绝对地址，全部使用相对地址，故而代码可以被加载器加载到内存的任意位置，都可以正确的执行。这正是共享库所要求的，共享库被加载时，在内存的位置不是固定的。如果不加-fPIC，则加载.so文件的代码段时，代码段引用的数据对象需要重定位， 重定位会修改代码段的内容，这就造成每个使用这个.so文件代码段的进程在内核里都会生成这个.so文件代码段的拷贝。</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/exec/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/c/exec/" class="post-title-link" itemprop="url">linux exec 函数集</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>exec函数并不创建新进程，只是用另一个新程序替换了当前进程的正文、数据、堆和栈段，且两个进程的PID相同。例如：在shell命令行执行ps命令，实际上是shell进程调用fork复制一个新的子进程，在利用exec系统调用将新产生的子进程完全替换成ps进程。exec系列函数底层其实都是通过调用execve函数实现的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="type">char</span> **environ;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">execl</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">const</span> <span class="type">char</span> *arg, ... (<span class="type">char</span> *)<span class="literal">NULL</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execlp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">const</span> <span class="type">char</span> *arg, ... (<span class="type">char</span> *)<span class="literal">NULL</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execle</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">const</span> <span class="type">char</span> *arg, ... (<span class="type">char</span> *)<span class="literal">NULL</span>, <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">char</span> *<span class="type">const</span> argv[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execvp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">char</span> *<span class="type">const</span> argv[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execvpe</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">char</span> *<span class="type">const</span> argv[], <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execve</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">char</span> *<span class="type">const</span> argv[], <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>带 l 的exec函数表示第一个参数是进程的完整路径，参数以可变参数的形式给出，且以一个NULL结束。</li>
+<li>带 p 的exec函数表示第一个参数只要是进程名即可，它会在环境变量当中查找命令。</li>
+<li>带 v 的exec函数表示命令的参数以字符串数组形式给出，且最后一个元素也必须是NULL。</li>
+<li>带 e 的exec函数表示将envp数组的内容作为环境变量传递给替换的进程。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> *<span class="type">const</span> envp[] = &#123;<span class="string">&quot;AA=11&quot;</span>, <span class="string">&quot;BB=22&quot;</span>, (<span class="type">char</span> *)<span class="literal">NULL</span>&#125;;</span><br><span class="line">    execle(<span class="string">&quot;./hello&quot;</span>, <span class="string">&quot;hello&quot;</span>, (<span class="type">char</span> *)<span class="literal">NULL</span>, envp);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">char</span> **environ;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[], <span class="type">char</span> *envp[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span>(*envp != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="built_in">puts</span>(*(envp++));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i=<span class="number">0</span> ; environ[i] != <span class="literal">NULL</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">puts</span>(environ[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/uml/uml_sequence/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1178,660 +1810,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/cpp/shared_ptr/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/cpp/shared_ptr/" class="post-title-link" itemprop="url">C++ 智能指针</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-09 19:51:44" itemprop="dateModified" datetime="2022-06-09T19:51:44+08:00">2022-06-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>在C++中，用new和delete动态内存管理经常会出现忘记或错误释放内存问题，为了更加容易和安全的使用动态内存，才引入了智能指针。</p>
-<p>智能指针就是一个类，当超出了类的作用域时，类会自动调用析构函数，析构函数会自动释放资源。智能指针通过引用计数技术来维护对象的生命周期。每当有一个新指针指向这个对象时，这个对象的引用计数就加1，相反当指针不再指向对象时，这个对象的引用计数就减1，当对象的引用计数为0时，就会自动释放。</p>
-<p>智能指针访问auto_ptr的成员函数用的是<code>.</code>，访问指向对象的成员时用的是<code>-&gt;</code>。</p>
-<p>智能指针限制：</p>
-<ul>
-<li>不能delete get()返回的指针。</li>
-<li>不要把一个原始指针给多个智能指针管理。</li>
-<li>不要用get()返回的原始指针去初始化或reset另一个智能指针。</li>
-<li>如果使用get()返回的指针，当最后一个对应的智能指针销毁后就无效。</li>
-<li>智能指针管理的资源只会默认删除new分配的内存，如果不是则需要自定义删除器作参数。</li>
-</ul>
-<h2 id="auto-ptr"><a href="#auto-ptr" class="headerlink" title="auto_ptr"></a>auto_ptr</h2><p>auto_ptr已经被c++11弃用。对auto_ptr进行赋值时会隐式转移所有权，如p2 = p，p2会接管p原来的内存管理权，p会变为空指针，如果p2原来不为空，则它会释放原来的资源，基于这个原因，应该避免把auto_ptr放到容器中，因为算法对容器操作时对容器实现了赋值传递操作，这样会使容器中很多元素被置为NULL。</p>
-<p>判断一个auto_ptr是否为空不能使用<code>if (p == NULL)</code>，应该使用<code>if (p.get() == NULL)</code>。</p>
-<p>成员函数release()会把智能指针赋值为空，但只是释放了对资源的所有权，它指向的内存并没有被释放。可以使用<code>p.reset()</code>方法来提前释放资源。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Test</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Test</span>(string s) : <span class="built_in">str_</span>(s) &#123;&#125;</span><br><span class="line">    ~<span class="built_in">Test</span>() &#123;</span><br><span class="line">        cout &lt;&lt; str_ &lt;&lt; <span class="string">&quot; destory.&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Printf</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;printf: &quot;</span> &lt;&lt; str_ &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    string str_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">auto_ptr&lt;Test&gt; <span class="title">p1</span><span class="params">(<span class="keyword">new</span> Test(<span class="string">&quot;p1&quot;</span>))</span></span>;</span><br><span class="line">    <span class="function">auto_ptr&lt;Test&gt; <span class="title">p2</span><span class="params">(<span class="keyword">new</span> Test(<span class="string">&quot;p2&quot;</span>))</span></span>;</span><br><span class="line"></span><br><span class="line">    Test *tmp = p1.<span class="built_in">get</span>();</span><br><span class="line">    tmp-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    p1 = p2;</span><br><span class="line">    <span class="keyword">if</span> (p2.<span class="built_in">get</span>() == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;auto_ptr p2 is null&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    p1.<span class="built_in">reset</span>(<span class="keyword">new</span> <span class="built_in">Test</span>(<span class="string">&quot;p4&quot;</span>));</span><br><span class="line">    p1-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    p1.<span class="built_in">release</span>();</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;p.release()&quot;</span> &lt;&lt; endl;</span><br><span class="line">    p1.<span class="built_in">reset</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="unique-ptr"><a href="#unique-ptr" class="headerlink" title="unique_ptr"></a>unique_ptr</h2><p>unique_ptr是独占对象所有权的智能指针，是用于取代auto_ptr的，虽然不能拷贝构造或者赋值操作，但可以通过调用release()或reset()方法将指针所有权从一个非const的unique_ptr转移给另一个unique。虽然无法使两个unique_ptr指向同一个对象，但可进行移动构造和移动赋值操作。</p>
-<table>
-<thead>
-<tr>
-<th>成员方法</th>
-<th>功 能</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>operator*()</td>
-<td>指针解引用</td>
-</tr>
-<tr>
-<td>swap()</td>
-<td>交换2个unique_ptr 指针的内容</td>
-</tr>
-<tr>
-<td>reset()</td>
-<td>重置指针，并销毁当前unique_ptr管理的对象</td>
-</tr>
-<tr>
-<td>release()</td>
-<td>解放指针，释放所有权，并不会销毁被管理的对象，会将其返回</td>
-</tr>
-<tr>
-<td>get()</td>
-<td>获取内部包含的原生指针</td>
-</tr>
-<tr>
-<td>operator bool()</td>
-<td>判断是否为空智能指针</td>
-</tr>
-</tbody></table>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Test</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Test</span>(string s) : <span class="built_in">str_</span>(s) &#123;&#125;</span><br><span class="line">    ~<span class="built_in">Test</span>() &#123;</span><br><span class="line">        cout &lt;&lt; str_ &lt;&lt; <span class="string">&quot; destory.&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Printf</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;printf: &quot;</span> &lt;&lt; str_ &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    string str_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">unique_ptr&lt;Test&gt; <span class="title">p1</span><span class="params">(<span class="keyword">new</span> Test(<span class="string">&quot;p1&quot;</span>))</span></span>;</span><br><span class="line">    unique_ptr&lt;Test&gt; p2 = <span class="built_in">make_unique</span>&lt;Test&gt;(<span class="string">&quot;p2&quot;</span>);</span><br><span class="line"></span><br><span class="line">    Test *tmp = p1.<span class="built_in">get</span>();</span><br><span class="line">    tmp-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    p1.<span class="built_in">swap</span>(p2);</span><br><span class="line">    p1-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    p1 = <span class="built_in">move</span>(p2); <span class="comment">//不能直接赋值</span></span><br><span class="line">    <span class="keyword">if</span> (p2) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;unique_ptr p2 is null&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    p1.<span class="built_in">reset</span>(<span class="keyword">new</span> <span class="built_in">Test</span>(<span class="string">&quot;p4&quot;</span>));</span><br><span class="line">    p1-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// auto p6 = p1.release();</span></span><br><span class="line">    <span class="comment">// p6-&gt;Printf();</span></span><br><span class="line"></span><br><span class="line">    p1.<span class="built_in">reset</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="shared-ptr"><a href="#shared-ptr" class="headerlink" title="shared_ptr"></a>shared_ptr</h2><p>shared_ptr 允许多个指针指向同一个对象。</p>
-<table>
-<thead>
-<tr>
-<th>成员方法</th>
-<th>功 能</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>operator=()</td>
-<td>赋值运算符，同一类型的 shared_ptr 智能指针可以相互赋值</td>
-</tr>
-<tr>
-<td>operator*()</td>
-<td>指针解引用</td>
-</tr>
-<tr>
-<td>swap()</td>
-<td>交换2个shared_ptr 指针的内容</td>
-</tr>
-<tr>
-<td>reset()</td>
-<td>当参数为空时，重置为一个空指针，引用计数减1；当传入新堆内存时，则获得该存储空间的所有权，并且引用计数的初始值为1</td>
-</tr>
-<tr>
-<td>get()</td>
-<td>获取内部包含的原生指针</td>
-</tr>
-<tr>
-<td>use_count()</td>
-<td>返回引用计数</td>
-</tr>
-<tr>
-<td>unique()</td>
-<td>判断是否有其它 shared_ptr 对象指向它</td>
-</tr>
-<tr>
-<td>operator bool()</td>
-<td>判断是否为空智能指针</td>
-</tr>
-</tbody></table>
-<p>对于申请的数组内存，可以自定义释放规则:</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">p</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>[<span class="number">10</span>], [](<span class="type">int</span>* p) &#123; <span class="keyword">delete</span>[]p; &#125;)</span></span>;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Test</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Test</span>(string s) : <span class="built_in">str_</span>(s) &#123;&#125;</span><br><span class="line">    ~<span class="built_in">Test</span>() &#123;</span><br><span class="line">        cout &lt;&lt; str_ &lt;&lt; <span class="string">&quot; destory.&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Printf</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;printf: &quot;</span> &lt;&lt; str_ &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    string str_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">shared_ptr&lt;Test&gt; <span class="title">p1</span><span class="params">(<span class="keyword">new</span> Test(<span class="string">&quot;p1&quot;</span>))</span></span>;</span><br><span class="line">    shared_ptr&lt;Test&gt; p2 = <span class="built_in">make_shared</span>&lt;Test&gt;(<span class="string">&quot;p2&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (!p1) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;shared_ptr p is null&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;is unique: &quot;</span> &lt;&lt; p1.<span class="built_in">unique</span>() &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;use_count: &quot;</span> &lt;&lt; p1.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    shared_ptr&lt;Test&gt; p3 = p1;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;use_count: &quot;</span> &lt;&lt; p1.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;is unique: &quot;</span> &lt;&lt; p1.<span class="built_in">unique</span>() &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> tmp = p1.<span class="built_in">get</span>();</span><br><span class="line">    tmp-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    p1.<span class="built_in">swap</span>(p2);</span><br><span class="line">    p1-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    p1.<span class="built_in">reset</span>(<span class="keyword">new</span> <span class="built_in">Test</span>(<span class="string">&quot;p4&quot;</span>));</span><br><span class="line">    p1-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    p1.<span class="built_in">reset</span>();</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;use_count: &quot;</span> &lt;&lt; p1.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="dynamic-pointer-cast"><a href="#dynamic-pointer-cast" class="headerlink" title="dynamic_pointer_cast"></a>dynamic_pointer_cast</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span> <span class="title class_">U</span>&gt;</span><br><span class="line">  <span class="function">shared_ptr&lt;T&gt; <span class="title">dynamic_pointer_cast</span> <span class="params">(<span class="type">const</span> shared_ptr&lt;U&gt;&amp; sp)</span> <span class="keyword">noexcept</span></span>;</span><br></pre></td></tr></table></figure>
-
-<p>dynamic_pointer_cast常用于shared_ptr之间的类型转换，它返回一个shared_ptr副本，其存储的指针从U *动态地转换为T *。</p>
-<h2 id="weak-ptr"><a href="#weak-ptr" class="headerlink" title="weak_ptr"></a>weak_ptr</h2><p>weak_ptr 是用来解决2个shared_ptr相互引用时的死锁问题的，如果两个shared_ptr相互引用，那么这两个指针的引用计数永远不可能减少为0，资源永远不会释放。weak_ptr是对对象的一种弱引用，指向shared_ptr所管理的对象，不会改变对象的引用计数，和shared_ptr之间可以相互转化。</p>
-<table>
-<thead>
-<tr>
-<th>成员方法</th>
-<th>功 能</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>operator=()</td>
-<td>赋值运算符，可以直接被 weak_ptr 或 shared_ptr 类型指针赋值</td>
-</tr>
-<tr>
-<td>swap()</td>
-<td>互换2个weak_ptr 指针内容</td>
-</tr>
-<tr>
-<td>use_count()</td>
-<td>返回和当前 weak_ptr 指针相同指向的 shared_ptr 指针的数量，每次lock后加1</td>
-</tr>
-<tr>
-<td>reset()</td>
-<td>将当前 weak_ptr 指针置为空指针</td>
-</tr>
-<tr>
-<td>expired()</td>
-<td>判断当前 weak_ptr 指针是否过期（为空或者已经被释放）</td>
-</tr>
-<tr>
-<td>lock()</td>
-<td>返回 shared_ptr 指针，有可能为空</td>
-</tr>
-</tbody></table>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span>;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    shared_ptr&lt;B&gt; pb_;</span><br><span class="line">    ~<span class="built_in">A</span>()</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;A delete&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Printf</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;use_count: &quot;</span> &lt;&lt; pb_.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// shared_ptr&lt;A&gt; pa_; </span></span><br><span class="line">    weak_ptr&lt;A&gt; pa_;</span><br><span class="line">    ~<span class="built_in">B</span>()</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;B delete&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Printf</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;use_count: &quot;</span> &lt;&lt; pa_.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">shared_ptr&lt;A&gt; <span class="title">pa</span><span class="params">(<span class="keyword">new</span> A())</span></span>;</span><br><span class="line">    <span class="function">shared_ptr&lt;B&gt; <span class="title">pb</span><span class="params">(<span class="keyword">new</span> B())</span></span>;</span><br><span class="line">    pb-&gt;pa_ = pa;</span><br><span class="line">    pa-&gt;pb_ = pb;</span><br><span class="line"></span><br><span class="line">    pa-&gt;<span class="built_in">Printf</span>();</span><br><span class="line">    pb-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    <span class="function">weak_ptr&lt;A&gt; <span class="title">wpa</span><span class="params">(pa)</span></span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;use_count: &quot;</span> &lt;&lt; wpa.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">auto</span> tmp = wpa.<span class="built_in">lock</span>();</span><br><span class="line">    tmp-&gt;<span class="built_in">Printf</span>();</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;use_count: &quot;</span> &lt;&lt; wpa.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;expired: &quot;</span> &lt;&lt; wpa.<span class="built_in">expired</span>() &lt;&lt; endl;</span><br><span class="line">    wpa.<span class="built_in">reset</span>();</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;expired: &quot;</span> &lt;&lt; wpa.<span class="built_in">expired</span>() &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/vimium/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/tool/vimium/" class="post-title-link" itemprop="url">vimium</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/tool/" itemprop="url" rel="index"><span itemprop="name">tool</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Vimium 是一个浏览器扩展，它本着 Vim 编辑器的精神提供基于键盘的导航和网络控制。可通过 <a target="_blank" rel="noopener" href="https://chrome.google.com/extensions/detail/dbepggeogbaibhgnhhndojpepiihcmeb">Chrome 网上应用店</a>安装。</p>
-<h2 id="快捷键"><a href="#快捷键" class="headerlink" title="快捷键"></a>快捷键</h2><p>修饰键分别指定为<code>&lt;c-x&gt;</code>、<code>&lt;m-x&gt;</code>、 和<code>&lt;a-x&gt;</code>，分别对应ctrl+x、meta+x 和 alt+x。键入<code>?</code>可以显示快捷键列表。</p>
-<p><img src="/images/tool/vimium.png" alt="img"></p>
-<p><strong>当前页面操作</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">?       显示帮助对话框以获取所有可用键的列表</span><br><span class="line">h       向左滚动一点</span><br><span class="line">j       向下滚动一点</span><br><span class="line">k       向上滚动一点</span><br><span class="line">l       向右滚动一点</span><br><span class="line">gg      滚动到页面顶部</span><br><span class="line">G       滚动到页面底部</span><br><span class="line">d       向下滚动半页</span><br><span class="line">u       向上滚动半页</span><br><span class="line">f       打开元素定位器，是在当前标签页打开</span><br><span class="line">F       打开元素定位器，是在新标签页打开</span><br><span class="line">r       刷新</span><br><span class="line">gs      查看源码</span><br><span class="line">i       进入插入模式 - 在您按Esc退出之前，将忽略所有命令</span><br><span class="line">yy      将当前网址复制到剪贴板</span><br><span class="line">yf      将链接URL复制到剪贴板</span><br><span class="line">gf      循环到下一帧(尤其在选择网页内置视频的时候很管用)</span><br><span class="line">gF      聚焦主/顶框架</span><br></pre></td></tr></table></figure>
-
-<p><strong>新页面</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">o   从URL、书签、历史记录中搜索地址，回车打开</span><br><span class="line">O   从URL、书签、历史记录中搜索地址，回车在新标签页中打开</span><br><span class="line">b   仅从书签搜索地址，回车打开</span><br><span class="line">B   仅从书签搜索地址，回车新标签页中打开</span><br><span class="line">T   搜索当前浏览器的所有标签</span><br></pre></td></tr></table></figure>
-
-<p><strong>查找</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/       进入查找模式 - 输入您的搜索查询并按Enter键进行搜索，或按Esc键取消</span><br><span class="line">n       查找下一个匹配项</span><br><span class="line">N       查找上一个匹配项</span><br></pre></td></tr></table></figure>
-
-<p><strong>浏览历史记录</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">H       回到历史，也就是回到前一页</span><br><span class="line">L       在历史上前进，也就是回到后一页</span><br></pre></td></tr></table></figure>
-
-<p><strong>标签</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">J, gT   跳到左标签</span><br><span class="line">K, gt   跳到右标签</span><br><span class="line">g0      跳转到第一个标签(根据不同的数字跳到第几个标签)</span><br><span class="line">g$      跳转到最后一个标签</span><br><span class="line">^       回到上一个访问的标签</span><br><span class="line">t       创建一个新的标签</span><br><span class="line">yt      复制当前页面，在新标签页打开</span><br><span class="line">x       关闭当前标签</span><br><span class="line">X       恢复关闭的上一个标签</span><br><span class="line">p       在当前标签页打开剪切板中的URL，如不是URL则默认引擎搜索</span><br><span class="line">P       在新标签页打开剪切板中的URL，如不是URL则默认引擎搜索</span><br><span class="line">T       在当前打开的所有标签中搜索</span><br><span class="line">W       将当前标签移动到新窗口</span><br><span class="line">&lt;a-p&gt;   pin/unpin current tab</span><br></pre></td></tr></table></figure>
-
-<p><strong>标记</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ma      设置本地标记 a</span><br><span class="line">mA      设置全局标记 A </span><br><span class="line">`a      跳转到本地标记 a</span><br><span class="line">`A      跳转到q全局标记 a</span><br><span class="line">``      跳回到跳转之前的位置 (也就是说，在执行gg，G，n，N，或/ a 之前的位置）</span><br></pre></td></tr></table></figure>
-
-<p><strong>其他高级浏览命令</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;&lt;      当前标签页向左移动  </span><br><span class="line">&gt;&gt;      当前标签页向右移动  </span><br><span class="line">&lt;a-f&gt;   在新标签中打开多个链接</span><br><span class="line">gi      聚焦页面上的第一个（或第n个）文本输入框</span><br><span class="line">gu      跳转到URL层次的父类(xxx.com/yyy/zzz 跳转到 xxx.com/yyy)</span><br><span class="line">gU      转到URL层次结构的根目录(也就是 xxx.com)</span><br><span class="line">ge      编辑当前URL</span><br><span class="line">gE      编辑当前URL并在新选项卡中打开</span><br><span class="line">zH      向左滚动</span><br><span class="line">zL      向右滚动</span><br><span class="line">v       进入预览模式;使用p / P粘贴，然后使用y来拷贝</span><br><span class="line">V       enter visual line mode</span><br><span class="line">&lt;a-m&gt;   开/关静音 </span><br><span class="line">&lt;a-p&gt;   固定标签栏 </span><br></pre></td></tr></table></figure>
-
-<p><strong>预览模式</strong></p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">先用 / 定位，找到想要选择的字符</span><br><span class="line">    再按 v ,进入模式</span><br><span class="line">    然后使用</span><br><span class="line">        j：向下一行</span><br><span class="line">        k：向上一行</span><br><span class="line">        h：向左一个字符或标点（数字+h，可以移动多个字符）</span><br><span class="line">        l：向右一个字符或标点（数字+l，可以移动多个字符）</span><br><span class="line">        w：下一个标点符号后位置，包括看不见的换行符</span><br><span class="line">        e：下一个标点符号前位置</span><br><span class="line">        b：取消选中上一个字符，字符和标点算一个字符</span><br></pre></td></tr></table></figure>
-
-<p>Vimium 支持命令重复，例如，点击<code>5t</code>将快速连续打开 5 个选项卡。<code>&lt;Esc&gt;</code> (或<code>&lt;c-[&gt;</code>) 将清除队列中的任何部分命令，并且还将退出插入和查找模式。</p>
-<h2 id="自定义键映射"><a href="#自定义键映射" class="headerlink" title="自定义键映射"></a>自定义键映射</h2><p>您可以在选项页面的“自定义键映射”中重新映射或取消映射任何默认键绑定。每行输入以下键映射命令之一：</p>
-<ul>
-<li><code>map key command</code>: 将键映射到 Vimium 命令。覆盖 Chrome 的默认行为。</li>
-<li><code>unmap key</code>：取消映射键并恢复 Chrome 的默认行为。</li>
-<li><code>unmapAll</code>：清除映射的所有绑定。</li>
-</ul>
-<p>以下特殊键可用于映射：</p>
-<ul>
-<li><code>&lt;c-*&gt;</code>, <code>&lt;a-*&gt;</code>, <code>&lt;m-*&gt;</code>，使用任意键替换*。</li>
-<li><code>&lt;left&gt;</code>, <code>&lt;right&gt;</code>, <code>&lt;up&gt;</code>,<code>&lt;down&gt;</code>方向键。</li>
-<li><code>&lt;f1&gt;</code>通过<code>&lt;f12&gt;</code>功能键</li>
-<li><code>&lt;space&gt;</code> 空格键</li>
-<li><code>&lt;tab&gt;</code>, <code>&lt;enter&gt;</code>, <code>&lt;delete&gt;</code>, <code>&lt;backspace&gt;</code>, <code>&lt;insert&gt;</code>,<code>&lt;home&gt;</code>和<code>&lt;end&gt;</code></li>
-</ul>
-<h2 id="自定义搜索引擎"><a href="#自定义搜索引擎" class="headerlink" title="自定义搜索引擎"></a>自定义搜索引擎</h2><p>配置自定义搜索引擎，通过快捷键<code>o</code>或<code>O</code>调起搜索框，输入搜索引擎简写，再输入空格，再输入搜索词回车，则会调用对应的搜索引擎进行搜索</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;搜索引擎简写&gt; &lt;搜索引擎地址&gt; &lt;搜索引擎名字&gt;</span><br><span class="line">例如：BZ https://search.bilibili.com/all?keyword=%s b站</span><br></pre></td></tr></table></figure>
-
-<p>在插件选项Custom search engines里自定义搜索引擎配置。</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">w: https://www.wikipedia.org/w/index.php?title=Special:Search&amp;search=%s Wikipedia</span><br><span class="line"></span><br><span class="line"># More examples.</span><br><span class="line">#</span><br><span class="line"># (Vimium supports search completion Wikipedia, as</span><br><span class="line"># above, and for these.)</span><br><span class="line">#</span><br><span class="line">g: https://www.google.com/search?q=%s Google</span><br><span class="line">G: https://www.google.com/search?q=%s Google</span><br><span class="line">zh: https://www.zhihu.com/search?type=content&amp;q=%s 知乎</span><br><span class="line">ZH: https://www.zhihu.com/search?type=content&amp;q=%s 知乎</span><br><span class="line">tb https://s.taobao.com/search?q=%s 淘宝</span><br><span class="line">TB https://s.taobao.com/search?q=%s 淘宝</span><br><span class="line">jd https://search.jd.com/Search?keyword=%s 京东</span><br><span class="line">JD https://search.jd.com/Search?keyword=%s 京东</span><br><span class="line">bd: https://www.baidu.com/s?wd=%s 百度</span><br><span class="line">BD: https://www.baidu.com/s?wd=%s 百度</span><br><span class="line">bz https://search.bilibili.com/all?keyword=%s b站</span><br><span class="line">BZ https://search.bilibili.com/all?keyword=%s b站</span><br><span class="line">tm https://list.tmall.com/search_product.htm?q=%s 天猫</span><br><span class="line">TM https://list.tmall.com/search_product.htm?q=%s 天猫</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/cpp/lambda/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/cpp/lambda/" class="post-title-link" itemprop="url">C++ Lambda</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-09 19:51:44" itemprop="dateModified" datetime="2022-06-09T19:51:44+08:00">2022-06-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>对于有捕获的lambda，其等价于对象;对于没有捕获的lambda，其等价于函数。</p>
-<p>Lambda表达式完整的声明格式如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[capture list] (params list) mutable exception-&gt; return type &#123; function body &#125;</span><br></pre></td></tr></table></figure>
-
-<p>其中只有捕获外部变量列表和函数体是必要的，<code>mutable</code>指示符用来说明是否可以修改捕获的变量，不管是那种捕获方式。</p>
-<p>在Lambda表达式中传递参数还有一些限制：</p>
-<ol>
-<li>参数列表中不能有默认参数</li>
-<li>不支持可变参数</li>
-<li>所有参数必须有参数名</li>
-</ol>
-<p><strong>捕获外部变量</strong></p>
-<p>Lambda表达式捕获外部变量的方式有值捕获、引用捕获、隐式捕获。</p>
-<table>
-<thead>
-<tr>
-<th>捕获形式</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>[]</td>
-<td>不捕获任何外部变量</td>
-</tr>
-<tr>
-<td>[变量名, …]</td>
-<td>默认以值得形式捕获指定的多个外部变量（用逗号分隔），如果引用捕获，需要&amp;显示声明</td>
-</tr>
-<tr>
-<td>[this]</td>
-<td>以值的形式捕获this指针</td>
-</tr>
-<tr>
-<td>[=]</td>
-<td>以值的形式捕获所有外部变量</td>
-</tr>
-<tr>
-<td>[&amp;]</td>
-<td>以引用形式捕获所有外部变量</td>
-</tr>
-<tr>
-<td>[=, &amp;x]</td>
-<td>变量x以引用形式捕获，其余变量以传值形式捕获</td>
-</tr>
-<tr>
-<td>[&amp;, x]</td>
-<td>变量x以值的形式捕获，其余变量以引用形式捕获</td>
-</tr>
-</tbody></table>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> a = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> fun1 = [a] &#123; cout &lt;&lt; a &lt;&lt; endl; &#125;;</span><br><span class="line">a = <span class="number">111</span>;</span><br><span class="line"><span class="built_in">fun1</span>(); <span class="comment">// a= 0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> fun2 = [&amp;a] &#123; cout &lt;&lt; a &lt;&lt; endl; &#125;;</span><br><span class="line">a = <span class="number">222</span>;</span><br><span class="line"><span class="built_in">fun2</span>(); <span class="comment">// a=222</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> fun3 = [=] &#123; cout &lt;&lt; a &lt;&lt; endl; &#125;;</span><br><span class="line">a = <span class="number">333</span>;</span><br><span class="line"><span class="built_in">fun3</span>(); <span class="comment">// a= 333</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> fun4 = [&amp;] &#123; cout &lt;&lt; a &lt;&lt; endl; &#125;;</span><br><span class="line">a = <span class="number">444</span>;</span><br><span class="line"><span class="built_in">fun4</span>(); <span class="comment">// a=444</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> fun5 = [&amp;]() <span class="keyword">mutable</span> &#123; a = <span class="number">666</span>; cout &lt;&lt; a &lt;&lt; endl; &#125;;</span><br><span class="line"><span class="built_in">fun5</span>(); <span class="comment">// a=666</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> b = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">auto</span> fun7 = [a, b]() <span class="keyword">mutable</span> &#123; cout &lt;&lt; a &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; b &lt;&lt; endl; &#125;;</span><br><span class="line">a = <span class="number">777</span>;</span><br><span class="line"><span class="built_in">fun7</span>(); <span class="comment">// a=666 b=0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> fun9 = [&amp;, b]() <span class="keyword">mutable</span> &#123; cout &lt;&lt; a &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; b &lt;&lt; endl; &#125;;</span><br><span class="line">a = <span class="number">777</span>;</span><br><span class="line">b = <span class="number">777</span>;</span><br><span class="line"><span class="built_in">fun9</span>(); <span class="comment">// a=666 b=0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> fun8 = [=, &amp;b]() <span class="keyword">mutable</span> &#123; cout &lt;&lt; a &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; b &lt;&lt; endl; &#125;;</span><br><span class="line">a = <span class="number">888</span>;</span><br><span class="line">b = <span class="number">888</span>;</span><br><span class="line"><span class="built_in">fun8</span>(); <span class="comment">// a=666 b=888</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>泛型lambda表达式</strong></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/cpp/stream_string/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/cpp/stream_string/" class="post-title-link" itemprop="url">C++ stream and string</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-09 19:51:44" itemprop="dateModified" datetime="2022-06-09T19:51:44+08:00">2022-06-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="iostream"><a href="#iostream" class="headerlink" title="iostream"></a>iostream</h2><ul>
-<li>cout 标准输出流，通常被重定向到控制台。</li>
-<li>cin 标准输入流，通常用于将数据读入变量。</li>
-<li>cerr 用于显示错误信息的标准输出流。</li>
-<li>clog 重定向到标准错误设备，但clog对象是缓冲的，会先存储在缓冲区，直到缓冲填满或者缓冲区刷新时才会输出。</li>
-<li>fstream 用于操作文件的输入和输出流，继承了 ofstream 和 ifstream。</li>
-<li>ofstream 用于操作文件的输出流类，即用于创建文件。</li>
-<li>ifstream 用于操作文件的输入流类，即用于读取文件。</li>
-<li>stringstream 用于操作字符串的输入和输出流类，继承了 istringstream 和 ostringstream，通常用于在字符串和其他类型之间进行转换。</li>
-</ul>
-<p>cout、cin 和cerr 分别是流类 ostream、istream 和 ostream 的全局对象。由于是全局对象，它们在main()开始之前就已初始化。</p>
-<p><img src="/images/cpp/stream_opt.png" alt="常用于流的控制符"></p>
-<h3 id="cin"><a href="#cin" class="headerlink" title="cin"></a>cin</h3><p>cin可以将输入直接写入变量，也可将输入直接写入char数组，但为了避免缓冲区溢出，应该使用get()函数。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> val;</span><br><span class="line">cin &gt;&gt; val;</span><br><span class="line"></span><br><span class="line"><span class="type">char</span> buf[<span class="number">16</span>];</span><br><span class="line">cin.<span class="built_in">get</span>(buf, <span class="number">16</span>);</span><br></pre></td></tr></table></figure>
-
-<h2 id="fstream"><a href="#fstream" class="headerlink" title="fstream"></a>fstream</h2><p>各种模式下打开文件流：</p>
-<ul>
-<li><code>ios_base::app</code>: 附加到现有文件末尾,而不是覆盖它。</li>
-<li><code>ios_base::ate</code>: 切换到文件末尾,但可在文件的任何地方写入数据。</li>
-<li><code>ios_base::trunc</code>: 导致现有文件被覆盖,这是默认设置。</li>
-<li><code>ios_base::binary</code>: 创建二进制文件(默认为文本文件)。</li>
-<li><code>ios_base::in</code>: 以只读方式打开文件。</li>
-<li><code>ios_base::out</code>: 以只写方式打开文件。</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ofstream file;</span><br><span class="line">    file.<span class="built_in">open</span>(<span class="string">&quot;./test&quot;</span>, ios_base::out);</span><br><span class="line">    <span class="keyword">if</span> (file.<span class="built_in">is_open</span>()) &#123;</span><br><span class="line">        file &lt;&lt; <span class="string">&quot;hello world&quot;</span>;</span><br><span class="line">        file.<span class="built_in">close</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ifstream read;</span><br><span class="line">    read.<span class="built_in">open</span>(<span class="string">&quot;./test&quot;</span>, ios_base::in);</span><br><span class="line">    string s;</span><br><span class="line">    <span class="keyword">if</span> (read.<span class="built_in">is_open</span>()) &#123;</span><br><span class="line">        <span class="built_in">getline</span>(read, s);</span><br><span class="line">        cout &lt;&lt; s &lt;&lt; endl;</span><br><span class="line">        read.<span class="built_in">close</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="string"><a href="#string" class="headerlink" title="string"></a>string</h2><p>字符串类 std::string 和 std::wstring 分别模拟了普通字符串和宽字符串，其长度可以动态增长，提供了一些方便操作的函数和运算符。</p>
-<p><strong>实例化</strong></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">string s1;</span><br><span class="line">string s2 = s1;</span><br><span class="line"><span class="function">string <span class="title">s2</span><span class="params">(s1)</span></span>;</span><br><span class="line">string s3 = <span class="string">&quot;hello&quot;</span>;  <span class="comment">//拷贝初始化</span></span><br><span class="line"><span class="function">string <span class="title">s4</span><span class="params">(<span class="string">&quot;hello&quot;</span>)</span></span>;   <span class="comment">//直接初始化</span></span><br><span class="line"><span class="function">string <span class="title">s5</span><span class="params">(<span class="number">10</span>, <span class="string">&#x27;c&#x27;</span>)</span></span>;   <span class="comment">//内容是10个c</span></span><br><span class="line"><span class="function">string <span class="title">s6</span><span class="params">(s4.begin(), s4.end())</span>)</span>;</span><br></pre></td></tr></table></figure>
-
-<p><strong>getline</strong></p>
-<p>使用getline读取一整行，保留输入的空白符，直到换行符为止。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">string line;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (<span class="built_in">getline</span>(cin, line))</span><br><span class="line">&#123;</span><br><span class="line">    cout &lt;&lt; line &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>可使用下标运算符<code>[]</code>获取字符，使用成员函数c_str()返回字符串指针。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/array-as-function-param/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/c/array-as-function-param/" class="post-title-link" itemprop="url">二维数据作函数参数</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="二维数组作为函数参数"><a href="#二维数组作为函数参数" class="headerlink" title="二维数组作为函数参数"></a>二维数组作为函数参数</h2><p><strong>1. 二维数组在栈上分配，二维数组作为参数</strong></p>
-<p>在栈上分配的二维数组，其各行地址空间是连续的，可以看作是一行排列的一维数组。其中二维数组的行数是可以省略的，所以也需要将行数作为参数传递。数组作为函数参数，其实传递的是指针，sizeof一下就知道了。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">func1</span><span class="params">(<span class="type">char</span> <span class="built_in">array</span>[<span class="number">3</span>][<span class="number">3</span>])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; ++i) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">3</span>; ++j) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, <span class="built_in">array</span>[i][j]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">func2</span><span class="params">(<span class="type">char</span> <span class="built_in">array</span>[][<span class="number">3</span>], <span class="type">int</span> N)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; N; ++i) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">3</span>; ++j) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, <span class="built_in">array</span>[i][j]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> array1[<span class="number">3</span>][<span class="number">3</span>] = &#123; &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;, &#123;<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>&#125;, &#123;<span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>&#125; &#125;;</span><br><span class="line">    func1(array1);</span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> array2[][<span class="number">3</span>] = &#123; &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;, &#123;<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>&#125;, &#123;<span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>&#125; &#125;;</span><br><span class="line">    func2(array2, (<span class="keyword">sizeof</span>(array2) / <span class="keyword">sizeof</span>(array2[<span class="number">0</span>][<span class="number">0</span>]) / <span class="number">3</span>));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>2. 二维数组在栈上分配，指向一维数组的指针作为参数</strong></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">func3</span><span class="params">(<span class="type">char</span> (*<span class="built_in">array</span>)[<span class="number">3</span>], <span class="type">int</span> N)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; N; ++i) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">3</span>; ++j) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, <span class="built_in">array</span>[i][j]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> array1[<span class="number">3</span>][<span class="number">3</span>] = &#123; &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;, &#123;<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>&#125;, &#123;<span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>&#125; &#125;;</span><br><span class="line">    <span class="type">char</span> (*array3)[<span class="number">3</span>] = &amp;array1[<span class="number">0</span>];</span><br><span class="line">    func3(array3, (<span class="keyword">sizeof</span>(array1) / <span class="keyword">sizeof</span>(array1[<span class="number">0</span>][<span class="number">0</span>]) / <span class="number">3</span>));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>3. 二维数组在栈上分配，指向数组类型的指针作为参数</strong></p>
-<p>需要将二维数组的首元素地址、行数、列数参数传入函数，通过加减指针再解引用来获取二维数组的値。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">func4</span><span class="params">(<span class="type">char</span> *<span class="built_in">array</span>, <span class="type">int</span> N, <span class="type">int</span> M)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; N; ++i) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; M; ++j) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, *(<span class="built_in">array</span> + i * M + j));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; N; ++i) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; M; ++j) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, <span class="built_in">array</span>[i * M + j]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> array1[<span class="number">3</span>][<span class="number">3</span>] = &#123; &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;, &#123;<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>&#125;, &#123;<span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>&#125; &#125;;</span><br><span class="line">    <span class="type">char</span> *array4 = &amp;array1[<span class="number">0</span>][<span class="number">0</span>];</span><br><span class="line">    func4(array4, <span class="number">3</span>, <span class="number">3</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>4. 二维数组在栈上分配，指向数组类型的指针的指针作为参数</strong></p>
-<p>因为可以当成一维数组来看，所以p[0][n]这样的取値方式也是可以的。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">func5</span><span class="params">(<span class="type">char</span> **<span class="built_in">array</span>, <span class="type">int</span> N, <span class="type">int</span> M)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> *p = *<span class="built_in">array</span>;</span><br><span class="line">    <span class="type">char</span> *tmp = p;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; N; ++i) &#123;</span><br><span class="line">        tmp = p + i * M;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; M; ++j) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, tmp[j]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; N; ++i) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; M; ++j) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, <span class="built_in">array</span>[<span class="number">0</span>][i * M + j]);</span><br><span class="line">            <span class="comment">// printf(&quot;%d &quot;, *(*array + i * M + j));  // also</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> array1[<span class="number">3</span>][<span class="number">3</span>] = &#123; &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;, &#123;<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>&#125;, &#123;<span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>&#125; &#125;;</span><br><span class="line">    <span class="type">char</span> *array4 = &amp;array1[<span class="number">0</span>][<span class="number">0</span>];</span><br><span class="line">    <span class="type">char</span> **array5 = &amp;array4;</span><br><span class="line">    func5(array5, <span class="number">3</span>, <span class="number">3</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>5. 在堆上分配二维数组，指向数组类型的指针的指针作为参数</strong></p>
-<p>在堆上分配的二维数组，各行地址空间不一定连续，但内存是固定的，可以使用p[n][m]这样方式取数组值。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">oid <span class="title function_">func6</span><span class="params">(<span class="type">char</span> **<span class="built_in">array</span>, <span class="type">int</span> N, <span class="type">int</span> M)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; N; ++i) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; M; ++j) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, *(*(<span class="built_in">array</span> + i) + j));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; N; ++i) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; M; ++j) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, <span class="built_in">array</span>[i][j]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> **array6 = (<span class="type">char</span> **)<span class="built_in">malloc</span>(<span class="number">3</span> * <span class="keyword">sizeof</span>(<span class="type">char</span> *));</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++) &#123;</span><br><span class="line">        array6[i] = (<span class="type">char</span> *)<span class="built_in">malloc</span>(i * <span class="keyword">sizeof</span>(<span class="type">char</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">3</span>; ++j)</span><br><span class="line">        &#123;</span><br><span class="line">            array6[i][j] = i * <span class="number">3</span> + j + <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    func6(array6, <span class="number">3</span>, <span class="number">3</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>6. 在堆上分配一维数组当作二维数组，指向数组类型的指针的指针作为参数</strong></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">func7</span><span class="params">(<span class="type">char</span> **<span class="built_in">array</span>, <span class="type">int</span> N, <span class="type">int</span> M)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; N; ++i) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; M; ++j) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, *(*<span class="built_in">array</span> + i*M + j));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; N; ++i) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; M; ++j) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, <span class="built_in">array</span>[<span class="number">0</span>][i * M + j]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> *array7 = (<span class="type">char</span> *)<span class="built_in">malloc</span>(<span class="number">3</span> * <span class="number">3</span> * <span class="keyword">sizeof</span>(<span class="type">char</span>));</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">3</span>; ++j)</span><br><span class="line">        &#123;</span><br><span class="line">            array7[i * <span class="number">3</span> + j] = i * <span class="number">3</span> + j + <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    func7(&amp;array7, <span class="number">3</span>, <span class="number">3</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1901,20 +1879,20 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">201</span>
+          <span class="site-state-item-count">203</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-count">37</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

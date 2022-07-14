@@ -176,6 +176,682 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/17/cpp/stl/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/17/cpp/stl/" class="post-title-link" itemprop="url">C++ STL</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-17 19:40:45" itemprop="dateCreated datePublished" datetime="2022-06-17T19:40:45+08:00">2022-06-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>STL 是Standard Template Library，标准模板库。STL 就是借助模板把常用的数据结构及其算法都实现了一遍，并且做到了数据结构和算法的分离。例如，vector 的底层为顺序表，list 的底层为双向链表，deque 的底层为循环队列，set 的底层为红黑树，hash_set 的底层为哈希表。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/gcc-mirror/gcc">https://github.com/gcc-mirror/gcc</a></p>
+<p>STL是一个标准，只规定了STL的接口，内部实现没有要求。C++ <a target="_blank" rel="noopener" href="http://c.biancheng.net/stl/">STL</a> 规范版本正式通过以后，由于其实开源的，各个 C++ 编译器厂商在此标准的基础上，实现了满足自己需求的 C++ STL 泛型库，所以STL有许多实现版本。PJ STL被Visual C++采用，RW STL等。，是最流行的版本。</p>
+<p>HP STL 是 Alexandar Stepanov在惠普 Palo Alto 实验室工作时，与 Meng Lee 合作完成的。HP STL 是开放源码的，即任何人都可以免费使用、复制、修改、发布和销售该软件以及相关文档，但前提是必须在相关文档中，加入 HP STL 版本信息和授权信息。</p>
+<p>PJ STL（全称为 P.J. Plauger STL）是由 P.J.Plauger参照 HP STL 实现出来的，也是 HP STL 的一个继承版本，因此该头文件中不仅含有 HP STL 的相关授权信息，同时还有 P.J.Plauger 本人的版权信息。PJ STL 被 Visual C++ 编译器所采用，但和 PH STL、SGI STL 不同的是，PJ STL 并不是开源。</p>
+<p>Rouge Wave STL是由 Rouge Wave 公司开发的，也是继承 HP STL 的一个版本，它也不是开源的。<br>Rouge Wave STL 用于 Borland C++ Builder 编译器中。不过由于 Rouge Wave STL 版本不仅更新频率慢，费用还高，所以Borland 在 6.0 版本决定弃用 Rouge Wave STL 而改用 STLport。</p>
+<p>Stepanov 在离开 HP 之后，就加入到了 SGI 公司，并和 Matt Austern 等人开发了 SGI STL。SGI STL 是开源的，版本注释丰富，结构清晰，可读性最强，被GCC采用。SGI STL 文件分布：</p>
+<ul>
+<li>C++ 标准规范下的 C 头文件（无扩展名），如 cstdio、cstdlib、cstring</li>
+<li>C++ 标准程序库中不属于 STL 范畴者，如 stream、string</li>
+<li>STL 标准头文件（无扩展名），如 vector、deque、list、map、algorithm、functional</li>
+<li>C++ Standard 定案前，HP 所规范的STL 头文件，如 vector.h、deque.h、list.h、map.h、algo.h、function.h</li>
+<li>SGI STL 内部文件（STL 真正实现于此），如 stl_vector.h、stl_deque.h、stl_list.h、stl_map.h、stl_algo.h、stl_function.h</li>
+</ul>
+<p>为了使 SGI STL 的基本代码都适用于 VC++ 和 C++ Builder 等多种编译器，俄国人 Boris Fomitchev 建立了一个 free 项目来开发 STLport，此版本 STL 是开放源码的。</p>
+<p>STL6大组件的交互关系：container通过 allocator取得数据储存空间，algorithm通过 iterator存取 container内容，functor可以协助 algorithm完成不同的策略变化，adapter可以修饰或套接 functor。</p>
+<h2 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h2><p>容器是一种类模板，包含各种数据结构的实现，用来存放数据。按元素是否线性，且插入时是否会自动排序，可分为序列式容器和关联式容器。</p>
+<p>序列式容器按顺序存储数据，顺序容器具有插入速度快但查找操作相对较慢的特征。</p>
+<p>关联式容器每个元素都有一个键值和一个实値，以key-value对形式存在。当元素被插入到容器中时，容器内部会依照其键値大小安排放置的位置，所以关联式容器没有所谓头尾，但在查询方面有很大的优势。</p>
+<p>set基于红黑树实现，红黑树具有自动排序的功能，因此内部所有的数据在任何时候都是有序的。适合需要有序数据，能顺序遍历场合。</p>
+<p>unordered_set基于哈希表实现，使用一个下标范围比较大的数组来存储元素，形成很多的桶，利用hash函数对key进行映射到不同区域进行保存。数据插入和查找的时间复杂度是常数，会消耗较多的内存，无自动排序功能。适合不需要排序，单个元素访问场合。</p>
+<p>multiset与 set 类似，但允许存储多个值相同的项。务必使用 multiset::count(value)确定有多少个元素包含特定的值。</p>
+<table>
+<thead>
+<tr>
+<th align="center">容器</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">vector</td>
+<td>插入数据时间固定<br/>随机访问</td>
+<td>调整大小时将影响性能<br/>搜索时间与容器包含的元素个数成反比<br/>只能在末尾插入数据</td>
+</tr>
+<tr>
+<td align="center">deque</td>
+<td>插入数据时间固定</td>
+<td>不能随机访问</td>
+</tr>
+<tr>
+<td align="center">list</td>
+<td>插入时间固定<br/>插入或删除元素后，迭代器仍有效</td>
+<td>不能随机访问<br/>搜索速度慢，因为内存不连续<br/>搜索时间与容器中的元素个数成反比</td>
+</tr>
+<tr>
+<td align="center">forward_list</td>
+<td>单向链表</td>
+<td>只能沿一个方向遍历<br/>只能在开头插入</td>
+</tr>
+<tr>
+<td align="center">set</td>
+<td>搜索速度快，与元素个数的对数成反比</td>
+<td>存储的值唯一<br/>插入速度慢，因为插入时要对元素排序</td>
+</tr>
+<tr>
+<td align="center">multiset</td>
+<td>允许存储多个值相同的项</td>
+<td>插入时要对元素排序</td>
+</tr>
+<tr>
+<td align="center">unordered_set</td>
+<td>查找、插入和删除复杂度为常数</td>
+<td>由于元素未被严格排序，因此不能依赖元素在容器中的相对位置</td>
+</tr>
+<tr>
+<td align="center">map</td>
+<td>搜索速度快，与元素个数的对数成反比</td>
+<td>key唯一<br/>插入时要对元素排序</td>
+</tr>
+<tr>
+<td align="center">multimap</td>
+<td>key可以不唯一</td>
+<td>插入时要对元素排序</td>
+</tr>
+<tr>
+<td align="center">unordered_map</td>
+<td>查找、插入和删除复杂度为常数，不受容器长度影响</td>
+<td>元素未被严格排序,不适合用于顺序很重要的情形</td>
+</tr>
+<tr>
+<td align="center">stack</td>
+<td>栈</td>
+<td>后进先出<br/>只能在栈顶压入和弹出元素</td>
+</tr>
+<tr>
+<td align="center">queue</td>
+<td>队列</td>
+<td>先进先出<br/>只能在访问队首，在队尾插入</td>
+</tr>
+<tr>
+<td align="center">priority_queue</td>
+<td>以特定顺序存储元素，优先级高在队列开头</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>push_back() 向容器添加元素时，先会调用构造函数构造一个临时对象，而 emplace_back() 是直接在容器空间内原地构造临时对象，省去移动或复制的过程。其传入的参数不是对象，而是对象的构造参数。但要保证容器是有剩余空间存放新元素的，不然跟 push_back() 一样。一般左值用 push_back()，右值用 emplace_back()。</p>
+<h3 id="vector"><a href="#vector" class="headerlink" title="vector"></a>vector</h3><p>可以通过swap()方法与一个小容量的vector交换的方式来减小过剩容量。</p>
+<h2 id="iterator"><a href="#iterator" class="headerlink" title="iterator"></a>iterator</h2><p>迭代器是一种行为类似指针的对象，通过对迭代器解引用，它将引用对象，对容器中元素进行迭代遍历，扮演着容器和算法之间的胶合剂。常用的迭代器按功能强弱分为:</p>
+<ul>
+<li>输入迭代器:只能以只读的方式访问对象。</li>
+<li>输出迭代器:只能执行写入操作。</li>
+<li>前向迭代器:允许输入与输出，可以是 const 的,只能读取它指向的对象;也可以改变对象,即可读写对象。通常用于单向链表。</li>
+<li>双向迭代器:可对其执行递减操作,从而向后移动。通常用于双向链表。</li>
+<li>随机访问迭代器:可将其加减一个偏移量,还可将两个迭代器相减以得到集合中两个元素的相对距离。通常用于数组。</li>
+</ul>
+<p><strong>迭代器失效</strong>：</p>
+<ul>
+<li><p>数组型数据结构：该容器元素是分配在连续的内存中，insert和erase操作，都会使得删除点和插入点之后的元素挪位置，所以，插入点和删除掉之后的迭代器全部失效，也就是说<code>insert(*iter)</code>或<code>erase(*iter)</code>，然后在iter++，是没有意义的。解决方法：erase(*iter)的返回值是下一个有效迭代器的值。</p>
+</li>
+<li><p>链表型数据结构：对于list型的数据结构，使用了不连续分配的内存，删除运算使指向删除位置的迭代器失效，但是不会失效其他迭代器。解决办法两种，erase(*iter)会返回下一个有效迭代器的值，或者erase(iter++).</p>
+</li>
+<li><p>树形数据结构： 使用红黑树来存储数据，插入不会使得任何迭代器失效；删除运算使指向删除位置的迭代器失效，但是不会失效其他迭代器。erase迭代器只是被删元素的迭代器失效，但是返回值为void，所以要采用erase(iter++)的方式删除迭代器。</p>
+</li>
+</ul>
+<h2 id="algorithm"><a href="#algorithm" class="headerlink" title="algorithm"></a>algorithm</h2><p>STL提供了一套常用的算法，在实现上是一种函数模板。不改变容器中元素的顺序和内容的算法称为非变序算法，反之为变序算法。</p>
+<ul>
+<li>count() 在指定范围内查找值与指定值匹配的所有元素。</li>
+<li>count_if() 在指定范围内查找值满足指定条件的所有元素。</li>
+<li>search() 在一个序列中查找另一个序列</li>
+<li>search_n() 在容器中查找n个相邻的指定值</li>
+<li>find() 在给定范围内搜索与指定值匹配的第一个元素。</li>
+<li>find_if() 在给定范围内搜索满足指定条件的第一个元素。</li>
+<li>find_end() 在指定范围内搜索最后一个满足特定条件的元素。</li>
+<li>find_first_of() 在目标范围内搜索指定序列中的任何一个元素第一次出现的位置</li>
+<li>adjacent_find() 在集合中搜索两个相等或满足指定条件的元素。</li>
+<li>equal() 比较两个元素是否相等或使用指定的二元谓词判断两者是否相等</li>
+<li>mismatch() 使用指定的二元谓词找出两个元素范围的第一个不同的地方</li>
+<li>lexicographical_compare() 比较两个序列中的元素，以判断哪个序列更小</li>
+<li>fill() 将指定范围内的元素设置为指定值</li>
+<li>fill_n() 将n个相邻元素设置为指定值</li>
+<li>generate() 将指定函数对象的返回值分配给指定范围中的每个元素</li>
+<li>generate_n() 将指定函数的返回值分配给n个相邻元素</li>
+<li>for_each() 对指定范围内的每个元素执行指定操作。</li>
+<li>transform() 对指定范围中的每个元素执行指定操作，能够处理一对来自两个不同范围的元素</li>
+<li>copy() 将一个范围复制到另一个范围</li>
+<li>copy_backward() 沿反方向将一个范围复制到另一个范围</li>
+<li>remove() 将指定范围中包含指定值的元素删除</li>
+<li>remove_if() 将指定范围中满足指定条件的元素删除</li>
+<li>unique() 比较指定范围内的相邻元素，并删除重复的元素</li>
+<li>unique_copy() 将源范围内的所有元素复制到目标范围，但相邻的重复元素除外</li>
+<li>replace() 用一个值来替换指定范围中与指定值匹配的所有元素</li>
+<li>replace_if() 用一个值来替换指定范围中满足指定条件的所有元素</li>
+<li>sort() 使用指定的排序标准对指定范围内的元素进行排序</li>
+<li>stable_sort() 类似于 sort，但在排序时保持相对顺序不变</li>
+<li>partial_sort() 将源范围内指定数量的元素排序</li>
+<li>partial_sort_copy() 将源范围内的元素复制到目标范围，同时对它们排序</li>
+<li>partition() 在指定范围中将满足指定条件的元素放在第一个组中，其他元素放在第二组中</li>
+<li>stable_partition() 与 partition 一样将指定范围分为两组，但保持元素的相对顺序不变</li>
+<li>binary_search() 用于判断一个元素是否存在于一个排序集合中</li>
+<li>lower_bound() 根据元素的值或满足条件判断元素可能插入到排序集合中的第一个位置，并返回指向该位置的迭代器</li>
+<li>upper_bound() 根据元素的值或满足条件判断元素可能插入到排序集合中的最后一个位置，并返回指向该位置的迭代器</li>
+</ul>
+<h2 id="allocator"><a href="#allocator" class="headerlink" title="allocator"></a>allocator</h2><p>空间配置器为容器提供空间配置和释放，对象构造和析构的服务。它的实际实现在三个文件中：</p>
+<ul>
+<li>stl_construct.h: 对象的构造和析构</li>
+<li>stl_alloc.h: 空间的配置和释放</li>
+<li>stl_uninitialized.h: 内存基本工具，用于提升性能。</li>
+</ul>
+<h2 id="functor"><a href="#functor" class="headerlink" title="functor"></a>functor</h2><p>仿函数是行为类似函数的对象，也叫函数对象，用于泛化算法的策略，其实就是在类中重载了operator() 运算符。和函数指针相似，让类使用起来像函数一样。函数对象与函数指针相比，有2个优点：</p>
+<ol>
+<li>编译器可以内联执行函数对象的调用，性能好。</li>
+<li>函数对象内部可以保持状态。</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">FuncObj</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">FuncObj</span>(<span class="type">char</span> *name) : <span class="built_in">name_</span>(name) &#123;&#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        cout &lt;&lt; str &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; name_ &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">char</span> *name_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">FuncObj <span class="title">f1</span><span class="params">(<span class="string">&quot;aaa&quot;</span>)</span></span>;</span><br><span class="line">    <span class="built_in">f1</span>(<span class="string">&quot;hello&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="function">FuncObj <span class="title">f2</span><span class="params">(<span class="string">&quot;bbb&quot;</span>)</span></span>;</span><br><span class="line">    <span class="built_in">f2</span>(<span class="string">&quot;hello&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="adapter"><a href="#adapter" class="headerlink" title="adapter"></a>adapter</h2><p>适配器用来修饰容器、迭代器和仿函数的接口，比如queue和stack容器是借助deque实现的。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/17/cpp/future/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/17/cpp/future/" class="post-title-link" itemprop="url">C++ future</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-17 19:40:45" itemprop="dateCreated datePublished" datetime="2022-06-17T19:40:45+08:00">2022-06-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="std-future"><a href="#std-future" class="headerlink" title="std::future"></a>std::future</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">future</span>() <span class="keyword">noexcept</span>;</span><br><span class="line"><span class="built_in">future</span>(<span class="type">const</span> future&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"><span class="built_in">future</span>(future&amp;&amp; x) <span class="keyword">noexcept</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>std::future</code> 一般由 <code>std::async</code>, <code>std::promise::get_future</code>, <code>std::packaged_task::get_future</code> 创建，</p>
+<p><code>std::future</code> 用来获取异步任务的结果，由某个 Provider(异步任务的提供者)，Provider 在某个线程中设置共享状态的值，与该共享状态相关联的 <code>std::future</code> 对象调用 <code>get()</code> 就可以获取该值，如果共享状态的标志不为 ready，则调用 <code>std::future::get()</code> 会阻塞当前的调用者，直到 Provider 设置了共享状态的值。</p>
+<ul>
+<li><code>get()</code>: 获取与该 std::future 对象相关联的共享状态的值或异常。</li>
+<li><code>valid()</code>: 有效性检查。</li>
+<li><code>wait()</code>: 等待与该 std::future 对象相关联的共享状态的标志变为 ready。</li>
+<li><code>wait_for()</code>: 等待一段时间与该 std::future 对象相关联的共享状态的标志变为 ready。</li>
+<li><code>wait_until()</code>: 等待一个时间点与该 std::future 对象相关联的共享状态的标志变为 ready。</li>
+<li><code>share()</code>: 返回一个 <code>std::shared_future</code> 对象，调用该函数之后，该 <code>std::future</code> 对象就不和任何共享状态相关联。</li>
+</ul>
+<p><strong>std::shared_future</strong></p>
+<p>std::shared_future 可以拷贝构造，多个 std::shared_future 可以共享某个共享状态的最终结果或异常。</p>
+<h2 id="std-promise"><a href="#std-promise" class="headerlink" title="std::promise"></a>std::promise</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">promise</span>();</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Alloc</span>&gt; </span><br><span class="line">    <span class="built_in">promise</span> (<span class="type">allocator_arg_t</span> aa, <span class="type">const</span> Alloc&amp; alloc);</span><br><span class="line"></span><br><span class="line"><span class="built_in">promise</span> (<span class="type">const</span> promise &amp;) = <span class="keyword">delete</span>;</span><br><span class="line"><span class="built_in">promise</span> (promise &amp;&amp;x) <span class="keyword">noexcept</span>;</span><br><span class="line"></span><br><span class="line"><span class="function">std::future&lt;R&gt; <span class="title">get_future</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>promise 对象是异步 Provider，它可以在某一时刻设置共享状态的值。future 对象可以异步返回共享状态的值，通过 <code>get_future()</code> 来获取与该 promise 对象相关联的 future 对象，或者在必要的情况下阻塞调用者并等待共享状态标志变为 ready，然后才能获取共享状态的值。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span>       <span class="comment">// std::cout</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span>     <span class="comment">// std::ref</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span>         <span class="comment">// std::thread</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;future&gt;</span>         <span class="comment">// std::promise, std::future</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">print_int</span><span class="params">(std::future&lt;<span class="type">int</span>&gt;&amp; fut)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> x = fut.<span class="built_in">get</span>(); <span class="comment">// 获取共享状态的值.</span></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;value: &quot;</span> &lt;&lt; x &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span> <span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::promise&lt;<span class="type">int</span>&gt; prom; <span class="comment">// 生成一个 std::promise&lt;int&gt; 对象.</span></span><br><span class="line">    std::future&lt;<span class="type">int</span>&gt; fut = prom.<span class="built_in">get_future</span>(); <span class="comment">// 和 future 关联.</span></span><br><span class="line"></span><br><span class="line">    <span class="function">std::thread <span class="title">t</span><span class="params">(print_int, std::ref(fut))</span></span>; <span class="comment">// 将 future 交给另外一个线程.</span></span><br><span class="line">    </span><br><span class="line">    prom.<span class="built_in">set_value</span>(<span class="number">10</span>); <span class="comment">// 设置共享状态的值, 此处和线程保持同步.</span></span><br><span class="line"></span><br><span class="line">    t.<span class="built_in">join</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="std-packaged-task"><a href="#std-packaged-task" class="headerlink" title="std::packaged_task"></a>std::packaged_task</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">packaged_task</span>() <span class="keyword">noexcept</span>;</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">F</span>&gt;</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">packaged_task</span><span class="params">( F&amp;&amp; f )</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">F</span>, <span class="keyword">class</span> <span class="title class_">Allocator</span>&gt;</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">packaged_task</span><span class="params">( std::<span class="type">allocator_arg_t</span>, <span class="type">const</span> Allocator&amp; a, F&amp;&amp; f )</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">packaged_task</span>( <span class="type">const</span> packaged_task&amp; ) = <span class="keyword">delete</span>;</span><br><span class="line"><span class="built_in">packaged_task</span>( packaged_task&amp;&amp; rhs ) <span class="keyword">noexcept</span>;</span><br></pre></td></tr></table></figure>
+
+<p>packaged_task 包装一个可调用的对象，并且允许一个 future 对象异步获取该可调用对象产生的结果。packaged_task 对象内部包含了两个最基本元素:</p>
+<ul>
+<li>被包装的任务，任务是一个可调用的对象，如函数指针、成员函数指针或者函数对象。</li>
+<li>共享状态，用于保存任务的返回值，可以通过 future 对象来达到异步访问共享状态的效果。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用 lambda 表达式初始化一个 packaged_task 对象.</span></span><br><span class="line"><span class="function">std::packaged_task&lt;<span class="title">int</span><span class="params">(<span class="type">int</span>)</span>&gt; <span class="title">task</span><span class="params">([](<span class="type">int</span> x)&#123; <span class="keyword">return</span> x * x; &#125;)</span></span>;</span><br><span class="line"><span class="comment">// 获取与 packaged_task 共享状态相关联的 future 对象.</span></span><br><span class="line">std::future&lt;<span class="type">int</span>&gt; ret = task.<span class="built_in">get_future</span>();</span><br><span class="line"></span><br><span class="line">std::<span class="built_in">thread</span>(std::<span class="built_in">move</span>(task), <span class="number">10</span>).<span class="built_in">detach</span>(); <span class="comment">// 产生线程，调用被包装的任务.</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> value = ret.<span class="built_in">get</span>(); <span class="comment">// 等待任务完成并获取结果.</span></span><br><span class="line">std::cout &lt;&lt; <span class="string">&quot;value =  &quot;</span> &lt;&lt; value &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
+
+<h2 id="std-async"><a href="#std-async" class="headerlink" title="std::async()"></a>std::async()</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt; <span class="keyword">class</span> <span class="title class_">Function</span>, <span class="keyword">class</span>... Args &gt;</span><br><span class="line">    std::future&lt;<span class="keyword">typename</span> std::result_of&lt;<span class="keyword">typename</span> std::decay&lt;Function&gt;::<span class="built_in">type</span>(</span><br><span class="line">        <span class="keyword">typename</span> std::decay&lt;Args&gt;::type...)&gt;::type&gt; <span class="built_in">async</span>( Function&amp;&amp; f, Args&amp;&amp;... args );</span><br></pre></td></tr></table></figure>
+
+<p><code>std::async()</code> 的 fn 和 args 参数用来指定异步任务及其参数，其返回一个 <code>std::future</code> 对象，通过该对象可以获取异步任务的值或异常。</p>
+<p><code>std::launch</code>枚举类型用于设置异步任务的启动策略。</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>launch::async</code></td>
+<td>异步任务会在另外一个线程中调用</td>
+</tr>
+<tr>
+<td><code>launch::deferred</code></td>
+<td>异步任务将会在共享状态被访问时调用</td>
+</tr>
+</tbody></table>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">std::future&lt;<span class="type">int</span>&gt; fut = std::<span class="built_in">async</span>([](<span class="type">int</span> x)&#123; <span class="keyword">return</span> x * x; &#125;, <span class="number">10</span>);</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> value = fut.<span class="built_in">get</span>();</span><br><span class="line">std::cout &lt;&lt; <span class="string">&quot;value =  &quot;</span> &lt;&lt; value &lt;&lt; std::endl;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/11/cpp/atomic/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/11/cpp/atomic/" class="post-title-link" itemprop="url">C++ atomic</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-06-11 17:55:25 / 修改时间：20:13:32" itemprop="dateCreated datePublished" datetime="2022-06-11T17:55:25+08:00">2022-06-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="atomic-flag"><a href="#atomic-flag" class="headerlink" title="atomic_flag"></a>atomic_flag</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">atomic_flag</span>() <span class="keyword">noexcept</span> = <span class="keyword">default</span>;</span><br><span class="line"><span class="built_in">atomic_flag</span> (<span class="type">const</span> atomic_flag&amp;T) = <span class="keyword">delete</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>std::atomic_flag</code> 只有默认构造函数，拷贝构造函数已被禁用。如果创建时没有初始化，那么对象的状态是未指定的，初始化时应该赋值为<code>ATOMIC_FLAG_INIT</code>，保证该对象在创建时处于 clear 状态。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::atomic_flag flag = ATOMIC_FLAG_INIT;</span><br></pre></td></tr></table></figure>
+
+<p><code>test_and_set()</code> 函数检查 <code>atomic_flag</code> 标志，如果之前没有被设置过，则设置 <code>atomic_flag</code> 的标志，并返回先前该对象是否被设置过，如果之前对象已被设置，则返回 true，否则返回 false。</p>
+<h2 id="atomic"><a href="#atomic" class="headerlink" title="atomic"></a>atomic</h2><p> <code>std::atomic</code> 提供了针对整形和指针类型的特化实现，分别定义如下：</p>
+<p><code>char</code>, <code>signed char</code>, <code>unsigned char</code>, <code>short</code>, <code>unsigned short</code>, <code>int</code>, <code>unsigned int</code>, <code>long</code>, <code>unsigned long</code>, <code>long long</code>, <code>unsigned long long</code>, <code>char16_t</code>, <code>char32_t</code>, <code>wchar_t</code>。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/11/cpp/lock/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/11/cpp/lock/" class="post-title-link" itemprop="url">C++ Mutex and Lock</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-06-11 17:23:19 / 修改时间：17:53:37" itemprop="dateCreated datePublished" datetime="2022-06-11T17:23:19+08:00">2022-06-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="std-mutex"><a href="#std-mutex" class="headerlink" title="std::mutex"></a>std::mutex</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">mutex</span> &#123;</span><br><span class="line">        <span class="keyword">public</span>:</span><br><span class="line">            <span class="function"><span class="keyword">constexpr</span> <span class="title">mutex</span><span class="params">()</span></span>;</span><br><span class="line">            ~<span class="built_in">mutex</span>();</span><br><span class="line">            <span class="built_in">mutex</span>(<span class="type">const</span> mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            mutex&amp; <span class="keyword">operator</span>=(<span class="type">const</span> mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">typedef</span> implementation-defined native_handle_type;</span><br><span class="line">            <span class="function">native_handle_type <span class="title">native_handle</span><span class="params">()</span></span>;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>std::mutex</code>不允许拷贝构造，也不允许 move 拷贝。</p>
+<h2 id="timed-mutex"><a href="#timed-mutex" class="headerlink" title="timed_mutex"></a>timed_mutex</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">timed_mutex</span> &#123;</span><br><span class="line">        <span class="keyword">public</span>:</span><br><span class="line">            <span class="built_in">timed_mutex</span>();</span><br><span class="line">            ~<span class="built_in">timed_mutex</span>();</span><br><span class="line">            <span class="built_in">timed_mutex</span>(<span class="type">const</span> timed_mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            timed_mutex&amp; <span class="keyword">operator</span>=(<span class="type">const</span> timed_mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Rep</span>, <span class="keyword">class</span> <span class="title class_">Period</span>&gt;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock_for</span><span class="params">(<span class="type">const</span> chrono::duration&lt;Rep, Period&gt;&amp; rel_time)</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Clock</span>, <span class="keyword">class</span> <span class="title class_">Duration</span>&gt;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock_until</span><span class="params">(<span class="type">const</span> chrono::time_point&lt;Clock, Duration&gt;&amp; abs_time)</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">typedef</span> implementation-defined native_handle_type; </span><br><span class="line">            <span class="function">native_handle_type <span class="title">native_handle</span><span class="params">()</span></span>;    </span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>std::time_mutex</code>比 <code>std::mutex</code> 多了两个成员函数：<code>try_lock_for()</code>，<code>try_lock_until()</code>。<code>try_lock_for()</code> 函数接受一个时间范围，在这一段时间范围之内，如果没有获得锁则被阻塞住，如果超时没有获得锁，则返回 false。<code>try_lock_until()</code> 函数则接受一个时间点作为参数，在指定时间点未到来之前，如果没有获得锁则被阻塞住，如果超时，则返回 false。</p>
+<h2 id="recursive-mutex"><a href="#recursive-mutex" class="headerlink" title="recursive_mutex"></a>recursive_mutex</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">recursive_mutex</span> &#123;</span><br><span class="line">        <span class="keyword">public</span>:</span><br><span class="line">            <span class="built_in">recursive_mutex</span>();</span><br><span class="line">            ~<span class="built_in">recursive_mutex</span>();</span><br><span class="line">            <span class="built_in">recursive_mutex</span>(<span class="type">const</span> recursive_mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            recursive_mutex&amp; <span class="keyword">operator</span>=(<span class="type">const</span> recursive_mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">typedef</span> implementation-defined native_handle_type;</span><br><span class="line">            <span class="function">native_handle_type <span class="title">native_handle</span><span class="params">()</span></span>;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>std::recursive_mutex</code> 允许递归上锁来获得对互斥量对象的多层所有权，重复对该互斥量进行上锁操作不会产生死锁，但必须保证上锁和解锁的次数相同。。</p>
+<h2 id="lock-guard"><a href="#lock-guard" class="headerlink" title="lock_guard"></a>lock_guard</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Mutex</span>&gt;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">lock_guard</span> &#123;</span><br><span class="line">        <span class="keyword">public</span>:</span><br><span class="line">            <span class="keyword">typedef</span> Mutex mutex_type;</span><br><span class="line">            <span class="function"><span class="keyword">explicit</span> <span class="title">lock_guard</span><span class="params">(mutex_type&amp; m)</span></span>;</span><br><span class="line">            <span class="built_in">lock_guard</span>(mutex_type&amp; m, <span class="type">adopt_lock_t</span>) <span class="keyword">noexcept</span>;</span><br><span class="line">            ~<span class="built_in">lock_guard</span>();</span><br><span class="line">            <span class="built_in">lock_guard</span>(lock_guard <span class="type">const</span>&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            lock_guard&amp; <span class="keyword">operator</span>=(lock_guard <span class="type">const</span>&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">        <span class="keyword">private</span>:</span><br><span class="line">            mutex_type&amp; pm; <span class="comment">// exposition only</span></span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>lock_guard</code> 对象并不负责管理 Mutex 对象的生命周期，只是简化了 Mutex 对象的上锁和解锁操作，在 <code>lock_guard</code> 对象构造时，传入的 Mutex 对象会被当前线程锁住。在<code>lock_guard</code> 对象被析构时，它所管理的 Mutex 对象会自动解锁。</p>
+<h2 id="unique-lock"><a href="#unique-lock" class="headerlink" title="unique_lock"></a>unique_lock</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Mutex</span>&gt;</span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">unique_lock</span> &#123;</span><br><span class="line">        <span class="keyword">public</span>:</span><br><span class="line">            <span class="keyword">typedef</span> Mutex mutex_type;</span><br><span class="line">            <span class="comment">// 构造/拷贝/析构:</span></span><br><span class="line">            <span class="built_in">unique_lock</span>() <span class="keyword">noexcept</span>;</span><br><span class="line">            <span class="function"><span class="keyword">explicit</span> <span class="title">unique_lock</span><span class="params">(mutex_type&amp; m)</span></span>;</span><br><span class="line">            <span class="built_in">unique_lock</span>(mutex_type&amp; m, <span class="type">defer_lock_t</span>) <span class="keyword">noexcept</span>;</span><br><span class="line">            <span class="built_in">unique_lock</span>(mutex_type&amp; m, <span class="type">try_to_lock_t</span>) <span class="keyword">noexcept</span>;</span><br><span class="line">            <span class="built_in">unique_lock</span>(mutex_type&amp; m, <span class="type">adopt_lock_t</span>) <span class="keyword">noexcept</span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Clock</span>, <span class="keyword">class</span> <span class="title class_">Duration</span>&gt;</span><br><span class="line">            <span class="built_in">unique_lock</span>(mutex_type&amp; m, <span class="type">const</span> chrono::time_point&lt;Clock, Duration&gt;&amp; abs_time) <span class="keyword">noexcept</span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Rep</span>, <span class="keyword">class</span> <span class="title class_">Period</span>&gt;</span><br><span class="line">            <span class="built_in">unique_lock</span>(mutex_type&amp; m, <span class="type">const</span> chrono::duration&lt;Rep, Period&gt;&amp; rel_time) <span class="keyword">noexcept</span>;</span><br><span class="line">            ~<span class="built_in">unique_lock</span>();</span><br><span class="line">            <span class="built_in">unique_lock</span>(unique_lock <span class="type">const</span>&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            unique_lock&amp; <span class="keyword">operator</span>=(unique_lock <span class="type">const</span>&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">            <span class="built_in">unique_lock</span>(unique    _lock&amp;&amp; u) <span class="keyword">noexcept</span>;</span><br><span class="line">            unique_lock&amp; <span class="keyword">operator</span>=(unique_lock&amp;&amp; u) <span class="keyword">noexcept</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 上锁操作:</span></span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock</span><span class="params">()</span></span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Rep</span>, <span class="keyword">class</span> <span class="title class_">Period</span>&gt;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock_for</span><span class="params">(<span class="type">const</span> chrono::duration&lt;Rep, Period&gt;&amp; rel_time)</span></span>;</span><br><span class="line">            <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Clock</span>, <span class="keyword">class</span> <span class="title class_">Duration</span>&gt;</span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">try_lock_until</span><span class="params">(<span class="type">const</span> chrono::time_point&lt;Clock, Duration&gt;&amp; abs_time)</span></span>;</span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 修改操作</span></span><br><span class="line">            <span class="function"><span class="type">void</span> <span class="title">swap</span><span class="params">(unique_lock&amp; u)</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function">mutex_type *<span class="title">release</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// observers:</span></span><br><span class="line">            <span class="function"><span class="type">bool</span> <span class="title">owns_lock</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function"><span class="keyword">explicit</span> <span class="keyword">operator</span> <span class="title">bool</span> <span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">            <span class="function">mutex_type* <span class="title">mutex</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">        <span class="keyword">private</span>:</span><br><span class="line">            mutex_type *pm; <span class="comment">// exposition only</span></span><br><span class="line">            <span class="type">bool</span> owns; <span class="comment">// exposition only</span></span><br><span class="line">    &#125;;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Mutex</span>&gt;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">swap</span><span class="params">(unique_lock&lt;Mutex&gt;&amp; x, unique_lock&lt;Mutex&gt;&amp; y)</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>unique_lock</code> 对象以独占所有权的方式管理 mutex 对象，也会自动上锁和解锁操作，提供了更多的操作函数。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/08/code/opensource-license/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/08/code/opensource-license/" class="post-title-link" itemprop="url">开源协议</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-06-08 17:51:06 / 修改时间：17:51:33" itemprop="dateCreated datePublished" datetime="2022-06-08T17:51:06+08:00">2022-06-08</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="开源协议"><a href="#开源协议" class="headerlink" title="开源协议"></a>开源协议</h2><p><img src="/images/code/opensource.png" alt="img"></p>
+<p><strong>BSD</strong></p>
+<p>BSD（original BSD license、FreeBSD license、Original BSD license）是”Berkeley Software Distribution”的缩写，意思是”伯克利软件发行版”。BSD协议给于使用者很大自由的协议。可以自由的使用，修改源代码，也可以将修改后的代码作为开源或者专有软件再发布。 当你发布使用了BSD协议的代码，或则以BSD协议代码为基础做二次开发自己的产品时，需要满足三个条件：</p>
+<ol>
+<li>如果再发布的产品中包含源代码，则在源代码中必须带有原来代码中的BSD协议。</li>
+<li>如果再发布的只是二进制类库/软件，则需要在类库/软件的文档和版权声明中包含原来代码中的BSD协议。</li>
+<li>不可以用开源代码的作者/机构名字和原来产品的名字做市场推广。</li>
+</ol>
+<p>BSD代码鼓励代码共享，但需要尊重代码作者的著作权。BSD由于允许使用者修改和重新发布代码，也允许使用或在BSD代码上开发商业软件发布和销售，因此是对商业集成很友好的协议。公司企业在选用开源产品时都首选BSD协议，因为可以完全控制这些第三方的代码，在必要的时候可以修改或者二次开发。</p>
+<p><strong>Apache License</strong></p>
+<p>Apache License（Apache License, Version 2.0、Apache License, Version 1.1、Apache License, Version 1.0），是Apache软件基金会发布的一个自由软件许可证。</p>
+<p>Apache Licence是著名的非盈利开源组织Apache采用的协议。该协议和BSD类似，同样鼓励代码共享和最终原作者的著作权，同样允许源代码修改和再发布。但是也需要遵循以下条件：</p>
+<ol>
+<li>需要给代码的用户一份Apache Licence。</li>
+<li>如果修改了代码，需要再被修改的文件中说明。</li>
+<li>在衍生的代码中（修改和有源代码衍生的代码中）需要带有原来代码中的协议，商标，专利声明和其他原来作者规定需要包含的说明。</li>
+<li>如果再发布的产品中包含一个Notice文件，则在Notice文件中需要带有Apache Licence。你可以再Notice中增加自己的许可，但是不可以表现为对Apache Licence构成更改。</li>
+</ol>
+<p>Apache Licence也是对商业应用友好的许可。使用者也可以再需要的时候修改代码来满足并作为开源或商业产品发布/销售。使用这个协议的好处是:</p>
+<ul>
+<li>永久权利 一旦被授权，永久拥有。</li>
+<li>全球范围的权利 在一个国家获得授权，适用于所有国家。假如你在美国，许可是从印度授权的，也没有问题。</li>
+<li>授权免费 无版税， 前期、后期均无任何费用。</li>
+<li>授权无排他性 任何人都可以获得授权</li>
+<li>授权不可撤消 一旦获得授权，没有任何人可以取消。比如，你基于该产品代码开发了衍生产品，你不用担心会在某一天被禁止使用该代码</li>
+</ul>
+<p><strong>GPL</strong></p>
+<p>GPL（GNU General Public License）：GNU通用公共许可协议。GPL的出发点是代码的开源/免费使用和引用/修改/衍生代码的开源/免费使用，但不允许修改后和衍生的代码做为闭源的商业软件发布和销售，这就是所谓的传染性。</p>
+<p><strong>LGPL</strong></p>
+<p>LGPL（GNU Lesser General Public License）是GPL的一个为主要为类库使用设计的开源协议。和GPL协议不同，LGPL允许商业软件通过类库链接方式使用LGPL类库而不需要开源商业软件的代码。这使得采用LGPL协议的开源代码可以被商业软件作为类库引用并发布和销售。</p>
+<p>但是如果修改LGPL协议的代码或者衍生，则所有修改的代码，涉及修改部分的额外代码和衍生的代码都必须采用LGPL协议。因此LGPL协议的开源代码很适合作为第三方类库被商业软件引用，但不适合希望以LGPL协议代码为基础，通过修改和衍生的方式做二次开发的商业软件采用。</p>
+<p>GPL/LGPL都保障原作者的知识产权，避免有人利用开源代码复制并开发类似的产品。</p>
+<p><strong>MIT</strong></p>
+<p>MIT与BSD类似，但是比BSD协议更加宽松，是目前最少限制的协议。这个协议唯一的条件就是在修改后的代码或者发行包包含原作者的许可信息。适用商业软件。使用MIT的软件项目有：jquery、Node.js。</p>
+<p><strong>MPL</strong></p>
+<p>MPL(Mozilla Public License 1.1)协议允许免费重发布、免费修改，但要求修改后的代码版权归软件的发起者 。这种授权维护了商业软件的利益，它要求基于这种软件的修改无偿贡献版权给该软件。这样，围绕该软件的所有代码的版权都集中在发起开发人的手中。但MPL是允许修改，无偿使用得。MPL软件对链接没有要求。</p>
+<p><strong>EPL</strong></p>
+<p>EPL(Eclipse Public License 1.0)允许Recipients任意使用、复制、分发、传播、展示、修改以及改后闭源的二次商业发布。使用EPL协议，需要遵守以下规则：</p>
+<ol>
+<li>当一个Contributors将源码的整体或部分再次开源发布的时候,必须继续遵循EPL开源协议来发布,而不能改用其他协议发布.除非你得到了原”源码”Owner 的授权；</li>
+<li>EPL协议下,你可以将源码不做任何修改来商业发布.但如果你要发布修改后的源码,或者当你再发布的是Object Code的时候,你必须声明它的Source Code是可以获取的,而且要告知获取方法；</li>
+<li>当你需要将EPL下的源码作为一部分跟其他私有的源码混和着成为一个Project发布的时候,你可以将整个Project/Product以私人的协议发布,但要声明哪一部分代码是EPL下的,而且声明那部分代码继续遵循EPL；</li>
+<li>独立的模块(Separate Module),不需要开源。</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/gdb/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/tool/gdb/" class="post-title-link" itemprop="url">usage for gdb</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-06-07 16:05:54 / 修改时间：19:48:55" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:54+08:00">2022-06-07</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/gdb/" itemprop="url" rel="index"><span itemprop="name">gdb</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>set val a=10  //更改程序变量的值</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/chen1415886044/article/details/105094688">https://blog.csdn.net/chen1415886044/article/details/105094688</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wuyuegb2312/archive/2013/03/29/2987025.html">https://www.cnblogs.com/wuyuegb2312/archive/2013/03/29/2987025.html</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/chenshengkai/p/14218678.html">https://www.cnblogs.com/chenshengkai/p/14218678.html</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/zsh/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -686,683 +1362,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/cpp/jsoncpp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/cpp/jsoncpp/" class="post-title-link" itemprop="url">JsonCpp</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-09 19:51:44" itemprop="dateModified" datetime="2022-06-09T19:51:44+08:00">2022-06-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>JsonCpp 中所有对象、类名都在 namespace Json 中，只需要包含 json/json.h 即可。JsonCpp 主要包含三个类:</p>
-<ul>
-<li><p>Json::Value：表示json对象或数组，支持的类型有int, double, string, object, array等。其包含节点的类型判断(isNull, isBool, isInt, isArray, isMember, isValidIndex等)，类型获取(type)，类型转换(asInt, asString等)，节点获取(get, [])，节点比较(重载&lt;, &lt;=, &gt;, &gt;=, ==, !=)，节点操作(compare, swap, removeMember, removeindex, append等)等函数。</p>
-</li>
-<li><p>Json::Reader：将文件流或字符串解析到Json::Value中，主要使用parse函数。Json::Reader的构造函数还允许用户使用特性Features来自定义Json的严格等级。</p>
-</li>
-<li><p>Json::Writer：将Json::Value转换成字符串流，Writer类是一个纯虚类，并不能直接使用。在此我们使用 Json::Writer 的子类：Json::FastWriter(将数据写入一行, 没有格式)，Json::StyledWriter(按json格式化输出, 易于阅读)。</p>
-</li>
-</ul>
-<h2 id="解析json属性"><a href="#解析json属性" class="headerlink" title="解析json属性"></a>解析json属性</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;aaa&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;age&quot;</span><span class="punctuation">:</span> <span class="number">16</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ifstream ifs;</span><br><span class="line">Json::Reader reader;</span><br><span class="line">Json::Value root;</span><br><span class="line"></span><br><span class="line">ifs.<span class="built_in">open</span>(<span class="string">&quot;conf.json&quot;</span>);</span><br><span class="line">reader.<span class="built_in">parse</span>(ifs, root, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">cout &lt;&lt; <span class="string">&quot;name: &quot;</span> &lt;&lt; root[<span class="string">&quot;name&quot;</span>].<span class="built_in">asString</span>() &lt;&lt; endl;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;age: &quot;</span> &lt;&lt; root[<span class="string">&quot;age&quot;</span>].<span class="built_in">asInt</span>() &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-
-<h2 id="解析json对象"><a href="#解析json对象" class="headerlink" title="解析json对象"></a>解析json对象</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;param&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;job&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;worker&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;income&quot;</span> <span class="punctuation">:</span> <span class="number">1000</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ifstream ifs;</span><br><span class="line">Json::Reader reader;</span><br><span class="line">Json::Value root;</span><br><span class="line"></span><br><span class="line">ifs.<span class="built_in">open</span>(<span class="string">&quot;conf.json&quot;</span>);</span><br><span class="line">reader.<span class="built_in">parse</span>(ifs, root, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">Json::Value param = root[<span class="string">&quot;param&quot;</span>];</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;job: &quot;</span> &lt;&lt; param[<span class="string">&quot;job&quot;</span>].<span class="built_in">asString</span>() &lt;&lt; endl;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;income: &quot;</span> &lt;&lt; param[<span class="string">&quot;income&quot;</span>].<span class="built_in">asInt</span>() &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-
-<h2 id="解析json数组"><a href="#解析json数组" class="headerlink" title="解析json数组"></a>解析json数组</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;files&quot;</span> <span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;./a.txt&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;./jsontest.cpp&quot;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ifstream ifs;</span><br><span class="line">Json::Reader reader;</span><br><span class="line">Json::Value root;</span><br><span class="line"></span><br><span class="line">ifs.<span class="built_in">open</span>(<span class="string">&quot;conf.json&quot;</span>);</span><br><span class="line">reader.<span class="built_in">parse</span>(ifs, root, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">Json::Value files = root[<span class="string">&quot;files&quot;</span>];</span><br><span class="line"><span class="keyword">for</span> (<span class="type">unsigned</span> <span class="type">int</span> i = <span class="number">0</span>; i &lt; files.<span class="built_in">size</span>(); ++i) &#123;</span><br><span class="line">    cout &lt;&lt; files[i].<span class="built_in">asString</span>() &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="封装json属性"><a href="#封装json属性" class="headerlink" title="封装json属性"></a>封装json属性</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Json::Value root;</span><br><span class="line">Json::FastWriter writer;</span><br><span class="line">root[<span class="string">&quot;name&quot;</span>] = <span class="string">&quot;tony&quot;</span>;</span><br><span class="line">root[<span class="string">&quot;age&quot;</span>] = <span class="number">19</span>;</span><br><span class="line"></span><br><span class="line">cout &lt;&lt; writer.<span class="built_in">write</span>(root) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-
-<h2 id="封装json对象"><a href="#封装json对象" class="headerlink" title="封装json对象"></a>封装json对象</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Json::Value root;</span><br><span class="line">Json::FastWriter writer;</span><br><span class="line">Json::Value param;</span><br><span class="line">param[<span class="string">&quot;job&quot;</span>] = <span class="string">&quot;worker&quot;</span>;</span><br><span class="line">param[<span class="string">&quot;income&quot;</span>] = <span class="number">21</span>;</span><br><span class="line">root[<span class="string">&quot;param&quot;</span>] = param;</span><br><span class="line"></span><br><span class="line">cout &lt;&lt; writer.<span class="built_in">write</span>(root) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-
-<h2 id="封装json数组"><a href="#封装json数组" class="headerlink" title="封装json数组"></a>封装json数组</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Json::Value root;</span><br><span class="line">Json::FastWriter writer;</span><br><span class="line">Json::Value files;</span><br><span class="line"></span><br><span class="line">files[<span class="number">0</span>] = <span class="string">&quot;./a.txt&quot;</span>;</span><br><span class="line">files[<span class="number">1</span>] = <span class="string">&quot;.jsontest.c&quot;</span>;</span><br><span class="line"></span><br><span class="line">Json::Value link;</span><br><span class="line">link[<span class="string">&quot;src&quot;</span>] = <span class="string">&quot;b_link&quot;</span>;</span><br><span class="line">link[<span class="string">&quot;dest&quot;</span>] = <span class="string">&quot;b.exe&quot;</span>;</span><br><span class="line">files.<span class="built_in">append</span>(link);</span><br><span class="line"></span><br><span class="line">root[<span class="string">&quot;files&quot;</span>] = files;</span><br><span class="line"></span><br><span class="line">cout &lt;&lt; writer.<span class="built_in">write</span>(root) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/flash/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/flash/" class="post-title-link" itemprop="url">kernel flash device</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="虚拟文件系统"><a href="#虚拟文件系统" class="headerlink" title="虚拟文件系统"></a>虚拟文件系统</h2><p>Linux 内核支持众多的逻辑文件系统,如 Ext2、Ext3、Ext4、btrfs、NFS、VFAT 等。<br>VFS 则是 Linux 基于各种逻辑文件系统抽象出的一种内存中的文件系统,隐藏了各种硬件设<br>备细节,为用户提供统一的操作接口,使用户访问各种不同文件系统和设备时,不用区分具<br>体的逻辑文件系统。</p>
-<p>虚拟文件系统(VFS)隐藏各种了硬件的具体细节，为所有的设备提供了统一的接口，使用户访问各种不同文件系统和设备时，不用区分具体的逻辑文件系统。</p>
-<p><img src="/images/kernel/kernel/VFS.webp" alt="img"></p>
-<p>在 VFS 上面，是对诸如 open、close、read 和 write 之类的函数的一个通用 API 抽象。在 VFS 下面是文件系统抽象，它定义了上层函数的实现方式。文件系统层之下是缓冲区缓存，这个缓存层通过将数据保留一段时间。缓冲区缓存之下是设备驱动程序，它实现了特定物理设备的接口。</p>
-<p>文件系统使用超级块super block 存放文件系统相关信息，使用索引节点inode存放文件的物理信息，使用目录项dentry存放文件的逻辑信息。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/dev/block/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/dev/block/" class="post-title-link" itemprop="url">block device</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>块设备是一种具有一定结构的随机存取设备，读写数据的基本单位为块，使用缓冲区来存放暂时的数据，待条件成熟后，从缓存一次性写入设备或者从设备一次性读到缓冲区。</p>
-<ul>
-<li>**页(page)**：Linux内存页，一般是4096字节，用作磁盘缓存。通过<code>getconf PAGE_SIZE</code>查看。</li>
-<li>**段(Segments)**：由若干个块组成。是Linux内存管理机制中一个内存页或者内存页的一部分。</li>
-<li><strong>块  (Blocks)</strong> ：  Linux虚拟文件系统I/O操作的最小单位，通常为扇区的2的幂次方倍。通过<code>tune2fs -l /dev/vdb1|grep Block</code>查看块大小。</li>
-<li>**扇区(Sectors)**：块设备的基本单位。通常在512字节到32768字节之间，默认512字节。可以通过<code>fdisk -l</code>命令查看每个磁盘sector的大小</li>
-</ul>
-<h2 id="框架"><a href="#框架" class="headerlink" title="框架"></a>框架</h2><p>Linux使用虚拟文件系统屏蔽不同I/O设备的差别，Linux内核通过映射层、通用块层、I/O调度层屏蔽不同块设备的差别。</p>
-<p><img src="/images/kernel/block/block-arch.jpg" alt="块设备框架"></p>
-<p><img src="/images/kernel/block/block-arch2.jpg" alt="块设备框架"></p>
-<p><img src="/images/kernel/block/block.png" alt="块设备框架"></p>
-<h2 id="块设备层"><a href="#块设备层" class="headerlink" title="块设备层"></a>块设备层</h2><h3 id="gendisk"><a href="#gendisk" class="headerlink" title="gendisk"></a>gendisk</h3><p>linux内核用 gendisk 结构体表示一个独立的磁盘设备或分区，用于对底层物理磁盘进行访问。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">gendisk</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> major;   <span class="comment">/* major number of driver */</span></span><br><span class="line">    <span class="type">int</span> first_minor;</span><br><span class="line">    <span class="type">int</span> minors;                     <span class="comment">/* maximum number of minors, =1 for</span></span><br><span class="line"><span class="comment">                                         * disks that can&#x27;t be partitioned. */</span></span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> disk_name[DISK_NAME_LEN]; <span class="comment">/* name of major driver */</span></span><br><span class="line">    <span class="type">char</span> *(*devnode)(<span class="keyword">struct</span> gendisk *gd, <span class="type">mode_t</span> *mode);</span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> events;  <span class="comment">/* supported events */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> async_events; <span class="comment">/* async events, subset of all */</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">disk_part_tbl</span> __<span class="title">rcu</span> *<span class="title">part_tbl</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">hd_struct</span> <span class="title">part0</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">block_device_operations</span> *<span class="title">fops</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">request_queue</span> *<span class="title">queue</span>;</span></span><br><span class="line">    <span class="type">void</span> *private_data;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> flags;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device</span> *<span class="title">driverfs_dev</span>;</span>  <span class="comment">// <span class="doctag">FIXME:</span> remove</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">kobject</span> *<span class="title">slave_dir</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timer_rand_state</span> *<span class="title">random</span>;</span></span><br><span class="line">    <span class="type">atomic_t</span> sync_io;  <span class="comment">/* RAID */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">disk_events</span> *<span class="title">ev</span>;</span></span><br><span class="line">    <span class="type">int</span> node_id;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* gendisk 是一个动态分配的结构体，需要内核来初始化，不能自己分配 */</span></span><br><span class="line"><span class="keyword">struct</span> gendisk *<span class="title function_">alloc_disk</span><span class="params">(<span class="type">int</span> minors)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 注册磁盘设备 */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">add_disk</span><span class="params">(<span class="keyword">struct</span> gendisk *disk)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 释放 gendisk */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">del_gendisk</span><span class="params">(<span class="keyword">struct</span> gendisk *disk)</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/kernel/block/add_disk.png" alt="块设备注册过程"></p>
-<h3 id="block-device-operations"><a href="#block-device-operations" class="headerlink" title="block_device_operations"></a>block_device_operations</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">block_device_operations</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> (*open) (<span class="keyword">struct</span> block_device *, <span class="type">fmode_t</span>);</span><br><span class="line">    <span class="type">int</span> (*release) (<span class="keyword">struct</span> gendisk *, <span class="type">fmode_t</span>);</span><br><span class="line">    <span class="type">int</span> (*ioctl) (<span class="keyword">struct</span> block_device *, <span class="type">fmode_t</span>, <span class="type">unsigned</span>, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">    <span class="type">int</span> (*compat_ioctl) (<span class="keyword">struct</span> block_device *, <span class="type">fmode_t</span>, <span class="type">unsigned</span>, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">    <span class="type">int</span> (*direct_access) (<span class="keyword">struct</span> block_device *, <span class="type">sector_t</span>,</span><br><span class="line">                        <span class="type">void</span> **, <span class="type">unsigned</span> <span class="type">long</span> *);</span><br><span class="line">    <span class="type">unsigned</span> <span class="title function_">int</span> <span class="params">(*check_events)</span> <span class="params">(<span class="keyword">struct</span> gendisk *disk,</span></span><br><span class="line"><span class="params">                      <span class="type">unsigned</span> <span class="type">int</span> clearing)</span>;</span><br><span class="line">    <span class="comment">/* -&gt;media_changed() is DEPRECATED, use -&gt;check_events() instead */</span></span><br><span class="line">    <span class="type">int</span> (*media_changed) (<span class="keyword">struct</span> gendisk *);</span><br><span class="line">    <span class="type">void</span> (*unlock_native_capacity) (<span class="keyword">struct</span> gendisk *);</span><br><span class="line">    <span class="type">int</span> (*revalidate_disk) (<span class="keyword">struct</span> gendisk *);</span><br><span class="line">    <span class="type">int</span> (*getgeo)(<span class="keyword">struct</span> block_device *, <span class="keyword">struct</span> hd_geometry *);</span><br><span class="line">    <span class="comment">/* this callback is with swap_lock and sometimes page table lock held */</span></span><br><span class="line">    <span class="type">void</span> (*swap_slot_free_notify) (<span class="keyword">struct</span> block_device *, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">module</span> *<span class="title">owner</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>media_changed()检查可移动介质的驱动器中的介质是否已经改变，如果是返回一个非 0 值，否则返回 0。</p>
-</li>
-<li><p>revalidate_disk()函数被调用来响应一个介质改变，使介质做好工作准备。</p>
-</li>
-<li><p>getgeo()函数获得驱动器信息，根据驱动器的几何信息填充一个 hd_geometry 结构体，hd_geometry 结构体包含磁头、<br>扇区、柱面等信息，其定义于 include/linux/hdreg.h 头文件。</p>
-</li>
-<li><p>owner是指向拥有这个结构体的模块的指针，通常被初始化为<code>THIS_MODULE</code>。</p>
-</li>
-</ul>
-<h2 id="通用块层"><a href="#通用块层" class="headerlink" title="通用块层"></a>通用块层</h2><p>通用块层 (Generic Block Layer) 负责维持一个 I/O 请求在上层文件系统与底层物理磁盘之间的关系。</p>
-<h3 id="bio"><a href="#bio" class="headerlink" title="bio"></a>bio</h3><p>bio 结构体用来对应一个 I/O 请求。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">bio</span> &#123;</span></span><br><span class="line">    <span class="type">sector_t</span>  bi_sector; <span class="comment">/* device address in 512 byte</span></span><br><span class="line"><span class="comment">                           sectors */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">bio</span>  *<span class="title">bi_next</span>;</span> <span class="comment">/* request queue link */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">block_device</span> *<span class="title">bi_bdev</span>;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>  bi_flags; <span class="comment">/* status, command, etc */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>  bi_rw;  <span class="comment">/* bottom bits READ/WRITE,</span></span><br><span class="line"><span class="comment">                         * top bits priority</span></span><br><span class="line"><span class="comment">                         */</span></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span>  bi_vcnt; <span class="comment">/* how many bio_vec&#x27;s */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span>  bi_idx;  <span class="comment">/* current index into bvl_vec */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Number of segments in this BIO after</span></span><br><span class="line"><span class="comment">     * physical address coalescing is performed.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  bi_phys_segments;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  bi_size; <span class="comment">/* residual I/O count */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * To keep track of the max segment size, we account for the</span></span><br><span class="line"><span class="comment">     * sizes of the first and last mergeable segments in this bio.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  bi_seg_front_size;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  bi_seg_back_size;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  bi_max_vecs; <span class="comment">/* max bvl_vecs we can hold */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  bi_comp_cpu; <span class="comment">/* completion CPU */</span></span><br><span class="line"></span><br><span class="line">    <span class="type">atomic_t</span>  bi_cnt;  <span class="comment">/* pin count */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">bio_vec</span>  *<span class="title">bi_io_vec</span>;</span> <span class="comment">/* the actual vec list */</span></span><br><span class="line">    <span class="type">bio_end_io_t</span>  *bi_end_io;</span><br><span class="line">    <span class="type">void</span>   *bi_private;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_BLK_DEV_INTEGRITY)</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">bio_integrity_payload</span> *<span class="title">bi_integrity</span>;</span>  <span class="comment">/* data integrity */</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="type">bio_destructor_t</span> *bi_destructor; <span class="comment">/* destructor */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * We can inline a number of vecs at the end of the bio, to avoid</span></span><br><span class="line"><span class="comment">     * double allocations for a small number of bio_vecs. This member</span></span><br><span class="line"><span class="comment">     * MUST obviously be kept at the very end of the bio.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">bio_vec</span>  <span class="title">bi_inline_vecs</span>[0];</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>bio 描述了内存中连续几页的数据，每一页的数据由一个段 bio_vec 表示。多个页会被封装成多个段，这些段被组成一个数组，用 bio_io_vec 表示，bi_vcnt 是数组中元素的个数。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">bio_vec</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">page</span> *<span class="title">bv_page</span>;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> bv_len;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> bv_offset;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 遍历一个bio中的bi_io_vec 数组 */</span></span><br><span class="line"><span class="type">int</span> iter</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">bio_vec</span>  *<span class="title">bvec</span>;</span></span><br><span class="line">bio_for_each_segment(bvec, bio, iter)   </span><br><span class="line"></span><br><span class="line"><span class="comment">/* 返回I/O操作的数据方向 */</span></span><br><span class="line">bio_rw(bio)</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 结束I/O请求 */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">bio_endio</span><span class="params">(<span class="keyword">struct</span> bio *bio, <span class="type">int</span> error)</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="I-O-调度层"><a href="#I-O-调度层" class="headerlink" title="I/O 调度层"></a>I/O 调度层</h2><p>I/O 调度层负责管理块设备的请求队列，对块设备提交的请求进行合并和排序预操作，以提高访问的效率。I/O调度算法可将连续的bio合并成一个请求，因此，一个请求可以包含多个bio，请求是bio经由I/O调度进行调整后的结果。</p>
-<h3 id="request"><a href="#request" class="headerlink" title="request"></a>request</h3><p>在 Linux 中，驱动对块设备的输入或输出 (I/O) 操作，都会向块设备发出一个请求，在驱动中用 request 结构体描述。但对于一些磁盘设备而言请求的速度很慢，这时候内核就提供一种队列的机制把这些 I/O 请求添加到队列中（即请求队列），在驱动中用 request_queue 结构体描述。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">request</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">queuelist</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">call_single_data</span> <span class="title">csd</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">request_queue</span> *<span class="title">q</span>;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> cmd_flags;</span><br><span class="line">    <span class="class"><span class="keyword">enum</span> <span class="title">rq_cmd_type_bits</span> <span class="title">cmd_type</span>;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> <span class="type">atomic_flags</span>;</span><br><span class="line">    <span class="type">int</span> cpu;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* the following two fields are internal, NEVER access directly */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> __data_len; <span class="comment">/* total data len */</span></span><br><span class="line">    <span class="type">sector_t</span> __sector;  <span class="comment">/* sector cursor */</span></span><br><span class="line">    </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">bio</span> *<span class="title">bio</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">bio</span> *<span class="title">biotail</span>;</span></span><br><span class="line">    </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">hlist_node</span> <span class="title">hash</span>;</span> <span class="comment">/* merge hash */</span></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * The rb_node is only used inside the io scheduler, requests</span></span><br><span class="line"><span class="comment">     * are pruned when moved to the dispatch queue. So let the</span></span><br><span class="line"><span class="comment">     * completion_data share space with the rb_node.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">rb_node</span> <span class="title">rb_node</span>;</span> <span class="comment">/* sort/lookup */</span></span><br><span class="line">        <span class="type">void</span> *completion_data;</span><br><span class="line">    &#125;;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * Three pointers are available for the IO schedulers, if they need</span></span><br><span class="line"><span class="comment">     * more they have to dynamically allocate it.  Flush requests are</span></span><br><span class="line"><span class="comment">     * never put on the IO scheduler. So let the flush fields share</span></span><br><span class="line"><span class="comment">     * space with the three elevator_private pointers.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="type">void</span> *elevator_private[<span class="number">3</span>];</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">            <span class="type">unsigned</span> <span class="type">int</span>  seq;</span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">list</span>;</span></span><br><span class="line">        &#125; flush;</span><br><span class="line">    &#125;;</span><br><span class="line">    </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gendisk</span> *<span class="title">rq_disk</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">hd_struct</span> *<span class="title">part</span>;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> start_time;</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_BLK_CGROUP</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span> start_time_ns;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span> io_start_time_ns;    <span class="comment">/* when passed to hardware */</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">    <span class="comment">/* Number of scatter-gather DMA addr+len pairs after</span></span><br><span class="line"><span class="comment">     * physical address coalescing is performed.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> nr_phys_segments;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_BLK_DEV_INTEGRITY)</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> nr_integrity_segments;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> ioprio;</span><br><span class="line">    <span class="type">int</span> ref_count;</span><br><span class="line">    <span class="type">void</span> *special;  <span class="comment">/* opaque pointer available for LLD use */</span></span><br><span class="line">    <span class="type">char</span> *buffer;  <span class="comment">/* kaddr of the current segment if available */</span></span><br><span class="line">    <span class="type">int</span> tag;</span><br><span class="line">    <span class="type">int</span> errors;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * when request is used as a packet command carrier</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> __cmd[BLK_MAX_CDB];</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> *cmd;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> cmd_len;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> extra_len; <span class="comment">/* length of alignment and padding */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> sense_len;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> resid_len; <span class="comment">/* residual count */</span></span><br><span class="line">    <span class="type">void</span> *sense;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> deadline;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">timeout_list</span>;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> timeout;</span><br><span class="line">    <span class="type">int</span> retries;</span><br><span class="line">    rq_end_io_fn *end_io;</span><br><span class="line">    <span class="type">void</span> *end_io_data;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">request</span> *<span class="title">next_rq</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>初始化请求队列</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(request_fn_proc)</span> <span class="params">(<span class="keyword">struct</span> request_queue *q)</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> request_queue *<span class="title function_">blk_init_queue</span><span class="params">(request_fn_proc *rfn, <span class="type">spinlock_t</span> *lock)</span></span><br></pre></td></tr></table></figure>
-
-<p>rfn是请求处理函数的指针，lock是控制访问队列权限的自旋锁</p>
-<ul>
-<li>清除请求队列</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">blk_cleanup_queue</span><span class="params">(<span class="keyword">struct</span> request_queue *q)</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>分配请求队列</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> request_queue *<span class="title function_">blk_alloc_queue</span><span class="params">(<span class="type">gfp_t</span> gfp_mask)</span></span><br></pre></td></tr></table></figure>
-
-<p>对于 Flash、RAM 盘等完全随机访问的非机械设备，并不需要进行复杂的 I/O 调度，这个时候，应该使用上述函数分配一个请求队列，并使用如下函数来绑定请求队列和制造请求函数。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(make_request_fn)</span> <span class="params">(<span class="keyword">struct</span> request_queue *q, <span class="keyword">struct</span> bio *bio)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">blk_queue_make_request</span><span class="params">(<span class="keyword">struct</span> request_queue *q, make_request_fn *mfn)</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>队列操作</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 从请求队列里面获得一个请求 */</span></span><br><span class="line"><span class="keyword">struct</span> request *<span class="title function_">blk_fetch_request</span><span class="params">(<span class="keyword">struct</span> request_queue *q)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 判断是否是队列尾部 */</span></span><br><span class="line"><span class="type">bool</span> __<span class="title function_">blk_end_request_cur</span><span class="params">(<span class="keyword">struct</span> request *rq, <span class="type">int</span> error)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 获得请求数据传送方向，0 返回值表示从设备中读，非 0 表示向设备写 */</span></span><br><span class="line"><span class="title function_">rq_data_dir</span><span class="params">(<span class="keyword">struct</span> request *req)</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="request-queue"><a href="#request-queue" class="headerlink" title="request_queue"></a>request_queue</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">request_queue</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * Together with queue_head for cacheline sharing</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">queue_head</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">request</span>  *<span class="title">last_merge</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">elevator_queue</span> *<span class="title">elevator</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * the queue request freelist, one for reads and one for writes</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">request_list</span> <span class="title">rq</span>;</span></span><br><span class="line">    </span><br><span class="line">    request_fn_proc  *request_fn;</span><br><span class="line">    make_request_fn  *make_request_fn;</span><br><span class="line">    prep_rq_fn  *prep_rq_fn;</span><br><span class="line">    unprep_rq_fn  *unprep_rq_fn;</span><br><span class="line">    merge_bvec_fn  *merge_bvec_fn;</span><br><span class="line">    softirq_done_fn  *softirq_done_fn;</span><br><span class="line">    rq_timed_out_fn  *rq_timed_out_fn;</span><br><span class="line">    dma_drain_needed_fn *dma_drain_needed;</span><br><span class="line">    lld_busy_fn  *lld_busy_fn;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * Dispatch queue sorting</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">sector_t</span>  end_sector;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">request</span>  *<span class="title">boundary_rq</span>;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * Delayed queue handling</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">delayed_work</span> <span class="title">delay_work</span>;</span></span><br><span class="line">    </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">backing_dev_info</span> <span class="title">backing_dev_info</span>;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * The queue owner gets to use this for whatever they like.</span></span><br><span class="line"><span class="comment">     * ll_rw_blk doesn&#x27;t touch it.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">void</span>   *queuedata;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * queue needs bounce pages for pages above this limit</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">gfp_t</span>   bounce_gfp;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * various queue flags, see QUEUE_* below</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>  queue_flags;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * protects queue structures from reentrancy. -&gt;__queue_lock should</span></span><br><span class="line"><span class="comment">     * _never_ be used directly, it is queue private. always use</span></span><br><span class="line"><span class="comment">     * -&gt;queue_lock.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">spinlock_t</span>  __queue_lock;</span><br><span class="line">    <span class="type">spinlock_t</span>  *queue_lock;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * queue kobject</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">kobject</span> <span class="title">kobj</span>;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * queue settings</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>  nr_requests; <span class="comment">/* Max # of requests */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  nr_congestion_on;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  nr_congestion_off;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  nr_batching;</span><br><span class="line">    </span><br><span class="line">    <span class="type">void</span>   *dma_drain_buffer;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  dma_drain_size;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  dma_pad_mask;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  dma_alignment;</span><br><span class="line">    </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">blk_queue_tag</span> *<span class="title">queue_tags</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">tag_busy_list</span>;</span></span><br><span class="line">    </span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  nr_sorted;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  in_flight[<span class="number">2</span>];</span><br><span class="line">    </span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  rq_timeout;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timer_list</span> <span class="title">timeout</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">timeout_list</span>;</span></span><br><span class="line">    </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">queue_limits</span> <span class="title">limits</span>;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * sg stuff</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  sg_timeout;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  sg_reserved_size;</span><br><span class="line">    <span class="type">int</span>   node;</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_BLK_DEV_IO_TRACE</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">blk_trace</span> *<span class="title">blk_trace</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * for flush operations</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  flush_flags;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  flush_not_queueable:<span class="number">1</span>;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  flush_queue_delayed:<span class="number">1</span>;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  flush_pending_idx:<span class="number">1</span>;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  flush_running_idx:<span class="number">1</span>;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>  flush_pending_since;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">flush_queue</span>[2];</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">flush_data_in_flight</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">request</span>  <span class="title">flush_rq</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mutex</span>  <span class="title">sysfs_lock</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_BLK_DEV_BSG)</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">bsg_class_device</span> <span class="title">bsg_dev</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_BLK_DEV_THROTTLING</span></span><br><span class="line">    <span class="comment">/* Throttle data */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">throtl_data</span> *<span class="title">td</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/mmu/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/mmu/" class="post-title-link" itemprop="url">kernel mmu</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h2><p>内存管理单元(MMU)的作用是控制和管理多个进程，使之能够安全的共享主内存区域，为各进程实现虚拟地址和物理地址转换、内存访问权限保护等功能，这将使得操作系统能单独为系统的每个用户进程分配独立的内存空间并保证用户空间不能访问内核空间的地址。</p>
-<p>在 32 位系统上，Linux 内核将 4G 空间分为 1G 内核空间(3<del>4G)和 3G(0</del>3G)用户空间，通过内存管理，每个进程都可以使用 3G 的用户空间。</p>
-<p><img src="/images/kernel/kernel/mmu.png" alt="mmu"></p>
-<h3 id="虚拟地址"><a href="#虚拟地址" class="headerlink" title="虚拟地址"></a>虚拟地址</h3><p><strong>逻辑地址</strong>是由程式产生的和段相关的偏移地址部分。机器语言指令中出现的内存地址，都是逻辑地址。编译器编译程序时，会为程序生成代码段和数据段，然后将所有代码放到代码段中，将所有数据放到数据段中。最后程序中的每句代码和每条数据都会有自己的逻辑地址。</p>
-<p><strong>线性地址</strong>是逻辑地址到物理地址变换之间的中间物。段中的偏移地址，加上段基地址就生成了一个线性地址。如果启用了分页机制，那么线性地址能再变换成物理地址。</p>
-<p>CPU加载程序后，会为程序分配代码段内存和数据段内存，代码段内存的基址保存在CS中，数据段内存的基址保存在DS中。</p>
-<p><strong>物理地址</strong>是CPU外部地址总线上的寻址物理内存的地址信号，是地址变换的最终结果地址。如果没有启用分页机制，物理地址等于线性地址。</p>
-<p><strong>虚拟地址与物理地址转化</strong></p>
-<p>要将一个逻辑地址转换为物理地址，需要两步：首先利用段式内存管理单元将逻辑地址转换成线性地址，再利用页式内存管理单元，把线性地址转换为物理地址。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span> <span class="type">phys_addr_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*内核虚拟地址转化为物理地址*/</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">phys_addr_t</span> <span class="title function_">virt_to_phys</span><span class="params">(<span class="type">const</span> <span class="keyword">volatile</span> <span class="type">void</span> *x)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> __virt_to_phys((<span class="type">unsigned</span> <span class="type">long</span>)(x));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*物理地址转化为内核虚拟地址*/</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> *<span class="title function_">phys_to_virt</span><span class="params">(<span class="type">phys_addr_t</span> x)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="type">void</span> *)__phys_to_virt(x);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="段式管理"><a href="#段式管理" class="headerlink" title="段式管理"></a>段式管理</h3><p>因为intel的CPU有20位的地址总线，而寄存器16位，要寻址2^20^=1M的内存空间，只能采用分段管理。线性地址 = 段基址 * 16 + 逻辑地址</p>
-<h3 id="页式管理"><a href="#页式管理" class="headerlink" title="页式管理"></a>页式管理</h3><p>CPU的页式内存管理单元负责把线性地址转换为物理地址。从管理和效率的角度出发，线性地址被分为固定长度单位的组，称为页(page)，例如一个32位的机器，线性地址最大可为4G，用4KB为一个页来划分，整个线性地址就被划分为共有2^20^个页的数组，我们称之为页目录。目录中的每一个目录项，就是对应的页的地址。这个数组有2^20^个成员，每个成员是一个地址（32位机，一个地址4字节），那么要表示这个数组，就要4MB的内存空间。为了节省空间，引入二级管理模式来组织分页单元。</p>
-<p><img src="/images/kernel/kernel/mmu_page.jpg" alt="img"></p>
-<p><strong>每个进程都有其独立的虚似内存，拥有惟一的页目录和页表</strong>，它的地址放在CPU的cr3寄存器中，是进行地址转换的开始点。每一个32位的线性地址被划分为三部分：页目录索引(10位)、页表索引(10位)、偏移(12位) 。依据以下步骤进行转换：</p>
-<ol>
-<li><p>从cr3中取出进程的页目录地址。</p>
-</li>
-<li><p>根据线性地址的页目录索引，找到页表地址。</p>
-</li>
-<li><p>根据线性地址的页表索引，在页表中找到页的起始地址。</p>
-</li>
-<li><p>将页的起始地址与线性地址中的偏移相加。</p>
-</li>
-</ol>
-<p>在二级管理模式中，页目录共有2^10^项，每项有2^10^个页表，每个页中可寻址2^12^个字节，2^10^ * 2^10^ * 2^12^ = 2^32^ = 4GB。能够表示4G的地址。同时页目录项和页表项共占空间 (2^10 * 4 + 2 ^10 *4) = 8KB，节省了空间。</p>
-<p><strong>Linux的页式内存管理</strong></p>
-<p>有些CPU，还有三级，甚至四级架构，Linux为了在更高层次提供抽像，为每个CPU提供统一的界面。提供了一个四层页管理架构，来兼容这些二级、三级、四级管理架构的CPU。这四级分别为： 页全局目录PGD、页上级目录PUD、页中间目录PMD、页表PT。 整个转换依据硬件转换原理，多了二次数组的索引。</p>
-<p><img src="/images/kernel/kernel/mmu_page2.jpg" alt="img"></p>
-<p>逻辑地址、线性地址和物理地址之间的变换过程如下图所示：</p>
-<p><img src="/images/kernel/kernel/mem_t.jpg" alt="虚拟地址、线性地址和物理地址的转换"></p>
-<h3 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h3><p>Linux采用虚拟内存管理技术，使得每个进程都有独立的进程地址空间，Linux将4GB的虚拟内存空间分成两个部分：0 ~ 3GB属于用户空间，3 ~ 4GB 属于内核空间。用户进程只能访问用户空间，只能通过系统调用访问内核空间。</p>
-<p><img src="/images/kernel/kernel/user_space.png" alt="img"></p>
-<p>用户空间(User Space) ：用户空间又包括用户的应用程序(User Applications)、C 库(C Library) 。</p>
-<p>内核空间(Kernel Space) ：内核空间又包括系统调用接口(System Call Interface)、内核(Kernel)、平台架构相关的代码(Architecture-Dependent Kernel Code) 。</p>
-<p>进程 fork(),execve(),malloc()等操作分配的内存仅仅是虚拟内存。只有当进程真正去访问地址时，才会产生缺页异常，内核才会为进程分配物理页，并建立对应的页表。</p>
-<h3 id="内核空间"><a href="#内核空间" class="headerlink" title="内核空间"></a>内核空间</h3><p>ARM处理器分为7种工作模式:</p>
-<ul>
-<li>用户模式(usr)：大多数的应用程序运行在用户模式下,当处理器运行在用户模式下时,某些被保护的系统资源是不能被访问的。</li>
-<li>快速中断模式(fiq)：用于高速数据传输或通道处理。</li>
-<li>外部中断模式(irq)：用于通用的中断处理。</li>
-<li>管理模式(svc)：操作系统使用的保护模式。</li>
-<li>数据访问终止模式(abt)：当数据或指令预取终止时进入该模式,可用于虚拟存储及存储保护。</li>
-<li>系统模式(sys)：运行具有特权的操作系统任务。</li>
-<li>未定义指令中止模式(und)：当未定义的指令执行时进入该模式,可用于支持硬件协处理器的软件仿真。</li>
-</ul>
-<p>Linux为了保护内核的安全，只使用处理器的2个模式，把系统分成了2部分。内核可进行任何操作，特权指令只能在内核态使用，从而起到保护作用。而应用程序则被禁止对硬件的直接访问和对内存的未授权访问。内核空间和用户空间使用不同的地址空间。用户空间只能通过系统调用和硬件中断转移到内核空间。</p>
-<p>Linux 中 1GB 的内核地址空间又被划分为物理内存映射区、虚拟内存分配区、高端页面映射区、专用页面映射区和系统保留映射区这几个区域。</p>
-<p>物理内存映射区是从3G开始最896MB的线性空间，物理内存顺序映射在这个区域中，虚拟地址 = 3G + 物理地址。</p>
-<p>动态内存映射区由vmalloc()分配，其线性空间连续，但物理空间不一定连续，可能处于低端内存，也可能处于高端内存。</p>
-<p>超过直接映射区896MB的那部分内存称为高端内存，内核在存取高端内存时必须将它们映射到高端页面映射区。内核空间最顶部 FIXADDR_TOP~4GB 的区域作为保留区。</p>
-<p>内核空间与用户空间的内存不能直接互访，必需借助函数 <code>copy_from_user()</code>完成用户空间到内核空间的拷贝，以及<code>copy_to_user()</code>完成内核空间到用户空间的拷贝。如果要复制的内存是简单类型，如char、int、long等，则可以使用<code>put_user()</code>和<code>get_user()</code>。宏__user 是一个指向用户空间地址的指针。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># <span class="keyword">define</span> __user  __attribute__((noderef, address_space(1)))</span></span><br><span class="line"></span><br><span class="line"><span class="type">long</span> <span class="title function_">copy_from_user</span><span class="params">(<span class="type">void</span> *to, <span class="type">const</span> <span class="type">void</span> __user *from, <span class="type">unsigned</span> <span class="type">long</span> n)</span>;</span><br><span class="line"><span class="type">long</span> <span class="title function_">copy_to_user</span><span class="params">(<span class="type">void</span> __user *to, <span class="type">const</span> <span class="type">void</span> *from, <span class="type">unsigned</span> <span class="type">long</span> n)</span>;</span><br><span class="line"></span><br><span class="line">put_user(val, <span class="type">void</span> __user *ptr); <span class="comment">/* 内核→用户 */</span></span><br><span class="line">get_user(val, <span class="type">void</span> __user *ptr); <span class="comment">/* 用户→内核 */</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="内存分配"><a href="#内存分配" class="headerlink" title="内存分配"></a>内存分配</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">kmalloc</span><span class="params">(<span class="type">size_t</span> size, <span class="type">gfp_t</span> flags)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">kfree</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *objp)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> *<span class="title function_">kzalloc</span><span class="params">(<span class="type">size_t</span> size, <span class="type">gfp_t</span> flags)</span></span><br><span class="line">&#123;    </span><br><span class="line">    <span class="keyword">return</span> kmalloc(size, flags | __GFP_ZERO);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>kmalloc在物理内存映射区域申请一个连续存储空间，保留内存原有的数据，不清零。分配的内存最小32Byte，最大128KB。flags参数：</p>
-<ul>
-<li>GFP_ATOMIC  原子性分配内存，分配内存的过程不会被高优先级进程或中断打断。若不存在空闲页，则不等待，直接返回。</li>
-<li>GFP_KERNEL  在内核空间的进程中申请内存，若不存在空闲页会引起阻塞，因此不能在中断上下文或持有自旋锁时使用。</li>
-<li>GFP_DMA  给DMA控制器分配内存（DMA要求分配虚拟地址和物理地址连续）。</li>
-</ul>
-<p>kzalloc() 会对申请到的内存内容清零。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">vmalloc</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> size)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">vfree</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *addr)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>vmalloc() 能在高端内存区分配，用来分配虚拟地址空间连续，而物理地址不一定连续的内存。常用于申请大内存空间。因为要建立新的页表，将不连续的物理内存映射成连续的虚拟内存，所以开销比较大。分配内存时则可能产生阻塞，因此不能从中断上下文调用。</p>
-<h2 id="I-O端口"><a href="#I-O端口" class="headerlink" title="I/O端口"></a>I/O端口</h2><p>设备通常会提供一组寄存器来用于控制设备、读写设备和获取设备状态，即控制寄存器、数据寄存器和状态寄存器。这些寄存器可能位于 I/O 空间，也可能位于内存空间。当位于 I/O 空间时，通常被称为 I/O 端口，端口号标识了外设的寄存器地址。位于内存空间时，对应的内存空间被称为 I/O 内存。内存空间是必须的，而 I/O 空间是可选的。</p>
-<p>I/O 端口访问的一种途径是直接使用 I/O 端口操作函数，在设备打开或驱动模块被加载时申请<br>I/O 端口区域，之后使用 inb()、outb()等进行端口访问，最后在设备关闭或驱动被卸载时释放 I/O<br>端口范围。</p>
-<img src=".img/mem/io_port.png" style="zoom:50%;" />
-
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> resource *<span class="title function_">request_region</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> start, <span class="type">unsigned</span> <span class="type">long</span> n, <span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">release_region</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> start, <span class="type">unsigned</span> <span class="type">long</span> n)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>request_region()函数向内核申请n个端口，这些端口从start开始，name 参数为设备的名称。如果返回NULL，则意味着申请端口失败。可以用来检查申请的资源是否可用，如果申请成功，则将其标志为已经使用，其他驱动再申请该资源时就会失败。</p>
-<p>release_region()函数用来释放申请的IO资源。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*读写字节端口(8 位宽)*/</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">char</span> <span class="title function_">inb</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">outb</span><span class="params">(<span class="type">unsigned</span> <span class="type">char</span> byte, <span class="type">unsigned</span> <span class="type">long</span> port)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*读写字端口(16 位宽)*/</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">short</span> <span class="title function_">inw</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">outw</span><span class="params">(<span class="type">unsigned</span> <span class="type">short</span> word, <span class="type">unsigned</span> <span class="type">long</span> port)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*读写长字端口(32 位宽)*/</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">inl</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">outl</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> longword, <span class="type">unsigned</span> <span class="type">long</span> port)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*读写一串字节*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">insb</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port, <span class="type">void</span> *addr, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">outsb</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port, <span class="type">void</span> *addr, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/*读写一串字*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">insw</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port, <span class="type">void</span> *addr, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">outsw</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port, <span class="type">void</span> *addr, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*读写一串长字*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">insl</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port, <span class="type">void</span> *addr, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">outsl</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port, <span class="type">void</span> *addr, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br></pre></td></tr></table></figure>
-
-<p><code>/proc/ioports</code>显示使用request_region( )分配的IO端口的情况。</p>
-<h2 id="I-O内存"><a href="#I-O内存" class="headerlink" title="I/O内存"></a>I/O内存</h2><p>I/O 内存的访问步骤：首先是调用 request_mem_region()申请资源，接着将寄存器地址通过 ioremap()映射到内核空间虚拟地址，之后就可以通过 Linux 设备访问编程接口访问这些设备的寄存器了。访问完成后，应对 ioremap()申请的虚拟地址进行释放，并释放 release_mem_<br>region()申请的 I/O 内存资源。</p>
-<p><img src="/images/kernel/mem/io_mem.png" alt="img"></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> resource *<span class="title function_">request_mem_region</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> start, <span class="type">unsigned</span> <span class="type">long</span> len, <span class="type">char</span> *name)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">release_mem_region</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> start, <span class="type">unsigned</span> <span class="type">long</span> len)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> __iomem *<span class="title function_">ioport_map</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port, <span class="type">unsigned</span> <span class="type">int</span> size)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">ioport_unmap</span><span class="params">(<span class="type">void</span> __iomem *addr)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> __iomem *<span class="title function_">ioremap</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> physaddr, <span class="type">unsigned</span> <span class="type">long</span> size)</span>;</span><br><span class="line"><span class="type">void</span> __iomem * <span class="title function_">ioremap_nocache</span> <span class="params">(<span class="type">unsigned</span> <span class="type">long</span> offset, <span class="type">unsigned</span> <span class="type">long</span> size)</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">iounmap</span><span class="params">(<span class="keyword">volatile</span> <span class="type">void</span> __iomem *addr)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>ioremap()函数将设备所处的物理地址映射到虚拟地址。</p>
-<p>ioremap_nocache()返回一个线性地址，此时CPU可以访问设备的内存空间。<em>phys_addr</em>要映射的物理地址 ；<em>size</em>要映射资源的大小。返回的映射地址必须使用<code>iounmap</code>来释放。</p>
-<p>ioport_map()函数可以把 port 开始的 count 个连续的 I/O 端口重映射为一段内存空间，然后就可以在其返回的地址上像访问 I/O 内存一样访问这些 I/O 端口。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*读I/O内存*/</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">ioread8</span><span class="params">(<span class="type">void</span> __iomem *addr)</span>;</span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">ioread16</span><span class="params">(<span class="type">void</span> __iomem *addr)</span>;</span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">ioread32</span><span class="params">(<span class="type">void</span> __iomem *addr)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">unsigned</span> <span class="type">char</span> <span class="title function_">readb</span><span class="params">(<span class="type">const</span> <span class="keyword">volatile</span> <span class="type">void</span> __iomem *addr)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> *(<span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">char</span> __force *)addr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">unsigned</span> <span class="type">short</span> <span class="title function_">readw</span><span class="params">(<span class="type">const</span> <span class="keyword">volatile</span> <span class="type">void</span> __iomem *addr)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> le16_to_cpu(*(<span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">short</span> __force *)addr);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">readl</span><span class="params">(<span class="type">const</span> <span class="keyword">volatile</span> <span class="type">void</span> __iomem *addr)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> le32_to_cpu(*(<span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> __force *)addr);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/*写I/O内存*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">iowrite8</span><span class="params">(u8 val, <span class="type">void</span> __iomem *addr)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">iowrite8</span><span class="params">(u16 val, <span class="type">void</span> __iomem *addr)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">iowrite8</span><span class="params">(u32 val, <span class="type">void</span> __iomem *addr)</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/*读一串 I/O 内存*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">ioread8_rep</span><span class="params">(<span class="type">void</span> __iomem *addr, <span class="type">void</span> *buf, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">ioread16_rep</span><span class="params">(<span class="type">void</span> __iomem *addr, <span class="type">void</span> *buf, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">ioread32_rep</span><span class="params">(<span class="type">void</span> __iomem *addr, <span class="type">void</span> *buf, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*写一串 I/O 内存*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">iowrite8_rep</span><span class="params">(<span class="type">void</span> __iomem *addr, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">iowrite16_rep</span><span class="params">(<span class="type">void</span> __iomem *addr, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">iowrite32_rep</span><span class="params">(<span class="type">void</span> __iomem *addr, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/*复制 I/O 内存*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">memcpy_fromio</span><span class="params">(<span class="type">void</span> *to, <span class="type">const</span> <span class="keyword">volatile</span> <span class="type">void</span> __iomem *from, <span class="type">long</span> count)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">memcpy_toio</span><span class="params">(<span class="keyword">volatile</span> <span class="type">void</span> __iomem *to, <span class="type">const</span> <span class="type">void</span> *from, <span class="type">long</span> count)</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/*设置 I/O 内存*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">memset_io</span><span class="params">(<span class="keyword">volatile</span> <span class="type">void</span> __iomem *addr, <span class="type">unsigned</span> <span class="type">char</span> val, <span class="type">int</span> count)</span>;</span><br></pre></td></tr></table></figure>
-
-<p><code>/proc/iomem</code>文件记录物理地址的分配情况，这些地址范围是通过 requset_mem_region 函数申请得到的。</p>
-<h2 id="DMA"><a href="#DMA" class="headerlink" title="DMA"></a>DMA</h2><p>DMA 是一种无需 CPU 的参与就可以让外设与系统内存之间进行双向数据传输的硬件机制。因为DMA的目的地址与Cache 所缓存的内存地址可能重叠，所以要禁止 DMA 目标地址范围内内存的Cache 功能。</p>
-<p>DMA 操作在整个常规内存区域进行，DMA 的硬件使用总线地址而非物理地址。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/dev/watchdog/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/dev/watchdog/" class="post-title-link" itemprop="url">watchdog device</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <ul>
-<li>watchdog_dev.c</li>
-<li>watchdog_core.c</li>
-<li>wdt.c</li>
-</ul>
-<p>内核配置<code>CONFIG_WATCHDOG_NOWAYOUT</code>选项表示看门狗一旦开启就无法被停止，可设置nowayout模块参数。</p>
-<p>如果驱动支持”Magic Close”，除非在关闭看门狗前，魔幻字符’V’发送到/dev/watchdog，否则不能停止看门狗。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/sched/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/kernel/sched/" class="post-title-link" itemprop="url">kernel process manage</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="进程管理"><a href="#进程管理" class="headerlink" title="进程管理"></a>进程管理</h2><p>进程管理负责控制进程对 CPU 的访问，如任务的创建、调度和终止等。</p>
-<p>进程是操作系统进行资源管理的最小单位，进程需要管理打开的文件、挂起的信号、内核内部数据、处理器状态等。线程是操作系统进行调度的最小单位。进程的可能状态有:</p>
-<ul>
-<li><p>运行态，已经获得了资源，并且进程正在被 CPU 执行。进程既可运行在内核态，也可运行在用户态。</p>
-</li>
-<li><p>内核态，内核和驱动所运行时的状态，程序处于特权阶级，能够访问系统的任何资源。</p>
-</li>
-<li><p>用户态，用户程序运行的状态，处于非特权阶级，不能随意访问系统资源，必须通过驱动程序方可访问，用户态程序可通过系统调用进入内核态。</p>
-</li>
-<li><p>就绪态，当系统资源已经可用，但由于前一个进程还没有执行完释放 CPU，准备进入运行状态。</p>
-</li>
-<li><p>可中断睡眠状态，当进程处于可中断等待状态时，系统不会调度该程序执行。当系统产生一个中断或者释放了进程正在等待的资源，或者进程收到一个信号，都可以被唤醒进入就绪状态或者运行态。</p>
-</li>
-<li><p>不可中断睡眠状态，处于中断等待状态，但是该进程只能被使用 wake_up()函数明确唤醒的时候才可进入就绪状态。</p>
-</li>
-<li><p>暂停状态，当进程收到 SIGSTOP、SIGSTP、SIGTTIN 或者 SIGTTOU 就会进入暂停状态，收到 SIGCONT 信号即可进入运行态。</p>
-</li>
-<li><p>僵死态，进程已经停止运行，但是其父进程还没有询问其状态。</p>
-</li>
-</ul>
-<p>每个进程都有两个栈，用户栈和内核栈，在用户态运行时CPU堆栈指针寄存器指向用户栈地址。进程在内核态运行时，CPU堆栈指针寄存器指向内核栈地址。内核栈使用的空间很小，通常为8KB。</p>
-<p><img src="/images/kernel/kernel/task_struct.png" alt="内核栈"></p>
-<h2 id="task-struct"><a href="#task-struct" class="headerlink" title="task_struct"></a>task_struct</h2><p>在linux中线程和进程都使用 struct task_struct 结构体表示，通过唯一的进程标识值pid来标识每个进程，用全局指针current指向当前正在运行的进程的 task_struct。task_struct的state域存储了进程当前的状态，总共有7种状态：</p>
-<ul>
-<li><p><strong>TASK_RUNNING</strong> 一般指就绪状态，进程正在运行。</p>
-</li>
-<li><p><strong>TASK_INTERRUPTIBLE</strong> 进程暂停，直到它获得满足它继续运行的条件，比如进程获得了需要的资源、接收到硬件终端、或者收到某些signal等。</p>
-</li>
-<li><p><strong>TASK_UNINTERRUPTIBLE</strong> 进程暂停，不会被signal唤醒，只能等待某些事件(资源、硬件终端等)。</p>
-</li>
-<li><p><strong>TASK_STOPPED</strong> 进程中止运行，进程在接收到SIGSTOP, SIGTSTP, SIGTTIN或者SIGTTOU 信号时会进入这个状态。 接收到SIGCONT信号后，重新回到进行状态。</p>
-</li>
-<li><p><strong>TASK_TRACED</strong> 进程处于被调试，例如通过ptrace()对程序进行调试。</p>
-</li>
-<li><p><strong>EXIT_ZOMBIE</strong> 进程将要结束，等待父进程调用wait4()或者waitpid()来回收该进程。</p>
-</li>
-<li><p><strong>EXIT_DEAD</strong> 进程退出，这个状态主要用于避免多个进程同时对该进程调用类似wait()的函数或者系统调用。</p>
-</li>
-</ul>
-<p><img src="/images/kernel/kernel/proc-sched.png" alt="proc"></p>
-<h2 id="任务调度"><a href="#任务调度" class="headerlink" title="任务调度"></a>任务调度</h2><p>任务调度由 Linux 内核调度器来完成。Linux 内核调度器根据进程的优先级选择运行进程。linux内核支持抢占，更高优先级的进程可以抢占低优先级进程。但在中断处理函数中，中断上下文的底半部，进程持有自旋锁的情况下不允许内核抢占。</p>
-<p>当请求的资源不能得到满足时，内核会调度其他进程执行，并使本进程进入睡眠状态，直到它请求的资源被释放，才会被唤醒而进入就绪态。睡眠分成可被打断的睡眠和不可被打断的睡眠，区别在于可被打断的睡眠在收到信号的时候唤醒。</p>
-<p>内核可以使用schedule()函数主动调度进程。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">current-&gt;state=TASK_INTERRUPTIBLE;</span><br><span class="line">schedule(); </span><br></pre></td></tr></table></figure>
-
-<h2 id="内核线程"><a href="#内核线程" class="headerlink" title="内核线程"></a>内核线程</h2><p>设备驱动中，如果需要几个并发执行的任务，可以启动内核线程，函数为:</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">pid_t</span> <span class="title function_">kernel_thread</span><span class="params">(<span class="type">int</span> (*fn)(<span class="type">void</span> *), <span class="type">void</span> *arg, <span class="type">unsigned</span> <span class="type">long</span> flags)</span>;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1432,20 +1431,20 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">201</span>
+          <span class="site-state-item-count">203</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-count">37</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

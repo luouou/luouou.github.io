@@ -176,6 +176,634 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/kernel_make/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/kernel/kernel_make/" class="post-title-link" itemprop="url">kernel make and menuconfig</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>指定交叉工具和平台。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm menuconfig</span><br></pre></td></tr></table></figure>
+
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><ul>
+<li>屏蔽编译信息</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make &gt; /dev/null</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>使用<code>make -j&lt;n&gt;</code>参数加速编译</p>
+</li>
+<li><p>指定编译某些模块</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make M=drivers/i2c/ modules</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用 verbose 模式，将每一步执行的命令都打印出来，并重定向到一个文件中去，这样以后可以方便地查找模块之间的依赖关系。</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make V=1 &gt; ~/bak.txt</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用 ccache 提高编译速度，使用 ccache时，需要更改源码树根目录下面的 Makefile 文件，在 CC 和 HOSTCC 变量的定义前添加 ccache。<a target="_blank" rel="noopener" href="http://ccache.samba.org/">ccache主页</a>。</li>
+</ul>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CC = ccache <span class="variable">$(CROSS_COMPILE)</span>gcc</span><br><span class="line">HOSTCC = ccache gcc</span><br></pre></td></tr></table></figure>
+
+<h2 id="编译文档"><a href="#编译文档" class="headerlink" title="编译文档"></a>编译文档</h2><p>使用下面的一些命令可以在 Documentation/DocBook/目录下，生成一些文档。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">make htmldocs //生成 HTML 文件</span><br><span class="line">make pdfdocs  //生成 PDF 文件</span><br><span class="line">make psdocs   //生成 Postscript 文件</span><br><span class="line">make mandocs  //生成 Kernel API 手册</span><br><span class="line">make installmandocs //将 Kernel API 手册页安装到 man 程序能够找到的目录中</span><br></pre></td></tr></table></figure>
+
+<h2 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h2><p>1.缺少libncurses5-dev</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make menuconfig requires the ncurses libraries.</span><br></pre></td></tr></table></figure>
+
+<p>2.没有安装u-boot-tools</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkimage command not found – U-Boot images will not be built</span><br></pre></td></tr></table></figure>
+
+<p>3.源文件编译生成的.o文件和模块目标文件xxx.o重名。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">module license &#x27;unspecified&#x27; taints kernel.</span><br><span class="line">Disabling lock debugging due to kernel taint</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/kernel_arch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/kernel/kernel_arch/" class="post-title-link" itemprop="url">Linux Kernel Architecture</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="linux系统结构"><a href="#linux系统结构" class="headerlink" title="linux系统结构"></a>linux系统结构</h2><img src="/images/kernel/kernel/linux_arch.jpeg" alt="Unix/Linux系统分层结构" style="zoom: 33%;" />
+
+<p><img src="/images/kernel/kernel/linux-arch.webp" alt="Linux系统层次结构"></p>
+<p>最上面是用户空间，这是用户应用程序执行的地方。用户空间之下是内核空间，GNU C Library （glibc）也位于这里，它提供了连接内核的系统调用接口，还提供了在用户空间应用程序和内核之间进行转换的机制。</p>
+<p>Linux 内核可以进一步划分成三层。最上面是系统调用接口。之下是内核代码，是与处理器体系结构无关的通用代码。最下面是依赖于特定处理器体系结构的代码，称为 BSP（Board Support Package）。</p>
+<h2 id="内核架构"><a href="#内核架构" class="headerlink" title="内核架构"></a>内核架构</h2><p><img src="/images/kernel/kernel/kernel_struct.webp" alt="linux内核架构"></p>
+<p>Linux内核的主要组件有：系统调用接口、进程调度、内存管理、虚拟文件系统、网络协议栈、进程间通信、设备驱动程序和硬件架构的相关代码。</p>
+<p>LXR (Linux Cross Reference)是一个内核的源代码浏览工具，<a target="_blank" rel="noopener" href="http://lxr.linux.no/%E3%80%82">http://lxr.linux.no/。</a></p>
+<p><img src="/images/kernel/kernel/linux_kernel_map.svg" alt="Linux kernel map"></p>
+<p><a target="_blank" rel="noopener" href="https://makelinux.github.io/kernel/map/">https://makelinux.github.io/kernel/map/</a></p>
+<h3 id="目录详解"><a href="#目录详解" class="headerlink" title="目录详解"></a>目录详解</h3><table>
+<thead>
+<tr>
+<th align="left">目录 / 文件名</th>
+<th align="left">源码功能简介</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">/Documentation</td>
+<td align="left">说明文档，对每个目录的具体作用进行说明。</td>
+</tr>
+<tr>
+<td align="left">/arch</td>
+<td align="left">不同 CPU 架构下的核心代码。其中的每一个子目录都代表 Linux 支持的 CPU 架构。</td>
+</tr>
+<tr>
+<td align="left">/block</td>
+<td align="left">块设备通用函数。</td>
+</tr>
+<tr>
+<td align="left">/certs</td>
+<td align="left">与证书相关。</td>
+</tr>
+<tr>
+<td align="left">/crypto</td>
+<td align="left">常见的加密算法的C 语言实现代码，譬如 crc32、md5、sha1 等。</td>
+</tr>
+<tr>
+<td align="left">/drivers</td>
+<td align="left">内核中所有设备的驱动程序，其中的每一个子目录对应一种设备驱动。</td>
+</tr>
+<tr>
+<td align="left">/include</td>
+<td align="left">内核编译通用的头文件。</td>
+</tr>
+<tr>
+<td align="left">/init</td>
+<td align="left">内核初始化的核心代码。</td>
+</tr>
+<tr>
+<td align="left">/ipc</td>
+<td align="left">内核中进程间的通信代码。</td>
+</tr>
+<tr>
+<td align="left">/kernel</td>
+<td align="left">内核的核心代码，此目录下实现了大多数 Linux 系统的内核函数。与处理器架构相关的内核代码在 /kernel/$ARCH/kernel。</td>
+</tr>
+<tr>
+<td align="left">/lib</td>
+<td align="left">内核共用的函数库，与处理器架构相关的库在 /kernel/$ARCH/lib。</td>
+</tr>
+<tr>
+<td align="left">/mm</td>
+<td align="left">内存管理代码，譬如页式存储管理内存的分配和释放等。与具体处理器架构相关的内存管理代码位于 /arch/$ARCH/mm 目录下。</td>
+</tr>
+<tr>
+<td align="left">/net</td>
+<td align="left">网络通信相关代码。</td>
+</tr>
+<tr>
+<td align="left">/samples</td>
+<td align="left">示例代码。</td>
+</tr>
+<tr>
+<td align="left">/scripts</td>
+<td align="left">用于内核配置的脚本文件，用于实现内核配置的图形界面。</td>
+</tr>
+<tr>
+<td align="left">/security</td>
+<td align="left">安全性相关的代码。</td>
+</tr>
+<tr>
+<td align="left">/sound</td>
+<td align="left">与音频有关的代码，包括与音频有关的驱动程序 [2]。</td>
+</tr>
+<tr>
+<td align="left">/tools</td>
+<td align="left">Linux 中的常用工具。</td>
+</tr>
+<tr>
+<td align="left">/usr</td>
+<td align="left">该目录中的代码为内核尚未完全启动时执行用户空间代码提供了支持。</td>
+</tr>
+<tr>
+<td align="left">/virt</td>
+<td align="left">此文件夹包含了虚拟化代码，它允许用户一次运行多个操作系统。</td>
+</tr>
+<tr>
+<td align="left">COPYING</td>
+<td align="left">许可和授权信息。</td>
+</tr>
+<tr>
+<td align="left">CREDITS</td>
+<td align="left">贡献者列表。</td>
+</tr>
+<tr>
+<td align="left">Kbuild</td>
+<td align="left">内核设定脚本，可以对内核中的变量进行设定。</td>
+</tr>
+<tr>
+<td align="left">Kconfig</td>
+<td align="left">配置哪些文件编译，那些文件不用编译 [4]。</td>
+</tr>
+<tr>
+<td align="left">Makefile</td>
+<td align="left">该文件将编译参数、编译所需的文件和必要的信息传给编译器。</td>
+</tr>
+</tbody></table>
+<h2 id="drivers目录"><a href="#drivers目录" class="headerlink" title="drivers目录"></a>drivers目录</h2><p><strong>accessibility</strong>  这些驱动提供支持一些辅助设备。在Linux 3.9.4中，这个文件夹中只有一个驱动就是盲文设备驱动。</p>
+<p><strong>acpi</strong>  高级配置和电源接口（ACPI : Advanced Configuration and Power Interface）驱动用来管理电源使用。</p>
+<p><strong>amba</strong>  高级微控制器总线架构（AMBA : Advanced Microcontroller Bus Architecture）是与片上系统（SoC）的管理和互连的协议。SoC是一块包含许多或所有必要的计算机组件的芯片。这里的AMBA驱动让内核能够运行在这上面。</p>
+<p><strong>ata</strong>  该目录包含PATA和SATA设备的驱动程序。串行ATA（SATA）是一种连接主机总线适配器到像硬盘那样的存储器的计算机总线接口。并行ATA（PATA）用于连接存储设备，如硬盘驱动器，软盘驱动器，光盘驱动器的标准。PATA就是我们所说的IDE。</p>
+<p><strong>atm</strong>  异步通信模式(ATM : Asynchronous Transfer Mode)是一种通信标准。这里有各种接到PCI桥的驱动(他们连接到PCI总线)和以太网控制器(控制以太网通信的集成电路芯片)。</p>
+<p><strong>auxdisplay</strong>  这个文件夹提供了三个驱动。LCD 帧缓存（framebuffer）驱动、LCD控制器驱动和一个LCD驱动。这些驱动用于管理液晶显示器 —— 液晶显示器会在按压时显示波纹。注意:按压会损害屏幕,所以请不要用力戳LCD显示屏。</p>
+<p><strong>base</strong>  这是个重要的目录包含了固件、系统总线、虚拟化能力等基本的驱动。</p>
+<p><strong>bcma</strong>  这些驱动用于使用基于AMBA协议的总线。AMBA是由博通公司开发。</p>
+<p><strong>block</strong>  这些驱动提供对块设备的支持，像软驱、SCSI磁带、TCP网络块设备等等。</p>
+<p><strong>bluetooth</strong>  蓝牙是一种安全的无线个人区域网络标准(PANs)。蓝牙驱动就在这个文件夹，它允许系统使用各种蓝牙设备。例如，一个蓝牙鼠标不用电缆，并且计算机有一个电子狗(小型USB接收器)。Linux系统必须能够知道进入电子狗的信号，否则蓝牙设备无法工作。</p>
+<p><strong>bus</strong>  这个目录包含了三个驱动。一个转换ocp接口协议到scp协议。一个是设备间的互联驱动，第三个是用于处理互联中的错误处理。</p>
+<p><strong>cdrom</strong>  这个目录包含两个驱动。一个是cd-rom，包括DVD和CD的读写。第二个是gd-rom(只读GB光盘)，GD光盘是1.2GB容量的光盘，这像一个更大的CD或者更小的DVD。GD通常用于世嘉游戏机中。</p>
+<p><strong>char</strong>  字符设备驱动就在这里。字符设备每次传输数据传输一个字符。这个文件夹里的驱动包括打印机、PS3闪存驱动、东芝SMM驱动和随机数发生器驱动等。</p>
+<p><strong>clk</strong>  这些驱动用于系统时钟。</p>
+<p><strong>clocksource</strong>  这些驱动用于作为定时器的时钟。</p>
+<p><strong>connector</strong>  这些驱动使内核知道当进程fork并使用proc连接器更改UID(用户ID)、GID(组ID)和SID(会话ID)。内核需要知道什么时候进程fork(CPU中运行多个任务)并执行。否则,内核可能会低效管理资源。</p>
+<p><strong>cpufreq</strong>  这些驱动改变CPU的电源能耗。</p>
+<p><strong>cpuidle</strong>  这些驱动用来管理空闲的CPU。一些系统使用多个CPU，其中一个驱动可以让这些CPU负载相当。</p>
+<p><strong>crypto</strong>  这些驱动提供加密功能。</p>
+<p><strong>dca</strong>  直接缓存访问（DCA ： Direct Cache Access）驱动允许内核访问CPU缓存。CPU缓存就像CPU内置的RAM。CPU缓存的速度比RAM更快。然而,CPU缓存的容量比RAM小得多。CPU在这个缓存系统上存储了最重要的和执行的代码。</p>
+<p><strong>devfreq</strong>  这个驱动程序提供了一个通用的动态电压和频率调整(DVFS ： Generic Dynamic Voltage and Frequency Scaling)框架，可以根据需要改变CPU频率来节约能源。这就是所谓的CPU节能。</p>
+<p><strong>dio</strong>  数字输入/输出（DIO ：Digital Input/Output）总线驱动允许内核可以使用DIO总线。</p>
+<p><strong>dma</strong>  直接内存访问(DMA)驱动允许设备无需CPU直接访问内存。这减少了CPU的负载。</p>
+<p><strong>edac</strong>  错误检测和校正（ Error Detection And Correction）驱动帮助减少和纠正错误。</p>
+<p><strong>eisa</strong>  扩展工业标准结构总线（Extended Industry Standard Architecture）驱动提供内核对EISA总线的支持。</p>
+<p><strong>extcon</strong>  外部连接器（EXTernal CONnectors）驱动用于检测设备插入时的变化。例如，extcon会检测用户是否插入了USB驱动器。</p>
+<p><strong>firewire</strong>  这些驱动用于控制苹果制造的类似于USB的火线设备。</p>
+<p><strong>firmware</strong>  这些驱动用于和像BIOS(计算机的基本输入输出系统固件)这样的设备的固件通信。BIOS用于启动操作系统和控制硬件与设备的固件。一些BIOS允许用户超频CPU。超频是使CPU运行在一个更快的速度。CPU速度以MHz(百万赫兹)或GHz衡量。一个3.7 GHz的CPU的的速度明显快于一个700Mhz的处理器。</p>
+<p><strong>gpio</strong>  通用输入/输出(GPIO ：General Purpose Input/Output)是可由用户控制行为的芯片的管脚。这里的驱动就是控制GPIO。</p>
+<p><strong>gpu</strong>  这些驱动控制VGA、GPU和直接渲染管理(DRM ：Direct Rendering Manager )。VGA是640*480的模拟计算机显示器或是简化的分辨率标准。GPU是图形处理器。DRM是一个Unix渲染系统。</p>
+<p><strong>hid</strong>  这驱动用于对USB人机界面设备的支持。</p>
+<p><strong>hsi</strong>  这个驱动用于内核访问像Nokia N900这样的蜂窝式调制解调器。</p>
+<p><strong>hv</strong>  这个驱动用于提供Linux中的键值对(KVP ：Key Value Pair)功能。</p>
+<p><strong>hwmon</strong>  硬件监控驱动用于内核读取硬件传感器上的信息。比如，CPU上有个温度传感器。那么内核就可以追踪温度的变化并相应地调节风扇的速度。</p>
+<p><strong>hwspinlock</strong>  硬件转锁驱动允许系统同时使用两个或者更多的处理器，或使用一个处理器上的两个或更多的核心。</p>
+<p><strong>i2c</strong>  I2C驱动可以使计算机用I2C协议处理主板上的低速外设。系统管理总线(SMBus ：System Management Bus)驱动管理SMBus,这是一种用于轻量级通信的two-wire总线。</p>
+<p><strong>ide</strong>  这些驱动用来处理像CDROM和硬盘这些PATA/IDE设备。</p>
+<p><strong>idle</strong>  这个驱动用来管理Intel处理器的空闲功能。</p>
+<p><strong>iio</strong>  工业I/O核心驱动程序用来处理数模转换器或模数转换器。</p>
+<p><strong>infiniband</strong>  Infiniband是在企业数据中心和一些超级计算机中使用的一种高性能的端口。这个目录中的驱动用来支持Infiniband硬件。</p>
+<p><strong>input</strong>  这里包含了很多驱动，这些驱动都用于输入处理，包括游戏杆、鼠标、键盘、游戏端口（旧式的游戏杆接口）、遥控器、触控、耳麦按钮和许多其他的驱动。如今的操纵杆使用USB端口，但是在上世纪80、90年代，操纵杆是插在游戏端口的。</p>
+<p><strong>iommu</strong>  输入/输出内存管理单元(IOMMU ：Input/Output Memory Management Unit)驱动用来管理内存管理单元中的IOMMU。IOMMU连接DMA IO总线到内存上。IOMMU是设备在没有CPU帮助下直接访问内存的桥梁。这有助于减少处理器的负载。</p>
+<p><strong>ipack</strong>  Ipack代表的是IndustryPack。 这个驱动是一个虚拟总线,允许在载体和夹板之间操作。</p>
+<p><strong>irqchip</strong>  这些驱动程序允许硬件的中断请求(IRQ)发送到处理器，暂时挂起一个正在运行的程序而去运行一个特殊的程序（称为一个中断处理程序）。</p>
+<p><strong>isdn</strong>  这些驱动用于支持综合业务数字网(ISDN)，这是用于同步数字传输语音、视频、数据和其他网络服务使用传统电话网络的电路的通信标准。</p>
+<p><strong>leds</strong>  用于LED的驱动。</p>
+<p><strong>lguest</strong>  lguest用于管理客户机系统的中断。中断是CPU被重要任务打断的硬件或软件信号。CPU接着给硬件或软件一些处理资源。</p>
+<p><strong>macintosh</strong>  苹果设备的驱动在这个文件夹里。</p>
+<p><strong>mailbox</strong>  这个文件夹(pl320-pci)中的驱动用于管理邮箱系统的连接。</p>
+<p><strong>md</strong>  多设备驱动用于支持磁盘阵列，一种多块硬盘间共享或复制数据的系统。</p>
+<p><strong>media</strong>  媒体驱动提供了对收音机、调谐器、视频捕捉卡、DVB标准的数字电视等等的支持。驱动还提供了对不同通过USB或火线端口插入的多媒体设备的支持。</p>
+<p><strong>memory</strong>  支持内存的重要驱动。</p>
+<p><strong>memstick</strong>  这个驱动用于支持Sony记忆棒。</p>
+<p><strong>message</strong>  这些驱动用于运行LSI Fusion MPT(一种消息传递技术)固件的LSI PCI芯片/适配器。LSI大规模集成，这代表每片芯片上集成了几万晶体管、</p>
+<p><strong>mfd</strong>  多用途设备(MFD)驱动提供了对可以提供诸如电子邮件、传真、复印机、扫描仪、打印机功能的多用途设备的支持。这里的驱动还给MFD设备提供了一个通用多媒体通信端口(MCP)层。</p>
+<p><strong>misc</strong>  这个目录包含了不适合在其他目录的各种驱动。就像光线传感器驱动。</p>
+<p><strong>mmc</strong>  MMC卡驱动用于处理用于MMC标准的闪存卡。</p>
+<p><strong>mtd</strong>  内存技术设备(MTD ：Memory technology devices)驱动程序用于Linux和闪存的交互，这就就像一层闪存转换层。其他块设备和字符设备的驱动程序不会以闪存设备的操作方式来做映射。尽管USB记忆卡和SD卡是闪存设备，但它们不使用这个驱动，因为他们隐藏在系统的块设备接口后。这个驱动用于新型闪存设备的通用闪存驱动器驱动。</p>
+<p><strong>net</strong>  网络驱动提供像AppleTalk、TCP和其他的网络协议。这些驱动也提供对调制解调器、USB 2.0的网络设备、和射频设备的支持。</p>
+<p><strong>nfc</strong>  这个驱动是德州仪器的共享传输层之间的接口和NCI核心。</p>
+<p><strong>ntb</strong>  不透明的桥接驱动提供了在PCIe系统的不透明桥接。PCIe是一种高速扩展总线标准。</p>
+<p><strong>nubus</strong>  NuBus是一种32位并行计算总线。用于支持苹果设备。</p>
+<p><strong>of</strong>  此驱动程序提供设备树中创建、访问和解释程序的OF助手。</p>
+<p><strong>oprofile</strong>  这个驱动用于从驱动到用户空间进程(运行在用户态下的应用)评测整个系统。这帮助开发人员找到性能问题—-性能分析机制-是用于 Linux 的若干种评测和性能监控工具中的一种</p>
+<p><strong>parisc</strong>  这些驱动用于HP生产的PA-RISC架构设备。PA-RISC是一种特殊指令集的处理器。</p>
+<p><strong>parport</strong>  并口驱动提供了Linux下的并口支持。</p>
+<p><strong>pci</strong>  这些驱动提供了PCI总线服务。</p>
+<p><strong>pcmcia</strong>  这些是笔记本的pc卡驱动</p>
+<p><strong>pinctrl</strong>  这些驱动用来处理引脚控制设备。引脚控制器可以禁用或启用I/O设备。</p>
+<p><strong>platform</strong> 这个文件夹包含了不同的计算机平台的驱动像Acer、Dell、Toshiba、IBM、Intel、Chrombooks等等。</p>
+<p><strong>pnp</strong>  即插即用驱动允许用户在插入一个像USB的设备后可以立即使用而不必手动配置设备。</p>
+<p><strong>power</strong>  电源驱动使内核可以测量电池电量，检测充电器和进行电源管理。</p>
+<p><strong>pps</strong>  Pulse-Per-Second驱动用来控制电流脉冲速率。这用于计时。</p>
+<p><strong>ps3</strong>  这是Sony的游戏控制台驱动- PlayStation3。</p>
+<p><strong>ptp</strong>  图片传输协议(PTP)驱动支持一种从数码相机中传输图片的协议。</p>
+<p><strong>pwm</strong>  脉宽调制(PWM)驱动用于控制设备的电流脉冲。主要用于控制像CPU风扇。</p>
+<p><strong>rapidio</strong>  RapidIO驱动用于管理RapidIO架构，它是一种高性能分组交换，用于电路板上交互芯片的交互技术，也用于互相使用底板的电路板。</p>
+<p><strong>regulator</strong>  校准驱动用于校准电流、温度、或其他可能系统存在的校准硬件。—-用于控制系统中某些设备的电压电流供应</p>
+<p><strong>remoteproc</strong>  这些驱动用来管理远程处理器。</p>
+<p><strong>rpmsg</strong>  这个驱动用来控制支持大量驱动的远程处理器通讯总线(rpmsg)。这些总线提供消息传递设施,促进客户端驱动程序编写自己的连接协议消息。—-该基础架构允许主处理器上的 Linux 操作系统管理远程处理器上远程软件环境的生命周期和通信-用于在 AMP 环境中的操作系统之间实现 IPC 的 rpmsg 组件和 API</p>
+<p><strong>rtc</strong>  实时时钟(RTC)驱动使内核可以读取时钟。</p>
+<p><strong>s390</strong>  用于31/32位的大型机架构的驱动。</p>
+<p><strong>sbus</strong>  用于管理基于SPARC的总线驱动。</p>
+<p><strong>scsi</strong>  允许内核使用SCSI标准外围设备。例如,Linux将在与SCSI硬件传输数据时使用SCSI驱动。</p>
+<p><strong>sfi</strong> 简单固件接口(SFI)驱动允许固件发送信息表给操作系统。这些表的数据称为SFI表。</p>
+<p><strong>sh</strong>  该驱动用于支持SuperHway总线。</p>
+<p><strong>sn</strong>  该驱动用于支持IOC3串口。</p>
+<p><strong>spi</strong>  这些驱动处理串行设备接口总线(SPI)，它是一个在在全双工下运行的同步串行数据链路标准,。全双工是指两个设备可以同一时间同时发送和接收信息。双工指的是双向通信。设备在主/从模式下通信(取决于设备配置)。</p>
+<p><strong>ssb</strong>  ssb(Sonics Silicon Backplane)驱动提供对在不同芯片和嵌入式设备上使用的迷你总线的支持。</p>
+<p><strong>staging</strong>  该目录含有许多子目录。这里所有的驱动还需要在加入主内核前经过更多的开发工作。</p>
+<p><strong>target</strong>  SCSI设备驱动</p>
+<p><strong>tc</strong>  这些驱动用于TURBOchannel，TURBOchannel是数字设备公司开发的32位开放总线。这主要用于DEC工作站。</p>
+<p><strong>thermal</strong>  thermal驱动使CPU保持较低温度。—Linux温控框架</p>
+<p><strong>tty</strong>  tty驱动用于管理物理终端连接。</p>
+<p><strong>uio</strong>  该驱动允许用户编译运行在用户空间而不是内核空间的驱动。这使用户驱动不会导致内核崩溃。—–运行在用户空间的IO技术</p>
+<p><strong>usb</strong>  USB设备允许内核使用USB端口。闪存驱动和记忆卡已经包含了固件和控制器,所以这些驱动程序允许内核使用USB接口和与USB设备。</p>
+<p><strong>uwb</strong>  Ultra-WideBand驱动用来管理短距离，高带宽通信的超低功耗的射频设备</p>
+<p><strong>vfio</strong>  允许设备访问用户空间的VFIO驱动。用户态驱动框架。</p>
+<p><strong>vhost</strong>  这是用于宿主内核中的virtio服务器驱动。用于虚拟化中。</p>
+<p><strong>video</strong>  这是用来管理显卡和监视器的视频驱动。</p>
+<p><strong>virt</strong>  这些驱动用来虚拟化。</p>
+<p><strong>virtio</strong>  这个驱动用来在虚拟PCI设备上使用virtio设备。用于虚拟化中。</p>
+<p><strong>vlynq</strong>  这个驱动控制着由德州仪器开发的专有接口。这些都是宽带产品，像WLAN和调制解调器，VOIP处理器，音频和数字媒体信号处理芯片。</p>
+<p><strong>vme</strong>  WMEbus最初是为摩托罗拉68000系列处理器开发的总线标准</p>
+<p><strong>w1</strong>  这些驱动用来控制one-wire总线。</p>
+<p><strong>watchdog</strong>  该驱动管理看门狗定时器，这是一个可以用来检测和恢复异常的定时器。</p>
+<p><strong>xen</strong>  该驱动是Xen管理程序系统。这是个允许用户运行多个操作系统在一台计算机的软件或硬件。这意味着xen的代码将允许用户在同一时间的一台计算机上运行两个或更多的Linux系统。用户也可以在Linux上运行Windows、Solaris、FreeBSD、或其他操作系统。</p>
+<p><strong>zorro</strong>  该驱动提供Zorro Amiga总线支持。</p>
+<p>Documentation/CodingStyle 文件描 述 了 Linux 内 核 对 编 码 风 格 的 要 求，内 核 下 的scripts/checkpatch.pl 脚本可以检查代码风格。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/lcd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/hardware/lcd/" class="post-title-link" itemprop="url">液晶显示器原理</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="LCD"><a href="#LCD" class="headerlink" title="LCD"></a>LCD</h3><p>液晶（Liquid Crystal）是一种介于液态与结晶态之间的一种物质状态的高分子材料。液晶具有双折射性，使得能对偏振光选择性透过。</p>
+<p>LCD是英文Liquid Crystal Display 的简称，指的是液晶显示屏。主要有TFT、UFB、TFD、STN等几种类型。其构造包括塑料球、玻璃球、边框胶、玻璃基板、上偏光片、定向层、液晶、导电ITO图案、导通点、IPO电极和下偏光片。</p>
+<p><img src="/images/lcd/LCD-struct.jpeg" alt="TN"></p>
+<p>两块偏光板相互垂直时光线就完全无法通过，液晶显示器就是在上下两片栅栏之间互垂直的偏光板之间充满液晶，利用电场控制液晶分子产生扭曲，从而对穿越其中的光线进行有规则的折射，来改变光的行进方向，如此一来，不同的电场大小，就会形成不同颜色。</p>
+<p>因为液晶材料本身并不发光，所以在显示屏两边都设有作为光源的灯管，而在液晶显示屏背面有一块背光板和反光膜，背光板是由荧光物质组成的可以发射光线，其作用主要是提供均匀的背景光源。</p>
+<p>液晶显示的原理基于液晶的透光率随其所施电压大小而变化的特性。当光通过下偏振片后，变成线性偏振光，偏振方向与偏振片振动方向一致，与上下玻璃基板上面液晶分子排列顺序一致。当光通过液晶层时，由于受液晶折射，线性偏振光被分解为两束光。又由于这两束光传播速度不同（相位相同），因而当两束光合成后，必然使振光的振动方向发生变化。通过液晶层的光，则被逐渐扭曲。当光达到上偏振片时，其光轴振动方向被扭曲了90度，且与上偏振片的振动方向保持一致。这样，光线通过上偏振片形成亮场。加上电压以后，液晶在电场作用下取向，扭曲消失。这时，通过下偏振片的线性偏振光，在液晶层不再旋转，无法通过上偏振片而形成暗场。可见液晶本身不发光，在外光源的调制下，才能显示，在整个显示过程中，液晶起到一个电压控制的光阀作用。</p>
+<p>LCD依据驱动方式可分为静态驱动、简单矩阵驱动以及主动<br>矩阵驱动 3 种。其中简单矩阵型又可再细分扭转向列型(TN)和超扭转式向列型(STN)两种，而主动矩阵型则以薄膜式晶体管型(TFT)为主流。</p>
+<p>NW(Normally white)是指当液晶面板不施加电压时，面板是亮的画面。另外一种， 液晶面板不施加电压时，面板无法透光, 看起来是黑色的，就称之为NB(Normally black)。</p>
+<p><strong>可视角度</strong>指的是使用者能从不一样的方位清晰地看见荧幕上所有显示内容的角度。液晶显示器的可视角度左右对称，而上下则不一定对称。当背光源的入射光通过偏光板、液晶及取向膜后，输出光便具备了特定的方向特性。假如从一个非常斜的角度观看一个全白的画面，我们可能会看到黑色或是色彩失真。一般来说，上下角度要小于或等于左右角度。现在有些厂商就开发出各种广视角技术，试图改善液晶显示器的视角特性，如：IPS(In Plane Switching)、MVA(Multidomain Vertical Alignment)、TN+FILM。</p>
+<h3 id="TFT"><a href="#TFT" class="headerlink" title="TFT"></a>TFT</h3><h2 id="OLED"><a href="#OLED" class="headerlink" title="OLED"></a>OLED</h2><p>OLED是Organic Light-Emitting Diode 的简称，中文名是有机发光二极管。</p>
+<p>不同于LCD需要通过背光板照射才能显示，OLED是自发光。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/mipi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/hardware/mipi/" class="post-title-link" itemprop="url">mipi接口</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:56:37" itemprop="dateModified" datetime="2022-06-08T17:56:37+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>MIPI (Mobile Industry Processor Interface) 是2003年由ARM, Nokia, ST ,TI等公司成立的一个联盟，目的是把手机内部的接口如摄像头、显示屏接口、射频/基带接口等标准化，从而减少手机设计的复杂程度和增加设计灵活性。</p>
+<p>MIPI联盟下面有不同的WorkGroup，分别定义了一系列的手机内部接口标准，比如摄像头接口CSI、显示接口DSI、射频接口DigRF、麦克风 /喇叭接口SLIMbus等。统一接口标准的好处是手机厂商根据需要可以从市面上灵活选择不同的芯片和模组，更改设计和功能时更加快捷方便。下图是按照 MIPI的规划下一代智能手机的内部架构。</p>
+<p><img src="/images/mipi/MIPI-Protocol-865x1024.png" alt="img"></p>
+<h2 id="MIPI规范"><a href="#MIPI规范" class="headerlink" title="MIPI规范"></a>MIPI规范</h2><p>已经完成和正在计划中的规范如下:<br><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/MIPI#cite_note-Working_Groups:_Overview-1">https://zh.wikipedia.org/wiki/MIPI#cite_note-Working_Groups:_Overview-1</a></p>
+<table>
+<thead>
+<tr>
+<th><strong>工作组</strong></th>
+<th><strong>规范名称</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Camera工作组</td>
+<td>MIPI Camera Serial Interface 2 (MIPI CSI-2) v2.0 (March 2017)MIPI Camera Serial Interface 3 (MIPI CSI-3) v1.1 (March 2014)MIPI Camera Command Set (MIPI CCS) v1.0 (October 2017)</td>
+</tr>
+<tr>
+<td>Device Descriptor Block工作组</td>
+<td>暂无</td>
+</tr>
+<tr>
+<td>DigRF工作组</td>
+<td>DigRF Baseband/RF Digital Interface Specification v4 (Feb. 2014)</td>
+</tr>
+<tr>
+<td>Display工作组</td>
+<td>DBI-2DPI-2DSI-2 v1.0 (January 2016)DCS</td>
+</tr>
+<tr>
+<td>高速同步接口工作组</td>
+<td>HSI 1.0</td>
+</tr>
+<tr>
+<td>接口管理框架工作组</td>
+<td>暂无</td>
+</tr>
+<tr>
+<td>低速多点连接工作组</td>
+<td>SLIMbus v2.0 (August 2015)SoundWire v1.1 (August 2016)</td>
+</tr>
+<tr>
+<td>NAND软件工作组</td>
+<td>暂无</td>
+</tr>
+<tr>
+<td>物理层工作组</td>
+<td>C-PHY v1.2 (March 2017)D-PHY v2.1 (March 2017)M-PHY v4.1 (March 2017)</td>
+</tr>
+<tr>
+<td>软件工作组</td>
+<td>暂无</td>
+</tr>
+<tr>
+<td>系统电源管理工作组</td>
+<td>SPMI v2.0 (August 2012)</td>
+</tr>
+<tr>
+<td>检测与调试工作组</td>
+<td>暂无</td>
+</tr>
+<tr>
+<td>统一协议工作组</td>
+<td>UniPro 1 point-to-point v1.61 (October 2015)PIE</td>
+</tr>
+</tbody></table>
+<h3 id="DSI-CSI"><a href="#DSI-CSI" class="headerlink" title="DSI/CSI"></a>DSI/CSI</h3><p>MIPI是一个比较新的标准，其规范也在不断修改和改进，目前比较成熟的接口应用有DSI(显示接口)和CSI（摄像头接口）。CSI/DSI分别是指其承载的是针对Camera或Display应用，都有复杂的协议结构。以DSI为例，其协议层结构如下：</p>
+<p><img src="/images/mipi/MIPI-DSI.png" alt="img"></p>
+<p>CSI/DSI的物理层（Phy Layer）由专门的WorkGroup负责制定，其目前的标准是D-PHY。D-PHY采用1对源同步的差分时钟和1～4对差分数据线来进行数据传输。数据传输采用DDR方式，即在时钟的上下边沿都有数据传输。</p>
+<p>D-PHY的物理层支持HS(High Speed)和LP(Low Power)两种工作模式。HS模式下采用低压差分信号，功耗较大，但是可以传输很高的数据速率（数据速率为80M～1Gbps）； LP模式下采用单端信号，数据速率很低（&lt;10Mbps），但是相应的功耗也很低。两种模式的结合保证了MIPI总线在需要传输大量数据（如图像） 时可以高速传输，而在不需要大数据量传输时又能够减少功耗。</p>
+<p><img src="/images/mipi/MIPI-DPHY.png" alt="img"></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/100476927">https://zhuanlan.zhihu.com/p/100476927</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/sensor/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -573,141 +1201,6 @@
 <p>WPU – Wearable Processing Unit， 可穿戴处理器，Ineda Systems公司推出的可穿戴片上系统产品，包含GPU/MIPS CPU等IP。</p>
 <p>XPU – 百度与Xilinx公司在2017年Hotchips大会上发布的FPGA智能云加速，含256核。</p>
 <p>ZPU – Zylin Processing Unit, 由挪威Zylin 公司推出的一款32位开源处理器。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/memory/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/memory/" class="post-title-link" itemprop="url">memory and disk</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:34:18" itemprop="dateModified" datetime="2022-06-08T20:34:18+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="ROM"><a href="#ROM" class="headerlink" title="ROM"></a>ROM</h2><p><strong>ROM</strong> (Read Only Memory)程序存储器，在掉电之后仍然可以保持数据，用于存储各种固化程序和数据。</p>
-<p><strong>PROM</strong> (Programmable ROM，可编程ROM)，写入时，烧录器通过高电压在芯片内永久地烧断或者建立内部连接（熔丝或反熔丝），因此只能一次编程。</p>
-<p><strong>EPROM</strong> (Erasable Programmable ROM，可擦去可编程ROM)，使用紫外线照射此类型的ROM可以抹去其中的数据。</p>
-<p><strong>EEPROM</strong> (Electrically Erasable Programmable ROM，电可擦去可编程ROM)，使用电来对其进行擦写，常用于电脑系统的BIOS。</p>
-<h2 id="RAM"><a href="#RAM" class="headerlink" title="RAM"></a>RAM</h2><p><strong>RAM</strong> (Random Access Memory)随机访问存储器，存储单元的内容可按照需要随机取出或存入，且存取的速度与存储单元的位置无关。在掉电之后就丢失数据，主要用来存储程序中用到的变量。随机存储器主要分两种：静态随机存储器SRAM和动态随机存储器DRAM。</p>
-<p><strong>DRAM</strong> (Dynamic RAM/DRAM)动态随机存储器，DRAM保留数据的时间很短，需要周期性地刷新。计算机内存就是DRAM的。</p>
-<p>DRAM利用MOS管的栅电容上的电荷来存储信息，存储单元存储的是0还是1取决于电容是否有电荷，有电荷代表1，无电荷代表0。由于栅极会漏电，所以每隔一定的时间就需要一个刷新机构给这些栅电容补充电荷，这个就叫动态刷新。刷新操作定期对电容进行检查，若电量大于满电量的1/2，则认为其代表1，并把电容充满电；若电量小于1/2，则认为其代表0，并把电容放电，以此来保持数据的连续性。</p>
-<p><strong>SRAM</strong> (Static Random-Access Memory)静态随机存取存储器，只要保持通电，里面储存的数据就可以一直保持，对任何数据访问的时间都是固定的。SRAM的优点是只要器件不掉电，存储内容就不丢失，工作速度快。缺点是集成度低、功耗大、价格高。CPU Cache采用的就是这种技术。</p>
-<h2 id="Flash"><a href="#Flash" class="headerlink" title="Flash"></a>Flash</h2><p>Flash 存储器（FLASH EEPROM）又称闪存，快闪。它是EEPROM的一种。它结合了ROM和RAM的长处。不仅具备EEPROM的性能，还不会断电丢失数据同时可以快速读取数据。它于EEPROM的最大区别是，FLASH按扇区操作，而EEPROM按照字节操作。FLASH的电路结构较简单，同样容量占芯片面积较小，成本自然比EEPROM低，因此适合用于做程序存储器。</p>
-<p>flash是非易失存储器，可以对称为块的存储器单元块进行擦写和再编程。任何flash器件的写入操作只能在空或已擦除的单元内进行，所以在进行写入操作之前必须先执行擦除。擦除的过程就是把所有位都写为1的过程，块内的所有字节变为0xFF。擦除是以块为单位进行的。</p>
-<h3 id="Nor-Flash"><a href="#Nor-Flash" class="headerlink" title="Nor Flash"></a>Nor Flash</h3><p>Nor Flash支持随机访问，具有XIP（eXecute In Place）特性，可以像普通ROM一样执行程序。所存储的内容可以直接映射到 CPU 地址空间，不需要拷贝到 RAM 中即可被 CPU 访问。容量小，读操作快，但擦除和写操作慢，块大小范围：64~128KB。NOR flash带有SRAM接口，有足够的地址引脚来寻址，可以很容易地存取其内部的每一个字节。</p>
-<p>Nor Flash根据数据传输的位数可以分为并行（Parallel，即地址线和数据线直接和处理器相连）和串行（SPI，即通过SPI接口和处理器相连）。早期Norflash的接口是parallel的形式，即把数据线和地址线并排与IC的管脚连接。但是后来发现不同容量的Norflash不能硬件上兼容（数据线和地址线的数量不一样），并且封装比较大，占用了较大的PCB板位置，后来逐渐被串行接口的SPI Norflash所取代，至于现在说起NOR flash都直接以SPI flash来代称。</p>
-<p>spi flash 接口定义：</p>
-<ul>
-<li>Standard SPI: CLK, /CS, DI, DO, /WP, /Hold</li>
-<li>Dual SPI: CLK, /CS, IO0, IO1, /WP, /Hold</li>
-<li>Quad SPI: CLK, /CS, IO0, IO1, IO2, IO3</li>
-</ul>
-<h3 id="Nand-Flash"><a href="#Nand-Flash" class="headerlink" title="Nand Flash"></a>Nand Flash</h3><p>Nand Flash是串行接口，容量大，擦除和写都快。块大小范围：8~64KB。没有采取内存的随机读取技术，读和写操作都采用512字节的块。</p>
-<p>Nor的读速度比Nand稍快一些，Nand的写入速度比Nor快很多。</p>
-<p>Nand闪存中每个块的最大擦写次数是一百万次，而Nor的擦写次数是十万次。</p>
-<p><img src="/images/memory/nor_nand.jpg" alt="nor_nand"></p>
-<p>由于Flash固有的电器特性，在读写数据过程中会偶然产生1位或几位数据错误，即位反转。Nand Flash发生位反转的几率要远大于Nor Flash。位反转无法避免，因此使用 Nand Flash 的同时，应采用错误探测/错误更正(EDC/ECC)算法。</p>
-<h2 id="硬盘"><a href="#硬盘" class="headerlink" title="硬盘"></a>硬盘</h2><p>硬盘(Hard Disk Drive，HDD)靠磁性盘片记录二进制数据。</p>
-<p><img src="/images/memory/disk/hdd.jpg" alt="img"></p>
-<p>Track Sector：磁道扇面      Head：磁头      Actuator Arm：悬浮磁臂。</p>
-<p>当磁盘旋转时，磁头若保持在一个位置上，则每个磁头都会在磁盘表面划出一个圆形轨迹，这些圆形轨迹就叫做磁道(Track)。划分分区时，分区大小必须以磁道为参考，一个分区必须包含一个或多个整数磁道，不能只占半个磁道。也就是说如果磁盘有两个磁道，最多只能分成2个分区。</p>
-<p>在有多个盘片构成的盘组中，由不同盘片的面，但处于同一半径圆的多个磁道组成的一个圆柱面(Cylinder)。</p>
-<p>磁盘上的每个磁道被等分为若干个弧段，这些弧段便是硬盘的扇区(Sector)。硬盘的第一个扇区，叫做引导扇区。磁盘上数据读写的最小单位。</p>
-<p>硬盘片的盘面上有一层涂得很薄的磁性材料。写入数据时，通电的磁头会形成磁场，在磁性材料层上留下一个一个小磁化区，每个被磁化的区域代表二进制的1。读取数据时，磁头扫过磁化区的时候能感受到微小的磁场变化。</p>
-<p>操作系统内核中的文件管理系统会将硬盘的扇区组合成<strong>簇</strong>(Data Cluster)，操作系统会记录文件所在簇的编号(文件数据分布在哪几个扇区)，方便查找并读写。</p>
-<p>机械硬盘通过磁头读取旋转的盘片来传输数据，而盘片的转速RPM(Round Per Minute，每分钟的转数)直接决定了硬盘读取和写入数据的速度。目前主流的机械硬盘，转速在6000~7500RPM左右。磁盘在写入数据时，会使用磁盘缓存暂时存储数据。</p>
-<p><strong>磁盘缓存</strong>(Disk Cache)，就是将下载到的数据先保存于系统为软件分配的内存空间中，当保存到内存池中的数据达到一个程度时，便将数据保存到硬盘中。这样可以减少实际的磁盘操作，有效的保护磁盘免于重复的读写操作而导致的损坏。目前主流的500G机械硬盘大都装载64MB的缓存。</p>
-<p>硬盘的主控芯片主要负责：</p>
-<ul>
-<li>控制磁头的读取</li>
-<li>温度检测</li>
-<li>为操作系统的文件管理系统提供逻辑接口</li>
-<li>负责纠错，磁头读写时会使用磁信号，而磁信号的误码率非常高，大约每记录0.6KB的数据就会出现一个bit的错误。</li>
-<li>负责将数据从RAM/硬盘缓存写入，或者将硬盘读出的数据写回RAM。</li>
-</ul>
-<h3 id="RAID"><a href="#RAID" class="headerlink" title="RAID"></a>RAID</h3><p>RAID(独立硬盘冗余阵列，Redundant Array of Independent Disks)，简称磁盘阵列。利用虚拟化存储技术把多个硬盘组合起来，成为一个或多个硬盘阵列组，目的为提升性能或数据冗余，或是两者同时提升。</p>
-<ul>
-<li><strong>RAID0</strong></li>
-</ul>
-<p>RAID0 是一种非常简单的的方式，它将多块磁盘组合在一起形成一个大容量的存储。当我们要写数据的时候，会将数据分为N份，以独立的方式实现N块磁盘的读写，那么这N份数据会同时并发的写到磁盘中，读写性能理论上是单块磁盘的N倍。</p>
-<p>但RAID0的问题是，它并不提供数据校验或冗余备份，因此一旦某块磁盘损坏了，数据就直接丢失，无法恢复了。因此RAID0就不可能用于高要求的业务中，但可以用在对可靠性要求不高，对读写性能要求高的场景中。</p>
-<ul>
-<li><strong>RAID1</strong></li>
-</ul>
-<p>RAID1 是磁盘阵列中单位成本最高的一种方式。因为它的原理是在往磁盘写数据的时候，将同一份数据无差别的写两份到磁盘，分别写到工作磁盘和镜像磁盘，对数据做了冗余备份，但它的实际空间使用率只有50%了，是一种比较昂贵的方案。</p>
-<ul>
-<li><strong>RAID3</strong></li>
-</ul>
-<p>RAID3的方式是：将数据按照RAID0的形式，分成多份同时写入多块磁盘，但是还会另外留出一块磁盘用于写奇偶校验码，一旦某一块磁盘坏掉了，就可以利用那块校验码磁盘去恢复数据。但是由于任何数据的写入都会要去更新这块磁盘，导致这块磁盘的读写是最频繁的，也就非常的容易损坏。</p>
-<ul>
-<li><strong>RAID5</strong></li>
-</ul>
-<p>RAID5对RAID3进行了改进，是一种存储性能、数据安全、存储成本兼顾的方案。</p>
-<p>在RAID5模式中，不再需要用单独的磁盘写校验码了。它把校验码信息分布到各个磁盘上。例如，总共有N块磁盘，那么会将要写入的数据分成N份，并发的写入到N块磁盘中，同时还将数据的校验码信息也写入到这N块磁盘中，数据与对应的校验码信息必须得分开存储在不同的磁盘上。一旦某一块磁盘损坏了，就可以用剩下的数据和对应的奇偶校验码信息去恢复损坏的数据。</p>
-<p><img src="/images/memory/disk/RAID5.jpg" alt="img"></p>
-<p>RAID5的方式，最少需要三块磁盘来组建磁盘阵列，允许最多同时坏一块磁盘。如果有两块磁盘同时损坏了，那数据就无法恢复了。</p>
 
       
     </div>
@@ -1420,488 +1913,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/spi-bus/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/spi-bus/" class="post-title-link" itemprop="url">spi总线</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:55:21" itemprop="dateModified" datetime="2022-06-08T17:55:21+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>SPI(Serial Peripheral Interface)串行外设接口是一种用于芯片通信的串行同步传输总线协议，最初由Motorola在2000年提出。</p>
-<ul>
-<li><p>SPI允许传输单个bit数据，甚至允许暂停，因为SCK时钟线由主控设备控制，当没有时钟跳变时，从设备不采集或传送数据。</p>
-</li>
-<li><p>支持全双工通信，每个从设备需要独立的使能信号。</p>
-</li>
-<li><p>推挽输出的驱动性能相比开漏输出信号完整性更好，支持高速应用（100MHz以上）。</p>
-</li>
-<li><p>协议支持字长不限于8bits，可根据应用特点灵活选择消息字长。</p>
-</li>
-<li><p>相比I2C和SMbus节省上拉电阻，不需要仲裁机制。</p>
-</li>
-<li><p>没有寻址机制，只能靠设备片选选择不同从设备，故没有数据流控制和应答机制。</p>
-</li>
-<li><p>SPI没有规定最大传输速率，通常能达到10Mbps。</p>
-</li>
-</ul>
-<p><strong>Dual SPI</strong>是针对SPI Flash而言，不是针对所有SPI外设。对于SPI Flash，全双工并不常用，因此修改了mosi和miso的用法，使其工作在半双工，能够加倍传输数据。也就是说对于Dual SPI Flash，可以发送一个命令字节进入dual mode，这样mosi变成SIO0，mosi变成SIO1，这样一个时钟周期内就能传输2个bit数据。</p>
-<p><strong>Qual SPI</strong>也是针对SPI Flash，Qual SPI 在Dual SPI基础上增加了两根线（SIO2、SIO3），目的是一个时钟内能传输4个bit数据。</p>
-<h2 id="信号定义"><a href="#信号定义" class="headerlink" title="信号定义"></a>信号定义</h2><p><strong>MOSI</strong>：主设备数据输出，从设备数据输入。</p>
-<p><strong>MISO</strong>：主设备数据输入，从设备数据输出。</p>
-<p><strong>SCLK</strong>：时钟信号，由主设备产生。</p>
-<p><strong>CS/SS</strong>：片选，从设备使能信号，由主设备控制。</p>
-<p>SPI总线定义两个及以上设备间的数据传输，提供时钟的设备为主设备，接收时钟的设备为从设备。片选信号SS通常低电平有效。SPI数据传输原理是基于主从设备内部移位寄存器的数据交换。在主设备SCK的控制下，待传数据由各自设备的数据寄存器传输到移位寄存器，再通过MOSI和MISO信号线完成主从设备间的数据交换。</p>
-<p><img src="/images/spi/spi_ms_mod_reg.png" alt="spi框图"></p>
-<h2 id="传输模式"><a href="#传输模式" class="headerlink" title="传输模式"></a>传输模式</h2><p>SPI有4种操作模式，每种模式由一对参数决定，主从设备必须使用相同的工作参数，才能正常工作。</p>
-<p>CPOL时钟极性(clock polarity)，决定时钟空闲时的电平为高或低，对于SPI数据传输格式没有显著影响。</p>
-<ul>
-<li>0 : 时钟高电平时有效，空闲时为低。</li>
-<li>1 : 时钟低电平时有效，空闲时为高。</li>
-</ul>
-<p>CPHA时钟相位(clock phase)，定义时钟脉冲在哪条边沿转换输出信号，哪条边沿采样输入信号。</p>
-<ul>
-<li>0 : 数据采样发生在时钟奇数边沿。</li>
-<li>1 : 数据采样发生在时钟偶数边沿。</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th>模式</th>
-<th>状态</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Mode 0</td>
-<td>SCLK 空闲是为低电平，数据在上升沿有效</td>
-</tr>
-<tr>
-<td>Mode 1</td>
-<td>SCLK 空闲是为低电平，数据在下降沿有效</td>
-</tr>
-<tr>
-<td>Mode 2</td>
-<td>SCLK 空闲是为高电平，数据在下降沿有效</td>
-</tr>
-<tr>
-<td>Mode 3</td>
-<td>SCLK 空闲是为高电平，数据在上升沿有效</td>
-</tr>
-</tbody></table>
-<p><img src="/images/spi/4mode.png" alt="4种模式"></p>
-<p><img src="/images/spi/timing_diagram.png" alt="时序"></p>
-<h2 id="多个从设备"><a href="#多个从设备" class="headerlink" title="多个从设备"></a>多个从设备</h2><ul>
-<li><strong>片选方式</strong></li>
-</ul>
-<p>每个从设备都需要单独的片选信号，主设备每次只能选择其中一个从设备进行通信。因为所有从设备的SCK、MOSI、MISO都是连在一起的，未被选中从设备的MISO要表现为高阻状态以避免数据传输错误。由于每个设备都需要单独的片选信号，如果需要的片选信号过多，可以使用译码器产生所有的片选信号。</p>
-<p><img src="/images/spi/multiple-slaves.png" alt="主设备以片选方式控制多个从设备"></p>
-<ul>
-<li><strong>菊花链方式</strong></li>
-</ul>
-<p>数据信号经过主从设备所有的移位寄存器构成闭环。数据通过主设备发送（绿色线）经过从设备返回（蓝色线）到主设备。在这种方式下，片选和时钟同时接到所有从设备。</p>
-<p>菊花链式连接常用于仅需主设备发送数据而不需要接收返回数据的场合，如LED驱动器。在这种应用下，主设备MISO可以不连。如果需要接收从设备的返回数据，则需要连接主设备的MISO形成闭环。同样地，切记要发送足够多的接收指令以确保数据移位送达主设备。</p>
-<p><img src="/images/spi/multiple-slaves2.png" alt="主设备以菊花链方式控制多个从设备"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/i2c-bus/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/i2c-bus/" class="post-title-link" itemprop="url">i2c总线</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:56:48" itemprop="dateModified" datetime="2022-06-08T17:56:48+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p><a target="_blank" rel="noopener" href="https://www.i2c-bus.org/">https://www.i2c-bus.org/</a></p>
-<p>I2C总线(Inter Integrated-Circuit)是由PHILIPS公司在上世纪80年代发明的一种电路板级串行总线标准，通过时钟线SCL和数据线SDA即可完成主从机的单工通信，广泛应用于电路板级的内部通信。</p>
-<ul>
-<li><p>总线上的所有设备通过软件寻址且具有唯一的地址。</p>
-</li>
-<li><p>总线上所有器件都具有自动应答功能，保证数据传输的正确性；</p>
-</li>
-<li><p>主机和从机的区别在于对SCL的发送权，只有主机才能发送SCL；</p>
-</li>
-<li><p>I2C数据传输速率有标准模式(100 kbps)、快速模式(400 kbps)和高速模式(3.4 Mbps)。</p>
-</li>
-</ul>
-<p><img src="/images/i2c/i2c-bus.png" alt=" I2C连接示意图"></p>
-<p>I2C总线上所有器件的SDA、SCL引脚输出驱动都为漏极开路结构，因此SDA和SCL可以被拉低为低电平，但是不能被驱动为高电平，低电平输出电压最大为0.4V，上拉电阻一般为4.7KΩ。通过外接上拉电阻实现总线上所有节点SDA、SCL信号的线与逻辑关系。<strong>线与</strong>的意思是只要总线上有一个设备输出底电平，总线信号就会被拉底。线与的作用在于可以实现总线的仲裁控制，总线的控制权会交给最后一个输出低电平的设备，其它设备(输出为高)通过检测总线上的电平状态(表现为低)，对比与自己输出状态不一致，则自动退出对总线的控制请求。</p>
-<p>漏极开路/集电极开路的缺点是对于一个距离长的数据线，信号传输速率得不到有效保证。更长的走线对于输出驱动器表现为更大的容性负载，等效容性负载C和信号线的上拉电阻R构成RC振荡器。RC越大，意味着反射和振荡越强，从而影响总线的信号完整性。所以I2C总线允许挂载最多的设备数量取决于总线上最大电容值，一般为400pf(Hs模式100pf)。</p>
-<h2 id="时序"><a href="#时序" class="headerlink" title="时序"></a>时序</h2><p><img src="/images/i2c/i2c-data.webp" alt="数据序列"></p>
-<h3 id="数据有效性"><a href="#数据有效性" class="headerlink" title="数据有效性"></a>数据有效性</h3><p>协议没有规定I2C逻辑1和0的电平值。每传输一比特数据SDA，对应产生一个时钟脉冲SCL。<strong>SCL为高时，SDA不允许变化；只有在SCL为低时，SDA才可以变化</strong>。</p>
-<p><img src="/images/i2c/bit.png" alt="位的传输"></p>
-<h3 id="开始-结束条件"><a href="#开始-结束条件" class="headerlink" title="开始/结束条件"></a>开始/结束条件</h3><p>如果I2C总线空闲，那么SCL和SDA信号线将都为高电平。<strong>在SCL为高电平时，将SDA由高到低电平跳变，作为起始信号，SDA由低到高电平跳变，作为结束信号</strong>。</p>
-<p><img src="/images/i2c/start-stop.png" alt="开始和结束条件"></p>
-<p>开始/结束条件总是由主机发起的。主机发出开始条件后，总线处于忙的状态；主机发出结束条件后，总线处于空闲状态。如果两个主机在同一时刻都希望获得总线的所有权，那么谁先将SDA拉低，谁就赢得了总线的控制权。</p>
-<p>当所有数据都发送完成时，主设备需要产生一个停止信号，告诉从设备自己已经操作完成。停止信号在SDA置于低电平时，将SCL拉高并保持高电平，然后将SDA拉高。在正常传输数据过程中，当SCL处于高电平时，SDA上的值不应该变化，防止意外产生一个停止信号。</p>
-<p>在操作中，如果主机发出重复开始条件而非结束条件，则总线仍处于忙的状态。也就是说重复开始条件和开始条件在功能上是相同的。</p>
-<h3 id="传输数据"><a href="#传输数据" class="headerlink" title="传输数据"></a>传输数据</h3><p>在地址帧发送之后，就可以开始传输数据了。主设备负责产生时钟，并且在时钟上升沿之前准备好数据。每个数据帧8bits，数据帧的数量可以是任意的，直到产生停止条件。每一帧数据传输之后，接收方就需要回复一个ACK或NACK。数据传输过程中，<strong>先发送高位，再发送低位</strong>。</p>
-<p>如果在数据传输过程中，从机如果没有准备好接收或发送下一个字节（比如内部中断需要处理等），它可以通过拉低SCL强制主机进入等待状态。直到从机释放SCL，主机才开始下一个字节的发送或接收。</p>
-<p><img src="/images/i2c/tu4.png" alt="I2C总线的数据传输"></p>
-<h3 id="应答"><a href="#应答" class="headerlink" title="应答"></a>应答</h3><p><img src="/images/i2c/ack.png" alt="I2C总线的数据应答"></p>
-<p>当主设备发送完地址帧之后，在应答时钟周期内，会放弃SDA总线控制权，让从设备获得SDA控制权，这样从设备才能通过将SDA拉低通知发送器数据已被成功接收。此时从设备应该在第9个时钟脉冲之前回复一个ACK以表示接收正常。SCL为高的时候，SDA数据才是有效的，因此接收器发送ACK时，要保证SCL为高的同时，SDA为低电平；建立和保持时间也要满足规范要求。</p>
-<p>如果在第9个时钟周期，SDA为高，表明接收设备无应答（NACK）。主机可以据此发出结束条件命令结束此次传输，或发起重传请求重新传输数据。有5种情况可能导致无应答：</p>
-<ul>
-<li>总线上没有报文中所指定地址的设备不存在。</li>
-<li>接收器件尚未准备好与主机的通信。</li>
-<li>接收器件无法解析读取的数据。</li>
-<li>接收器件无法收取更多的数据，比如程序或者芯片内置缓冲区已经满了。</li>
-<li>主机作为接收器时，在读取从机发出的最后一个字节数据后，发出NACK通知从发送器释放数据线SDA，以便主机发起结束或重传指令。</li>
-</ul>
-<p>主机作为发送器和接收器在写和读情况下的数据格式：</p>
-<h3 id="重复开始信号"><a href="#重复开始信号" class="headerlink" title="重复开始信号"></a>重复开始信号</h3><p>主设备可以发起多个开始信号来完成数据的传输，只要不发停止信号，总线上的其他主设备就不能占据这条总线，有时候发送完一组数据后，希望重新发数据，所以就有了重复开始信号。重复的开始信号为，SDA在SCL低电平时拉高，然后SCL拉高。重复开始条件的传输时序如下图所示：</p>
-<p><img src="/images/i2c/restart.jpg" alt="重复开始条件的传输时序"></p>
-<h2 id="时钟同步和仲裁"><a href="#时钟同步和仲裁" class="headerlink" title="时钟同步和仲裁"></a>时钟同步和仲裁</h2><p>I2C的一大特点是可以在同一条总线上接多个主机，当两个及以上的主机同时发起传输请求时，需要通过某种机制确定哪个主机获得总线的使用权；另外，每个主机都独立产生时钟，时钟速率可能千差万别，这也需要某种机制解决时钟速率不一致的问题。这种机制就是时钟同步（Clock Synchronization）和仲裁（Arbitration）。在单主机的I2C系统中，不需要时钟同步和仲裁。</p>
-<h3 id="时钟同步"><a href="#时钟同步" class="headerlink" title="时钟同步"></a>时钟同步</h3><p>每个I2C的主机内部都有两个计数器，分别计数SCL上高电平和低电平的时间。如果总线上只有一个主机，则这两个计数器的值取决于系统时钟速率。当多个主机存在时，不同设备的计数器速度可能不一致，因此涉及时钟同步的概念。</p>
-<p>时钟同步是通过I2C接口的“线与”逻辑实现的。SCL信号线由高变低时，所有连接在SCL上的主机都开始计数低电平的时间（低电平计数器复位），由线与的逻辑可知：只有当SCL总线上所有主机的时钟输出端都为高时，SCL总线才会由低变高。SCL的低电平时间由总线上低电平时间最长的主机决定。时钟端口先跳变为高的其它主机进入等待状态。这样所有主机的时钟输出和SCL线上的状态保持相同；当SCL由低变高后，所有主机（高电平计数器）开始计数SCL高电平的时间；最早由高跳变到低的主机再次将SCL拉低。通过这种方式产生的同步时钟：其低电平时间是所有主机时钟中最长的低电平时间，其高电平时间是所有主机时钟中最短的高电平时间。</p>
-<p><img src="/images/i2c/clock_sync.png" alt="仲裁阶段的时钟同步"></p>
-<h3 id="仲裁"><a href="#仲裁" class="headerlink" title="仲裁"></a>仲裁</h3><p>当总线上有一个以上的主机时，协议通过仲裁的方法确定哪个主机获得总线的使用权。从机不参与仲裁的过程。</p>
-<p>当总线处于空闲状态时，在最小的保持时间内，多个主机都可能发起开始条件在总线上传输数据。仲裁用来判断哪个主机的传输可以正常进行。</p>
-<p>仲裁是按位进行的。仲裁开始时，对于每一位数据，SCL为高时，每个主机都检测SDA上的数据是否和自己发送的数据相同。可能需要进行多个位的比较，主机才开始检测到SDA上数据和自己发送的不一致。实际上，只要SDA上的数据和主机发送的数据一致，这些主机就可以将数据一致发送下去。当主机发送为HIGH，检测SDA上电平却为LOW，那么该主机就在仲裁中失去主控权，并将其SDA输出关闭。余下的主机获得总线控制权并继续数据的传输。如图8，当主机1在检测到SDA数据和它自身的输出DATA1不一致时，将自动关闭DATA1的输出，停止向总线上发送数据。</p>
-<p>由此可见，在仲裁过程中胜出的主机是没有丢失数据的。在仲裁中失去总线控制权的主机在本次字节传输结束后继续产生时钟，并在总线空闲时开始上次数据的重传。如果同一个器件可以工作在主从两种模式，它在仲裁过程中失去总线控制权，那么有可能是仲裁胜出的主机将要访问该器件，该器件应该立即切换到从机模式。</p>
-<p><img src="/images/i2c/arbitration.png" alt="两个主机的仲裁过程"></p>
-<p>从上面的原理分析可知，I2C不存在核心主机，是没有优先级的概念的。总线的控制权仅取决于主机在SDA上的竞争（SDA包含地址和数据）。</p>
-<p>在仲裁过程中，存在以下未定条件会导致不可预期的结果：</p>
-<ul>
-<li>主机1在主机2发送数据的过程中发出重复开始条件</li>
-<li>主机1在主机2发送数据的过程中发出结束条件</li>
-<li>主机1在主机发出结束条件的过程中发出重复开始条件</li>
-</ul>
-<h3 id="时钟拉伸"><a href="#时钟拉伸" class="headerlink" title="时钟拉伸"></a>时钟拉伸</h3><p>如果主设备发送的速度比从设备接收的速度快，因为是同步传输，可能就会出现问题，这时候，从设备可以通过控制时钟线，要求主设备线暂停传输，这就叫时钟拉伸(clock stretching)。</p>
-<p>时钟拉伸通过拉低SCL延迟数据的传输。从机在主机释放SCL后，将SCL主动拉低并保持，此时主机停止在SCL上产生脉冲以及在SDA上发送数据，直到slave释放SCL，让SCL变成高电平。之后，主机便可以继续正常的数据传输了。可见时钟拉伸实际上是利用了时钟同步的机制，只是时钟由从机产生。</p>
-<p>时钟拉伸是可选功能，实际上许多从机不包括SCL驱动器，因此也无法拉伸时钟。</p>
-<p>包含时钟拉伸的I2C数据传输时序图为：</p>
-<h2 id="地址"><a href="#地址" class="headerlink" title="地址"></a>地址</h2><h3 id="7位地址"><a href="#7位地址" class="headerlink" title="7位地址"></a>7位地址</h3><p>7位从机地址，其高4位为设备类型地址，由生产厂家制定，低3位为器件引脚定义地址，由使用者定义。</p>
-<p>8位地址的第0位是数据方向控制位：为0表示主机写数据，1表示主机读数据。</p>
-<p>主机发送结束条件（P）终止一次传输。主机也可以通过发起重复开始条件（Sr）进行一次新的传输，而不需要先产生结束条件（P）。在一次传输过程中，可能存在多种读写组合，包括：</p>
-<ul>
-<li>主机作为发送，向从机发送（写）数据，传输的方向不变；</li>
-</ul>
-<p><img src="/images/i2c/tu10.png" alt="7位地址主发从收模式"></p>
-<ul>
-<li>主机发送开始条件（S）以及其后的第一个字节，立即改为从总线上读取状态。收到从机的应答（ACK）后，主机由主发模式切换到主收模式，从机由从收模式切换到从发模式。第一个应答是从机发出的。主机先发送NACK，再发送结束条件（P）结束本次传输；</li>
-</ul>
-<p><img src="/images/i2c/tu11.png" alt="主机在第一个字节后立即读取从机内容"></p>
-<p><img src="/images/i2c/tu12.png" alt="混合模式"></p>
-<h3 id="10位地址"><a href="#10位地址" class="headerlink" title="10位地址"></a>10位地址</h3><p>任何I2C设备都有一个7位地址，理论上，现实中只能有127种不同的IIC设备。实际上，已有IIC的设备种类远远多于这个限制，在一条总线上出现相同的地址的IIC设备的概率相当高。为了突破这个限制，很多设备使用了双重地址，7位地址加引脚地址。IIC 标准也预知了这种限制，提出10位的地址方案。</p>
-<p>在10-bit地址的I2C系统中，需要两帧来传输slave的地址。第一个帧的前<strong>5个bit固定为b11110</strong>，后接slave地址的高2位，第8位仍然是R/W位，接着是一个ACK位，然后再发送另外8bit的地址，发送完后从设备会给出应答。</p>
-<p><img src="/images/i2c/10-addr.bmp" alt="10位地址"></p>
-<p><img src="/images/i2c/tu13.png" alt="主发送器寻址从接收器"></p>
-<p>主接收器读取10位地址的从发送器发送的数据。数据传送方向在第二个R/W后发生改变。如图15所示，A2之前的操作和主发送器向从接收器写数据没有区别。通过Sr，匹配地址的从机得知它就是被寻址的设备，接下来从机检测Sr后的七个比特是否和先前START后的七比特一致（1111 0XX），并检测第八位（R/W）是否为1。如果是，则从机据此判断它被寻址并将要作为发送器往总线上发送数据，此时从机产生响应A3。从机一直占用总线，直到接收到STOP或Sr指向另一个从机地址。收到Sr信号后，所有从机都会对比Sr后第一个字节的前七位（1111 0XX），并检测该字节的第八位（R/W）。对于10位地址设备R/W=1，对于7位地址设备，地址（1111 0XX）不匹配，因此这些设备都不会响应Sr，不会被寻址。</p>
-<p><img src="/images/i2c/tu14.png" alt="主接收器寻址从发送器"></p>
-<h3 id="保留地址"><a href="#保留地址" class="headerlink" title="保留地址"></a>保留地址</h3><table>
-<thead>
-<tr>
-<th align="left">设备地址</th>
-<th align="left">读写位</th>
-<th align="left">描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">0000 000</td>
-<td align="left">0</td>
-<td align="left">广播地址</td>
-</tr>
-<tr>
-<td align="left">0000 000</td>
-<td align="left">1</td>
-<td align="left">启动字节</td>
-</tr>
-<tr>
-<td align="left">0000 001</td>
-<td align="left">X</td>
-<td align="left">CBUS 地址</td>
-</tr>
-<tr>
-<td align="left">0000 010</td>
-<td align="left">X</td>
-<td align="left">预留给不同的总线格式</td>
-</tr>
-<tr>
-<td align="left">0000 011</td>
-<td align="left">X</td>
-<td align="left">预留未来扩展使用</td>
-</tr>
-<tr>
-<td align="left">0000 1XX</td>
-<td align="left">1</td>
-<td align="left">Hs-mode 主代码</td>
-</tr>
-<tr>
-<td align="left">1111 1XX</td>
-<td align="left">1</td>
-<td align="left">设备 ID</td>
-</tr>
-<tr>
-<td align="left">1111 0XX</td>
-<td align="left">X</td>
-<td align="left">10 位从地址</td>
-</tr>
-</tbody></table>
-<h3 id="通用广播地址"><a href="#通用广播地址" class="headerlink" title="通用广播地址"></a>通用广播地址</h3><p>通用广播地址是为了寻址总线上所有设备。如果一个设备不需要使用广播功能，可以不响应广播。如果设备需要使用广播功能，则它在检测到广播地址后发送响应，并作为从接收器读取总线上发送的数据。主机不知道总线上有多少从机发送响应。总线上所有可以响应广播的从机读取广播地址后的第二个及后面的字节。不能处理这些广播数据的从机通过不发送响应的方式忽略它。同样地，如果有一个或一个以上的从机发送响应，则主机就检测不到总线上其它没有响应的设备。广播消息的含义总是定义在第二个字节。</p>
-<p><img src="/images/i2c/tu15.png" alt="广播消息格式"></p>
-<p>有两种可能情况：</p>
-<ul>
-<li>最低位“B”为0</li>
-<li>最低位“B”为1</li>
-</ul>
-<p><strong>“B”为0</strong>，第二个字节包括以下定义：</p>
-<ul>
-<li><strong>0000 0110（06h）</strong>：复位并通过硬件写内容到从机的可编程部分。所有可以响应此类广播的从机，收到此两字节后，进行复位并进入它们地址的可编程部分。注意确保设备在加电后不会将SDA或SCL拉低，因为这些低电平会阻塞总线；</li>
-<li><strong>0000 0100（04h）</strong>：通过硬件写内容到从机的可编程部分，作用类似（06h），但设备不会复位；</li>
-<li><strong>0000 0000（00h）</strong>：这个不应该作为第二个字节用。</li>
-</ul>
-<p>编程时序参考相应设备的DATASHEET。</p>
-<p><strong>“B”为1</strong>，两字节广播定义为“硬件广播”。主机（如键盘扫描器）在编程后，可以发送既定的从机地址到总线上，构成两字节序列的“硬件广播”。既然主机可能并不知道总线上从机的地址，它只能通过硬件广播的方式，将自身地址通知给系统。</p>
-<p><img src="/images/i2c/tu16.png" alt="主发送器的数据传输格式"></p>
-<p>硬件广播的第二个字节的前七位包括主机的地址。总线上的智能设备如微控制器，读取此地址并接收主机发送的其它信息。如果主机也可以作为从机使用，则以上读取的主机地址实际上也就是（切换主从模式后的）从机地址。</p>
-<p>在系统中，一种可能是系统复位后设备由主机发送模式切换到从机接收模式，这时由系统主机先告诉硬件主机数据应送往的从机地址，这样当硬件主机发送数据时就可以直接向指定从机地址发送数据了。</p>
-<p><strong>软件复位</strong></p>
-<p>通用广播地址0000 0000后发送0000 0110（06h）可以使总线上设备进入复位过程。该功能是可选的，所有预留该功能的设备在收到该两字节序列（00 06h）后，开始响应（复位），并进入它们地址的可编程部分。注意确保设备在加电后不会将SDA或SCL拉低，因为这些低电平会阻塞总线。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/uart-bus/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/uart-bus/" class="post-title-link" itemprop="url">串口通信协议</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-07-05 17:04:27" itemprop="dateModified" datetime="2022-07-05T17:04:27+08:00">2022-07-05</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="UART"><a href="#UART" class="headerlink" title="UART"></a>UART</h2><p>UART通用异步接收器/发送。传输数据包由起始位、数据帧、奇偶校验位和停止位组成。</p>
-<p><img src="/images/uart/uart.png" alt="img"></p>
-<p><strong>起始位</strong></p>
-<p>当不传输数据时，UART数据传输线通常保持高电压电平。若要开始数据传输，发送UART会将传输线从高电平拉到低电平并保持1个时钟周期。当接收UART检测到高到低电压跃迁时，便开始以波特率对应的频率读取数据帧中的位。</p>
-<p><strong>数据帧</strong></p>
-<p>数据帧包含所传输的实际数据，如果使用奇偶校验位，数据帧长度可以是5 - 8位。如果不使用奇偶校验位，数据帧长度可以是9位。低位先发送。</p>
-<p><strong>校验</strong></p>
-<p>通过奇偶校验位，接收器就可以判断传输期间是否有数据发生改变，当奇偶校验位与数据匹配时，则认为传输未出错。</p>
-<ul>
-<li>奇校验(odd parity)：让传输的数据（包含校验位）中1的个数是否为奇数，即如果传输字节中1的个数是偶数，则校验位就要为1，否则为0。</li>
-<li>偶校验(even parity)：传输的数据（包含校验位）中1的个数是否为偶数，即如果传输字节中1的个数是偶数，则校验位就要为0，否则为0。</li>
-<li>1校验(mark parity): 校验位始终为1。</li>
-<li>0校验(space parity): 校验位始终为0。</li>
-</ul>
-<p><strong>停止位</strong></p>
-<p>表示一帧数据的结束，发送端将数据传输线从低电压驱动到高电压并保持1、1.5、2bit的时间。</p>
-<p>波特率：意思是每秒传输这么多个比特位数(bit)。</p>
-<p>1、当为奇数校验：”A”字符的8个bit位中有两个1,那么奇偶校验位为1才能满足1的个数为奇数(奇校验)。图-1的波形就是这种情况。<br>2、当为偶数校验：”A”字符的8个bit位中有两个1,那么奇偶校验位为0才能满足1的个数为偶数(偶校验)。<br>此位还可以去除，即不需要奇偶校验位。</p>
-<h2 id="RS232"><a href="#RS232" class="headerlink" title="RS232"></a>RS232</h2><p>RS232是串口的一个标准，RS232是负逻辑电平，它定义+5 ~ +12V为低电平，而-12 ~ -5V为高电平。</p>
-<ul>
-<li>最大传输距离 50 米。</li>
-<li>传输速率较低，在异步传输时，波特率为 20Kbps。</li>
-<li>只允许一对一通信。</li>
-</ul>
-<p><img src="/images/uart/RS232.webp" alt="img"><br><img src="/images/uart/max3232.png" alt="max3232"></p>
-<h2 id="RS485"><a href="#RS485" class="headerlink" title="RS485"></a>RS485</h2><p>RS-232接口只能点对点的通信，不能实现联网功能，于是一个新的标准RS-485产生了。RS-485使用一对双绞线采用差分传输方式，由于是差分通信，因此数据的接收和发送数据不能同时进行，只能工作在半双工模式，常用于总线网。</p>
-<ul>
-<li>电气特性：逻辑1以两线间的电压差为+2 ~ 6V表示；逻辑0以两线间的电压差为-2 ~ 6V表示。</li>
-<li>最大的通信距离约为1200米（9600bps 时），实际上可达 3000 米。</li>
-<li>最大传输速率为10Mb/s。</li>
-<li>RS-485总线一般最大支持32个节点。</li>
-</ul>
-<p><img src="/images/uart/max485.png" alt="MAX485"></p>
-<p>为了提高RS485的抗干扰性能，需要在靠近MAX485的AB引脚之间并接一个100 ~ 1K的电阻。</p>
-<h2 id="RS422"><a href="#RS422" class="headerlink" title="RS422"></a>RS422</h2><p>RS-422（EIA RS-422-A Standard）是Apple的Macintosh计算机的串口连接标准。有4根信号线：两根发送，两根接收。由于RS-422 的收与发是分开的，所以可以全双工，适用于两个站之间通信，星型网、环网，不可用于总线网。</p>
-<ul>
-<li>最大传输距离为1219米，最大传输速率为10Mb/s。</li>
-<li>最多可接10个节点。</li>
-<li>支持点对多的双向通信。</li>
-</ul>
-<p><img src="/images/uart/RS-xxx.webp" alt="RS-xxx"></p>
-<h2 id="帧协议"><a href="#帧协议" class="headerlink" title="帧协议"></a>帧协议</h2><p><img src="/images/uart/uart-protocol.jpg" alt="img"></p>
-<hr>
-<p><a target="_blank" rel="noopener" href="https://www.analog.com/cn/analog-dialogue/articles/uart-a-hardware-communication-protocol.html">https://www.analog.com/cn/analog-dialogue/articles/uart-a-hardware-communication-protocol.html</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1971,20 +1982,20 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">201</span>
+          <span class="site-state-item-count">203</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-count">37</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

@@ -176,6 +176,2001 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/media/audio/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/media/audio/" class="post-title-link" itemprop="url">audio</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:32:36" itemprop="dateModified" datetime="2022-06-08T17:32:36+08:00">2022-06-08</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h2><h3 id="声音"><a href="#声音" class="headerlink" title="声音"></a>声音</h3><p>声音三要素：音调、响度、音色。<br>-　音调：声音的高低，由频率决定，频率越高音调越高。<br>-　响度：又称音量、音强，由振幅和距离声源的距离决定。<br>-　音色：又称音品，由发声物体本身材料、结构决定。</p>
+<p>分贝用于度量声音强度，单位是dB。</p>
+<p><img src="/images/media/audio/dB.png" alt="分贝"></p>
+<h3 id="采样率"><a href="#采样率" class="headerlink" title="采样率"></a>采样率</h3><p>采样率（sample rate）表示单位时间内对声音信号的采样次数，单位Hz。在当今的主流采集卡上，采样频率一般共分为 22.05KHz、44.1KHz、48KHz三个等级，对于高于48KHz的采样频率人耳已无法辨别出来了。</p>
+<p><img src="/images/media/audio/sample_rate.png" alt="采样率"></p>
+<h3 id="位深度"><a href="#位深度" class="headerlink" title="位深度"></a>位深度</h3><p>位深度也叫采样位数就是采样值用多少位0和1来表示，也叫采样精度，代表取样中对声音强度记录的精细程度。音频的位深度决定动态范围。采样声波时，为每个采样指定最接近原始声波振幅的振幅值。较高的位深度可提供更多可能的振幅值，产生更大的动态范围、更低的噪声基准和更高的保真度。</p>
+<p><img src="/images/media/audio/bit_deep.png" alt="位深"></p>
+<h3 id="声道"><a href="#声道" class="headerlink" title="声道"></a>声道</h3><p>声道（channel）分为单声道mono；立体声stereo；还可以是多声道，叫环绕立体声。如果是单声道的文件，采样数据按时间的先后顺序依次存入。如果是双声道的文件，采样数据按时间先后顺序交叉的存入。</p>
+<p><img src="/images/media/audio/pcm.png" alt="PCM格式"></p>
+<h3 id="比特率"><a href="#比特率" class="headerlink" title="比特率"></a>比特率</h3><p>比特率（bitrate）也叫码率，表示压缩编码后每秒的音频数据量大小。比特率 = 采样率 x 采样精度 x 声道数（单位kbps，这里的k为1000）</p>
+<h3 id="音频帧"><a href="#音频帧" class="headerlink" title="音频帧"></a>音频帧</h3><p>音频数据是流式的，本身没有明确的一帧帧的概念，在实际的应用中，为了音频算法处理/传输的方便，一般约定俗成取2.5ms~60ms为单位的数据量为一帧音频。这个时间被称之为“采样时间”，其长度没有特别的标准，它是根据编解码器和具体应用的需求来决定的。</p>
+<h3 id="码率模式"><a href="#码率模式" class="headerlink" title="码率模式"></a>码率模式</h3><p>VBR（VariableBitrate）动态比特率。也就是没有固定的比特率，压缩软件在压缩时根据音频数据即时确定使用什么比特率。这是新发展的算法，他们将一首歌的复杂部分用高Bitrate编码，简单部分用低Bitrate编码。主意虽然不错，可惜新编码器的VBR算法很差，音质与CBR相去甚远。幸运的是， Lame完美地优化了VBR算法，使之成为MP3的最佳编码模式。这是以质量为前提兼顾文件大小的方式时推荐的编码模式。</p>
+<p>ABR（Average Bitrate）平均比特率，是VBR的一种插值参数。Lame针对CBR不佳的文件体积比和VBR生成文件大小不定的特点独创了这种编码模式。ABR也被称为“Safe VBR”，它是在指定的平均Bitrate内，以每50帧（30帧约1秒）为一段，低频和不敏感频率使用相对低的流量，高频和大动态表现时使用高流量。举例来说，当指定用192kbps ABR对一段wav文件进行编码时，Lame会将该文件的85%用192kbps固定编码，然后对剩余15%进行动态优化：复杂部分用高于192kbps 来编码、简单部分用低于192kbps来编码。与192kbps CBR相比，192kbps ABR在文件大小上相差不多，音质却提高不少。ABR编码在速度上是VBR编码的2到3倍，在128-256kbps范围内质量要好于CBR。可以做为 VBR和CBR的一种折衷选择。</p>
+<p>CBR（ConstantBitrate），常数比特率，指文件从头到尾都是一种位速率。相对于VBR和ABR来讲，它压缩出来的文件体积很大，但音质却不会有明显的提高。</p>
+<h2 id="音频编码"><a href="#音频编码" class="headerlink" title="音频编码"></a>音频编码</h2><p>根据编码方式的不同，音频编码技术分为三种：波形编码、参数编码和混合编码。波形编码的话音质量高，但编码速率也很高；参数编码的编码速率很低，产生的合成语音的音质不高；混合编码使用参数编码技术和波形编码技术，编码速率和音质介于它们之间。</p>
+<p> PCM 即脉冲编码调制(Pulse Code Modulation)。 在PCM 过程中，将输入的模拟信号进行采样、量化和编码，用二进制进行编码的数来代表模拟信号的幅度；接收端再将这些编码还原为原来的模拟信号。</p>
+<h3 id="音频数据格式"><a href="#音频数据格式" class="headerlink" title="音频数据格式"></a>音频数据格式</h3><p>PCM数据是最原始的音频数据完全无损，所以PCM数据虽然音质优秀但体积庞大，为了解决这个问题先后诞生了一系列的音频格式，这些音频格式运用不同的方法对音频数据进行压缩，其中有无损压缩（WAV，PCM，ALS，TAK，WavPack　ALAC、APE、FLAC）和有损压缩（MP3、AAC、OGG、WMA）两种。</p>
+<h4 id="WAV"><a href="#WAV" class="headerlink" title="WAV"></a>WAV</h4><p>WAV是WaveFom的简写，也称为波形文件，可直接存储声音波形。WAV格式支持MSADPCM、CCITT A律、CCITT μ律和其他压缩算法，支持多种音频位数、采样频率和声道；但其文件尺寸较大，多用于存储简短的声音片段</p>
+<h4 id="MIDI"><a href="#MIDI" class="headerlink" title="MIDI"></a>MIDI</h4><p>MIDI是Musical InstrumentDigital Interface的缩写，又称作乐器数字接口，是数字音乐/电子合成乐器的统一国际标准。它定义了计算机音乐程序、数字合成器及其它电子设备交换音乐信号的方式，规定了不同厂家的电子乐器与计算机连接的电缆和硬件及设备间数据传输的协议，可以模拟多种乐器的声音。MIDI文件就是MIDI格式的文件，在MIDI文件中存储的是一些指令。把这些指令发送给声卡，由声卡按照指令将声音合成出来。</p>
+<h4 id="WMA"><a href="#WMA" class="headerlink" title="WMA"></a>WMA</h4><p>Windows Media Audio是微软公司开发的一种声音文件格式，也叫波形声音文件，压缩率低。 所需频宽 320～112kbps（压缩10～12倍），当Bitrate小于128K时，WMA最为出色且编码后得到的音频文件很小 ，当Bitrate大于128K时，WMA音质损失过大。WMA标准不开放。</p>
+<h4 id="MP1"><a href="#MP1" class="headerlink" title="MP1"></a>MP1</h4><p>MPEG-1 audio layer 1声音压缩编码是国际上第一个高保真声音数据压缩的国际标准，编码简单，用于数字盒式录音磁带，2声道，VCD中使用的音频压缩方案就是MPEG-1层Ⅰ。所需频宽：384kbps（压缩4倍）。压缩方式相对时域压缩技术而言要复杂得多，同时编码效率、声音质量也大幅提高，编码延时相应增加。可以达到“完全透明”的声音质量（EBU音质标准）。</p>
+<h4 id="MUSICAM"><a href="#MUSICAM" class="headerlink" title="MUSICAM"></a>MUSICAM</h4><p>MPEG-1 audio layer 2（MP2），所需频宽：256～192kbps（压缩6～8倍），算法复杂度中等，用于数字音频广播(DAB)和VCD等，2声道，而MUSICAM由于其适当的复杂程度和优秀的声音质量，在数字演播室、DAB、DVB等数字节目的制作、交换、存储、传送中得到广泛应用。</p>
+<h4 id="MP3"><a href="#MP3" class="headerlink" title="MP3"></a>MP3</h4><p>MP3全称是动态影像专家压缩标准音频层面3（Moving Picture Experts Group Audio Layer III）。是一种有损压缩的音频格式，设计这种格式的目的就是为了大幅度的减小音频的数据量，它舍弃PCM音频数据中人类听觉不敏感的部分。所需频宽：128～112kbps（压缩10～12倍），编码复杂，用于互联网上的高质量声音的传输，如MP3音乐压缩10倍，2声道。MP3是在综合MUSICAM和ASPEC的优点的基础上提出的混合压缩技术，在当时的技术条件下，MP3的复杂度显得相对较高，编码不利于实时，但由于MP3在低码率条件下高水准的声音质量，使得它成为软解压及网络广播的宠儿。优点：压缩比高，适合用于互联网上的传播，缺点：MP3在128KBitrate及以下时，会出现明显的高频丢失。</p>
+<p>所谓的MP3也就是指的是MPEG标准中的音频部分，也就是MPEG音频层。根据压缩质量和编码处理的不同分为3层，分别对应mp1/mp2/mp3这3种声音文件。需要提醒大家注意的地方是：MPEG音频文件的压缩是一种有损压缩，MPEG3音频编码具有10：1~12：1的高压缩率，同时基本保持低音频部分不失真，但是牺牲了声音文件中12KHz到16KHz高音频这部分的质量来换取文件的尺寸，相同长度的音乐文件，用*.mp3格式来储存，一般只有*.wav文件的1/10，而音质要次于CD格式或WAV格式的声音文件。由于其文件尺寸小，音质好;所以在它问世之初还没有什么别的音频格式可以与之匹敌，因而为*.mp3格式的发展提供了良好的条件。</p>
+<p>MP3格式中的数据通常由两部分组成，一部分为ID3用来存储歌名、演唱者、专辑、音轨数等信息，另一部分为音频数据。音频数据部分以帧(frame)为单位存储，每个音频都有自己的帧头，如图所示就是一个MP3文件帧结构图（图片同样来自互联网）。MP3中的每一个帧都有自己的帧头，其中存储了采样率等解码必须的信息，所以每一个帧都可以独立于文件存在和播放，这个特性加上高压缩比使得MP3文件成为了音频流播放的主流格式。帧头之后存储着音频数据，这些音频数据是若干个PCM数据帧经过压缩算法压缩得到的，对CBR的MP3数据来说每个帧中包含的PCM数据帧是固定的，而VBR是可变的。</p>
+<p><img src="/images/media/audio/mp3_format.webp" alt="mp3文件格式"></p>
+<h4 id="AAC"><a href="#AAC" class="headerlink" title="AAC"></a>AAC</h4><p>AAC实际上是高级音频编码(Advanced Audio Coding–AAC)的缩写。AAC是由Fraunhofer IIS-A、杜比和AT&amp;T共同开发的一种音频格式，它是MPEG-2规范的一部分。成为继MPEG-2音频标准（ISO/IEC13818-3）之后的新一代音频压缩标准。制定者：MPEG，所需频宽：96-128 kbps。</p>
+<p>AAC所采用的运算法则与MP3的运算法则有所不同，AAC通过结合其他的功能来提高编码效率。AAC的音频算法在压缩能力上远远超过了以前的一些压缩算法。它还同时支持多达48个音轨、15个低频音轨、更多种采样率和比特率、多种语言的兼容能力、更高的解码效率。总之，AAC可以在比MP3文件缩小30%的前提下提供更好的音质。</p>
+<p>AAC支持多声道，可提供1到48路之间任意数目的音频声道组合、包括15路低频效果声道、配音/多语音声道，以及15路数据。它可同时传送16套节目，每套节目的音频及数据结构可任意规定。最高支持96KHz的采样频率。</p>
+<p>AAC主要可能的应用范围集中在因特网网络传播、数字音频广播，包括卫星直播和数字AM、以及数字电视及影院系统等方面。AAC使用了一种非常灵活的熵编码核心去传输编码频谱数据。具有48个主要音频通道，16 个低频增强通道，16 个集成数据流, 16 个配音，16 种编排。</p>
+<h4 id="GSM-AMR"><a href="#GSM-AMR" class="headerlink" title="GSM-AMR"></a>GSM-AMR</h4><p>GSM-ASM(Adaptive Multi-Rate)是一种广泛使用在GPRS和W-CDMA网络上的音频标准。在规范ETSI GSM06.90中对GSM-AMR进行了定义。AMR语音编码是GSM 2+和WCDMA的默认编码标准，是第三代无线通讯系统的语音编码标准。GSM-AMR标准基于ACELP（代数激励线性预测）编码。它能在广泛的传输条件下提供高品质的语音效果。制定者：飞利浦，所需频宽：8Kbps(4.75 Kbps~12.2 Kbps)，可以对语音进行替换和消音，平滑噪音，支持间断式传输，对语音进行动态侦查。能在各种网络条件下提供优质的语音效果。</p>
+<h4 id="EVRC"><a href="#EVRC" class="headerlink" title="EVRC"></a>EVRC</h4><p>Enhanced Variable Rate Coder，增强型可变速率编码器广泛使用于CDMA网络。EVRC标准遵循规范TIA IS-127的内容。EVRC编码基于RCELP（松弛码激励线性预测）标准。该编码可以以Rate 1（171bits/packet），Rate 1/2（80bits/packet）或是Rate 1/8（16bits/packet）的容量进行操作。在要求下，它也能产生空包（0bits/packet）。制定者：Qualcomm，所需频宽：8Kbps或13Kbps，支持三种码率（9.6 Kbps, 4.8 Kbps 和 1.2 Kbps），噪声抑制，邮件过滤。能在各种网络条件下提供优质的语音效果。</p>
+<h4 id="ADPCM"><a href="#ADPCM" class="headerlink" title="ADPCM"></a>ADPCM</h4><p>ADPCM(adaptive difference pulse code modulation，　自适应差分PCM)综合了APCM的自适应特性和DPCM系统的差分特性，是一种性能比较好的波形编码。它的核心想法是利用自适应的思想改变量化阶的大小，即使用小的量化阶(step-size)去编码小的差值，使用大的量化阶去编码大的差值；使用过去的样本值估算下一个输入样本的预测值，使实际样本值和预测值之间的差值总是最小。针对 16bit (或者更高) 声音波形数据的一种有损压缩算法, 它将声音流中每次采样的 16bit 数据以 4bit 存储, 所以压缩比 1:4. 而压缩/解压缩算法非常的简单, 所以是一种低空间消耗,高质量声音获得的好途径。制定者：ITU-T，所需频宽：32Kbps，优点：算法复杂度低，压缩比小（CD音质&gt;400kbps），编解码延时最短。，缺点：声音质量一般</p>
+<h4 id="MP3Pro"><a href="#MP3Pro" class="headerlink" title="MP3Pro"></a>MP3Pro</h4><p>MP3Pro是由瑞典Coding科技公司开发的，其中包含了两大技术：一是来自于Coding科技公司所特有的解码技术，二是由MP3的专利持有者法国汤姆森多媒体公司和德国Fraunhofer集成电路协会共同研究的一项译码技术。MP3Pro可以在基本不改变文件大小的情况下改善原先的MP3音乐音质。它能够在用较低的比特率压缩音频文件的情况下，最大程度地保持压缩前的音质。</p>
+<h4 id="RealAudio"><a href="#RealAudio" class="headerlink" title="RealAudio"></a>RealAudio</h4><p>RealAudio是由Real Networks公司推出的一种文件格式，最大的特点就是可以实时传输音频信息，尤其是在网速较慢的情况下，仍然可以较为流畅地传送数据，因此RealAudio主要适用于网络上的在线播放。现在的RealAudio文件格式主要有RA(RealAudio)、RM（RealMedia，RealAudio G2）、RMX(RealAudio Secured)等三种，这些文件的共同性在于随着网络带宽的不同而改变声音的质量，在保证大多数人听到流畅声音的前提下，令带宽较宽敞的听众获得较好的音质。</p>
+<p>RA采用的是有损压缩技术，由于它的压缩比相当高，因此音质相对较差，但是文件也是最小的，因此在高压缩比条件下表现好，但若在中、低压缩比条件下时，表现却反而不及其他同类型档案格式了。此外RA可以随网络带宽的不同而改变声音质量，以使用户在得到流畅声音的前提下，尽可能高地提高声音质量。由于RA格式的这些特点，因此特别适合在网络传输速度较低的互联网上使用，互联网上许多的网络电台、音乐网站的歌曲试听都在使用这种音频格式。</p>
+<h4 id="Ogg-Vorbis"><a href="#Ogg-Vorbis" class="headerlink" title="Ogg Vorbis"></a>Ogg Vorbis</h4><p>Ogg Vorbis 是一种新的音频压缩格式，类似于MP3等现有的音乐格式。但有一点不同的是，它是完全免费、开放和没有专利限制的。Vorbis 是这种音频压缩机制的名字，而Ogg则是一个计划的名字，该计划意图设计一个完全开放性的多媒体系统。VORBIS也是有损压缩，但通过使用更加先进的声学模型去减少损失，因此，同样位速率(Bit Rate)编码的OGG与MP3相比听起来更好一些。</p>
+<h4 id="APE"><a href="#APE" class="headerlink" title="APE"></a>APE</h4><p>APE是Monkey’s Audio提供的一种无损压缩格式,是一种无损压缩音频格式,在音质不降低的前提下，大小压缩到传统无损格式 WAV 文件的一半,而且可以无须解压而直接播放。APE的采样率最高可达1400kbps，接近于音乐CD格式。</p>
+<h4 id="FLAC"><a href="#FLAC" class="headerlink" title="FLAC"></a>FLAC</h4><p>FLAC即是Free Lossless AudioCodec的缩写，是一套著名的自由音频无损压缩编码，其特点是无损压缩。</p>
+<h2 id="音频处理"><a href="#音频处理" class="headerlink" title="音频处理"></a>音频处理</h2><p>音频处理是指对PCM数据进行处理，从而达到想要的效果。对音频编码前的PCM数据进行处理叫音频前处理，主要用于语音中，来去除各种干扰，使声音更清晰，主要有回声消除、噪声抑制、增益控制等。对音频解码后的PCM数据进行处理叫音频后处理，主要用于音乐中，来产生各种音效，使音乐更动听，主要有均衡器、混响等。</p>
+<h3 id="重采样"><a href="#重采样" class="headerlink" title="重采样"></a>重采样</h3><p>音频输入和音频输出模块支持对音频数据实施重采样。如果启用 AI 重采样功能，内部将会先执行重采样处理，再返回处理后的数据。如果启用了 AO 重采样功能，则音频数据在发送给 AO 之前，内部先执行重采样处理，处理完成后再发送给 AO 通道进行播放。重采样仅支持处理单声道。</p>
+<h3 id="ANR"><a href="#ANR" class="headerlink" title="ANR"></a>ANR</h3><p>ANR 为语音降噪（ Audio Noise Reduction ）模块，主要工作在需要去除外界噪声，保<br>留语音输入的场景下。与 RNR 算法比起来， ANR 更讲究噪声处理的干净程度。 ANR 会滤除一些环境声音，主要保留语音数据，并会带来一定的细节丢失。所以 ANR 算法更适用于 NVR 和 IPC<br>场景。在这两个场景下，我们更希望能够着重保留人声，滤除其他噪声。</p>
+<h3 id="RNR"><a href="#RNR" class="headerlink" title="RNR"></a>RNR</h3><p>RNR 为录音噪声消除（ Record Noise Reduction ）模块，主要工作在需要去除环境噪声，但保留小信号输入的场景下。与 ANR 算法比起来， RNR 更讲究细节输入（小信号）的保留度， RNR 会在降噪的同时保留小信号的输入，所以降噪力度会低一点，但能更多的保留现场声音，真实还原场景，适用于运动 DV 场景。</p>
+<h3 id="AEC"><a href="#AEC" class="headerlink" title="AEC"></a>AEC</h3><p>AEC 为回声抵消（ Acoustic Echo Cancellation ）模块，主要工作在需要进行去除回声的<br>场景下：如 IPC 对讲，远端语音数据在 AO 设备上播放，此时在本地通过 MIC 采集语<br>音数据，它支持消除录制的语音数据中的 AO 设备播放的声音（回声）。</p>
+<h3 id="AGC"><a href="#AGC" class="headerlink" title="AGC"></a>AGC</h3><p>AGC 为自动增益控制（ Auto Gain Control ）模块，主要负责增益控制输出电平，在声音输入音量有大小变化时，能将输出音量控制在比较一致的范围内，主要工作在需要保证声音不至于过大或过小的场景下。AGC 更多起到的作用是放大输入源的声音，以保证音源过小时，经过算法处理后的声音依然很大。</p>
+<h3 id="DRC"><a href="#DRC" class="headerlink" title="DRC"></a>DRC</h3><p>DRC 为动态压缩控制（ Dynamic Range Control ）模块，负责控制输出电平，将输出增益控制在一个范围，主要工作在需要保证声音不至于过大或过小的场景下。DRC 与 AGC 作用相似，但算法实现及调节力度不同。其配合 RNR 使用在运动 DV 场景，与 AEC/ANR 互斥。</p>
+<h3 id="HDR"><a href="#HDR" class="headerlink" title="HDR"></a>HDR</h3><p>HDR 为高动态范围（ High Dynamic Range ）模块，主要用于 Codec 输入音量控制，通过动态调节 Codec 增益控制 Codec 音量在合理范围内，保证声音不至于过大或过小。</p>
+<h3 id="HPF"><a href="#HPF" class="headerlink" title="HPF"></a>HPF</h3><p>HPF 为高通滤波（ high-pass filte ）模块，主要负责去除低频噪声。</p>
+<h3 id="PEQ"><a href="#PEQ" class="headerlink" title="PEQ"></a>PEQ</h3><p>PEQ 为参量均衡器（ Parameter Equalizer ）模块，主要对音频数据进行均衡处理，以调节音频数据中各频段声音的增益。PEQ 与 EQ 均为均衡处理器，但是 PEQ 调节方式更灵活，适用于运动 DV 场景。</p>
+<h3 id="EQ"><a href="#EQ" class="headerlink" title="EQ"></a>EQ</h3><p>EQ 模块为均衡处理器（ Equalizer ）模块，主要对音频数据进行均衡处理，以调节音频数据中各频段声音的增益。</p>
+<p>均衡器的调整方法：</p>
+<ul>
+<li>超低音： 20Hz-40Hz，适当时声音强而有力。能控制雷声、低音鼓、管风琴和贝司的声音。过度提升会使音乐变得混浊不清</li>
+<li>低音： 40Hz-150Hz，是声音的基础部份，其能量占整个音频能量的70%，是表现音乐风格的重要成份。适当时，低音张弛得宜，声音丰满柔和，不足时声音单薄，150Hz，过度提升时会使声音发闷，明亮度下降，鼻音增强</li>
+<li>中低音： 150Hz-500Hz，是声音的结构部分，人声位于这个位置，不足时，演唱声会被音乐淹没，声音软而无力，适当提升时会感到浑厚有力，提高声音的力度和响度。提升过度时会使低音变得生硬，300Hz处过度提升3-6dB，如再加上混响，则会严重影响声音的清晰度</li>
+<li>中音： 500Hz-2KHz，包含大多数乐器的低次谐波和泛音，是小军鼓和打击乐器的特征音。适当时声音透彻明亮，不足时声音朦胧。过度提升时会产生类似电话的声音</li>
+<li>中高音： 2KHz-5KHz，是弦乐的特征音（拉弦乐的弓与弦的摩搡声，弹拔乐的手指触弦的声音某）。不足时声音的穿透力下降，过强时会掩蔽语言音节的识别</li>
+<li>高音： 7KHz-8KHz，是影响声音层次感的频率。过度提升会使短笛、长笛声音突出，语言的齿音加重和音色发毛</li>
+<li>极高音： 8KHz-10KHz 合适时，三角铁和立*的金属感通透率高，沙钟的节奏清晰可辨。过度提升会使声音不自然，易烧毁高频单元。</li>
+</ul>
+<h2 id="耳机插头"><a href="#耳机插头" class="headerlink" title="耳机插头"></a>耳机插头</h2><p><img src="/images/media/audio/hp1.png" alt="耳机插头"></p>
+<p><img src="/images/media/audio/hp2.png" alt="耳机插头"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/media/video/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/media/video/" class="post-title-link" itemprop="url">video</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:36:20" itemprop="dateModified" datetime="2022-06-08T17:36:20+08:00">2022-06-08</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><h3 id="码流"><a href="#码流" class="headerlink" title="码流"></a>码流</h3><p>码流是指视频文件在单位时间内使用的数据流量，也叫码率或码流率，通俗一点的理解就是取样率,是视频编码中画面质量控制中最重要的部分，一般我们用的单位是kb/s或者Mb/s。一般来说同样分辨率下，视频文件的码流越大，压缩比就越小，画面质量就越高。码流越大，说明单位时间内取样率越大，数据流，精度就越高，处理出来的文件就越接近原始文件，图像质量越好，画质越清晰，要求播放设备的解码能力也越高。</p>
+<h3 id="采样率"><a href="#采样率" class="headerlink" title="采样率"></a>采样率</h3><p>采样率（也称为采样速度或者采样频率）定义了每秒从连续信号中提取并组成离散信号的采样个数，它用赫兹（Hz）来表示。采样率是指将模拟信号转换成数字信号时的采样频率，也就是单位时间内采样多少点。</p>
+<h3 id="比特率"><a href="#比特率" class="headerlink" title="比特率"></a>比特率</h3><p>比特率是指每秒传送的bit数。单位为bps(Bit Per Second)，表示经过编码后的音视频数据每秒钟需要用多少个bit来表示。</p>
+<h3 id="码率"><a href="#码率" class="headerlink" title="码率"></a>码率</h3><p>码率就是数据传输时单位时间传送的数据位数,一般我们用的单位是kbps即千位每秒。也就是取样率（并不等同与采样率，采样率的单位是Hz，表示每秒采样的次数），单位时间内取样率越大，精度就越高，处理出来的文件就越接近原始文件。</p>
+<p>$码率 = 采样率 x 位深度 x 声道$</p>
+<p>$文件大小 = 码率（KBit） / 8  x  时长$  （用bits/s码流计算容量记得要除8）</p>
+<h3 id="帧率"><a href="#帧率" class="headerlink" title="帧率"></a>帧率</h3><p>帧率fps(Frames Per Second)就是在1秒钟时间里传输的图片的帧数，也可以理解为图形处理器每秒钟能够刷新几次。每秒显示的图片数影响画面流畅度，与画面流畅度成正比：帧率越大，画面越流畅；帧率越小，画面越有跳动感。由于人类眼睛的特殊生理结构，如果所看画面之帧率高于16的时候，就会认为是连贯的，此现象称之为视觉暂留。并且当帧速达到一定数值后，再增长的话，人眼也不容易察觉到有明显的流畅度提升了。</p>
+<p>帧率影响画面流畅度，与画面流畅度成正比：帧率越大，画面越流畅；帧率越小，画面越有跳动感。如果码率为变量，则帧率也会影响体积，帧率越高，每秒钟经过的画面越多，需要的码率也越高，体积也越大。</p>
+<h3 id="分辨率"><a href="#分辨率" class="headerlink" title="分辨率"></a>分辨率</h3><p>分辨率就是帧大小或尺寸，影响图像大小，与图像大小成正比：分辨率越高，图像越大；分辨率越低，图像越小。</p>
+<p>标清(standard definition)，是物理分辨率在720p以下的一种视频格式，一般是480p。</p>
+<p>高清(high definition)，有720p、1080i与1080p三种标准形式，1080p又叫全高清(超清)。1080p是逐行扫描(Progressive scan)，1080i是隔行扫描(Interlaced scan)。720p格式，分辨率为1280×720p/60Hz，行频为45kHz。</p>
+<p>4K分辨率是1080p的4倍 3840×2160 = 1920×2×1080×2，8K分辨率是4K的4倍 7680×4320 = 3840×2×2160×2</p>
+<p><img src="/images/media/video/res.png" alt="res"></p>
+<table>
+<thead>
+<tr>
+<th align="center">格式</th>
+<th>分辨率</th>
+<th>PAL</th>
+<th>NTSC</th>
+<th align="center">码率</th>
+<th align="center">视频高宽比</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">8K</td>
+<td>3310万像素</td>
+<td>7680x4320</td>
+<td>7680x4320</td>
+<td align="center">40-60Mbps</td>
+<td align="center">16:9</td>
+</tr>
+<tr>
+<td align="center">5K</td>
+<td>1470万像素</td>
+<td>5120x2880</td>
+<td>5120x2880</td>
+<td align="center">25-35Mbps</td>
+<td align="center">16:9</td>
+</tr>
+<tr>
+<td align="center">4K</td>
+<td>880万像素</td>
+<td>4096x2160</td>
+<td>4096x2160</td>
+<td align="center">20-30Mbps</td>
+<td align="center">256:135</td>
+</tr>
+<tr>
+<td align="center">5MP</td>
+<td>500万像素</td>
+<td>2592x1944</td>
+<td>2592x1944</td>
+<td align="center">8Mbps</td>
+<td align="center">4:3</td>
+</tr>
+<tr>
+<td align="center">2K</td>
+<td>310万像素</td>
+<td>2048x1080</td>
+<td>2048x1080</td>
+<td align="center">10-15Mbps</td>
+<td align="center">256:135</td>
+</tr>
+<tr>
+<td align="center">3MP</td>
+<td>300万像素</td>
+<td>2047x1536</td>
+<td>2047x1536</td>
+<td align="center">6Mbps</td>
+<td align="center">4:3</td>
+</tr>
+<tr>
+<td align="center">1080p</td>
+<td>130万像素</td>
+<td>1920x1080</td>
+<td>1920x1080</td>
+<td align="center">2Mbps</td>
+<td align="center">16:9</td>
+</tr>
+<tr>
+<td align="center">2MP</td>
+<td>200万像素</td>
+<td>1600x1200</td>
+<td>1600x1200</td>
+<td align="center">4Mbps</td>
+<td align="center">4:3</td>
+</tr>
+<tr>
+<td align="center">1.3MP</td>
+<td>130万像素</td>
+<td>1280x1024</td>
+<td>1280x1024</td>
+<td align="center">2Mbps</td>
+<td align="center">5:4</td>
+</tr>
+<tr>
+<td align="center">960p</td>
+<td>130万像素</td>
+<td>1280x960</td>
+<td>1280x960</td>
+<td align="center">2Mbps</td>
+<td align="center">4:3</td>
+</tr>
+<tr>
+<td align="center">720p</td>
+<td>100万像素</td>
+<td>1280x720</td>
+<td>1280x720</td>
+<td align="center">2Mbps</td>
+<td align="center">16:9</td>
+</tr>
+<tr>
+<td align="center">960H</td>
+<td>50万像素</td>
+<td>960x480</td>
+<td>960x480</td>
+<td align="center">1Mbps</td>
+<td align="center">2:1</td>
+</tr>
+<tr>
+<td align="center">D1(4CIF)</td>
+<td>40万像素</td>
+<td>704x576</td>
+<td>704x480</td>
+<td align="center">&gt;1Mbps</td>
+<td align="center">22:15</td>
+</tr>
+<tr>
+<td align="center">VGA</td>
+<td>30万像素</td>
+<td>640x480</td>
+<td>640x480</td>
+<td align="center">&gt;1Mbps</td>
+<td align="center">4:3</td>
+</tr>
+<tr>
+<td align="center">Half D1</td>
+<td>20万像素</td>
+<td>352x576</td>
+<td>352x480</td>
+<td align="center">&gt;1Mbps</td>
+<td align="center">11:15</td>
+</tr>
+<tr>
+<td align="center">2CIF</td>
+<td>20万像素</td>
+<td>704x288</td>
+<td>704x240</td>
+<td align="center">&gt;0.5Mbps</td>
+<td align="center">4:3</td>
+</tr>
+<tr>
+<td align="center">BCIF</td>
+<td>20万像素</td>
+<td>528x288</td>
+<td>528x240</td>
+<td align="center">&gt;0.5Mbps</td>
+<td align="center">22:9</td>
+</tr>
+<tr>
+<td align="center">QVGA</td>
+<td>10万像素</td>
+<td>320x240</td>
+<td>320x240</td>
+<td align="center">&gt;0.5Mbps</td>
+<td align="center">4:3</td>
+</tr>
+<tr>
+<td align="center">CIF</td>
+<td>10万像素</td>
+<td>352x288</td>
+<td>352x240</td>
+<td align="center">&gt;0.5Mbps</td>
+<td align="center">11:9</td>
+</tr>
+<tr>
+<td align="center">QCIF</td>
+<td>10万像素</td>
+<td>176x144</td>
+<td>176x144</td>
+<td align="center">&gt;0.5Mbps</td>
+<td align="center">11:9</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>Idx</th>
+<th>Name</th>
+<th>W</th>
+<th>H</th>
+<th>Pxs</th>
+<th>gcd</th>
+<th>Per</th>
+<th>C</th>
+<th>P</th>
+<th>T</th>
+<th>V</th>
+<th>Memo</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td></td>
+<td>8</td>
+<td>8</td>
+<td>64</td>
+<td>8</td>
+<td>p1_1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Macro Block</td>
+</tr>
+<tr>
+<td>1</td>
+<td>SQCIF</td>
+<td>128</td>
+<td>96</td>
+<td>12,288</td>
+<td>32</td>
+<td>p4_3</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td>Y</td>
+<td>Sub Quarter CIF</td>
+</tr>
+<tr>
+<td>2</td>
+<td></td>
+<td>128</td>
+<td>128</td>
+<td>16,384</td>
+<td>128</td>
+<td>p1_1</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td></td>
+<td>160</td>
+<td>100</td>
+<td>16,000</td>
+<td>20</td>
+<td>p8_5</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td>QQVGA</td>
+<td>160</td>
+<td>120</td>
+<td>19,200</td>
+<td>40</td>
+<td>p4_3</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>Quarter-QVGA</td>
+</tr>
+<tr>
+<td>5</td>
+<td></td>
+<td>160</td>
+<td>128</td>
+<td>20,480</td>
+<td>32</td>
+<td>p5_4</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>6</td>
+<td>QCIF</td>
+<td>176</td>
+<td>144</td>
+<td>25,344</td>
+<td>16</td>
+<td>p11_9</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td>Y</td>
+<td>Quarter CIF</td>
+</tr>
+<tr>
+<td>7</td>
+<td></td>
+<td>208</td>
+<td>176</td>
+<td>36,608</td>
+<td>16</td>
+<td>p7_5</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>. Nokia</td>
+</tr>
+<tr>
+<td>8</td>
+<td></td>
+<td>220</td>
+<td>176</td>
+<td>38,720</td>
+<td>44</td>
+<td>p5_4</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>9</td>
+<td>HQVGA</td>
+<td>240</td>
+<td>160</td>
+<td>38,400</td>
+<td>80</td>
+<td>p3_2</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>Half-QVGA</td>
+</tr>
+<tr>
+<td>10</td>
+<td>SCIF</td>
+<td>256</td>
+<td>192</td>
+<td>49,152</td>
+<td>64</td>
+<td>p4_3</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>11</td>
+<td>CGA</td>
+<td>320</td>
+<td>200</td>
+<td>64,000</td>
+<td>40</td>
+<td>p8_5</td>
+<td>Y</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>12</td>
+<td>QVGA</td>
+<td>320</td>
+<td>240</td>
+<td>76,800</td>
+<td>80</td>
+<td>p4_3</td>
+<td>Y</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>Quarter Video Graphics Array</td>
+</tr>
+<tr>
+<td>13</td>
+<td></td>
+<td>350</td>
+<td>240</td>
+<td>84,000</td>
+<td>10</td>
+<td>p13_9</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>. Video CD</td>
+</tr>
+<tr>
+<td>14</td>
+<td>SIF(525)</td>
+<td>352</td>
+<td>240</td>
+<td>84,480</td>
+<td>16</td>
+<td>p13_9</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>Source Input Format(NTSC). VCD(MPEG1)</td>
+</tr>
+<tr>
+<td>15</td>
+<td>CIF</td>
+<td>352</td>
+<td>288</td>
+<td>101,376</td>
+<td>32</td>
+<td>p11_9</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>Common Intermediate Format. SIF(625)(PAL). VDC(MPEG1)</td>
+</tr>
+<tr>
+<td>16</td>
+<td>WQVGA</td>
+<td>376</td>
+<td>240</td>
+<td>90,240</td>
+<td>8</td>
+<td>p11_7</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>wide-QVGA. Apple iPod nano</td>
+</tr>
+<tr>
+<td>17</td>
+<td>WQVGA</td>
+<td>384</td>
+<td>240</td>
+<td>92,160</td>
+<td>48</td>
+<td>p8_5</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>wide-QVGA</td>
+</tr>
+<tr>
+<td>18</td>
+<td></td>
+<td>384</td>
+<td>288</td>
+<td>110,592</td>
+<td>96</td>
+<td>p4_3</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>. Display for SIF</td>
+</tr>
+<tr>
+<td>19</td>
+<td>WQVGA</td>
+<td>400</td>
+<td>240</td>
+<td>96,000</td>
+<td>80</td>
+<td>p5_3</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>wide-QVGA</td>
+</tr>
+<tr>
+<td>20</td>
+<td>WQVGA</td>
+<td>432</td>
+<td>240</td>
+<td>103,680</td>
+<td>48</td>
+<td>p9_5</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>wide-QVGA</td>
+</tr>
+<tr>
+<td>21</td>
+<td>HVGA</td>
+<td>480</td>
+<td>272</td>
+<td>130,560</td>
+<td>16</td>
+<td>p16_9</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>Half-size VGA</td>
+</tr>
+<tr>
+<td>22</td>
+<td></td>
+<td>480</td>
+<td>300</td>
+<td>144,000</td>
+<td>60</td>
+<td>p8_5</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>. Umatic, Betamax, VHS, Video8</td>
+</tr>
+<tr>
+<td>23</td>
+<td>HVGA</td>
+<td>480</td>
+<td>320</td>
+<td>153,600</td>
+<td>160</td>
+<td>p3_2</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>Half-size VGA</td>
+</tr>
+<tr>
+<td>24</td>
+<td></td>
+<td>480</td>
+<td>350</td>
+<td>168,000</td>
+<td>10</td>
+<td>p11_8</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>. Super Betamax, Betacam (pro)</td>
+</tr>
+<tr>
+<td>25</td>
+<td>HVGA</td>
+<td>480</td>
+<td>360</td>
+<td>172,800</td>
+<td>120</td>
+<td>p4_3</td>
+<td>Y</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>Half-size VGA</td>
+</tr>
+<tr>
+<td>26</td>
+<td></td>
+<td>480</td>
+<td>420</td>
+<td>201,600</td>
+<td>60</td>
+<td>p8_7</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>. LaserDisc, Super VHS, Hi8</td>
+</tr>
+<tr>
+<td>27</td>
+<td></td>
+<td>500</td>
+<td>480</td>
+<td>240,000</td>
+<td>20</td>
+<td>p1_1</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>. Analog broadcast</td>
+</tr>
+<tr>
+<td>28</td>
+<td>DCIF</td>
+<td>528</td>
+<td>384</td>
+<td>202,752</td>
+<td>48</td>
+<td>p11_8</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Double CIF</td>
+</tr>
+<tr>
+<td>29</td>
+<td>HVGA</td>
+<td>640</td>
+<td>240</td>
+<td>153,600</td>
+<td>80</td>
+<td>p8_3</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>Half-size VGA</td>
+</tr>
+<tr>
+<td>30</td>
+<td>EGA</td>
+<td>640</td>
+<td>350</td>
+<td>224,000</td>
+<td>10</td>
+<td>p11_6</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>31</td>
+<td></td>
+<td>640</td>
+<td>352</td>
+<td>225,280</td>
+<td>32</td>
+<td>p11_6</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>. nHD for Video(32x32 macroblocks)</td>
+</tr>
+<tr>
+<td>32</td>
+<td>nHD</td>
+<td>640</td>
+<td>360</td>
+<td>230,400</td>
+<td>40</td>
+<td>p16_9</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>one ninth of a full HD 1080p frame</td>
+</tr>
+<tr>
+<td>33</td>
+<td></td>
+<td>640</td>
+<td>368</td>
+<td>235,520</td>
+<td>16</td>
+<td>p7_4</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>. nHD for Video(16x16 macroblocks)</td>
+</tr>
+<tr>
+<td>34</td>
+<td>VGA</td>
+<td>640</td>
+<td>480</td>
+<td>307,200</td>
+<td>160</td>
+<td>p4_3</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Video Graphics Array</td>
+</tr>
+<tr>
+<td>35</td>
+<td></td>
+<td>670</td>
+<td>480</td>
+<td>321,600</td>
+<td>10</td>
+<td>p7_5</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>. Enhanced Definition Betamax</td>
+</tr>
+<tr>
+<td>36</td>
+<td>HALF D1</td>
+<td>704</td>
+<td>288</td>
+<td>202,752</td>
+<td>32</td>
+<td>p22_9</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>HALF D1 = 2× CIF</td>
+</tr>
+<tr>
+<td>37</td>
+<td>4SIF(525)</td>
+<td>704</td>
+<td>480</td>
+<td>337,920</td>
+<td>32</td>
+<td>p13_9</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>4× SIF(525)</td>
+</tr>
+<tr>
+<td>38</td>
+<td>4CIF</td>
+<td>704</td>
+<td>576</td>
+<td>405,504</td>
+<td>64</td>
+<td>p11_9</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>4× CIF, D1, 4× SIF(625)</td>
+</tr>
+<tr>
+<td>39</td>
+<td></td>
+<td>720</td>
+<td>348</td>
+<td>250,560</td>
+<td>12</td>
+<td>p60_29</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Hercules</td>
+</tr>
+<tr>
+<td>40</td>
+<td>NTSC</td>
+<td>720</td>
+<td>480</td>
+<td>345,600</td>
+<td>240</td>
+<td>p3_2</td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td>National Television System Committee</td>
+</tr>
+<tr>
+<td>41</td>
+<td>EDTV</td>
+<td>720</td>
+<td>576</td>
+<td>414,720</td>
+<td>144</td>
+<td>p5_4</td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td>Enhanced-definition television</td>
+</tr>
+<tr>
+<td>42</td>
+<td>PAL</td>
+<td>768</td>
+<td>576</td>
+<td>442,368</td>
+<td>192</td>
+<td>p4_3</td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td>Phase Alternating Line</td>
+</tr>
+<tr>
+<td>43</td>
+<td>WVGA</td>
+<td>800</td>
+<td>480</td>
+<td>384,000</td>
+<td>160</td>
+<td>p5_3</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>wide-VGA</td>
+</tr>
+<tr>
+<td>44</td>
+<td>SVGA</td>
+<td>800</td>
+<td>600</td>
+<td>480,000</td>
+<td>200</td>
+<td>p4_3</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Super Video Graphics Array</td>
+</tr>
+<tr>
+<td>45</td>
+<td>WVGA</td>
+<td>848</td>
+<td>480</td>
+<td>407,040</td>
+<td>16</td>
+<td>p16_9</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>wide-VGA</td>
+</tr>
+<tr>
+<td>46</td>
+<td>WVGA</td>
+<td>852</td>
+<td>480</td>
+<td>408,960</td>
+<td>12</td>
+<td>p16_9</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>wide-VGA</td>
+</tr>
+<tr>
+<td>47</td>
+<td>FWVGA</td>
+<td>854</td>
+<td>480</td>
+<td>409,920</td>
+<td>2</td>
+<td>p16_9</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>Full Wide VGA</td>
+</tr>
+<tr>
+<td>48</td>
+<td>qHD</td>
+<td>960</td>
+<td>540</td>
+<td>518,400</td>
+<td>60</td>
+<td>p16_9</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>one quarter of a full HD 1080p frame</td>
+</tr>
+<tr>
+<td>49</td>
+<td>WSVGA</td>
+<td>1024</td>
+<td>576</td>
+<td>589,824</td>
+<td>64</td>
+<td>p16_9</td>
+<td>Y</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>wide-SVGA</td>
+</tr>
+<tr>
+<td>50</td>
+<td>WSVGA</td>
+<td>1024</td>
+<td>600</td>
+<td>614,400</td>
+<td>8</td>
+<td>p12_7</td>
+<td>Y</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>wide-SVGA</td>
+</tr>
+<tr>
+<td>51</td>
+<td></td>
+<td>1024</td>
+<td>640</td>
+<td>655,360</td>
+<td>128</td>
+<td>p8_5</td>
+<td>Y</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>52</td>
+<td>XGA</td>
+<td>1024</td>
+<td>768</td>
+<td>786,432</td>
+<td>256</td>
+<td>p4_3</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>eXtended Graphics Array</td>
+</tr>
+<tr>
+<td>53</td>
+<td></td>
+<td>1152</td>
+<td>720</td>
+<td>829,440</td>
+<td>144</td>
+<td>p8_5</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>54</td>
+<td>XGA+</td>
+<td>1152</td>
+<td>768</td>
+<td>884,736</td>
+<td>384</td>
+<td>p3_2</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>eXtended Graphics Array Plus</td>
+</tr>
+<tr>
+<td>55</td>
+<td>XGA+</td>
+<td>1152</td>
+<td>864</td>
+<td>995,328</td>
+<td>288</td>
+<td>p4_3</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>eXtended Graphics Array Plus</td>
+</tr>
+<tr>
+<td>56</td>
+<td>HD720</td>
+<td>1280</td>
+<td>720</td>
+<td>921,600</td>
+<td>80</td>
+<td>p16_9</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>High-definition television 720p</td>
+</tr>
+<tr>
+<td>57</td>
+<td>WXGA</td>
+<td>1280</td>
+<td>768</td>
+<td>983,040</td>
+<td>256</td>
+<td>p5_3</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>wide-XGA</td>
+</tr>
+<tr>
+<td>58</td>
+<td>WXGA</td>
+<td>1280</td>
+<td>800</td>
+<td>1,024,000</td>
+<td>160</td>
+<td>p8_5</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>wide-XGA</td>
+</tr>
+<tr>
+<td>59</td>
+<td></td>
+<td>1280</td>
+<td>854</td>
+<td>1,093,120</td>
+<td>2</td>
+<td>p3_2</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>60</td>
+<td>SXGA-</td>
+<td>1280</td>
+<td>960</td>
+<td>1,228,800</td>
+<td>320</td>
+<td>p4_3</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>61</td>
+<td>SXGA</td>
+<td>1280</td>
+<td>1024</td>
+<td>1,310,720</td>
+<td>256</td>
+<td>p5_4</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Super eXtended Graphics Array</td>
+</tr>
+<tr>
+<td>62</td>
+<td>HD</td>
+<td>1360</td>
+<td>768</td>
+<td>1,044,480</td>
+<td>16</td>
+<td>p16_9</td>
+<td>Y</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td>HD, wide-XGA</td>
+</tr>
+<tr>
+<td>63</td>
+<td>HD</td>
+<td>1365</td>
+<td>768</td>
+<td>1,048,320</td>
+<td>3</td>
+<td>p16_9</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>HD, wide-XGA</td>
+</tr>
+<tr>
+<td>64</td>
+<td>HD</td>
+<td>1366</td>
+<td>768</td>
+<td>1,049,088</td>
+<td>2</td>
+<td>p16_9</td>
+<td>Y</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td>HD, wide-XGA</td>
+</tr>
+<tr>
+<td>65</td>
+<td>SXGA+</td>
+<td>1400</td>
+<td>1050</td>
+<td>1,470,000</td>
+<td>350</td>
+<td>p4_3</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Super eXtended Graphics Array Plus</td>
+</tr>
+<tr>
+<td>66</td>
+<td>16SIF(525)</td>
+<td>1408</td>
+<td>960</td>
+<td>1,351,680</td>
+<td>64</td>
+<td>p13_9</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>16× SIF(525)</td>
+</tr>
+<tr>
+<td>67</td>
+<td>16CIF</td>
+<td>1408</td>
+<td>1152</td>
+<td>1,622,016</td>
+<td>128</td>
+<td>p11_9</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>16× CIF, 16× SIF(625)</td>
+</tr>
+<tr>
+<td>68</td>
+<td>WXGA+</td>
+<td>1440</td>
+<td>900</td>
+<td>1,296,000</td>
+<td>180</td>
+<td>p8_5</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Wide eXtended Graphics Array Plus</td>
+</tr>
+<tr>
+<td>69</td>
+<td></td>
+<td>1440</td>
+<td>960</td>
+<td>1,382,400</td>
+<td>480</td>
+<td>p3_2</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>70</td>
+<td></td>
+<td>1440</td>
+<td>1080</td>
+<td>1,555,200</td>
+<td>360</td>
+<td>p4_3</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>. HDV (miniDV)</td>
+</tr>
+<tr>
+<td>71</td>
+<td>UWXGA</td>
+<td>1600</td>
+<td>768</td>
+<td>1,228,800</td>
+<td>64</td>
+<td>p25_12</td>
+<td></td>
+<td></td>
+<td></td>
+<td>ultra-wide-XGA</td>
+<td></td>
+</tr>
+<tr>
+<td>72</td>
+<td>HD+</td>
+<td>1600</td>
+<td>900</td>
+<td>1,440,000</td>
+<td>100</td>
+<td>p16_9</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>73</td>
+<td>UGA</td>
+<td>1600</td>
+<td>1200</td>
+<td>1,920,000</td>
+<td>400</td>
+<td>p4_3</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Ultra eXtended Graphics Array</td>
+</tr>
+<tr>
+<td>74</td>
+<td>WSXGA+</td>
+<td>1680</td>
+<td>1050</td>
+<td>1,764,000</td>
+<td>210</td>
+<td>p8_5</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>Widescreen Super eXtended Graphics Array Plus</td>
+</tr>
+<tr>
+<td>75</td>
+<td>HD1080</td>
+<td>1920</td>
+<td>1080</td>
+<td>2,073,600</td>
+<td>120</td>
+<td>p16_9</td>
+<td>Y</td>
+<td></td>
+<td>Y</td>
+<td>Y</td>
+<td>High-definition television 1080p</td>
+</tr>
+<tr>
+<td>76</td>
+<td>WUXGA</td>
+<td>1920</td>
+<td>1200</td>
+<td>2,304,000</td>
+<td>240</td>
+<td>p8_5</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Widescreen Ultra eXtended Graphics Array</td>
+</tr>
+<tr>
+<td>77</td>
+<td>2K</td>
+<td>2048</td>
+<td>1080</td>
+<td>2,211,840</td>
+<td>8</td>
+<td>p17_9</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>2K Digital Cinema</td>
+</tr>
+<tr>
+<td>78</td>
+<td>QWXGA</td>
+<td>2048</td>
+<td>1152</td>
+<td>2,359,296</td>
+<td>128</td>
+<td>p16_9</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Quad Wide eXtended Graphics Array</td>
+</tr>
+<tr>
+<td>79</td>
+<td>QXGA</td>
+<td>2048</td>
+<td>1536</td>
+<td>3,145,728</td>
+<td>512</td>
+<td>p4_3</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Quad eXtended Graphics Array</td>
+</tr>
+<tr>
+<td>80</td>
+<td></td>
+<td>2304</td>
+<td>1440</td>
+<td>3,317,760</td>
+<td>288</td>
+<td>p8_5</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>. GDM-FW900 &amp; A7217A</td>
+</tr>
+<tr>
+<td>81</td>
+<td>WQHD</td>
+<td>2560</td>
+<td>1440</td>
+<td>3,686,400</td>
+<td>160</td>
+<td>p16_9</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>Wide Quad High Definition</td>
+</tr>
+<tr>
+<td>82</td>
+<td>WQXGA</td>
+<td>2560</td>
+<td>1600</td>
+<td>4,096,000</td>
+<td>320</td>
+<td>p8_5</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Wide Quad eXtended Graphics Array</td>
+</tr>
+<tr>
+<td>83</td>
+<td></td>
+<td>2560</td>
+<td>1920</td>
+<td>4,915,200</td>
+<td>640</td>
+<td>p4_3</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>. Viewsonic P225f</td>
+</tr>
+<tr>
+<td>84</td>
+<td>QSXGA</td>
+<td>2560</td>
+<td>2048</td>
+<td>5,242,880</td>
+<td>512</td>
+<td>p5_4</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Quad Super eXtended Graphics Array</td>
+</tr>
+<tr>
+<td>85</td>
+<td>WQSXGA</td>
+<td>3200</td>
+<td>2048</td>
+<td>6,553,600</td>
+<td>128</td>
+<td>p14_9</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Wide Quad Super eXtended Graphics Array</td>
+</tr>
+<tr>
+<td>86</td>
+<td>QUXGA</td>
+<td>3200</td>
+<td>2400</td>
+<td>7,680,000</td>
+<td>800</td>
+<td>p4_3</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Quad Ultra Extended Graphics Array</td>
+</tr>
+<tr>
+<td>87</td>
+<td>WQSXGA</td>
+<td>3280</td>
+<td>2048</td>
+<td>6,717,440</td>
+<td>16</td>
+<td>p8_5</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>WQSXGA. Coronis Fusion 6MP DL</td>
+</tr>
+<tr>
+<td>88</td>
+<td></td>
+<td>3840</td>
+<td>2048</td>
+<td>7,864,320</td>
+<td>256</td>
+<td>p15_8</td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td>. UHDTV</td>
+</tr>
+<tr>
+<td>89</td>
+<td>QFHD</td>
+<td>3840</td>
+<td>2160</td>
+<td>8,294,400</td>
+<td>240</td>
+<td>p16_9</td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>Y</td>
+<td>Quad Full High Definition</td>
+</tr>
+<tr>
+<td>90</td>
+<td>WQUXGA</td>
+<td>3840</td>
+<td>2400</td>
+<td>9,216,000</td>
+<td>480</td>
+<td>p8_5</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Wide Quad Ultra eXtended Graphics Array</td>
+</tr>
+<tr>
+<td>91</td>
+<td>4K-</td>
+<td>4096</td>
+<td>1716</td>
+<td>7,028,736</td>
+<td>4</td>
+<td>p19_8</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td></td>
+</tr>
+<tr>
+<td>92</td>
+<td>4K</td>
+<td>4096</td>
+<td>2160</td>
+<td>8,847,360</td>
+<td>16</td>
+<td>p17_9</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>4K Digital Cinema</td>
+</tr>
+<tr>
+<td>93</td>
+<td></td>
+<td>4096</td>
+<td>2304</td>
+<td>9,437,184</td>
+<td>256</td>
+<td>p16_9</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>. YouTube</td>
+</tr>
+<tr>
+<td>94</td>
+<td>HXGA</td>
+<td>4096</td>
+<td>3072</td>
+<td>12,582,912</td>
+<td>1024</td>
+<td>p4_3</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Hex[adecatuple] Extended Graphics Array</td>
+</tr>
+<tr>
+<td>95</td>
+<td></td>
+<td>5120</td>
+<td>3072</td>
+<td>15,728,640</td>
+<td>1024</td>
+<td>p5_3</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>. WHXGA-</td>
+</tr>
+<tr>
+<td>96</td>
+<td>WHXGA</td>
+<td>5120</td>
+<td>3200</td>
+<td>16,384,000</td>
+<td>640</td>
+<td>p8_5</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Wide Hex[adecatuple] Extended Graphics Array</td>
+</tr>
+<tr>
+<td>97</td>
+<td>HSXGA</td>
+<td>5120</td>
+<td>4096</td>
+<td>20,971,520</td>
+<td>1024</td>
+<td>p5_4</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Hex[adecatuple] Super Extended Graphics Array</td>
+</tr>
+<tr>
+<td>98</td>
+<td>WHSXGA</td>
+<td>6400</td>
+<td>4096</td>
+<td>26,214,400</td>
+<td>256</td>
+<td>p14_9</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Wide Hex[adecatuple] Super Extended Graphics Array</td>
+</tr>
+<tr>
+<td>99</td>
+<td>HUXGA</td>
+<td>6400</td>
+<td>4800</td>
+<td>30,720,000</td>
+<td>1600</td>
+<td>p4_3</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Hex[adecatuple] Ultra Extended Graphics Array</td>
+</tr>
+<tr>
+<td>100</td>
+<td>UHDTV</td>
+<td>7680</td>
+<td>4320</td>
+<td>33,177,600</td>
+<td>480</td>
+<td>p16_9</td>
+<td>Y</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td>Ultra High Definition Television</td>
+</tr>
+<tr>
+<td>101</td>
+<td>WHUXGA</td>
+<td>7680</td>
+<td>4800</td>
+<td>36,864,000</td>
+<td>960</td>
+<td>p8_5</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Wide Hex[adecatuple] Ultra Extended Graphics Array</td>
+</tr>
+</tbody></table>
+<p><em>Idx：顺序。Name：命名了的分辨率。W：宽度。H：高度。Pxs：总像素。gcd：宽度、高度的最大公约数。Per：比例。p16_9表示16:9。C：是否电脑屏幕分辨率；P：是否手机屏幕分辨率；T：是否电视屏幕分辨率；V：是否视频设备分辨率。</em></p>
+<h3 id="码率模式"><a href="#码率模式" class="headerlink" title="码率模式"></a>码率模式</h3><p>-　VBR（Variable Bitrate）动态比特率也就是没有固定的比特率，用的是动态编码的方式，压缩软件在压缩时根据音频数据即时确定使用什么比特率，把较高的采样率用于复杂的动态画面，而把较低的采样率用于静态画面，合理利用资源，达到画质与体积可兼得的效果。</p>
+<p>-　ABR（Average Bitrate）平均比特率是VBR的一种插值参数。LAME针对CBR不佳的文件体积比和VBR生成文件大小不定的特点独创了这种编码模式。ABR在指定的文件大小内，以每50帧（30帧约1秒）为一段，低频和不敏感频率使用相对低的流量，高频和大动态表现时使用高流量，可以做为VBR和CBR的一种折衷选择。</p>
+<p>-　CBR（Constant Bitrate）常数比特率指文件从头到尾都是一种位速率。相对于VBR和ABR来讲，它压缩出来的文件体积很大，而且音质相对于VBR和ABR不会有明显的提高。</p>
+<h3 id="QP"><a href="#QP" class="headerlink" title="QP"></a>QP</h3><p>Quantizer Parameter，量化参数，反映了空间细节压缩情况。值越小，量化越精细，图像质量越高，产生的码流也越长。如QP小，大部分的细节都会被保留；QP增大，一些细节丢失，码率降低，但图像失真加强和质量下降。</p>
+<h3 id="profile-level"><a href="#profile-level" class="headerlink" title="profile level"></a>profile level</h3><ul>
+<li><p>BP-Baseline Profile：基本画质。支持I/P 帧，只支持无交错（Progressive）和CAVLC；</p>
+</li>
+<li><p>EP-Extended profile：进阶画质。支持I/P/B/SP/SI 帧，只支持无交错（Progressive）和CAVLC；</p>
+</li>
+<li><p>MP-Main profile：主流画质。提供I/P/B 帧，支持无交错（Progressive）和交错（Interlaced），也支持CAVLC 和CABAC 的支持；</p>
+</li>
+<li><p>HP-High profile：高级画质。在main Profile 的基础上增加了8x8内部预测、自定义量化、无损视频编码和更多的YUV 格式。</p>
+</li>
+</ul>
+<h2 id="视频编码"><a href="#视频编码" class="headerlink" title="视频编码"></a>视频编码</h2><p>视频是由不同的帧画面连续播放形成的。这些帧，主要分为三类，分别是I帧，B帧，P帧。</p>
+<ul>
+<li><p>I帧，是自带全部信息的独立帧，是最完整的画面，无需参考其它图像便可独立进行解码。视频序列中的第一个帧，始终都是I帧。</p>
+</li>
+<li><p>P帧，帧间预测编码帧，需要参考前面的I帧和/或P帧的不同部分，才能进行编码。P帧对前面的P和I参考帧有依赖性。但是，P帧压缩率比较高，占用的空间较小。</p>
+</li>
+</ul>
+<p><img src="/images/media/video/Pframe.jpg" alt="P帧"></p>
+<p>*　B帧，双向预测编码帧，以前帧和后作为参考帧。不仅参考前面，还参考后面的帧，所以，它的压缩率最高，可以达到200:1。不过，因为依赖后面的帧，所以不适合实时传输。</p>
+<p><img src="/images/media/video/Bframe.jpg" alt="B帧"></p>
+<p><img src="/images/media/video/venc.jpg" alt="venc"></p>
+<h3 id="IDR"><a href="#IDR" class="headerlink" title="IDR"></a>IDR</h3><p>Instantaneous Decoding Refresh，即时解码刷新。为将首个I帧和其他I帧区别开，定义首个I帧为IDR帧。</p>
+<h3 id="GOP"><a href="#GOP" class="headerlink" title="GOP"></a>GOP</h3><p>Group of picture，关键帧的周期，也就是两个IDR帧之间的距离，一个帧组的最大帧数，一般而言，每一秒视频至少需要使用 1 个关键帧。增加关键帧个数可改善质量，但是同时增加带宽和网络负载。<br>需要说明的是，通过提高GOP值来提高图像质量是有限度的，在遇到场景切换的情况时，H.264编码器会自动强制插入一个I帧，此时实际的GOP值被缩短了。另一方面，在一个GOP中，P、B帧是由I帧预测得到的，当I帧的图像质量比较差时，会影响到一个GOP中后续P、B帧的图像质量，直到下一个GOP开始才有可能得以恢复，所以GOP值也不宜设置过大。</p>
+<p>同时，由于P、B帧的复杂度大于I帧，所以过多的P、B帧会影响编码效率，使编码效率降低。另外，过长的GOP还会影响Seek操作的响应速度，由于P、B帧是由前面的I或P帧预测得到的，所以Seek操作需要直接定位，解码某一个P或B帧时，需要先解码得到本GOP内的I帧及之前的N个预测帧才可以，GOP值越长，需要解码的预测帧就越多，seek响应的时间也越长。</p>
+<p><img src="/images/media/video/gop.png" alt="gop"></p>
+<p>-　H.265和H.264的区别</p>
+<p>　　1．H.265是新的编码协议，也即是H.264的升级版。H.265标准保留H.264原来的某些技术，同时对一些相关的技术加以改进。新技术使用先进的技术用以改善码流、编码质量、延时和算法复杂度之间的关系，达到最优化设置。</p>
+<p>　　2．H.265相比H.264最主要的改变是采用了块的四叉树划分结构，采用了从64×64～8×8像素的自适应块划分，并基于这种块划分结构采用一系列自适应的预测和变换等编码技术。</p>
+<p>　　3．H.264由于算法优化，可以低于1Mbps的速度实现标清数字图像传送；H.265则可以实现利用1~2Mbps的传输速度传送720P（分辨率1280×720）普通高清音视频传送。</p>
+<p>　　4．同样的画质和同样的码率，H.265比H2.64 占用的存储空间要少理论50%。</p>
+<p>　　5．比起H.264/AVC，H.265/HEVC提供了更多不同的工具来降低码率，以编码单位来说，H.264中每个宏块（macroblock/MB）大小都是固定的16×16像素，而H.265的编码单位可以选择从最小的8×8到最大的64×64。</p>
+<p>　　6．在相同的图象质量下，相比于H.264，通过H.265编码的视频大小将减少大约39～44%。</p>
+<p>-　H.265的优势</p>
+<p>　　1．H.265/HEVC的编码架构大致上和H.264/AVC的架构相似，主要也包含，帧内预测（intra prediction）、帧间预测（inter prediction）、转换（transform）、量化（quantization）、去区块滤波器（deblocking filter）、熵编码（entropy coding）等模块。</p>
+<p>　　但在HEVC编码架构中，整体被分为了三个基本单位，分别是编码单位（coding unit, CU）、预测单位（predict unit, PU）和转换单位（transform unit, TU）。</p>
+<p>　　2．比起H.264/AVC，H.265/HEVC提供了更多不同的工具来降低码率，以编码单位来说，H.264中每个宏块（macroblock/MB）大小都是固定的16x16像素，而H.265的编码单位可以选择从最小的8×8到最大的64×64。</p>
+<p>　　3．H.265的帧内预测模式支持33种方向（H.264只支持8种），并且提供了更好的运动补偿处理和矢量预测方法。</p>
+<p>　　4．反复的质量比较测试已经表明，在相同的图象质量下，相比于H.264，通过H.265编码的视频大小将减少大约39～44%。由于质量控制的测定方法不同，这个数据也会有相应的变化。</p>
+<p>　　5．通过主观视觉测试得出的数据显示，在码率减少51～74%的情况下，H.265编码视频的质量还能与H.264编码视频近似甚至更好，其本质上说是比预期的信噪比（PSNR）要好。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/media/image/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/media/image/" class="post-title-link" itemprop="url">image</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:36:12" itemprop="dateModified" datetime="2022-06-08T17:36:12+08:00">2022-06-08</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="像素"><a href="#像素" class="headerlink" title="像素"></a>像素</h2><h3 id="RGB"><a href="#RGB" class="headerlink" title="RGB"></a>RGB</h3><p>在RGB 颜色空间上，当任何一个基色的亮度值为零时，即在原点处，就显示为黑色。当三种基色都达到最高亮度时，就表现为白色。在连接黑色与白色的对角线上，是亮度等量的三基色混合而成的灰色，该线称为灰色线。<a target="_blank" rel="noopener" href="http://www.fourcc.org/rgb.php">详细</a></p>
+<ul>
+<li>RGB565格式每一个像素用16个bit来表示。 R, G, B分别用5， 6， 5个bit来表示。</li>
+<li>RGB55格式每一个像素用16个bit，但是最高位不用，R, G, B分别用5个bit来表示。</li>
+<li>RGB24每一个像素用24个bit来表示，R, G， B分量分别用8个bit来表示。</li>
+<li>RGB32每一个像素用32个bit表示，R, G, B分量分别用8个bit表示，存储顺序为B, G, R，最后8个字节保留。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">R = Y + <span class="number">1.402</span> (Cr<span class="number">-128</span>)</span><br><span class="line">G = Y * <span class="number">0.34414</span> (Cb<span class="number">-128</span>) * <span class="number">0.71414</span> (Cr<span class="number">-128</span>)</span><br><span class="line">B = Y + <span class="number">1.772</span> (Cb<span class="number">-128</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="YUV"><a href="#YUV" class="headerlink" title="YUV"></a>YUV</h3><p>YUV是一种颜色编码方法，主要用于电视系统以及模拟视频领域，它将亮度信息（Y）与色彩信息（UV）分离，没有UV信息一样可以显示完整的图像，只不过是黑白的，这样的设计很好地解决了彩色电视机与黑白电视的兼容问题。并且，YUV不像RGB那样要求三个独立的视频信号同时传输，YUV是数据总尺寸小于RGB格式（但用YUV444的话，和RGB888一样都是24bits），所以用YUV方式传送占用极少的频宽。</p>
+<p>YUV，分为三个分量，“Y”表示明亮度（Luminance或Luma），也就是灰度值；而“U”和“V” 表示的则是色度（Chrominance或Chroma），作用是描述影像色彩及饱和度，用于指定像素的颜色。</p>
+<p><img src="/images/media/image/yuv.jpg" alt="彩色，Y分量，V分量，U分量"></p>
+<p>YUV细分的话有Y’UV，YUV，YCbCr，YPbPr等类型，其中YCbCr主要用于数字信号。Y’CbCr也称为YUV，是YUV的压缩版本，不同之处在于Y’CbCr用于数字图像领域，YUV用于模拟信号领域，MPEG、DVD、摄像机中常说的YUV其实就是Y’CbCr。</p>
+<p>其中，Cr反映了RGB输入信号红色部分与RGB信号亮度值之间的差异，而Cb反映的是RGB输入信号蓝色部分与RGB信号亮度值之间的差异，此即所谓的色差信号。<a target="_blank" rel="noopener" href="http://www.fourcc.org/yuv.php">详细</a></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Y = <span class="number">0.30</span>R + <span class="number">0.59</span>G + <span class="number">0.11B</span></span><br><span class="line">U = <span class="number">0.493</span>(B-Y) = <span class="number">-0.15</span>R - <span class="number">0.29</span>G + <span class="number">0.44B</span></span><br><span class="line">V = <span class="number">0.877</span>(R-Y) = <span class="number">0.62</span>R - <span class="number">0.52</span>G - <span class="number">0.10B</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="采样方式"><a href="#采样方式" class="headerlink" title="采样方式"></a>采样方式</h4><p>YUV的采样有许多种，常用的有444，422，420，411等。用三个图来直观地表示采集的方式，以黑点表示采样该像素点的Y分量，以空心圆圈表示采用该像素点的UV分量。<br><img src="/images/media/image/yuv_sample.webp" alt="YUV常用采样"></p>
+<ul>
+<li>4:4:4采样，每一个Y对应一组UV分量，24 Bits per Pixel</li>
+<li>4:2:2采样，每两个Y共用一组UV分量，16 Bits per Pixel</li>
+<li>4:2:0采样，每四个Y共用一组UV分量，12 Bits per Pixel</li>
+</ul>
+<h4 id="存储格式"><a href="#存储格式" class="headerlink" title="存储格式"></a>存储格式</h4><p>对于packed的YUV格式，每个像素点的Y,U,V是连续交错存储的。</p>
+<ul>
+<li><p>UYVY422<br><img src="/images/media/image/UYVY422.webp" alt="img"></p>
+</li>
+<li><p>YUV420<br><img src="/images/media/image/YUV420.webp" alt="img"></p>
+</li>
+</ul>
+<p>对于planar的YUV格式，先连续存储所有像素点的Y，紧接着存储所有像素点的U，随后是所有像素点的V。</p>
+<ul>
+<li><p>YUV422P<br><img src="/images/media/image/YUV422P.webp" alt="img"></p>
+</li>
+<li><p>YUV420P<br><img src="/images/media/image/YUV420P.webp" alt="img"></p>
+</li>
+</ul>
+<p>对于SemiPlanar，则是先连续存储所有像素点的Y，再连续交错U和V。</p>
+<ul>
+<li><p>YUV422SP<br><img src="/images/media/image/YUV422SP.webp" alt="img"></p>
+</li>
+<li><p>YUV420SP<br><img src="/images/media/image/YUV420SP.webp" alt="img"></p>
+</li>
+</ul>
+<h3 id="OSD字模"><a href="#OSD字模" class="headerlink" title="OSD字模"></a>OSD字模</h3><ul>
+<li>单色字模，1个像素对应1bit，1个8×8的字模对应的是8个字节的数据。</li>
+<li>4色字模，1个像素对应2bit，1个8×8的字模对应的是8x2个字节的数据。</li>
+<li>16色字模，1个像素对应4bit，1个8×8的字模对应的是8x4个字节的数据。</li>
+</ul>
+<h2 id="图像处理"><a href="#图像处理" class="headerlink" title="图像处理"></a>图像处理</h2><p>在图像处理中，常见的颜色模型包括HSB（色相、饱和度、亮度）、RGB（红色、绿色、蓝色）、CMYK（青色、品红、黄色、黑色）和CIE L<em>a</em>b*等，因此，相应的颜色模式也就有RGB、CMYK、Lab等。在HSB颜色模型中，色相、饱和度、亮度是对图像属性的基本描述。</p>
+<p><strong>图象亮度</strong>（brightness）是指画面的明亮程度，单位是堪德拉每平米(cd/m2)或称nits。</p>
+<p><strong>对比度</strong>（contrast）指的是图像暗和亮的落差值，即图像最大灰度级和最小灰度级之间的差值。</p>
+<p><strong>饱和度</strong>（saturation）指的是图像颜色种类的多少， 上面提到图像的灰度级是[L<del>min</del>，L<del>max</del>]，则在L<del>min</del>、L<del>max</del> 的中间值越多，便代表图像的颜色种类多，饱和度也就更高，外观上看起来图像会更鲜艳，调整饱和度可以修正过度曝光或者未充分曝光的图片，使图像看上去更加自然。</p>
+<p><strong>色相</strong>（hue）是从物体反射或透过物体传播的颜色。在0°到360°的标准色轮上，按位置度量色相。</p>
+<p><strong>锐度</strong>（sharpness）是图像清晰度和图像边缘锐利程度。图像锐化是补偿图像的轮廓，增强图像的边缘及灰度跳变的部分，使图像变得清晰。在做图像平滑，图像滤波处理的时候经过会把丢失图像的边缘信息，通过图像锐化便能够增强突出图像的边缘轮廓。</p>
+<p><strong>灰度</strong>是图像上每个像素的颜色值，指黑白图像中点的颜色深度，范围一般从0到255，白色为255，黑色为0。</p>
+<ul>
+<li><p>最大值法：将彩色图像中的三分量亮度的最大值作为灰度图的灰度值，这种方法转换的灰度图亮度很高。</p>
+</li>
+<li><p>平均值法：将彩色图像中的三分量亮度求平均得到一个灰度值，这种方法产生的灰度图像比较柔和。</p>
+</li>
+<li><p>加权平均值法：以不同的权值对R，G，B的值加权平均，由于人眼对绿色最为敏感，对蓝色的敏感性最低，因此得到的灰度图像效果最好。$gray = 0.299<em>R + 0.578</em>G + 0.114*B$。</p>
+</li>
+</ul>
+<p><strong>灰阶</strong>（gray scale）在YUV空间，将UV分量丢弃，只保留Y分量，得到的黑白图像。</p>
+<p><strong>复古</strong>（绿，蓝）（sepia / sepiagreen / sepiablue）就是在灰阶的基础上，对UV值额外再做了一个offset，将灰度图转换成某种颜色的梯度图。为了获得蓝色效果，应该增加蓝色差信号，减小红色差信号，即增大U，减小V。</p>
+<p><strong>负片</strong>（Negative Film）就是将图像的颜色反转，看起来就像是在看胶片底片时的效果。在RGB空间，取其补色，就是用255分别减去RGB得到新的RGB值。<br><img src="/images/media/image/complementary.jpg" alt="img"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/char-encode/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -10578,86 +12573,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/linux/file_mode/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/linux/file_mode/" class="post-title-link" itemprop="url">linux file mode</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>r(Read，读取)：对文件而言，具有读取文件内容的权限；对目录来说，具有浏览目录的权限。</p>
-<p>w(Write,写入)：对文件而言，具有新增、修改文件内容的权限；对目录来说，具有删除、移动目录内文件的权限。</p>
-<p>x(execute，执行)：对文件而言，具有执行文件的权限；对目录了来说该用户具有进入目录的权限。</p>
-<p>s或S（SUID,Set UID）：使文件在执行时临时拥有文件所有者的权限。在设置s权限时文件属主、属组必须先设置x权限，否则s权限不能生效。当我们ls -l时看到rwS，大写S说明s权限未生效。passwd便是个设置了SUID的程序，普通用户无读写/etc/shadow文件的权限也可以修改自己的密码。</p>
-<p>t或T（Sticky）：t权限一般只用在目录上，任何的用户都能够在这个目录下创建文档，但只能删除自己创建的文档，这就对任何用户能写的目录下的用户文档启到了保护的作用。可通过<code>chmod +t</code>  <code>chmod -t</code>  <code>chmod 1777</code>来设置。</p>
-<p>i不可修改权限。通过<code>chattr +i</code>  <code>chattr -i</code>来设置，用<code>lsattr</code>命令查看。</p>
-<p>a只追加权限， 对于日志系统很好用，让目标文件只能追加，不能删除，而且不能通过编辑器追加。通过<code>chattr +a</code>  <code>chattr -a</code>来设置。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/linux/etc/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -11116,177 +13031,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/clang-format/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/tool/clang-format/" class="post-title-link" itemprop="url">config of clang-format</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:43:15" itemprop="dateModified" datetime="2022-06-08T17:43:15+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/tool/" itemprop="url" rel="index"><span itemprop="name">tool</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>vscode安装的C/C++插件就自带了clang-format工具，可以很方便的格式化代码，只需将配置文件.clang-format放到工程目录下。</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 语言: None, Cpp, Java, JavaScript, ObjC, Proto, TableGen, TextProto</span></span><br><span class="line"><span class="attr">Language:</span> <span class="string">Cpp</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 预定义样式： LLVM、Google、Chromium、Mozilla、WebKit、Microsoft</span></span><br><span class="line"><span class="attr">BasedOnStyle:</span> <span class="string">LLVM</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># tab宽度</span></span><br><span class="line"><span class="attr">TabWidth:</span> <span class="number">4</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 缩进宽度</span></span><br><span class="line"><span class="attr">IndentWidth:</span> <span class="number">4</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 访问说明符(public、private等)的偏移</span></span><br><span class="line"><span class="attr">AccessModifierOffset:</span> <span class="number">-4</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 开括号(开圆括号、开尖括号、开方括号)后的对齐: Align, DontAlign, AlwaysBreak(总是在开括号后换行)</span></span><br><span class="line"><span class="attr">AlignAfterOpenBracket:</span> <span class="string">Align</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 连续赋值时，对齐所有等号</span></span><br><span class="line"><span class="attr">AlignConsecutiveAssignments:</span> <span class="string">AcrossEmptyLines</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 连续位域</span></span><br><span class="line"><span class="attr">AlignConsecutiveBitFields:</span> <span class="string">Consecutive</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 连续声明时，对齐所有声明的变量名</span></span><br><span class="line"><span class="attr">AlignConsecutiveDeclarations:</span> <span class="string">AcrossEmptyLines</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 连续对齐的尾随的注释</span></span><br><span class="line"><span class="attr">AlignTrailingComments:</span> <span class="literal">true</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># AlignEscapedNewlines: Right</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># # 左对齐逃脱换行(使用反斜杠换行)的反斜杠</span></span><br><span class="line"><span class="comment"># #AlignEscapedNewlinesLeft: true</span></span><br><span class="line"><span class="comment"># # 水平对齐二元和三元表达式的操作数</span></span><br><span class="line"><span class="comment"># AlignOperands: true</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># # 允许函数声明的所有参数在放在下一行</span></span><br><span class="line"><span class="comment"># AllowAllParametersOfDeclarationOnNextLine: false</span></span><br><span class="line"><span class="comment"># # 允许短的块放在同一行</span></span><br><span class="line"><span class="comment"># AllowShortBlocksOnASingleLine: true</span></span><br><span class="line"><span class="comment"># # 允许短的case标签放在同一行</span></span><br><span class="line"><span class="comment"># AllowShortCaseLabelsOnASingleLine: true</span></span><br><span class="line"><span class="comment"># # 允许短的函数放在同一行: None, InlineOnly(定义在类中), Empty(空函数), Inline(定义在类中，空函数), All</span></span><br><span class="line"><span class="comment"># AllowShortFunctionsOnASingleLine: Empty</span></span><br><span class="line"><span class="comment"># # 允许短的if语句保持在同一行</span></span><br><span class="line"><span class="comment"># AllowShortIfStatementsOnASingleLine: false</span></span><br><span class="line"><span class="comment"># # 允许短的循环保持在同一行</span></span><br><span class="line"><span class="comment"># AllowShortLoopsOnASingleLine: false</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># # 总是在定义返回类型后换行(deprecated)</span></span><br><span class="line"><span class="comment"># AlwaysBreakAfterDefinitionReturnType: None</span></span><br><span class="line"><span class="comment"># # 总是在返回类型后换行: None, All, TopLevel(顶级函数，不包括在类中的函数), </span></span><br><span class="line"><span class="comment"># #   AllDefinitions(所有的定义，不包括声明), TopLevelDefinitions(所有的顶级函数的定义)</span></span><br><span class="line"><span class="comment"># AlwaysBreakAfterReturnType: None</span></span><br><span class="line"><span class="comment"># # 总是在多行string字面量前换行</span></span><br><span class="line"><span class="comment"># AlwaysBreakBeforeMultilineStrings: false</span></span><br><span class="line"><span class="comment"># # 总是在template声明后换行</span></span><br><span class="line"><span class="comment"># AlwaysBreakTemplateDeclarations: false</span></span><br><span class="line"><span class="comment"># # false表示函数实参要么都在同一行，要么都各自一行</span></span><br><span class="line"><span class="comment"># BinPackArguments: true</span></span><br><span class="line"><span class="comment"># # false表示所有形参要么都在同一行，要么都各自一行</span></span><br><span class="line"><span class="comment"># BinPackParameters: false</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># # 在二元运算符前换行: None(在操作符后换行), NonAssignment(在非赋值的操作符前换行), All(在操作符前换行)</span></span><br><span class="line"><span class="comment"># BreakBeforeBinaryOperators: None</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 在大括号前换行: Attach(始终将大括号附加到周围的上下文), Linux(除函数、命名空间和类定义，与Attach类似), </span></span><br><span class="line"><span class="comment">#   Mozilla(除枚举、函数、记录定义，与Attach类似), Stroustrup(除函数定义、catch、else，与Attach类似), </span></span><br><span class="line"><span class="comment">#   Allman(总是在大括号前换行), GNU(总是在大括号前换行，并对于控制语句的大括号增加额外的缩进), WebKit(在函数前换行), Custom</span></span><br><span class="line"><span class="comment">#   注：这里认为语句块也属于函数</span></span><br><span class="line"><span class="attr">BreakBeforeBraces:</span> <span class="string">Custom</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># # 在三元运算符前换行</span></span><br><span class="line"><span class="comment"># BreakBeforeTernaryOperators: false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 大括号换行，只有当BreakBeforeBraces设置为Custom时才有效</span></span><br><span class="line"><span class="attr">BraceWrapping:</span></span><br><span class="line">  <span class="comment"># class定义后面</span></span><br><span class="line">  <span class="attr">AfterClass:</span> <span class="literal">false</span></span><br><span class="line"><span class="comment">#   # 控制语句后面</span></span><br><span class="line"><span class="comment">#   AfterControlStatement: false</span></span><br><span class="line"><span class="comment">#   # enum定义后面</span></span><br><span class="line"><span class="comment">#   AfterEnum: false</span></span><br><span class="line"><span class="comment">#   # 函数定义后面</span></span><br><span class="line"><span class="comment">#   AfterFunction: true</span></span><br><span class="line"><span class="comment">#   # 命名空间定义后面</span></span><br><span class="line"><span class="comment">#   AfterNamespace: false</span></span><br><span class="line"><span class="comment">#   # ObjC定义后面</span></span><br><span class="line"><span class="comment">#   AfterObjCDeclaration: false</span></span><br><span class="line"><span class="comment">#   # struct定义后面</span></span><br><span class="line"><span class="comment">#   AfterStruct: true</span></span><br><span class="line"><span class="comment">#   # union定义后面</span></span><br><span class="line"><span class="comment">#   AfterUnion: true</span></span><br><span class="line"> </span><br><span class="line"><span class="comment">#   AfterExternBlock: false</span></span><br><span class="line"><span class="comment">#   # catch之前</span></span><br><span class="line"><span class="comment">#   BeforeCatch: true</span></span><br><span class="line"><span class="comment">#   # else之前</span></span><br><span class="line"><span class="comment">#   BeforeElse: true</span></span><br><span class="line"><span class="comment">#   # 缩进大括号</span></span><br><span class="line"><span class="comment">#   IndentBraces: false</span></span><br><span class="line"><span class="comment">#   SplitEmptyFunction: true</span></span><br><span class="line"><span class="comment">#   SplitEmptyRecord: true</span></span><br><span class="line"><span class="comment">#   SplitEmptyNamespace: true</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># # 在构造函数的初始化列表的逗号前换行</span></span><br><span class="line"><span class="comment"># BreakConstructorInitializersBeforeComma: false</span></span><br><span class="line"><span class="comment"># BreakConstructorInitializers: BeforeColon</span></span><br><span class="line"><span class="comment"># # 每行字符的限制，0表示没有限制</span></span><br><span class="line"><span class="comment"># ColumnLimit: 120</span></span><br><span class="line"><span class="comment"># # 描述具有特殊意义的注释的正则表达式，它不应该被分割为多行或以其它方式改变</span></span><br><span class="line"><span class="comment"># CommentPragmas: &#x27;^ IWYU pragma:&#x27;</span></span><br><span class="line"><span class="comment"># CompactNamespaces: false</span></span><br><span class="line"><span class="comment"># # 构造函数的初始化列表要么都在同一行，要么都各自一行</span></span><br><span class="line"><span class="comment"># ConstructorInitializerAllOnOneLineOrOnePerLine: false</span></span><br><span class="line"><span class="comment"># # 构造函数的初始化列表的缩进宽度</span></span><br><span class="line"><span class="comment"># ConstructorInitializerIndentWidth: 4</span></span><br><span class="line"><span class="comment"># # 延续的行的缩进宽度</span></span><br><span class="line"><span class="comment"># ContinuationIndentWidth: 4</span></span><br><span class="line"><span class="comment"># # 去除C++11的列表初始化的大括号&#123;后和&#125;前的空格</span></span><br><span class="line"><span class="comment"># Cpp11BracedListStyle: true</span></span><br><span class="line"><span class="comment"># # 继承最常用的指针和引用的对齐方式</span></span><br><span class="line"><span class="comment"># DerivePointerAlignment: false</span></span><br><span class="line"><span class="comment"># # 关闭格式化</span></span><br><span class="line"><span class="comment"># DisableFormat: false</span></span><br><span class="line"><span class="comment"># # 自动检测函数的调用和定义是否被格式为每行一个参数(Experimental)</span></span><br><span class="line"><span class="comment"># ExperimentalAutoDetectBinPacking: false</span></span><br><span class="line"><span class="comment"># # 需要被解读为foreach循环而不是函数调用的宏</span></span><br><span class="line"><span class="comment"># ForEachMacros: [ foreach, Q_FOREACH, BOOST_FOREACH ]</span></span><br><span class="line"><span class="comment"># # 对#include进行排序，匹配了某正则表达式的#include拥有对应的优先级，匹配不到的则默认优先级为INT_MAX(优先级越小排序越靠前)，</span></span><br><span class="line"><span class="comment"># #   可以定义负数优先级从而保证某些#include永远在最前面</span></span><br><span class="line"><span class="comment"># IncludeCategories: </span></span><br><span class="line"><span class="comment">#   - Regex: &#x27;^&quot;(llvm|llvm-c|clang|clang-c)/&#x27;</span></span><br><span class="line"><span class="comment">#     Priority: 2</span></span><br><span class="line"><span class="comment">#   - Regex: &#x27;^(&lt;|&quot;(gtest|isl|json)/)&#x27;</span></span><br><span class="line"><span class="comment">#     Priority: 3</span></span><br><span class="line"><span class="comment">#   - Regex: &#x27;.*&#x27;</span></span><br><span class="line"><span class="comment">#     Priority: 1</span></span><br><span class="line"><span class="comment"># # 缩进case标签</span></span><br><span class="line"><span class="comment"># IndentCaseLabels: true</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># IndentPPDirectives:  AfterHash</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># # 函数返回类型换行时，缩进函数声明或函数定义的函数名</span></span><br><span class="line"><span class="comment"># IndentWrappedFunctionNames: false</span></span><br><span class="line"><span class="comment"># # 保留在块开始处的空行</span></span><br><span class="line"><span class="comment"># KeepEmptyLinesAtTheStartOfBlocks: false</span></span><br><span class="line"><span class="comment"># # 开始一个块的宏的正则表达式</span></span><br><span class="line"><span class="comment"># MacroBlockBegin: &#x27;&#x27;</span></span><br><span class="line"><span class="comment"># # 结束一个块的宏的正则表达式</span></span><br><span class="line"><span class="comment"># MacroBlockEnd: &#x27;&#x27;</span></span><br><span class="line"><span class="comment"># # 连续空行的最大数量</span></span><br><span class="line"><span class="comment"># MaxEmptyLinesToKeep: 1</span></span><br><span class="line"><span class="comment"># # 命名空间的缩进: None, Inner(缩进嵌套的命名空间中的内容), All</span></span><br><span class="line"><span class="comment"># NamespaceIndentation: Inner</span></span><br><span class="line"><span class="comment"># # 使用ObjC块时缩进宽度</span></span><br><span class="line"><span class="comment"># ObjCBlockIndentWidth: 4</span></span><br><span class="line"><span class="comment"># # 在ObjC的@property后添加一个空格</span></span><br><span class="line"><span class="comment"># ObjCSpaceAfterProperty: false</span></span><br><span class="line"><span class="comment"># # 在ObjC的protocol列表前添加一个空格</span></span><br><span class="line"><span class="comment"># ObjCSpaceBeforeProtocolList: true</span></span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"><span class="comment"># # 在call(后对函数调用换行的penalty</span></span><br><span class="line"><span class="comment"># PenaltyBreakBeforeFirstCallParameter: 19</span></span><br><span class="line"><span class="comment"># # 在一个注释中引入换行的penalty</span></span><br><span class="line"><span class="comment"># PenaltyBreakComment: 300</span></span><br><span class="line"><span class="comment"># # 第一次在&lt;&lt;前换行的penalty</span></span><br><span class="line"><span class="comment"># PenaltyBreakFirstLessLess: 120</span></span><br><span class="line"><span class="comment"># # 在一个字符串字面量中引入换行的penalty</span></span><br><span class="line"><span class="comment"># PenaltyBreakString: 1000</span></span><br><span class="line"><span class="comment"># # 对于每个在行字符数限制之外的字符的penalty</span></span><br><span class="line"><span class="comment"># PenaltyExcessCharacter: 1000000</span></span><br><span class="line"><span class="comment"># # 将函数的返回类型放到它自己的行的penalty</span></span><br><span class="line"><span class="comment"># PenaltyReturnTypeOnItsOwnLine: 60</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># SpaceAroundPointerQualifiers: Before</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 指针和引用的对齐: Left, Right, Middle</span></span><br><span class="line"><span class="comment"># PointerAlignment: Right</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># # 允许重新排版注释</span></span><br><span class="line"><span class="comment"># ReflowComments: true</span></span><br><span class="line"><span class="comment"># # 允许排序#include</span></span><br><span class="line"><span class="comment"># SortIncludes: true</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># # 在C风格类型转换后添加空格</span></span><br><span class="line"><span class="comment"># SpaceAfterCStyleCast: false</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># SpaceAfterTemplateKeyword: true</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># 在赋值运算符之前添加空格</span></span><br><span class="line"><span class="comment"># SpaceBeforeAssignmentOperators: true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 开圆括号之前添加一个空格: Never, ControlStatements, Always</span></span><br><span class="line"><span class="comment"># SpaceBeforeParens: ControlStatements</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 在空的圆括号中添加空格</span></span><br><span class="line"><span class="comment"># SpaceInEmptyParentheses: false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 在尾随的注释前添加的空格数(只适用于//)</span></span><br><span class="line"><span class="comment"># SpacesBeforeTrailingComments: 2</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 在尖括号的&lt;后和&gt;前添加空格</span></span><br><span class="line"><span class="comment"># SpacesInAngles: false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># # 在容器(ObjC和JavaScript的数组和字典等)字面量中添加空格</span></span><br><span class="line"><span class="comment"># SpacesInContainerLiterals: false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 在C风格类型转换的括号中添加空格</span></span><br><span class="line"><span class="comment"># SpacesInCStyleCastParentheses: false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 在圆括号的(后和)前添加空格</span></span><br><span class="line"><span class="comment"># SpacesInParentheses: false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 在方括号的[后和]前添加空格，lamda表达式和未指明大小的数组的声明不受影响</span></span><br><span class="line"><span class="comment"># SpacesInSquareBrackets: false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># # 标准: Cpp03, Cpp11, Auto</span></span><br><span class="line"><span class="comment"># Standard: Cpp11</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用tab字符: Never, ForIndentation, ForContinuationAndIndentation, Always</span></span><br><span class="line"><span class="comment"># UseTab: Never</span></span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/bus/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/kernel/bus/" class="post-title-link" itemprop="url">bus device driver</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Linux内核分别使用 bus_type、device_driver 和 device 来描述总线、驱动和设备，这三个结构体定义于 include/linux/device.h 头文件中。</p>
-<h2 id="bus"><a href="#bus" class="headerlink" title="bus"></a>bus</h2><p>在linux设备模型中，总线用 bus_type 结构体表示。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">bus_type</span> &#123;</span></span><br><span class="line">    <span class="type">char</span> *name;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">subsystem</span> <span class="title">subsys</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">kset</span> <span class="title">drivers</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">kset</span> <span class="title">devices</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">bus_attribute</span>    *<span class="title">bus_attrs</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_attribute</span> *<span class="title">dev_attrs</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">driver_attribute</span> *<span class="title">drv_attrs</span>;</span></span><br><span class="line">    <span class="type">int</span> (*match)(<span class="keyword">struct</span> device *dev, <span class="keyword">struct</span> device_driver *drv);</span><br><span class="line">    <span class="type">int</span> (*hotplug) (<span class="keyword">struct</span> device *dev, <span class="type">char</span> **envp, </span><br><span class="line">                    <span class="type">int</span> num_envp, <span class="type">char</span> *buffer, <span class="type">int</span> buffer_size);</span><br><span class="line">    <span class="type">int</span> (*suspend)(<span class="keyword">struct</span> device *dev, <span class="type">pm_message_t</span> state);</span><br><span class="line">    <span class="type">int</span> (*resume)(<span class="keyword">struct</span> device *dev);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>match()成员函数将分开注册的设备和驱动捆绑在一起。</p>
-<h3 id="bus-register"><a href="#bus-register" class="headerlink" title="bus_register()"></a>bus_register()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">bus_register</span><span class="params">(<span class="keyword">struct</span> bus_type *bus)</span></span><br><span class="line">&#123;</span><br><span class="line">   <span class="type">int</span> retval;</span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">subsys_private</span> *<span class="title">priv</span>;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">lock_class_key</span> *<span class="title">key</span> =</span> &amp;bus-&gt;lock_key;</span><br><span class="line"></span><br><span class="line">   priv = kzalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> subsys_private), GFP_KERNEL);</span><br><span class="line"></span><br><span class="line">   priv-&gt;bus = bus;</span><br><span class="line">   bus-&gt;p = priv;</span><br><span class="line"></span><br><span class="line">   BLOCKING_INIT_NOTIFIER_HEAD(&amp;priv-&gt;bus_notifier);</span><br><span class="line"></span><br><span class="line">   retval = kobject_set_name(&amp;priv-&gt;subsys.kobj, <span class="string">&quot;%s&quot;</span>, bus-&gt;name);</span><br><span class="line"></span><br><span class="line">   priv-&gt;subsys.kobj.kset = bus_kset;</span><br><span class="line">   priv-&gt;subsys.kobj.ktype = &amp;bus_ktype;</span><br><span class="line">   priv-&gt;drivers_autoprobe = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">   retval = kset_register(&amp;priv-&gt;subsys);</span><br><span class="line"></span><br><span class="line">   retval = bus_create_file(bus, &amp;bus_attr_uevent);</span><br><span class="line"></span><br><span class="line">   priv-&gt;devices_kset = kset_create_and_add(<span class="string">&quot;devices&quot;</span>, <span class="literal">NULL</span>, &amp;priv-&gt;subsys.kobj);</span><br><span class="line">   priv-&gt;drivers_kset = kset_create_and_add(<span class="string">&quot;drivers&quot;</span>, <span class="literal">NULL</span>, &amp;priv-&gt;subsys.kobj);</span><br><span class="line"></span><br><span class="line">   INIT_LIST_HEAD(&amp;priv-&gt;interfaces);</span><br><span class="line">   __mutex_init(&amp;priv-&gt;mutex, <span class="string">&quot;subsys mutex&quot;</span>, key);</span><br><span class="line">   klist_init(&amp;priv-&gt;klist_devices, klist_devices_get, klist_devices_put);</span><br><span class="line">   klist_init(&amp;priv-&gt;klist_drivers, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">   retval = add_probe_files(bus);</span><br><span class="line"></span><br><span class="line">   retval = bus_add_groups(bus, bus-&gt;bus_groups);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="bus-attribute"><a href="#bus-attribute" class="headerlink" title="bus_attribute"></a>bus_attribute</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">bus_attribute</span> &#123;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">attribute</span>   <span class="title">attr</span>;</span></span><br><span class="line">   <span class="type">ssize_t</span> (*show)(<span class="keyword">struct</span> bus_type *bus, <span class="type">char</span> *buf);</span><br><span class="line">   <span class="type">ssize_t</span> (*store)(<span class="keyword">struct</span> bus_type *bus, <span class="type">const</span> <span class="type">char</span> *buf, <span class="type">size_t</span> count);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BUS_ATTR(_name, _mode, _show, _store)   \</span></span><br><span class="line"><span class="meta">   struct bus_attribute bus_attr_##_name = __ATTR(_name, _mode, _show, _store)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">bus_create_file</span><span class="params">(<span class="keyword">struct</span> bus_type *bus, <span class="keyword">struct</span> bus_attribute *attr)</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">bus_remove_file</span><span class="params">(<span class="keyword">struct</span> bus_type *bus, <span class="keyword">struct</span> bus_attribute *attr)</span></span><br></pre></td></tr></table></figure>
-
-<p>可用BUS_ATTR宏来初始化一个 bus_attribute 结构体。调用 bus_create_file() 函数创建总线属性。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">show_bus_version</span><span class="params">(<span class="keyword">struct</span> bus_type *bus, <span class="type">char</span> *buf)</span></span><br><span class="line">&#123;</span><br><span class="line">   <span class="keyword">return</span> <span class="built_in">snprintf</span>(buf, PAGE_SIZE, <span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;revision: 1.0&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="title function_">BUS_ATTR</span><span class="params">(version, S_IRUGO, show_bus_version, <span class="literal">NULL</span>)</span>;</span><br><span class="line"></span><br><span class="line">bus_create_file(&amp;my_bus_type, &amp;bus_attr_version)</span><br></pre></td></tr></table></figure>
-
-<h2 id="device"><a href="#device" class="headerlink" title="device"></a>device</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">device</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device</span>  *<span class="title">parent</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_private</span> *<span class="title">p</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">kobject</span> <span class="title">kobj</span>;</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>  *init_name; <span class="comment">/* initial name of the device */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_type</span> *<span class="title">type</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mutex</span>  <span class="title">mutex</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">bus_type</span> *<span class="title">bus</span>;</span>  <span class="comment">/* type of bus device is on */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_driver</span> *<span class="title">driver</span>;</span> <span class="comment">/* which driver has allocated this device */</span></span><br><span class="line">    <span class="type">void</span>  *platform_data; <span class="comment">/* Platform specific data, device core doesn&#x27;t touch it */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dev_pm_info</span> <span class="title">power</span>;</span></span><br><span class="line">    u64  *dma_mask;</span><br><span class="line">    u64  coherent_dma_mask;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_dma_parameters</span> *<span class="title">dma_parms</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">dma_pools</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dma_coherent_mem</span> *<span class="title">dma_mem</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dev_archdata</span> <span class="title">archdata</span>;</span></span><br><span class="line">    <span class="type">dev_t</span>   devt; <span class="comment">/* dev_t, creates the sysfs &quot;dev&quot; */</span></span><br><span class="line">    <span class="type">spinlock_t</span>  devres_lock;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">devres_head</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">klist_node</span> <span class="title">knode_class</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="keyword">class</span>  *<span class="keyword">class</span>;</span></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">attribute_group</span> **<span class="title">groups</span>;</span> <span class="comment">/* optional groups */</span></span><br><span class="line">    <span class="type">void</span> (*release)(<span class="keyword">struct</span> device *dev);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<h3 id="device-register"><a href="#device-register" class="headerlink" title="device_register()"></a>device_register()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">device_register</span><span class="params">(<span class="keyword">struct</span> device *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">   device_initialize(dev);</span><br><span class="line">   <span class="keyword">return</span> device_add(dev);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">device_initialize</span><span class="params">(<span class="keyword">struct</span> device *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">   dev-&gt;kobj.kset = devices_kset;</span><br><span class="line">   kobject_init(&amp;dev-&gt;kobj, &amp;device_ktype);</span><br><span class="line">   INIT_LIST_HEAD(&amp;dev-&gt;dma_pools);</span><br><span class="line">   mutex_init(&amp;dev-&gt;mutex);</span><br><span class="line">   lockdep_set_novalidate_class(&amp;dev-&gt;mutex);</span><br><span class="line">   spin_lock_init(&amp;dev-&gt;devres_lock);</span><br><span class="line">   INIT_LIST_HEAD(&amp;dev-&gt;devres_head);</span><br><span class="line">   device_pm_init(dev);</span><br><span class="line">   set_dev_node(dev, <span class="number">-1</span>);</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_GENERIC_MSI_IRQ</span></span><br><span class="line">   INIT_LIST_HEAD(&amp;dev-&gt;msi_list);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">   INIT_LIST_HEAD(&amp;dev-&gt;links.consumers);</span><br><span class="line">   INIT_LIST_HEAD(&amp;dev-&gt;links.suppliers);</span><br><span class="line">   dev-&gt;links.status = DL_DEV_NO_DRIVER;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">device_add</span><span class="params">(<span class="keyword">struct</span> device *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">device</span> *<span class="title">parent</span>;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">kobject</span> *<span class="title">kobj</span>;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">class_interface</span> *<span class="title">class_intf</span>;</span></span><br><span class="line">   <span class="type">int</span> error = -EINVAL;</span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">kobject</span> *<span class="title">glue_dir</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">   dev = get_device(dev);</span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> (!dev-&gt;p) &#123;</span><br><span class="line">      error = device_private_init(dev);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> (dev-&gt;init_name) &#123;</span><br><span class="line">      dev_set_name(dev, <span class="string">&quot;%s&quot;</span>, dev-&gt;init_name);</span><br><span class="line">      dev-&gt;init_name = <span class="literal">NULL</span>;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">/* subsystems can specify simple device enumeration */</span></span><br><span class="line">   <span class="keyword">if</span> (!dev_name(dev) &amp;&amp; dev-&gt;bus &amp;&amp; dev-&gt;bus-&gt;dev_name)</span><br><span class="line">      dev_set_name(dev, <span class="string">&quot;%s%u&quot;</span>, dev-&gt;bus-&gt;dev_name, dev-&gt;id);</span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> (!dev_name(dev)) &#123;</span><br><span class="line">      error = -EINVAL;</span><br><span class="line">      <span class="keyword">goto</span> name_error;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   parent = get_device(dev-&gt;parent);</span><br><span class="line">   kobj = get_device_parent(dev, parent);</span><br><span class="line">   <span class="keyword">if</span> (kobj)</span><br><span class="line">      dev-&gt;kobj.parent = kobj;</span><br><span class="line"></span><br><span class="line">   <span class="comment">/* use parent numa_node */</span></span><br><span class="line">   <span class="keyword">if</span> (parent &amp;&amp; (dev_to_node(dev) == NUMA_NO_NODE))</span><br><span class="line">      set_dev_node(dev, dev_to_node(parent));</span><br><span class="line"></span><br><span class="line">   error = kobject_add(&amp;dev-&gt;kobj, dev-&gt;kobj.parent, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">   <span class="comment">/* notify platform of device entry */</span></span><br><span class="line">   error = device_platform_notify(dev, KOBJ_ADD);</span><br><span class="line"></span><br><span class="line">   error = device_create_file(dev, &amp;dev_attr_uevent);</span><br><span class="line"></span><br><span class="line">   error = device_add_class_symlinks(dev);</span><br><span class="line">   error = device_add_attrs(dev);</span><br><span class="line">   error = bus_add_device(dev);</span><br><span class="line">   error = dpm_sysfs_add(dev);</span><br><span class="line">   device_pm_add(dev);</span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> (MAJOR(dev-&gt;devt)) &#123;</span><br><span class="line">      error = device_create_file(dev, &amp;dev_attr_dev);</span><br><span class="line"></span><br><span class="line">      error = device_create_sys_dev_entry(dev);</span><br><span class="line"></span><br><span class="line">      devtmpfs_create_node(dev);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> (dev-&gt;bus)</span><br><span class="line">      blocking_notifier_call_chain(&amp;dev-&gt;bus-&gt;p-&gt;bus_notifier,</span><br><span class="line">                    BUS_NOTIFY_ADD_DEVICE, dev);</span><br><span class="line"></span><br><span class="line">   kobject_uevent(&amp;dev-&gt;kobj, KOBJ_ADD);</span><br><span class="line">   bus_probe_device(dev);</span><br><span class="line">   <span class="keyword">if</span> (parent)</span><br><span class="line">      klist_add_tail(&amp;dev-&gt;p-&gt;knode_parent,</span><br><span class="line">                &amp;parent-&gt;p-&gt;klist_children);</span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> (dev-&gt;class) &#123;</span><br><span class="line">      mutex_lock(&amp;dev-&gt;class-&gt;p-&gt;mutex);</span><br><span class="line">      <span class="comment">/* tie the class to the device */</span></span><br><span class="line">      klist_add_tail(&amp;dev-&gt;knode_class,</span><br><span class="line">                &amp;dev-&gt;class-&gt;p-&gt;klist_devices);</span><br><span class="line"></span><br><span class="line">      <span class="comment">/* notify any interfaces that the device is here */</span></span><br><span class="line">      list_for_each_entry(class_intf,</span><br><span class="line">                &amp;dev-&gt;class-&gt;p-&gt;interfaces, node)</span><br><span class="line">         <span class="keyword">if</span> (class_intf-&gt;add_dev)</span><br><span class="line">            class_intf-&gt;add_dev(dev, class_intf);</span><br><span class="line">      mutex_unlock(&amp;dev-&gt;class-&gt;p-&gt;mutex);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="device-attribute"><a href="#device-attribute" class="headerlink" title="device_attribute"></a>device_attribute</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">device_attribute</span> &#123;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">attribute</span>   <span class="title">attr</span>;</span></span><br><span class="line">   <span class="type">ssize_t</span> (*show)(<span class="keyword">struct</span> device *dev, <span class="keyword">struct</span> device_attribute *attr,</span><br><span class="line">         <span class="type">char</span> *buf);</span><br><span class="line">   <span class="type">ssize_t</span> (*store)(<span class="keyword">struct</span> device *dev, <span class="keyword">struct</span> device_attribute *attr,</span><br><span class="line">          <span class="type">const</span> <span class="type">char</span> *buf, <span class="type">size_t</span> count);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEVICE_ATTR(_name, _mode, _show, _store) \</span></span><br><span class="line"><span class="meta">   struct device_attribute dev_attr_##_name = __ATTR(_name, _mode, _show, _store)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">device_create_file</span><span class="params">(<span class="keyword">struct</span> device *dev, <span class="type">const</span> <span class="keyword">struct</span> device_attribute *attr)</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">device_remove_file</span><span class="params">(<span class="keyword">struct</span> device *dev, <span class="keyword">struct</span> device_attribute *attr)</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="device-driver"><a href="#device-driver" class="headerlink" title="device_driver"></a>device_driver</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">device_driver</span> &#123;</span></span><br><span class="line">    <span class="comment">/* 驱动程序的名称 */</span></span><br><span class="line">    <span class="type">char</span>   *name;</span><br><span class="line">    <span class="comment">/* 指向总线描述符的指针。 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">bus_type</span>  *<span class="title">bus</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 禁止卸载设备驱动程序的信号量。 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">semaphore</span> <span class="title">unload_sem</span>;</span></span><br><span class="line">    <span class="comment">/* 内嵌kobject */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">kobject</span>  <span class="title">kobj</span>;</span></span><br><span class="line">    <span class="comment">/* 驱动程序所支持的所有设备组成的链表的首部。 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">devices</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 驱动程序所在模块（如果有的话） */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">module</span>   *<span class="title">owner</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 探测设备的方法 */</span></span><br><span class="line">    <span class="type">int</span> (*probe) (<span class="keyword">struct</span> device *dev);</span><br><span class="line">    <span class="comment">/* 移走设备的方法（检测设备驱动程序是否可以控制该设备） */</span></span><br><span class="line">    <span class="type">int</span>  (*remove) (<span class="keyword">struct</span> device *dev);</span><br><span class="line">    <span class="comment">/* 设备断电时调用的方法。 */</span></span><br><span class="line">    <span class="type">void</span> (*shutdown) (<span class="keyword">struct</span> device *dev);</span><br><span class="line">    <span class="comment">/* 设备置于低功率状态时所调用的方法 */</span></span><br><span class="line">    <span class="type">int</span> (*suspend) (<span class="keyword">struct</span> device *dev, u32 state, u32 level);</span><br><span class="line">    <span class="comment">/* 设备恢复正常状态时所调用的方法 */</span></span><br><span class="line">    <span class="type">int</span> (*resume) (<span class="keyword">struct</span> device *dev, u32 level);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h3 id="driver-register"><a href="#driver-register" class="headerlink" title="driver_register()"></a>driver_register()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">driver_register</span><span class="params">(<span class="keyword">struct</span> device_driver *drv)</span></span><br><span class="line">&#123;</span><br><span class="line">   <span class="type">int</span> ret;</span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">device_driver</span> *<span class="title">other</span>;</span></span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> ((drv-&gt;bus-&gt;probe &amp;&amp; drv-&gt;probe) ||</span><br><span class="line">       (drv-&gt;bus-&gt;remove &amp;&amp; drv-&gt;remove) ||</span><br><span class="line">       (drv-&gt;bus-&gt;shutdown &amp;&amp; drv-&gt;shutdown))</span><br><span class="line">      printk(KERN_WARNING <span class="string">&quot;Driver &#x27;%s&#x27; needs updating - please use &quot;</span></span><br><span class="line">         <span class="string">&quot;bus_type methods\n&quot;</span>, drv-&gt;name);</span><br><span class="line"></span><br><span class="line">   other = driver_find(drv-&gt;name, drv-&gt;bus);</span><br><span class="line"></span><br><span class="line">   ret = bus_add_driver(drv);</span><br><span class="line"></span><br><span class="line">   ret = driver_add_groups(drv, drv-&gt;groups);</span><br><span class="line"></span><br><span class="line">   kobject_uevent(&amp;drv-&gt;p-&gt;kobj, KOBJ_ADD);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="driver-attribute"><a href="#driver-attribute" class="headerlink" title="driver_attribute"></a>driver_attribute</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">driver_attribute</span> &#123;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">attribute</span> <span class="title">attr</span>;</span></span><br><span class="line">   <span class="type">ssize_t</span> (*show)(<span class="keyword">struct</span> device_driver *driver, <span class="type">char</span> *buf);</span><br><span class="line">   <span class="type">ssize_t</span> (*store)(<span class="keyword">struct</span> device_driver *driver, <span class="type">const</span> <span class="type">char</span> *buf, <span class="type">size_t</span> count);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DRIVER_ATTR(_name, _mode, _show, _store)   \</span></span><br><span class="line"><span class="meta">struct driver_attribute driver_attr_##_name =      \</span></span><br><span class="line"><span class="meta">   __ATTR(_name, _mode, _show, _store)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">driver_create_file</span><span class="params">(<span class="keyword">struct</span> device_driver *drv, <span class="type">const</span> <span class="keyword">struct</span> driver_attribute *attr)</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">driver_remove_file</span><span class="params">(<span class="keyword">struct</span> device_driver *drv, <span class="keyword">struct</span> driver_attribute *attr)</span></span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -11356,20 +13100,20 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">201</span>
+          <span class="site-state-item-count">203</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-count">37</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
