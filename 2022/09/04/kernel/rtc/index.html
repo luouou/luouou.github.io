@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="RTC(实时时钟)借助电池供电，在系统掉电的情况下时间依然可以正常走动，通常还具有产生周期性中断以及产生闹钟(alarm)中断的能力。   rtc-dev.c   rtc设备用户接口; class.c     管理rtc sys class; interface.c 间接rtc驱动接口; rtc-lib.c   rtc辅助函数,主要用于rtc时间转换、计算; rtc-proc    rtc pro">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RTC device">
+<meta property="og:url" content="http://example.com/2022/09/04/kernel/rtc/index.html">
+<meta property="og:site_name" content="nullptr">
+<meta property="og:description" content="RTC(实时时钟)借助电池供电，在系统掉电的情况下时间依然可以正常走动，通常还具有产生周期性中断以及产生闹钟(alarm)中断的能力。   rtc-dev.c   rtc设备用户接口; class.c     管理rtc sys class; interface.c 间接rtc驱动接口; rtc-lib.c   rtc辅助函数,主要用于rtc时间转换、计算; rtc-proc    rtc pro">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/kernel/rtc/rtc-arch.png">
+<meta property="article:published_time" content="2022-09-04T12:23:47.289Z">
+<meta property="article:modified_time" content="2022-09-04T12:23:47.289Z">
+<meta property="article:author" content="ubun2">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/kernel/rtc/rtc-arch.png">
+
+<link rel="canonical" href="http://example.com/2022/09/04/kernel/rtc/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>RTC device | nullptr</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nullptr</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">吾生也有涯 而知也无涯</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/kernel/rtc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          RTC device
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>RTC(实时时钟)借助电池供电，在系统掉电的情况下时间依然可以正常走动，通常还具有产生周期性中断以及产生闹钟(alarm)中断的能力。</p>
+<p><img src="/images/kernel/rtc/rtc-arch.png" alt="rtc"></p>
+<ul>
+<li>rtc-dev.c   rtc设备用户接口;</li>
+<li>class.c     管理rtc sys class;</li>
+<li>interface.c 间接rtc驱动接口;</li>
+<li>rtc-lib.c   rtc辅助函数,主要用于rtc时间转换、计算;</li>
+<li>rtc-proc    rtc proc fs用户接口;</li>
+<li>rtc-sysfs   rtc sys fs用户接口;</li>
+<li>hctosys.c   用于在系统启动时从rtc读取时间，并设置为系统时间;</li>
+<li>rtc-xxx.c   rtc硬件芯片驱动，如rtc-wm8350.c、rtc-s3c.c等。</li>
+<li>include/linux/rtc.h  rtc接口声明，定义ioctl命令宏。</li>
+</ul>
+<p>RTC框架大致可以分为三部分：芯片底层驱动，核心层API以及应用层接口，它们依次向上抽象注册。同时又对下面底层的函数进行回调。</p>
+<h2 id="rtc-xxx-c"><a href="#rtc-xxx-c" class="headerlink" title="rtc-xxx.c"></a>rtc-xxx.c</h2><p>不同的芯片对应不同的.c文件，每种芯片的实现方式都不一样，由芯片硬件自身决定。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">rtc_class_ops</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> (*open)(<span class="keyword">struct</span> device *);</span><br><span class="line">    <span class="type">void</span> (*release)(<span class="keyword">struct</span> device *);</span><br><span class="line">    <span class="type">int</span> (*ioctl)(<span class="keyword">struct</span> device *, <span class="type">unsigned</span> <span class="type">int</span>, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">    <span class="type">int</span> (*read_time)(<span class="keyword">struct</span> device *, <span class="keyword">struct</span> rtc_time *);</span><br><span class="line">    <span class="type">int</span> (*set_time)(<span class="keyword">struct</span> device *, <span class="keyword">struct</span> rtc_time *);</span><br><span class="line">    <span class="type">int</span> (*read_alarm)(<span class="keyword">struct</span> device *, <span class="keyword">struct</span> rtc_wkalrm *);</span><br><span class="line">    <span class="type">int</span> (*set_alarm)(<span class="keyword">struct</span> device *, <span class="keyword">struct</span> rtc_wkalrm *);</span><br><span class="line">    <span class="type">int</span> (*proc)(<span class="keyword">struct</span> device *, <span class="keyword">struct</span> seq_file *);</span><br><span class="line">    <span class="type">int</span> (*set_mmss)(<span class="keyword">struct</span> device *, <span class="type">unsigned</span> <span class="type">long</span> secs);</span><br><span class="line">    <span class="type">int</span> (*read_callback)(<span class="keyword">struct</span> device *, <span class="type">int</span> data);</span><br><span class="line">    <span class="type">int</span> (*alarm_irq_enable)(<span class="keyword">struct</span> device *, <span class="type">unsigned</span> <span class="type">int</span> enabled);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">rtc_class_ops</span> <span class="title">s3c_rtcops</span> =</span> &#123;</span><br><span class="line">    .read_time  = s3c_rtc_gettime,</span><br><span class="line">    .set_time   = s3c_rtc_settime,</span><br><span class="line">    .read_alarm = s3c_rtc_getalarm,</span><br><span class="line">    .set_alarm  = s3c_rtc_setalarm,</span><br><span class="line">    .alarm_irq_enable = s3c_rtc_setaie,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">rtc_device</span> *<span class="title">rtc</span>;</span></span><br><span class="line">rtc = rtc_device_register(<span class="string">&quot;s3c&quot;</span>, &amp;pdev-&gt;dev, &amp;s3c_rtcops, THIS_MODULE);</span><br></pre></td></tr></table></figure>
+
+<p>rtc芯片要实例化一个 rtc_class_ops 结构体，里面是一些rtc设备的操作函数，然后使用 <a href="#rtc_device_register">rtc_device_register()</a> 函数注册到rtc设备中。</p>
+<h2 id="rtc-class-c"><a href="#rtc-class-c" class="headerlink" title="rtc-class.c"></a>rtc-class.c</h2><p>rtc-class.c 提供了一些rtc核心的API。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">rtc_device</span>  </span></span><br><span class="line"><span class="class">&#123;</span>  </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device</span> <span class="title">dev</span>;</span>  </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">module</span> *<span class="title">owner</span>;</span>  </span><br><span class="line">  </span><br><span class="line">    <span class="type">int</span> id;                                              <span class="comment">//代表是那个rtc设备  </span></span><br><span class="line">    <span class="type">char</span> name[RTC_DEVICE_NAME_SIZE];                     <span class="comment">//代表rtc设备的名称  </span></span><br><span class="line">  </span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">rtc_class_ops</span> *<span class="title">ops</span>;</span>                     <span class="comment">//rtc操作函数集，需要驱动实现  </span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mutex</span> <span class="title">ops_lock</span>;</span>                               <span class="comment">//操作函数集的互斥锁  </span></span><br><span class="line">  </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">cdev</span> <span class="title">char_dev</span>;</span>                                <span class="comment">//代表rtc字符设备，因为rtc就是个字符设备  </span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> flags;                                 <span class="comment">//rtc的状态标志，例如RTC_DEV_BUSY  </span></span><br><span class="line">  </span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> irq_data;                              <span class="comment">//rtc中断数据  </span></span><br><span class="line">    <span class="type">spinlock_t</span> irq_lock;                                 <span class="comment">//访问数据是要互斥，需要spin_lock  </span></span><br><span class="line">    <span class="type">wait_queue_head_t</span> irq_queue;                         <span class="comment">//数据查询中用到rtc队列  </span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">fasync_struct</span> *<span class="title">async_queue</span>;</span>                   <span class="comment">//异步队列  </span></span><br><span class="line">  </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rtc_task</span> *<span class="title">irq_task</span>;</span>                           <span class="comment">//在中断中使用task传输数据  </span></span><br><span class="line">    <span class="type">spinlock_t</span> irq_task_lock;                            <span class="comment">//task传输互斥  </span></span><br><span class="line">    <span class="type">int</span> irq_freq;                                        <span class="comment">//rtc的中断频率  </span></span><br><span class="line">    <span class="type">int</span> max_user_freq;                                   <span class="comment">//rtc的最大中断频率  </span></span><br><span class="line">  </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timerqueue_head</span> <span class="title">timerqueue</span>;</span>                   <span class="comment">//定时器队列                    </span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rtc_timer</span> <span class="title">aie_timer</span>;</span>                          <span class="comment">//aie(alaram interrupt enable)定时器  </span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rtc_timer</span> <span class="title">uie_rtctimer</span>;</span>                       <span class="comment">//uie(update interrupt enable)定时器  </span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">hrtimer</span> <span class="title">pie_timer</span>;</span> <span class="comment">/* sub second exp, so needs hrtimer */</span> <span class="comment">//pie(periodic interrupt enable)定时器  </span></span><br><span class="line">    <span class="type">int</span> pie_enabled;                                     <span class="comment">//pie使能标志  </span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">work_struct</span> <span class="title">irqwork</span>;</span>                            </span><br><span class="line">    <span class="comment">/* Some hardware can&#x27;t support UIE mode */</span>  </span><br><span class="line">    <span class="type">int</span> uie_unsupported;                                 <span class="comment">//uie使能标志  </span></span><br><span class="line">  </span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_RTC_INTF_DEV_UIE_EMUL                      <span class="comment">//RTC UIE emulation on dev interface配置项，目前没有开启  </span></span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">work_struct</span> <span class="title">uie_task</span>;</span>  </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timer_list</span> <span class="title">uie_timer</span>;</span>  </span><br><span class="line">    <span class="comment">/* Those fields are protected by rtc-&gt;irq_lock */</span>  </span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> oldsecs;  </span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uie_irq_active:<span class="number">1</span>;  </span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> stop_uie_polling:<span class="number">1</span>;  </span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uie_task_active:<span class="number">1</span>;  </span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uie_timer_active:<span class="number">1</span>;  </span><br><span class="line"><span class="meta">#<span class="keyword">endif</span>  </span></span><br></pre></td></tr></table></figure>
+
+<h3 id="rtc-device-register"><a href="#rtc-device-register" class="headerlink" title="rtc_device_register"></a>rtc_device_register</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> rtc_device *<span class="title function_">rtc_device_register</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name, <span class="keyword">struct</span> device *dev,</span></span><br><span class="line"><span class="params">                    <span class="type">const</span> <span class="keyword">struct</span> rtc_class_ops *ops,</span></span><br><span class="line"><span class="params">                    <span class="keyword">struct</span> module *owner)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rtc_device</span> *<span class="title">rtc</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rtc_wkalrm</span> <span class="title">alrm</span>;</span></span><br><span class="line">    <span class="type">int</span> id, err;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (idr_pre_get(&amp;rtc_idr, GFP_KERNEL) == <span class="number">0</span>) &#123;</span><br><span class="line">        err = -ENOMEM;</span><br><span class="line">        <span class="keyword">goto</span> <span class="built_in">exit</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    mutex_lock(&amp;idr_lock);</span><br><span class="line">    err = idr_get_new(&amp;rtc_idr, <span class="literal">NULL</span>, &amp;id);</span><br><span class="line">    mutex_unlock(&amp;idr_lock);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (err &lt; <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">goto</span> <span class="built_in">exit</span>;</span><br><span class="line"></span><br><span class="line">    id = id &amp; MAX_ID_MASK;</span><br><span class="line"></span><br><span class="line">    rtc = kzalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> rtc_device), GFP_KERNEL);</span><br><span class="line">    <span class="keyword">if</span> (rtc == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        err = -ENOMEM;</span><br><span class="line">        <span class="keyword">goto</span> exit_idr;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    rtc-&gt;id = id;</span><br><span class="line">    rtc-&gt;ops = ops;</span><br><span class="line">    rtc-&gt;owner = owner;</span><br><span class="line">    rtc-&gt;irq_freq = <span class="number">1</span>;</span><br><span class="line">    rtc-&gt;max_user_freq = <span class="number">64</span>;</span><br><span class="line">    rtc-&gt;dev.parent = dev;</span><br><span class="line">    rtc-&gt;dev.class = rtc_class;</span><br><span class="line">    rtc-&gt;dev.release = rtc_device_release;</span><br><span class="line"></span><br><span class="line">    mutex_init(&amp;rtc-&gt;ops_lock);</span><br><span class="line">    spin_lock_init(&amp;rtc-&gt;irq_lock);</span><br><span class="line">    spin_lock_init(&amp;rtc-&gt;irq_task_lock);</span><br><span class="line">    init_waitqueue_head(&amp;rtc-&gt;irq_queue);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Init timerqueue */</span></span><br><span class="line">    timerqueue_init_head(&amp;rtc-&gt;timerqueue);</span><br><span class="line">    INIT_WORK(&amp;rtc-&gt;irqwork, rtc_timer_do_work);</span><br><span class="line">    <span class="comment">/* Init aie timer */</span></span><br><span class="line">    rtc_timer_init(&amp;rtc-&gt;aie_timer, rtc_aie_update_irq, (<span class="type">void</span> *)rtc);</span><br><span class="line">    <span class="comment">/* Init uie timer */</span></span><br><span class="line">    rtc_timer_init(&amp;rtc-&gt;uie_rtctimer, rtc_uie_update_irq, (<span class="type">void</span> *)rtc);</span><br><span class="line">    <span class="comment">/* Init pie timer */</span></span><br><span class="line">    hrtimer_init(&amp;rtc-&gt;pie_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);</span><br><span class="line">    rtc-&gt;pie_timer.function = rtc_pie_update_irq;</span><br><span class="line">    rtc-&gt;pie_enabled = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Check to see if there is an ALARM already set in hw */</span></span><br><span class="line">    err = __rtc_read_alarm(rtc, &amp;alrm);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!err &amp;&amp; !rtc_valid_tm(&amp;alrm.time))</span><br><span class="line">        rtc_initialize_alarm(rtc, &amp;alrm);</span><br><span class="line"></span><br><span class="line">    strlcpy(rtc-&gt;name, name, RTC_DEVICE_NAME_SIZE);</span><br><span class="line">    dev_set_name(&amp;rtc-&gt;dev, <span class="string">&quot;rtc%d&quot;</span>, id);</span><br><span class="line"></span><br><span class="line">    rtc_dev_prepare(rtc);</span><br><span class="line"></span><br><span class="line">    err = device_register(&amp;rtc-&gt;dev);</span><br><span class="line">    <span class="keyword">if</span> (err) &#123;</span><br><span class="line">        put_device(&amp;rtc-&gt;dev);</span><br><span class="line">        <span class="keyword">goto</span> exit_kfree;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    rtc_dev_add_device(rtc);</span><br><span class="line">    rtc_sysfs_add_device(rtc);</span><br><span class="line">    rtc_proc_add_device(rtc);</span><br><span class="line"></span><br><span class="line">    dev_info(dev, <span class="string">&quot;rtc core: registered %s as %s\n&quot;</span>,</span><br><span class="line">            rtc-&gt;name, dev_name(&amp;rtc-&gt;dev));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> rtc;</span><br><span class="line"></span><br><span class="line">exit_kfree:</span><br><span class="line">    kfree(rtc);</span><br><span class="line"></span><br><span class="line">exit_idr:</span><br><span class="line">    mutex_lock(&amp;idr_lock);</span><br><span class="line">    idr_remove(&amp;rtc_idr, id);</span><br><span class="line">    mutex_unlock(&amp;idr_lock);</span><br><span class="line"></span><br><span class="line"><span class="built_in">exit</span>:</span><br><span class="line">    dev_err(dev, <span class="string">&quot;rtc core: unable to register %s, err = %d\n&quot;</span>,</span><br><span class="line">            name, err);</span><br><span class="line">    <span class="keyword">return</span> ERR_PTR(err);</span><br></pre></td></tr></table></figure>
+
+<p>rtc_device_register()函数主要工作是创建一个rtc设备和实现proc、sysfs文件系统操作。</p>
+<h2 id="rtc-dev-c"><a href="#rtc-dev-c" class="headerlink" title="rtc-dev.c"></a>rtc-dev.c</h2><p>rtc-dev.c 是硬件抽象层，为应用层提供了文件操作接口，如read, ioctl等。同时也为rtc-class.c 提供了API，rtc字符设备的创建的实现也在这里。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_AIE_ON  _IO(<span class="string">&#x27;p&#x27;</span>, 0x01)  <span class="comment">/* Alarm int. enable on     */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_AIE_OFF _IO(<span class="string">&#x27;p&#x27;</span>, 0x02)  <span class="comment">/* ... off          */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_UIE_ON  _IO(<span class="string">&#x27;p&#x27;</span>, 0x03)  <span class="comment">/* Update int. enable on    */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_UIE_OFF _IO(<span class="string">&#x27;p&#x27;</span>, 0x04)  <span class="comment">/* ... off          */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_PIE_ON  _IO(<span class="string">&#x27;p&#x27;</span>, 0x05)  <span class="comment">/* Periodic int. enable on  */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_PIE_OFF _IO(<span class="string">&#x27;p&#x27;</span>, 0x06)  <span class="comment">/* ... off          */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_WIE_ON  _IO(<span class="string">&#x27;p&#x27;</span>, 0x0f)  <span class="comment">/* Watchdog int. enable on  */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_WIE_OFF _IO(<span class="string">&#x27;p&#x27;</span>, 0x10)  <span class="comment">/* ... off          */</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_ALM_SET _IOW(<span class="string">&#x27;p&#x27;</span>, 0x07, struct rtc_time) <span class="comment">/* Set alarm time  */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_ALM_READ    _IOR(<span class="string">&#x27;p&#x27;</span>, 0x08, struct rtc_time) <span class="comment">/* Read alarm time */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_RD_TIME _IOR(<span class="string">&#x27;p&#x27;</span>, 0x09, struct rtc_time) <span class="comment">/* Read RTC time   */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_SET_TIME    _IOW(<span class="string">&#x27;p&#x27;</span>, 0x0a, struct rtc_time) <span class="comment">/* Set RTC time    */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_IRQP_READ   _IOR(<span class="string">&#x27;p&#x27;</span>, 0x0b, unsigned long)   <span class="comment">/* Read IRQ rate   */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_IRQP_SET    _IOW(<span class="string">&#x27;p&#x27;</span>, 0x0c, unsigned long)   <span class="comment">/* Set IRQ rate    */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_EPOCH_READ  _IOR(<span class="string">&#x27;p&#x27;</span>, 0x0d, unsigned long)   <span class="comment">/* Read epoch      */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_EPOCH_SET   _IOW(<span class="string">&#x27;p&#x27;</span>, 0x0e, unsigned long)   <span class="comment">/* Set epoch       */</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_WKALM_SET   _IOW(<span class="string">&#x27;p&#x27;</span>, 0x0f, struct rtc_wkalrm)<span class="comment">/* Set wakeup alarm*/</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_WKALM_RD    _IOR(<span class="string">&#x27;p&#x27;</span>, 0x10, struct rtc_wkalrm)<span class="comment">/* Get wakeup alarm*/</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_PLL_GET _IOR(<span class="string">&#x27;p&#x27;</span>, 0x11, struct rtc_pll_info)  <span class="comment">/* Get PLL correction */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTC_PLL_SET _IOW(<span class="string">&#x27;p&#x27;</span>, 0x12, struct rtc_pll_info)  <span class="comment">/* Set PLL correction */</span></span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">long</span> <span class="title function_">rtc_dev_ioctl</span><span class="params">(<span class="keyword">struct</span> file *file,</span></span><br><span class="line"><span class="params">        <span class="type">unsigned</span> <span class="type">int</span> cmd, <span class="type">unsigned</span> <span class="type">long</span> arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> err = <span class="number">0</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rtc_device</span> *<span class="title">rtc</span> =</span> file-&gt;private_data;</span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">rtc_class_ops</span> *<span class="title">ops</span> =</span> rtc-&gt;ops;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rtc_time</span> <span class="title">tm</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rtc_wkalrm</span> <span class="title">alarm</span>;</span></span><br><span class="line">    <span class="type">void</span> __user *uarg = (<span class="type">void</span> __user *) arg;</span><br><span class="line"></span><br><span class="line">    err = mutex_lock_interruptible(&amp;rtc-&gt;ops_lock);</span><br><span class="line">    <span class="keyword">if</span> (err)</span><br><span class="line">        <span class="keyword">return</span> err;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* check that the calling task has appropriate permissions</span></span><br><span class="line"><span class="comment">     * for certain ioctls. doing this check here is useful</span></span><br><span class="line"><span class="comment">     * to avoid duplicate code in each driver.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">switch</span> (cmd) &#123;</span><br><span class="line">    <span class="keyword">case</span> RTC_EPOCH_SET:</span><br><span class="line">    <span class="keyword">case</span> RTC_SET_TIME:</span><br><span class="line">        <span class="keyword">if</span> (!capable(CAP_SYS_TIME))</span><br><span class="line">            err = -EACCES;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> RTC_IRQP_SET:</span><br><span class="line">        <span class="keyword">if</span> (arg &gt; rtc-&gt;max_user_freq &amp;&amp; !capable(CAP_SYS_RESOURCE))</span><br><span class="line">            err = -EACCES;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> RTC_PIE_ON:</span><br><span class="line">        <span class="keyword">if</span> (rtc-&gt;irq_freq &gt; rtc-&gt;max_user_freq &amp;&amp;</span><br><span class="line">                !capable(CAP_SYS_RESOURCE))</span><br><span class="line">            err = -EACCES;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (err)</span><br><span class="line">        <span class="keyword">goto</span> done;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * Drivers *SHOULD NOT* provide ioctl implementations</span></span><br><span class="line"><span class="comment">     * for these requests.  Instead, provide methods to</span></span><br><span class="line"><span class="comment">     * support the following code, so that the RTC&#x27;s main</span></span><br><span class="line"><span class="comment">     * features are accessible without using ioctls.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * RTC and alarm times will be in UTC, by preference,</span></span><br><span class="line"><span class="comment">     * but dual-booting with MS-Windows implies RTCs must</span></span><br><span class="line"><span class="comment">     * use the local wall clock time.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">switch</span> (cmd) &#123;</span><br><span class="line">    <span class="keyword">case</span> RTC_ALM_READ:</span><br><span class="line">        mutex_unlock(&amp;rtc-&gt;ops_lock);</span><br><span class="line"></span><br><span class="line">        err = rtc_read_alarm(rtc, &amp;alarm);</span><br><span class="line">        <span class="keyword">if</span> (err &lt; <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> err;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (copy_to_user(uarg, &amp;alarm.time, <span class="keyword">sizeof</span>(tm)))</span><br><span class="line">            err = -EFAULT;</span><br><span class="line">        <span class="keyword">return</span> err;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> RTC_ALM_SET:</span><br><span class="line">        mutex_unlock(&amp;rtc-&gt;ops_lock);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (copy_from_user(&amp;alarm.time, uarg, <span class="keyword">sizeof</span>(tm)))</span><br><span class="line">            <span class="keyword">return</span> -EFAULT;</span><br><span class="line"></span><br><span class="line">        alarm.enabled = <span class="number">0</span>;</span><br><span class="line">        alarm.pending = <span class="number">0</span>;</span><br><span class="line">        alarm.time.tm_wday = <span class="number">-1</span>;</span><br><span class="line">        alarm.time.tm_yday = <span class="number">-1</span>;</span><br><span class="line">        alarm.time.tm_isdst = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* RTC_ALM_SET alarms may be up to 24 hours in the future.</span></span><br><span class="line"><span class="comment">         * Rather than expecting every RTC to implement &quot;don&#x27;t care&quot;</span></span><br><span class="line"><span class="comment">         * for day/month/year fields, just force the alarm to have</span></span><br><span class="line"><span class="comment">         * the right values for those fields.</span></span><br><span class="line"><span class="comment">         *</span></span><br><span class="line"><span class="comment">         * RTC_WKALM_SET should be used instead.  Not only does it</span></span><br><span class="line"><span class="comment">         * eliminate the need for a separate RTC_AIE_ON call, it</span></span><br><span class="line"><span class="comment">         * doesn&#x27;t have the &quot;alarm 23:59:59 in the future&quot; race.</span></span><br><span class="line"><span class="comment">         *</span></span><br><span class="line"><span class="comment">         * <span class="doctag">NOTE:</span>  some legacy code may have used invalid fields as</span></span><br><span class="line"><span class="comment">         * wildcards, exposing hardware &quot;periodic alarm&quot; capabilities.</span></span><br><span class="line"><span class="comment">         * Not supported here.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="type">unsigned</span> <span class="type">long</span> now, then;</span><br><span class="line"></span><br><span class="line">            err = rtc_read_time(rtc, &amp;tm);</span><br><span class="line">            <span class="keyword">if</span> (err &lt; <span class="number">0</span>)</span><br><span class="line">                <span class="keyword">return</span> err;</span><br><span class="line">            rtc_tm_to_time(&amp;tm, &amp;now);</span><br><span class="line"></span><br><span class="line">            alarm.time.tm_mday = tm.tm_mday;</span><br><span class="line">            alarm.time.tm_mon = tm.tm_mon;</span><br><span class="line">            alarm.time.tm_year = tm.tm_year;</span><br><span class="line">            err  = rtc_valid_tm(&amp;alarm.time);</span><br><span class="line">            <span class="keyword">if</span> (err &lt; <span class="number">0</span>)</span><br><span class="line">                <span class="keyword">return</span> err;</span><br><span class="line">            rtc_tm_to_time(&amp;alarm.time, &amp;then);</span><br><span class="line"></span><br><span class="line">            <span class="comment">/* alarm may need to wrap into tomorrow */</span></span><br><span class="line">            <span class="keyword">if</span> (then &lt; now) &#123;</span><br><span class="line">                rtc_time_to_tm(now + <span class="number">24</span> * <span class="number">60</span> * <span class="number">60</span>, &amp;tm);</span><br><span class="line">                alarm.time.tm_mday = tm.tm_mday;</span><br><span class="line">                alarm.time.tm_mon = tm.tm_mon;</span><br><span class="line">                alarm.time.tm_year = tm.tm_year;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> rtc_set_alarm(rtc, &amp;alarm);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> RTC_RD_TIME:</span><br><span class="line">        mutex_unlock(&amp;rtc-&gt;ops_lock);</span><br><span class="line"></span><br><span class="line">        err = rtc_read_time(rtc, &amp;tm);</span><br><span class="line">        <span class="keyword">if</span> (err &lt; <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> err;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (copy_to_user(uarg, &amp;tm, <span class="keyword">sizeof</span>(tm)))</span><br><span class="line">            err = -EFAULT;</span><br><span class="line">        <span class="keyword">return</span> err;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> RTC_SET_TIME:</span><br><span class="line">        mutex_unlock(&amp;rtc-&gt;ops_lock);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (copy_from_user(&amp;tm, uarg, <span class="keyword">sizeof</span>(tm)))</span><br><span class="line">            <span class="keyword">return</span> -EFAULT;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> rtc_set_time(rtc, &amp;tm);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> RTC_PIE_ON:</span><br><span class="line">        err = rtc_irq_set_state(rtc, <span class="literal">NULL</span>, <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> RTC_PIE_OFF:</span><br><span class="line">        err = rtc_irq_set_state(rtc, <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> RTC_AIE_ON:</span><br><span class="line">        mutex_unlock(&amp;rtc-&gt;ops_lock);</span><br><span class="line">        <span class="keyword">return</span> rtc_alarm_irq_enable(rtc, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> RTC_AIE_OFF:</span><br><span class="line">        mutex_unlock(&amp;rtc-&gt;ops_lock);</span><br><span class="line">        <span class="keyword">return</span> rtc_alarm_irq_enable(rtc, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> RTC_UIE_ON:</span><br><span class="line">        mutex_unlock(&amp;rtc-&gt;ops_lock);</span><br><span class="line">        <span class="keyword">return</span> rtc_update_irq_enable(rtc, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> RTC_UIE_OFF:</span><br><span class="line">        mutex_unlock(&amp;rtc-&gt;ops_lock);</span><br><span class="line">        <span class="keyword">return</span> rtc_update_irq_enable(rtc, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> RTC_IRQP_SET:</span><br><span class="line">        err = rtc_irq_set_freq(rtc, <span class="literal">NULL</span>, arg);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> RTC_IRQP_READ:</span><br><span class="line">        err = put_user(rtc-&gt;irq_freq, (<span class="type">unsigned</span> <span class="type">long</span> __user *)uarg);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> RTC_WKALM_SET:</span><br><span class="line">        mutex_unlock(&amp;rtc-&gt;ops_lock);</span><br><span class="line">        <span class="keyword">if</span> (copy_from_user(&amp;alarm, uarg, <span class="keyword">sizeof</span>(alarm)))</span><br><span class="line">            <span class="keyword">return</span> -EFAULT;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> rtc_set_alarm(rtc, &amp;alarm);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> RTC_WKALM_RD:</span><br><span class="line">        mutex_unlock(&amp;rtc-&gt;ops_lock);</span><br><span class="line">        err = rtc_read_alarm(rtc, &amp;alarm);</span><br><span class="line">        <span class="keyword">if</span> (err &lt; <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> err;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (copy_to_user(uarg, &amp;alarm, <span class="keyword">sizeof</span>(alarm)))</span><br><span class="line">            err = -EFAULT;</span><br><span class="line">        <span class="keyword">return</span> err;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="comment">/* Finally try the driver&#x27;s ioctl interface */</span></span><br><span class="line">        <span class="keyword">if</span> (ops-&gt;ioctl) &#123;</span><br><span class="line">            err = ops-&gt;ioctl(rtc-&gt;dev.parent, cmd, arg);</span><br><span class="line">            <span class="keyword">if</span> (err == -ENOIOCTLCMD)</span><br><span class="line">                err = -ENOTTY;</span><br><span class="line">        &#125; <span class="keyword">else</span></span><br><span class="line">            err = -ENOTTY;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">done:</span><br><span class="line">    mutex_unlock(&amp;rtc-&gt;ops_lock);</span><br><span class="line">    <span class="keyword">return</span> err;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/09/04/kernel/spi_device/" rel="prev" title="spi 设备驱动">
+      <i class="fa fa-chevron-left"></i> spi 设备驱动
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/09/04/kernel/input/" rel="next" title="input 子系统">
+      input 子系统 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#rtc-xxx-c"><span class="nav-number">1.</span> <span class="nav-text">rtc-xxx.c</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rtc-class-c"><span class="nav-number">2.</span> <span class="nav-text">rtc-class.c</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rtc-device-register"><span class="nav-number">2.1.</span> <span class="nav-text">rtc_device_register</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rtc-dev-c"><span class="nav-number">3.</span> <span class="nav-text">rtc-dev.c</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ubun2</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">203</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ubun2</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

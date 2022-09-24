@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="字符设备是一个顺序的数据流设备，对设备的读写是按字符进行的，而且这些字符是连续地形成一个数据流。不具备缓冲区，所以对字符设备的读写是实时的。 创建一个字符设备的步骤：  申请然后注册设备号。 实例一个cdev结构体。 实现字符设备的文件操作函数，然后用cdev_init()函数初始化cdev。 使用cdev_add()函数添加设备号。以上几步也可以直接用register_chrdev函数代替。 使">
+<meta property="og:type" content="article">
+<meta property="og:title" content="char device">
+<meta property="og:url" content="http://example.com/2022/09/04/kernel/cdev/index.html">
+<meta property="og:site_name" content="nullptr">
+<meta property="og:description" content="字符设备是一个顺序的数据流设备，对设备的读写是按字符进行的，而且这些字符是连续地形成一个数据流。不具备缓冲区，所以对字符设备的读写是实时的。 创建一个字符设备的步骤：  申请然后注册设备号。 实例一个cdev结构体。 实现字符设备的文件操作函数，然后用cdev_init()函数初始化cdev。 使用cdev_add()函数添加设备号。以上几步也可以直接用register_chrdev函数代替。 使">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/kernel/char/cdev-file_ops.png">
+<meta property="article:published_time" content="2022-09-04T12:23:47.289Z">
+<meta property="article:modified_time" content="2022-09-04T12:23:47.289Z">
+<meta property="article:author" content="ubun2">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/kernel/char/cdev-file_ops.png">
+
+<link rel="canonical" href="http://example.com/2022/09/04/kernel/cdev/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>char device | nullptr</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nullptr</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">吾生也有涯 而知也无涯</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/kernel/cdev/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          char device
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>字符设备是一个顺序的数据流设备，对设备的读写是按字符进行的，而且这些字符是连续地形成一个数据流。不具备缓冲区，所以对字符设备的读写是实时的。</p>
+<p>创建一个字符设备的步骤：</p>
+<ol>
+<li>申请然后注册设备号。</li>
+<li>实例一个cdev结构体。</li>
+<li>实现字符设备的文件操作函数，然后用cdev_init()函数初始化cdev。</li>
+<li>使用cdev_add()函数添加设备号。以上几步也可以直接用register_chrdev函数代替。</li>
+<li>使用device_create()函数在/dev/下创建设备节点。</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">if</span> 0</span></span><br><span class="line">register_chrdev_region(chardev-&gt;devno, <span class="number">1</span>, CHARDEV_DEV_NAME);</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">alloc_chrdev_region(&amp;chardev-&gt;devno, <span class="number">0</span>, <span class="number">1</span>, CHARDEV_DEV_NAME);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">cdev_init(&amp;chardev-&gt;cdev, &amp;chardev_fops);</span><br><span class="line">chardev-&gt;cdev.owner = THIS_MODULE;</span><br><span class="line">cdev_add(&amp;chardev-&gt;cdev, chardev-&gt;devno, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 在/sys/class/目录下创建设备 */</span></span><br><span class="line">chardev-&gt;<span class="class"><span class="keyword">class</span> =</span> class_create(THIS_MODULE, CHARDEV_DEV_NAME);</span><br><span class="line"></span><br><span class="line">device_create(chardev-&gt;class, <span class="literal">NULL</span>, chardev-&gt;devno, <span class="literal">NULL</span>, CHARDEV_DEV_NAME);</span><br></pre></td></tr></table></figure>
+
+<p>卸载设备时，需要将之前创建的cdev、设备号、设备结点一并销毁。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">cdev_del(&amp;chardev-&gt;cdev);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 销毁设备节点 */</span></span><br><span class="line">device_destroy(chardev-&gt;class, chardev-&gt;devno);</span><br><span class="line"></span><br><span class="line">class_destroy(chardev-&gt;class);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*注销设备号*/</span></span><br><span class="line">unregister_chrdev_region(chardev-&gt;devno, <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">register_chrdev</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> major, <span class="type">const</span> <span class="type">char</span> *name, <span class="keyword">struct</span> file_operations *fops)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">char_device_struct</span> *<span class="title">cd</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">cdev</span> *<span class="title">cdev</span>;</span></span><br><span class="line">    <span class="type">char</span> *s;</span><br><span class="line">    <span class="type">int</span> err = -ENOMEM;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 分配请求的设备号范围。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    cd = __register_chrdev_region(major, <span class="number">0</span>, <span class="number">256</span>, name);</span><br><span class="line">    <span class="keyword">if</span> (IS_ERR(cd))<span class="comment">/* 设备号冲突，返回。 */</span></span><br><span class="line">        <span class="keyword">return</span> PTR_ERR(cd);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 为设备驱动程序分配一个新的cdev结构 */</span></span><br><span class="line">    cdev = cdev_alloc();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 初始化cdev结构 */</span></span><br><span class="line">    cdev-&gt;owner = fops-&gt;owner;</span><br><span class="line">    cdev-&gt;ops = fops;</span><br><span class="line">    kobject_set_name(&amp;cdev-&gt;kobj, <span class="string">&quot;%s&quot;</span>, name);</span><br><span class="line">    <span class="keyword">for</span> (s = <span class="built_in">strchr</span>(kobject_name(&amp;cdev-&gt;kobj),<span class="string">&#x27;/&#x27;</span>); s; s = <span class="built_in">strchr</span>(s, <span class="string">&#x27;/&#x27;</span>))</span><br><span class="line">        *s = <span class="string">&#x27;!&#x27;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 将设备添加到设备驱动模型中 */</span></span><br><span class="line">    cdev_add(cdev, MKDEV(cd-&gt;major, <span class="number">0</span>), <span class="number">256</span>);</span><br><span class="line">    cd-&gt;cdev = cdev;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> major ? <span class="number">0</span> : cd-&gt;major;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">unregister_chrdev</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> major, <span class="type">const</span> <span class="type">char</span> *name)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">char_device_struct</span> *<span class="title">cd</span>;</span></span><br><span class="line">    cd = __unregister_chrdev_region(major, <span class="number">0</span>, <span class="number">256</span>);</span><br><span class="line">    <span class="keyword">if</span> (cd &amp;&amp; cd-&gt;cdev)</span><br><span class="line">        cdev_del(cd-&gt;cdev);</span><br><span class="line">    kfree(cd);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="设备号"><a href="#设备号" class="headerlink" title="设备号"></a>设备号</h2><p>设备号分为主设备号和次设备号，主设备号用来标识设备类型，次设备号用来区分同类型的设备，分别为dev_t的高12位和低20位。inode 结构i_rdev 字段包含设备号。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MINORBITS   20</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MINORMASK   ((1U &lt;&lt; MINORBITS) - 1)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*分解出主设备号*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAJOR(dev)    ((unsigned int) ((dev) &gt;&gt; MINORBITS))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*分解出次设备号*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MINOR(dev)    ((unsigned int) ((dev) &amp; MINORMASK))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*合成dev_t*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MKDEV(ma,mi)  (((ma) &lt;&lt; MINORBITS) | (mi))</span></span><br></pre></td></tr></table></figure>
+
+<p>设备号可以是动态分配，也可以是静态注册，如果是静态注册，需要避免与系统现有的设备号不冲突，内核Documents 目录下的devices.txt 文件，里面描述了linux设备号的分配情况，可供参考。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 静态注册，设备号已知 */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">register_chrdev_region</span><span class="params">(<span class="type">dev_t</span> from, <span class="type">unsigned</span> count, <span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 动态注册，设备号未知 */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">alloc_chrdev_region</span><span class="params">(<span class="type">dev_t</span> *dev, <span class="type">unsigned</span> baseminor, <span class="type">unsigned</span> count, <span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*注销设备号*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">unregister_chrdev_region</span><span class="params">(<span class="type">dev_t</span> from, <span class="type">unsigned</span> count)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>可以通过读取/proc/devices文件获取字符设备和块设备的设备号信息。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Character devices:</span><br><span class="line">  4 tty</span><br><span class="line">  5 /dev/tty</span><br><span class="line">  5 /dev/console</span><br><span class="line"> 10 misc</span><br><span class="line"> 13 input</span><br><span class="line"> 89 i2c</span><br><span class="line">180 usb</span><br><span class="line">249 watchdog</span><br><span class="line">250 rtc</span><br><span class="line">254 gpiochip</span><br><span class="line"></span><br><span class="line">Block devices:</span><br><span class="line">259 blkext</span><br><span class="line">  7 loop</span><br><span class="line">  8 sd</span><br><span class="line">  9 md</span><br><span class="line"> 11 sr</span><br><span class="line"> 65 sd</span><br></pre></td></tr></table></figure>
+
+<h2 id="cdev结构体"><a href="#cdev结构体" class="headerlink" title="cdev结构体"></a>cdev结构体</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">cdev</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">kobject</span> <span class="title">kobj</span>;</span> <span class="comment">/* 内嵌的 kobject 对象 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">module</span> *<span class="title">owner</span>;</span> <span class="comment">/*所属模块*/</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> *<span class="title">ops</span>;</span> <span class="comment">/*文件操作结构体*/</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">list</span>;</span></span><br><span class="line">    <span class="type">dev_t</span> dev; <span class="comment">/*设备号*/</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> count; /引用计数*/</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/kernel/char/cdev-file_ops.png" alt="cdev-file_ops"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> cdev *<span class="title function_">cdev_alloc</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">cdev</span> *<span class="title">p</span> =</span> kzalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> cdev), GFP_KERNEL);</span><br><span class="line">    <span class="keyword">if</span> (p) &#123;</span><br><span class="line">        INIT_LIST_HEAD(&amp;p-&gt;<span class="built_in">list</span>);</span><br><span class="line">        kobject_init(&amp;p-&gt;kobj, &amp;ktype_cdev_dynamic);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">cdev_init</span><span class="params">(<span class="keyword">struct</span> cdev *cdev, <span class="type">const</span> <span class="keyword">struct</span> file_operations *fops)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">memset</span>(cdev, <span class="number">0</span>, <span class="keyword">sizeof</span> *cdev);</span><br><span class="line">    INIT_LIST_HEAD(&amp;cdev-&gt;<span class="built_in">list</span>);</span><br><span class="line">    kobject_init(&amp;cdev-&gt;kobj, &amp;ktype_cdev_default);</span><br><span class="line">    cdev-&gt;ops = fops;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">cdev_add</span><span class="params">(<span class="keyword">struct</span> cdev *p, <span class="type">dev_t</span> dev, <span class="type">unsigned</span> count)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> error;</span><br><span class="line"></span><br><span class="line">    p-&gt;dev = dev;</span><br><span class="line">    p-&gt;count = count;</span><br><span class="line"></span><br><span class="line">    error = kobj_map(cdev_map, dev, count, <span class="literal">NULL</span>,</span><br><span class="line">             exact_match, exact_lock, p);</span><br><span class="line">    <span class="keyword">if</span> (error)</span><br><span class="line">        <span class="keyword">return</span> error;</span><br><span class="line"></span><br><span class="line">    kobject_get(p-&gt;kobj.parent);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">cdev_del</span><span class="params">(<span class="keyword">struct</span> cdev *p)</span></span><br><span class="line">&#123;</span><br><span class="line">    cdev_unmap(p-&gt;dev, p-&gt;count);</span><br><span class="line">    kobject_put(&amp;p-&gt;kobj);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">cdev_put</span><span class="params">(<span class="keyword">struct</span> cdev *p)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (p) &#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">module</span> *<span class="title">owner</span> =</span> p-&gt;owner;</span><br><span class="line">        kobject_put(&amp;p-&gt;kobj);</span><br><span class="line">        module_put(owner);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="设备节点"><a href="#设备节点" class="headerlink" title="设备节点"></a>设备节点</h2><p>class_create()在/sys/class/目录下创建设备类。再调用 device_create()函数来在/dev目录下创建相应的设备节点。当加载模块时，用户空间中的udev会自动去/sysfs下寻找对应的类从而创建设备节点。</p>
+<p><code>udevadm info</code>命令可以查看/dev下的设备节点信息。可以通过<code>mknod</code>命令来手动创建设备节点。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">mknod [选项] name &#123;bcp&#125; major minor</span><br><span class="line"></span><br><span class="line">选项： </span><br><span class="line">-Z：设置安全的上下文;</span><br><span class="line">-m：设置权限模式;</span><br><span class="line">-help：显示帮助信息;</span><br><span class="line">--version：显示版本信息;</span><br><span class="line"></span><br><span class="line">参数:</span><br><span class="line">b 创建块设备;</span><br><span class="line">c 创建字符设备;</span><br><span class="line">p 创建命名管道;</span><br></pre></td></tr></table></figure>
+
+<h2 id="file结构体"><a href="#file结构体" class="headerlink" title="file结构体"></a>file结构体</h2><p>file 结构体代表一个打开的设备文件，每个打开的文件在内核空间都关联一个struct file，在打开文件时创建，在文件关闭后释放。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">file</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">f_list</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dentry</span>  *<span class="title">f_dentry</span>;</span> <span class="comment">// 文件对应的目录项结构，可用filp-&gt;f_dentry-&gt;d_inode的方式来访问索引节点结构</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">vfsmount</span>         *<span class="title">f_vfsmnt</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> *<span class="title">f_op</span>;</span> <span class="comment">// 文件相关的操作</span></span><br><span class="line">    <span class="type">atomic_t</span>  f_count; <span class="comment">// 文件对象的引用计数</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>   f_flags; <span class="comment">// 文件标志，如O_RONLY、O_NONBLOCK和O_SYNC</span></span><br><span class="line">    <span class="type">mode_t</span>   f_mode; <span class="comment">// 文件模式，FMODE_READ和FMODE_WRITE分别表示读写权限</span></span><br><span class="line">    <span class="type">int</span>   f_error;</span><br><span class="line">    <span class="type">loff_t</span>   f_pos; <span class="comment">// 当前的读写位置</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">fown_struct</span> <span class="title">f_owner</span>;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>  f_uid, f_gid;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file_ra_state</span> <span class="title">f_ra</span>;</span></span><br><span class="line">    <span class="type">size_t</span>   f_maxcount;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>  f_version;</span><br><span class="line">    <span class="type">void</span>   *f_security;</span><br><span class="line">    <span class="type">void</span>   *private_data;  <span class="comment">// 文件私有数据</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_EPOLL</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">f_ep_links</span>;</span></span><br><span class="line">    <span class="type">spinlock_t</span>  f_ep_lock;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span> <span class="comment">/* #ifdef CONFIG_EPOLL */</span></span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">address_space</span> *<span class="title">f_mapping</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="file-operations结构体"><a href="#file-operations结构体" class="headerlink" title="file_operations结构体"></a>file_operations结构体</h2><p>file_operations 是对设备操作的抽象结构体，应用程序和VFS之间的接口是系统调用，而VFS与磁盘文件系统以及普通设备之间的接口是file_operations 结构体成员函数。应用程序进行open、write、read、close等系统调用，最终都会引起file_operations 结构体对应函数的调用。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">module</span> *<span class="title">owner</span>;</span></span><br><span class="line">    <span class="type">loff_t</span> (*llseek) (<span class="keyword">struct</span> file *, <span class="type">loff_t</span>, <span class="type">int</span>);</span><br><span class="line">    <span class="type">ssize_t</span> (*read) (<span class="keyword">struct</span> file *, <span class="type">char</span> __user *, <span class="type">size_t</span>, <span class="type">loff_t</span> *);</span><br><span class="line">    <span class="type">ssize_t</span> (*write) (<span class="keyword">struct</span> file *, <span class="type">const</span> <span class="type">char</span> __user *, <span class="type">size_t</span>, <span class="type">loff_t</span> *);</span><br><span class="line">    <span class="type">ssize_t</span> (*aio_read) (<span class="keyword">struct</span> kiocb *, <span class="type">const</span> <span class="keyword">struct</span> iovec *, <span class="type">unsigned</span> <span class="type">long</span>, <span class="type">loff_t</span>);</span><br><span class="line">    <span class="type">ssize_t</span> (*aio_write) (<span class="keyword">struct</span> kiocb *, <span class="type">const</span> <span class="keyword">struct</span> iovec *, <span class="type">unsigned</span> <span class="type">long</span>, <span class="type">loff_t</span>);</span><br><span class="line">    <span class="type">int</span> (*readdir) (<span class="keyword">struct</span> file *, <span class="type">void</span> *, <span class="type">filldir_t</span>);</span><br><span class="line">    <span class="type">unsigned</span> <span class="title function_">int</span> <span class="params">(*poll)</span> <span class="params">(<span class="keyword">struct</span> file *, <span class="keyword">struct</span> poll_table_struct *)</span>;</span><br><span class="line">    <span class="type">int</span> (*ioctl) (<span class="keyword">struct</span> inode *, <span class="keyword">struct</span> file *, <span class="type">unsigned</span> <span class="type">int</span>, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">    <span class="type">long</span> (*unlocked_ioctl) (<span class="keyword">struct</span> file *, <span class="type">unsigned</span> <span class="type">int</span>, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">    <span class="type">long</span> (*compat_ioctl) (<span class="keyword">struct</span> file *, <span class="type">unsigned</span> <span class="type">int</span>, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">    <span class="type">int</span> (*mmap) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> vm_area_struct *);</span><br><span class="line">    <span class="type">int</span> (*open) (<span class="keyword">struct</span> inode *, <span class="keyword">struct</span> file *);</span><br><span class="line">    <span class="type">int</span> (*flush) (<span class="keyword">struct</span> file *, <span class="type">fl_owner_t</span> id);</span><br><span class="line">    <span class="type">int</span> (*release) (<span class="keyword">struct</span> inode *, <span class="keyword">struct</span> file *);</span><br><span class="line">    <span class="type">int</span> (*fsync) (<span class="keyword">struct</span> file *, <span class="type">int</span> datasync);</span><br><span class="line">    <span class="type">int</span> (*aio_fsync) (<span class="keyword">struct</span> kiocb *, <span class="type">int</span> datasync);</span><br><span class="line">    <span class="type">int</span> (*fasync) (<span class="type">int</span>, <span class="keyword">struct</span> file *, <span class="type">int</span>);</span><br><span class="line">    <span class="type">int</span> (*lock) (<span class="keyword">struct</span> file *, <span class="type">int</span>, <span class="keyword">struct</span> file_lock *);</span><br><span class="line">    <span class="type">ssize_t</span> (*sendpage) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> page *, <span class="type">int</span>, <span class="type">size_t</span>, <span class="type">loff_t</span> *, <span class="type">int</span>);</span><br><span class="line">    <span class="type">unsigned</span> <span class="title function_">long</span> <span class="params">(*get_unmapped_area)</span><span class="params">(<span class="keyword">struct</span> file *, <span class="type">unsigned</span> <span class="type">long</span>, <span class="type">unsigned</span> <span class="type">long</span>, <span class="type">unsigned</span> <span class="type">long</span>, <span class="type">unsigned</span> <span class="type">long</span>)</span>;</span><br><span class="line">    <span class="type">int</span> (*check_flags)(<span class="type">int</span>);</span><br><span class="line">    <span class="type">int</span> (*flock) (<span class="keyword">struct</span> file *, <span class="type">int</span>, <span class="keyword">struct</span> file_lock *);</span><br><span class="line">    <span class="type">ssize_t</span> (*splice_write)(<span class="keyword">struct</span> pipe_inode_info *, <span class="keyword">struct</span> file *, <span class="type">loff_t</span> *, <span class="type">size_t</span>, <span class="type">unsigned</span> <span class="type">int</span>);</span><br><span class="line">    <span class="type">ssize_t</span> (*splice_read)(<span class="keyword">struct</span> file *, <span class="type">loff_t</span> *, <span class="keyword">struct</span> pipe_inode_info *, <span class="type">size_t</span>, <span class="type">unsigned</span> <span class="type">int</span>);</span><br><span class="line">    <span class="type">int</span> (*setlease)(<span class="keyword">struct</span> file *, <span class="type">long</span>, <span class="keyword">struct</span> file_lock **);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="inode结构体"><a href="#inode结构体" class="headerlink" title="inode结构体"></a>inode结构体</h2><p>inode结构体用来记录文件的物理上的信息，包含文件访问权限、属主、组、大小、生成时间、访问时间、最后修改时间等信息。一个文件可以对应多个file结构，但只有一个inode 结构。它是Linux管理文件系统的最基本单位，也是文件系统连接任何子目录、文件的桥梁。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">inode</span> &#123;</span></span><br><span class="line">    <span class="type">umode_t</span>         i_mode;  <span class="comment">/* inode 的权限 */</span></span><br><span class="line">    <span class="type">uid_t</span>           i_uid;   <span class="comment">/* inode 拥有者的 id */</span></span><br><span class="line">    <span class="type">gid_t</span>           i_gid;   <span class="comment">/* inode 所属的群组 id */</span></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">inode_operations</span>   *<span class="title">i_op</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">super_block</span>  *<span class="title">i_sb</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="type">spinlock_t</span>          i_lock; <span class="comment">/* i_blocks, i_bytes, maybe i_size */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>        i_flags;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>       i_state;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mutex</span>        <span class="title">i_mutex</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>       dirtied_when;   <span class="comment">/* jiffies of first dirtying */</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">hlist_node</span>   <span class="title">i_hash</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>    <span class="title">i_wb_list</span>;</span>  <span class="comment">/* backing dev IO list */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>    <span class="title">i_lru</span>;</span>      <span class="comment">/* inode LRU list */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>    <span class="title">i_sb_list</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>    <span class="title">i_dentry</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">rcu_head</span>     <span class="title">i_rcu</span>;</span></span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>   i_ino;</span><br><span class="line">    <span class="type">atomic_t</span>        i_count;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>    i_nlink;</span><br><span class="line">    <span class="type">dev_t</span>           i_rdev;  <span class="comment">/* 若是设备文件,此字段将记录设备的设备号 */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>    i_blkbits;</span><br><span class="line">    u64             i_version;</span><br><span class="line">    <span class="type">loff_t</span>          i_size;  <span class="comment">/* inode 所代表的文件大小 */</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">i_atime</span>;</span> <span class="comment">/* inode 最近一次的存取时间 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">i_mtime</span>;</span> <span class="comment">/* inode 最近一次的修改时间 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">i_ctime</span>;</span> <span class="comment">/* inode 的产生时间 */</span></span><br><span class="line"></span><br><span class="line">    <span class="type">blkcnt_t</span>        i_blocks;  <span class="comment">/* inode 所使用的 block 数,一个 block为512 byte */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span>  i_bytes;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rw_semaphore</span> <span class="title">i_alloc_sem</span>;</span></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span>    *<span class="title">i_fop</span>;</span> <span class="comment">/* former -&gt;i_op-&gt;default_file_ops */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file_lock</span>    *<span class="title">i_flock</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">address_space</span>    *<span class="title">i_mapping</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">address_space</span>    <span class="title">i_data</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>    <span class="title">i_devices</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">pipe_inode_info</span>  *<span class="title">i_pipe</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">block_device</span> *<span class="title">i_bdev</span>;</span>  <span class="comment">/*若是块设备,为其对应的 block_device 结构体指针*/</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">cdev</span>     *<span class="title">i_cdev</span>;</span>  <span class="comment">/*若是字符设备,为其对应的 cdev 结构体指针*/</span></span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="type">void</span>            *i_private; <span class="comment">/* fs or device private pointer */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>应用程序每打开一个设备文件，就会产生一个inode节点，通过结点的i_cdev字段找到cdev结构体，再通过cdev的ops指针，就能找到设备的操作函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">light_open</span><span class="params">(<span class="keyword">struct</span> inode *inode, <span class="keyword">struct</span> file *filp)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/* 获得设备结构体指针 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">light_dev</span> *<span class="title">dev</span> =</span> container_of(inode-&gt;i_cdev, <span class="keyword">struct</span> light_dev, cdev);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 让设备结构体作为设备的私有信息 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">light_object</span> *<span class="title">obj</span> =</span> kmalloc(<span class="keyword">sizeof</span> (<span class="keyword">struct</span> light_object), GFP_KERNEL);</span><br><span class="line">    filp-&gt;private_data = obj;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">light_release</span><span class="params">(<span class="keyword">struct</span> inode *inode, <span class="keyword">struct</span> file *file)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">light_object</span> *<span class="title">obj</span> =</span> (<span class="keyword">struct</span> light_object *)file-&gt;private_data;</span><br><span class="line">    kfree(obj);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">light_read</span><span class="params">(<span class="keyword">struct</span> file *file, <span class="type">char</span> __user *buf, <span class="type">size_t</span> size, </span></span><br><span class="line"><span class="params">    <span class="type">loff_t</span> *ppos)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">chardev_object</span> *<span class="title">obj</span> =</span> file-&gt;private_data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>inode节点的i_devices 成员和cdev的 list 相关联，这样文件就和字符设备绑定了，操作文件就等同在操作设备。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">chrdev_open</span><span class="params">(<span class="keyword">struct</span> inode * inode, <span class="keyword">struct</span> file * filp)</span></span><br><span class="line">&#123;</span><br><span class="line">    list_add(&amp;inode-&gt;i_devices, &amp;p-&gt;<span class="built_in">list</span>);</span><br><span class="line">    cdev_put(new);</span><br><span class="line"></span><br><span class="line">    filp-&gt;f_op = fops_get(p-&gt;ops);</span><br><span class="line">    <span class="keyword">if</span> (filp-&gt;f_op-&gt;open) &#123;</span><br><span class="line">        lock_kernel();</span><br><span class="line">        ret = filp-&gt;f_op-&gt;open(inode,filp);</span><br><span class="line">        unlock_kernel();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">def_chr_fops</span> =</span> &#123;</span><br><span class="line">    .open = chrdev_open,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">init_special_inode</span><span class="params">(<span class="keyword">struct</span> inode *inode, <span class="type">umode_t</span> mode, <span class="type">dev_t</span> rdev)</span></span><br><span class="line">&#123;</span><br><span class="line">    inode-&gt;i_mode = mode;</span><br><span class="line">    <span class="keyword">if</span> (S_ISCHR(mode)) &#123;</span><br><span class="line">        inode-&gt;i_fop = &amp;def_chr_fops;</span><br><span class="line">        inode-&gt;i_rdev = rdev;</span><br><span class="line">    ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="ioctl"><a href="#ioctl" class="headerlink" title="ioctl"></a>ioctl</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">long</span> <span class="title function_">chardev_ioctl</span><span class="params">(<span class="keyword">struct</span> file *file, <span class="type">unsigned</span> <span class="type">int</span> cmd, </span></span><br><span class="line"><span class="params">    <span class="type">unsigned</span> <span class="type">long</span> arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">chardev_object</span> *<span class="title">dev</span> =</span> file-&gt;private_data;</span><br><span class="line">    <span class="keyword">switch</span> (cmd)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">case</span> xxx:</span><br><span class="line">            ...</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            printk(KERN_WARNING <span class="string">&quot;cmd invalid\n&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> - EINVAL;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ioctl() 函数的cmd参数是自定义的IO控制命令，用于设备驱动区别应用程序的请求内容，大小为32位，分为4个域：</p>
+<ul>
+<li><p><strong>bit[31:30]</strong>: 区别读写命令，值可能是 <code>_IOC_NONE</code> 表示无数据传输，<code>_IOC_READ</code> (读)， <code>_IOC_WRITE</code> (写) ， <code>_IOC_READ|_IOC_WRITE</code> (双向)。</p>
+</li>
+<li><p><strong>bit[29:15]</strong>: 数据大小，表示 ioctl() 中的 arg 变量传送的内存大小。</p>
+</li>
+<li><p><strong>bit[20:8]</strong>: 魔数，这个值用以与其它设备驱动程序的 ioctl 命令进行区别，魔数范围为 0~255 。通常用英文字符 “A” ~ “Z” 或者 “a” ~ “z” 来表示。</p>
+</li>
+<li><p><strong>bit[7:0]</strong>: 区别序号，是命令的顺序序号。</p>
+</li>
+</ul>
+<p>Doucumention/ioctl-number.txt文件中罗列了内核所使用的幻数，自己选择的幻数要避免和内核冲突。内核定义了 <code>_IO()</code> , <code>_IOR()</code> , <code>IOW()</code> 和 <code>_IOWR()</code> 4 个宏用来来辅助生成上面的 cmd 。注意cmd不能为2。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 序数（number）字段的字位宽度，8bits</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IOC_NRBITS      8 </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IOC_TYPEBITS    8 </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IOC_SIZEBITS    14 </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IOC_DIRBITS     2 </span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>         _IOC_NRMASK        ((1 &lt;&lt; _IOC_NRBITS)-1)  </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>         _IOC_TYPEMASK   ((1 &lt;&lt; _IOC_TYPEBITS)-1) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>         _IOC_SIZEMASK     ((1 &lt;&lt; _IOC_SIZEBITS)-1)  </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>         _IOC_DIRMASK      ((1 &lt;&lt; _IOC_DIRBITS)-1)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>        _IOC_NRSHIFT       0  </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>        _IOC_TYPESHIFT   (_IOC_NRSHIFT+_IOC_NRBITS) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>        _IOC_SIZESHIFT    (_IOC_TYPESHIFT+_IOC_TYPEBITS) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>        _IOC_DIRSHIFT      (_IOC_SIZESHIFT+_IOC_SIZEBITS)  </span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IOC_NONE     0U  </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IOC_WRITE   1U   </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IOC_READ     2U </span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*_IOC 宏将dir，type，nr，size四个参数组合成一个cmd参数*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IOC(dir,type,nr,size) \</span></span><br><span class="line"><span class="meta">       (((dir)  &lt;&lt; _IOC_DIRSHIFT) | \</span></span><br><span class="line"><span class="meta">        ((type) &lt;&lt; _IOC_TYPESHIFT) | \</span></span><br><span class="line"><span class="meta">        ((nr)   &lt;&lt; _IOC_NRSHIFT) | \</span></span><br><span class="line"><span class="meta">        ((size) &lt;&lt; _IOC_SIZESHIFT))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//构造无参数的命令编号</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO(type,nr)          _IOC(_IOC_NONE,(type),(nr),0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//构造从驱动程序中读取数据的命令编号</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IOR(type,nr,size)    _IOC(_IOC_READ,(type),(nr),sizeof(size)) </span></span><br><span class="line"></span><br><span class="line"><span class="comment">//用于向驱动程序写入数据命令</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IOW(type,nr,size)    _IOC(_IOC_WRITE,(type),(nr),sizeof(size))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//用于双向传输</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IOWR(type,nr,size)   _IOC(_IOC_READ|_IOC_WRITE,(type),(nr),sizeof(size))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//从命令参数中解析出数据方向，即写进还是读出</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IOC_DIR(nr)    (((nr) &gt;&gt; _IOC_DIRSHIFT) &amp; _IOC_DIRMASK)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//从命令参数中解析出幻数type</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IOC_TYPE(nr)   (((nr) &gt;&gt; _IOC_TYPESHIFT) &amp; _IOC_TYPEMASK)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//从命令参数中解析出序数number</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IOC_NR(nr)           (((nr) &gt;&gt; _IOC_NRSHIFT) &amp; _IOC_NRMASK)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//从命令参数中解析出用户数据大小</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IOC_SIZE(nr)     (((nr) &gt;&gt; _IOC_SIZESHIFT) &amp; _IOC_SIZEMASK)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IOC_IN            (_IOC_WRITE &lt;&lt; _IOC_DIRSHIFT)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IOC_OUT         (_IOC_READ &lt;&lt; _IOC_DIRSHIFT)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IOC_INOUT     ((_IOC_WRITE|_IOC_READ) &lt;&lt; _IOC_DIRSHIFT)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IOCSIZE_MASK      (_IOC_SIZEMASK &lt;&lt; _IOC_SIZESHIFT)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IOCSIZE_SHIFT      (_IOC_SIZESHIFT)</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/09/04/kernel/i2c_tools/" rel="prev" title="i2c-tools 使用">
+      <i class="fa fa-chevron-left"></i> i2c-tools 使用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/09/04/kernel/dts/" rel="next" title="device tree">
+      device tree <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E5%A4%87%E5%8F%B7"><span class="nav-number">1.</span> <span class="nav-text">设备号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cdev%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">2.</span> <span class="nav-text">cdev结构体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E5%A4%87%E8%8A%82%E7%82%B9"><span class="nav-number">3.</span> <span class="nav-text">设备节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#file%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">4.</span> <span class="nav-text">file结构体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#file-operations%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">5.</span> <span class="nav-text">file_operations结构体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#inode%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">6.</span> <span class="nav-text">inode结构体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ioctl"><span class="nav-number">7.</span> <span class="nav-text">ioctl</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ubun2</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">203</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ubun2</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
