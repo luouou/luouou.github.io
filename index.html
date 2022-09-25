@@ -176,7 +176,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/24/algo/tree/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/algo/heap/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -190,7 +190,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/09/24/algo/tree/" class="post-title-link" itemprop="url">数据结构-树</a>
+            <a href="/2022/09/25/algo/heap/" class="post-title-link" itemprop="url">堆</a>
         </h1>
 
         <div class="post-meta">
@@ -199,8 +199,9 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2022-09-24 19:07:35" itemprop="dateCreated datePublished" datetime="2022-09-24T19:07:35+08:00">2022-09-24</time>
+              <time title="创建时间：2022-09-25 21:32:48 / 修改时间：21:40:41" itemprop="dateCreated datePublished" datetime="2022-09-25T21:32:48+08:00">2022-09-25</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -223,125 +224,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="树的定义"><a href="#树的定义" class="headerlink" title="树的定义"></a>树的定义</h2><p>树是 n (n &gt;= 0)个节点的有限集合，当n = 0 时称为空树，在任意一棵非空树中都应满足：</p>
-<ol>
-<li>有且仅有一个根节点。</li>
-<li>当 n &gt; 1 时，其余节点可分为 m ( m &gt; 0)个互不相交的有限集合T1,T2,T3, …. Tm ，其中每一个集合本身又是一棵树。</li>
-</ol>
-<ul>
-<li>父节点：若一个节点含有子节点，则这个节点称为其子节点的父节点</li>
-<li>子节点：一个节点含有的子树的根节点称为该节点的子节点</li>
-<li>节点深度：根节点到这个节点所经历的边的个数</li>
-<li>节点高度：节点到叶子节点的最长路径(边数)</li>
-<li>节点的层次：从根节点开始，根节点为第一层，根的子节点为第二层，以此类推</li>
-<li>树的深度：一棵树中节点的最大深度就是树的深度，也称为高度</li>
-<li>兄弟节点：拥有共同父节点的节点</li>
-<li>度：节点的子树数目</li>
-<li>叶子节点：度为零的节点</li>
-<li>祖先：对任意节点x，从根节点到节点x的所有节点都是x的祖先（节点x也是自己的祖先）</li>
-<li>后代：对任意节点x，从节点x到叶子节点的所有节点都是x的后代（节点x也是自己的后代）</li>
-<li>森林：m颗互不相交的树构成的集合就是森林</li>
-</ul>
-<p>“高度”是从下往上度量，从最底层开始计数计数的起点是0。“深度”是从上往下度量，从根结点开始度量计数起点也是0。“层数”跟深度的计算类似，不过计数起点是1。</p>
-<p><img src="/images/code/algo/tree/struct.png" alt="树定义"></p>
-<h2 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h2><p>二叉树是树的一种，特点是每个节点最多有两个子节点，分别是左子节点和右子节点，有的只有左子节点，有的只有右子节点。</p>
-<ul>
-<li>每个节点最多有两个子节点，度小于2。</li>
-<li>二叉树的第i层上至多有2^i-1^个节点(i&gt;=1)。</li>
-<li>深度为k的二叉树至多有2^k^-1个节点(k&gt;=1)。</li>
-<li>对任何一棵二叉树，如果其终端节点数为n<del>0</del>，度为2的节点数为n<del>2</del>，则n<del>0</del> = n<del>2</del> + 1。</li>
-<li>具有n个节点的完全二叉树的深度为|log2^n^|+1 (|x|表示不大于x的最大整数)。</li>
-</ul>
-<h3 id="树的存储结构"><a href="#树的存储结构" class="headerlink" title="树的存储结构"></a>树的存储结构</h3><p><strong>链式存储法</strong>：每个节点有三个字段，其中一个存储数据，另外两个是指向左右子节点的指针。从根节点开始可以通过左右子节点的指针，把整棵树都串起来。</p>
-<p><img src="/images/code/algo/tree/list.png" alt="链式存储"></p>
-<p><strong>数组顺序存储法</strong>：把根节点存储在下标 i = 1 的位置，那左子节点存储在下标 2 * i = 2 的位置，右子节点存储在 2 * i + 1 = 3 的位置，以此类推。</p>
-<p><img src="/images/code/algo/tree/array.png" alt="顺序存储"></p>
-<p>如果节点 X 存储在数组中下标为 i 的位置，左子节点的下标为 2 * i ，右子节点的下标为 2 * i + 1。反过来，下标为 i/2 的位置存储就是它的父节点。通过这种方式，只要知道根节点存储的位置（一般情况下，为了方便计算子节点，根节点会存储在下标为 1 的位置），就可以通过下标计算，把整棵树都串起来。</p>
-<p>这种方式比较适合完全二叉树，仅浪费了一个下标为 0 的存储位置，如果是非完全二叉树，则会比较浪费存储空间。</p>
-<p><img src="/images/code/algo/tree/array2.png" alt="顺序存储"></p>
-<h3 id="二叉树的遍历"><a href="#二叉树的遍历" class="headerlink" title="二叉树的遍历"></a>二叉树的遍历</h3><p>二叉树遍历过程中每个节点最多会被访问两次，所以遍历操作的时间复杂度跟节点的个数 n 成正比，二叉树遍历的时间复杂度是 O(n)。</p>
-<p><img src="/images/code/algo/tree/foreach.png" alt="二叉树的遍历"></p>
-<ul>
-<li><p>前序遍历规则是若树为空，则空操作返回，否则先访问根节点，然后依次访问的左子树和右子树。</p>
-</li>
-<li><p>中序遍历规则是若树为空，则空操作返回，否则从根节点开始，先遍历根节点的左子树，然后访问根节点，最后访问右子树。</p>
-</li>
-<li><p>后序遍历规则是若树为空，则空操作返回，否则从左到右先叶子后节点的方式遍历访问左右子树，最后访问根节点。</p>
-</li>
-<li><p>层序遍历规则是若树为空，则空操作返回，否则从树的第一层，也就是根节点开始访问，从上而下逐层遍历，在同一层中，按从左到右的顺序对节点逐个访问。</p>
-</li>
-</ul>
-<p><img src="/images/code/algo/tree/foreach2.png" alt="层序遍历"></p>
-<p>按照广度优先的遍历算法的思路实现层序遍历：引入一个队列，根节点先入队列，然后开始从队列头部取元素，每取一个元素则先打印当前元素，然后依次将左右子节点加入队列，若左子节点或右子节点为空则跳过此步。</p>
-<h3 id="满二叉树"><a href="#满二叉树" class="headerlink" title="满二叉树"></a>满二叉树</h3><p>叶子节点全都在同一层，并且除了叶子节点之外，每个节点都有左右两个子节点的二叉树。</p>
-<p><img src="/images/code/algo/tree/fulltree.png" alt="满二叉树"></p>
-<h3 id="完全二叉树"><a href="#完全二叉树" class="headerlink" title="完全二叉树"></a>完全二叉树</h3><p>子节点都在最底下两层，最后一层的叶子节点都靠左排列，并且除了最后一层，其他层的节点个数都要达到最大（构成满二叉树）。</p>
-<p><img src="/images/code/algo/tree/alltree.png" alt="完全二叉树"></p>
-<ol>
-<li>叶子节点只能出现在最下两层。</li>
-<li>最下层的叶子一定集中在左部连续位置。</li>
-<li>倒数二层，若有叶子节点，一定都在右部连续位置。</li>
-<li>如果节点度数为1,则该节点只有左子树，即不存在只有右子树的情况。</li>
-<li>同样节点数的二叉树，完全二叉树的深度最小。</li>
-</ol>
-<h3 id="二叉搜索树"><a href="#二叉搜索树" class="headerlink" title="二叉搜索树"></a>二叉搜索树</h3><p>二叉搜索树（Binary Search Tree， BST）支持动态数据集合的快速插入、删除、查找操作，是一棵空树或者有如下性质的二叉树：</p>
-<ul>
-<li>若任意节点的左子树不空，其左子树中的每个节点的值都小于这个节点的值；</li>
-<li>若任意节点的右子树不空，其右子树每个节点的值都大于这个节点的值；</li>
-<li>任意节点的左、右子树也分别为二叉查找树；</li>
-<li>没有键值相等的节点。</li>
-</ul>
-<p>不管操作是插入、删除还是查找，其时间复杂度其实都跟树的高度成正比，也就是 O(height)。</p>
-<p><strong>查找操作</strong></p>
-<p>先取根节点，如果它等于要查找的数据就返回。如果要查找的数据比根节点的值小，那就在左子树中递归查找；如果要查找的数据比根节点的值大，那就在右子树中递归查找。</p>
-<p><img src="/images/code/algo/tree/findtree.png" alt="二叉搜索树"></p>
-<p><strong>插入操作</strong></p>
-<p>二叉查找树的插入过程需要从根节点开始，依次比较要插入的数据和节点的大小关系：</p>
-<ol>
-<li><p>如果要插入的数据比节点的数据大，并且节点的右子树为空，就将新数据直接插到右子节点的位置；如果不为空，就再递归遍历右子树，查找插入位置。</p>
-</li>
-<li><p>如果要插入的数据比节点数值小，并且节点的左子树为空，就将新数据插入到左子节点的位置；如果不为空，就再递归遍历左子树，查找插入位置。</p>
-</li>
-</ol>
-<p><img src="/images/code/algo/tree/findtree-add.png" alt="img"></p>
-<p><strong>删除操作</strong></p>
-<p>针对要删除节点的子节点个数的不同需要分2种情况来处理:</p>
-<ol>
-<li><p>如果要删除的节点只有一个子节点或没有子节点，只需要要将要删除节点的父节点的指针指向要删除节点的子节点。比如下图中删除节点 55、 13。</p>
-</li>
-<li><p>如果要删除的节点有两个子节点。需要找到这个节点的右子树中的最小节点，把它替换到要删除的节点上。然后再按照上面方法删除掉这个最小节点。比如下图中的删除节点 18。（用左子树的最大节点进行替换也可以）。</p>
-</li>
-</ol>
-<p><img src="/images/code/algo/tree/findtree-del.png" alt="img"></p>
-<h3 id="平衡二叉树"><a href="#平衡二叉树" class="headerlink" title="平衡二叉树"></a>平衡二叉树</h3><p>为了解决普通二叉查找树在频繁的插入、删除等动态更新的情况下，出现时间复杂度退化的问题。平衡二叉查找树就是让整棵树左右看起来比较平衡，不要出现左子树很高、右子树很矮的情况。这样就能让整棵树的高度相对来说低一些，相应的插入、删除、查找等操作的效率高一些。</p>
-<p>任何节点的左右子树高度相差不超过 1，完全二叉树、满二叉树都是平衡二叉树，非完全二叉树有可能是平衡二叉树。</p>
-<h3 id="霍夫曼树"><a href="#霍夫曼树" class="headerlink" title="霍夫曼树"></a>霍夫曼树</h3><p>带权路径最短的二叉树称为哈夫曼树或最优二叉树。</p>
-<h3 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h3><p>红黑树是一颗特殊的二叉查找树，除了二叉查找树的要求外，它还具有以下特性：</p>
-<ul>
-<li>每个节点是黑色或者红色。</li>
-<li>根节点是黑色。</li>
-<li>每个叶子节点(NIL，空节点)是黑色。</li>
-<li>从根节点到叶子节点，不会出现两个连续的红色节点。如果一个节点是红色的，则它的子节点必是黑色。</li>
-<li>从任何节点到叶子节点，这条路径上有相同数目的黑色节点。</li>
-</ul>
-<p><strong>旋转</strong></p>
-<p>左旋就是当新加入节点之后，树的高度及颜色不再满足红黑树定义规则后；将不满足的节点进行左旋转，使得它取代之前它的父节点，同时它的父节点变为它的左子节点，最后调整颜色的过程。</p>
-<p><img src="/images/code/algo/tree/rbtree.png" alt="img"></p>
-<p>对x左旋，意味着降低x节点的高度，将x变成一个左节点，提升x节点右节点y的高度。</p>
-<ol>
-<li>x的右子树指向y的左子树</li>
-<li>本来指向x结点的父指针，改成指向y</li>
-<li>y的左子树指向x结点</li>
-</ol>
-<p><img src="/images/code/algo/tree/rbtree2.png" alt="img"></p>
-<p>右旋就是以某节点为中心进行向右的旋转，取代并成为之前自己的父节点，然后把之前的父节点变为自己的右子节点，最后调整颜色的过程。</p>
-<ol>
-<li>x的左子树指向y的右子树</li>
-<li>本来指向x结点的父指针，改成指向y</li>
-<li>y的右子树指向x结点</li>
-</ol>
-<hr>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wuqinglong/p/9709048.html">https://www.cnblogs.com/wuqinglong/p/9709048.html</a></p>
+          <p>堆是一种完全二叉树，每个节点的值都大于等于（或小于等于）其子树节点的值。对于每个节点的值都大于等于子树中每个节点值的堆叫<strong>大顶堆</strong>，<br>对于每个节点的值都小于等于子树中每个节点值的堆叫<strong>小顶堆</strong>。</p>
+<p>堆比较适合用数组来存储。</p>
+<p>新插入的元素直接放到堆的最后，之前的堆不符合堆定义的话，就需要进行调整，让其重新满足堆的特性，这个过程叫作<strong>堆化</strong>。</p>
+<p>堆化就是顺着节点所在的路径，向上或者向下进行对比，然后交换。从下往上堆化是让新插入的节点与父节点对比大小。如果不满足子节点小于等于父节点的大小关系，就互换两个节点。一直重复这个过程，直到比对到根节点。</p>
 
       
     </div>
@@ -361,7 +247,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/24/tool/gcc_options/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/TrustZone/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -375,7 +261,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/09/24/tool/gcc_options/" class="post-title-link" itemprop="url">gcc compile and link options</a>
+            <a href="/2022/09/25/cpu/TrustZone/" class="post-title-link" itemprop="url">TrustZone</a>
         </h1>
 
         <div class="post-meta">
@@ -384,8 +270,842 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2022-09-24 19:07:35" itemprop="dateCreated datePublished" datetime="2022-09-24T19:07:35+08:00">2022-09-24</time>
+              <time title="创建时间：2022-09-25 16:27:12 / 修改时间：20:37:37" itemprop="dateCreated datePublished" datetime="2022-09-25T16:27:12+08:00">2022-09-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>TrustZone是ARM针对消费电子设备设计的一种硬件架构，其目的是为消费电子产品构建一个安全框架来抵御各种可能的攻击。</p>
+<p>TrustZone在概念上将SoC的硬件和软件资源划分为Secure World和Normal World两个世界，所有需要保密的操作在安全世界执行（如指纹识别、密码处理、数据加解密、安全认证等），其余操作在非安全世界执行（如用户操作系统、各种应用程序等），安全世界和非安全世界通过一个名为Monitor Mode的模式进行转换。</p>
+<p>实现TrustZone需要组件有：</p>
+<ul>
+<li>AMBA3 AXI总线，安全机制的基础设施。</li>
+<li>虚拟化的ARM Core，虚拟安全和非安全核。</li>
+<li>TZPC (TrustZone Protection Controller)，根据需要控制外设的安全特性。</li>
+<li>TZASC (TrustZone Address Space Controller)，对内存进行安全和非安全区域划分和保护。</li>
+<li>TZMA (TrustZone Memory Adapter)，片上ROM或RAM安全区域和非安全区域的划分和保护，可选。</li>
+<li>AXI-to-APB bridge，桥接APB总线，配合TZPC使APB总线外设支持TrustZone安全特性，可选。</li>
+</ul>
+<p><img src="/images/cpu/arm/TrustZone.png" alt="img"></p>
+<h2 id="总线设计"><a href="#总线设计" class="headerlink" title="总线设计"></a>总线设计</h2><p>AMBA3 AXI(AMBA3 Advanced eXtensible Interface)系统总线作为TrustZone的基础架构设施，提供了安全世界和非安全世界的隔离机制，确保非安全核只能访问非安全世界的系统资源，而安全核能访问所有资源。</p>
+<p>AMBA-AXI总线的扩展，增加了标志secure读和写地址线：AWPROT[1]和ARPROT[1]。</p>
+<p>TrustZone 在系统总线上针对每一个信道的读写增加了一个额外的控制信号位，这个控制位叫做Non-Secure或者NS位。所有非安全世界的主设备在操作时必须将信号的NS位置高，而NS位置高又使得其无法访问总线上安全世界的从设备，简单来说就是对非安全世界主设备发出的地址信号进行解码时在安全世界中找不到对应的从设备，从而导致操作失败。当然，非安全世界的主设备尝试访问安全世界的从设备会引发访问错误。</p>
+<p>在TrustZone出现前，ARM的外设基于AMBA2 APB (Advanced Peripheral Bus)总线协议，由于APB总线的设备不支持AXI总线的NS控制信号，所以AXI到APB总线需要AXI-to-APB bridge设备连接。AXI-to-APB bridge负责管理APB总线设备的安全事宜，其会拒绝不合理的安全请求，保证这些请求不会被转发到相应的外设。</p>
+<h2 id="处理器设计"><a href="#处理器设计" class="headerlink" title="处理器设计"></a>处理器设计</h2><p>TrustZone将每个物理核虚拟为两个核，非安全核，运行非安全世界的代码；和安全核，运行安全世界的代码。两个虚拟的核以基于时间片的方式运行，根据需要实时占用物理核，并通过Monitor Mode实现了同一CPU上两个操作系统间的切换。</p>
+<p>安全世界和非安全世界都有自己的虚拟MMU，各自管理物理地址的映射。实际上只是两个世界都有一份TTBR0、TTBR1、TTBCR寄存器，因此就会对应两个MMU表。尽管MMU有两套，但TBL缓存硬件上只有一套，因此TBL对于两个世界来说是共享的，其通过NS位来标志其每一项具体属于哪一个世界。这样在两个世界间进行切换时不再需要重新刷新TLB，提高执行效率。</p>
+<p>Cache也是两个世界共享，具体Cache数据属于哪一个世界也由其NS位指定，在世界间切换也不需要刷新Cache。</p>
+<p>在gicv2、gicv3的版本中，都增加了对安全扩展的支持:</p>
+<p>在gicv2/gicv3中，支持了安全中断，配置有如下：<br>gicv2分组</p>
+<ul>
+<li>group0：安全中断，由nFIQ驱动</li>
+<li>group1：非安全中断，由nIRQ驱动</li>
+</ul>
+<p>gicv3分组</p>
+<ul>
+<li>group0：安全中断</li>
+<li>non-secure group1：非安全中断</li>
+<li>secure group1：安全中断</li>
+</ul>
+<h2 id="隔离机制"><a href="#隔离机制" class="headerlink" title="隔离机制"></a>隔离机制</h2><p>内存隔离和保护通过总线组件TZASC和TZMA的设置来实现。</p>
+<ul>
+<li><p>TZASC (TrustZone Address Space Controller)可以把外部DDR分成多个区域，每个区域可以单独配置为安全或非安全区域，非安全世界的代码和应用只能访问非安全区域。TZASC只能用于内存设备，不适合用于配置块设备，如Nand Flash。</p>
+</li>
+<li><p>TZMA (TrustZone Memory Adapter)可以把片上ROM和SRAM隔离出安全和非安全区域。TZMA最大可以将片上存储的低2MB配置为安全区域，其余部分配置为非安全区域。大小划分上，片上安全区域可以在芯片出厂前设置为固定大小，或运行时通过TZPC动态配置。TZMA使用上有些限制，其不适用于外部内存划分，而且也只能配置一个安全区域。</p>
+</li>
+</ul>
+<p>在外设上需要TZPC (TrustZone Protection Controller) 来向APB总线上的设备提供类似AXI上的NS控制信号。由于TZPC可以在运行时动态设置，这就决定了外设的安全特性是动态变化的，例如键盘平时可以作为非安全的输入设备，在输入密码时可以配置为安全设备，只允许安全世界访问。</p>
+<h2 id="安全启动"><a href="#安全启动" class="headerlink" title="安全启动"></a>安全启动</h2><p>系统上电复位后，先从安全世界开始执行。安全世界会对非安全世界的bootloader进行验证，确保非安全世界执行的代码经过授权而没有被篡改过。然后非安全世界的bootloader会加载非安全世界的OS，完成整个系统的启动。下一级的安全依赖于上一级的验证，逐级的验证构成了整个系统的信任链。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/ATF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/25/cpu/ATF/" class="post-title-link" itemprop="url">ARM Trusted Firmware</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-25 16:26:11 / 修改时间：21:26:56" itemprop="dateCreated datePublished" datetime="2022-09-25T16:26:11+08:00">2022-09-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>ARM Trusted Firmware启动实现分为5个步骤：</p>
+<p><img src="/images/cpu/arm/ATF3.png" alt="img"><br><img src="/images/cpu/arm/ATF2.jpg" alt="img"></p>
+<h2 id="BL1"><a href="#BL1" class="headerlink" title="BL1"></a>BL1</h2><p>BL1是Trusted Boot ROM，就是BootRom，是信任链的根所在，位于ROM中。BL1主要目的是建立Trusted SRAM、exception vector、初始化串口等。然后找到并验证BL2（验签CSF头），然后跳转过去。</p>
+<ul>
+<li>决定启动路径：冷启动还是热启动。</li>
+<li>架构初始化：异常向量、CPU复位处理函数配置、控制寄存器设置(SCRLR_EL3/SCR_EL3/CPTR_EL3/DAIF)</li>
+<li>平台初始化：使能Trusted Watchdog、初始化控制台、配置硬件一致性互联、配置MMU、初始化相关存储设备。</li>
+<li>固件更新处理</li>
+<li>BL2镜像加载和执行</li>
+</ul>
+<p>bl1_main()开始就是c程序了，那c运行依靠的堆和栈空间在哪里呢？在CPU内部的SRAM里。SRAM一启动就已经可以访问了，bl1_plat_arch_setup（）简单地在其中划分出来一块作为Trusted SRAM给c程序用，而不用像x86在cache里面扣一块出来，简单了很多。</p>
+<p>BL1镜像的异常向量表初始化了两个：一个是入口bl1_entrypoint，EL1镜像正常执行流程；另一个是SMC调用接口，EL2执行结束会通过SMC返回执行BL31。</p>
+<h2 id="BL2"><a href="#BL2" class="headerlink" title="BL2"></a>BL2</h2><p>BL2在Flash上，作为Trusted Boot Firmware，也叫Trusted Bootloader。</p>
+<ul>
+<li>架构初始化：EL1/EL0使能浮点单元和ASMID。</li>
+<li>平台初始化：控制台初始化、相关存储设备初始化、MMU、相关设备安全配置、</li>
+<li>SCP_BL2：系统控制核镜像加载，单独核处理系统功耗、时钟、复位等控制。</li>
+<li>寻找BL31，BL32和BL33镜像加载到RAM中，验签并运行BL31。</li>
+</ul>
+<h2 id="BL31"><a href="#BL31" class="headerlink" title="BL31"></a>BL31</h2><p>BL31是EL3 Runtime Firmware，一般为SML，管理SMC执行处理和中断，运行在secure monitor中，通过SMC指令在Secure World和Non-Secure World之间进行切换。它的主要任务是找到BL32，验签，并运行BL32。</p>
+<ul>
+<li>PSCI服务初始化，后续提供CPU功耗管理操作。</li>
+<li>BL32镜像运行初始化。</li>
+<li>初始化非安全EL2或EL1，跳转到BL33执行。</li>
+<li>负责安全非安全世界切换。</li>
+<li>进行安全服务请求的分发。</li>
+</ul>
+<h2 id="BL32"><a href="#BL32" class="headerlink" title="BL32"></a>BL32</h2><p>BL32是Trust OS，，它是一个可信安全的OS运行在EL1并在EL0启动可信任APP（如指纹信息，移动支付的密码等），并在Trust OS运行完成后通过SMC指令返回BL31，BL31找到BL33，验签并切换到Non-Seucre World运行BL33。</p>
+<h2 id="BL33"><a href="#BL33" class="headerlink" title="BL33"></a>BL33</h2><p>BL33运行的都是非安全固件，如UEFI 或u-boot。</p>
+<p><img src="/images/cpu/arm/ATF.jpg" alt="img"><br><img src="/images/cpu/arm/ATF.png" alt="img"></p>
+<hr>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/arnoldlu/p/14175126.html">https://www.cnblogs.com/arnoldlu/p/14175126.html</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/armv8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/25/cpu/armv8/" class="post-title-link" itemprop="url">ARMv8 架构</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-25 15:35:42 / 修改时间：16:52:22" itemprop="dateCreated datePublished" datetime="2022-09-25T15:35:42+08:00">2022-09-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="特权等级"><a href="#特权等级" class="headerlink" title="特权等级"></a>特权等级</h2><p>ARMv8中，引入了Secure World和Non-Secure World（Normal World）两种安全状态，四种异常级别。</p>
+<ul>
+<li><p>EL0是无特权模式，就是用户空间，运行应用程序，在Secure world就是Trust Application。</p>
+</li>
+<li><p>EL1是一个特权模式，能够执行一些特权指令，用于运行操作系统，在Secure World则就是Trusted OS，比如OP-TEE，豌豆荚的TEE等。</p>
+</li>
+<li><p>EL2提供了对虚拟化的支持，只在Noraml world使用。</p>
+</li>
+<li><p>EL3具有最高管理权限，负责安全监测和Secure World和Normal World之间的切换。当noraml world想要访问Secure world需要通过安全监视器调用SMC指令进入监视模式然后切换。</p>
+</li>
+</ul>
+<p>安全状态主要是影响资源的访问，比如memory，系统寄存器等。</p>
+<p>对于memory，有时候需要做数据隔离，用于保护数据的安全性。因此就可以将memory分成两个区域，secure区域和non-secure区域。对于secure的memory区域，只允许secure状态去访问，而对于non-secure的memory区域，允许secure状态和non-secure状态都可访问。这样可以保护数据的安全。</p>
+<p>对于系统寄存器，有些系统寄存器限制了最低EL的访问，这样可以有效的保护系统。不让低EL运行的程序，误操作这些系统寄存器而使整个系统崩溃掉。</p>
+<p>对于EL1和EL0，可以是non-secure状态，也可以是secure状态。对于EL2，只能是non-secure状态。对于EL3，只能是secure状态。</p>
+<p>secure和non-secure状态的切换，只能通过EL3进行切换，也就是如果想从non-secure的EL0切换到secure的EL0，首先要先从non-secure的EL0，通过异常切换到EL3，然后再通过异常，返回到secure的EL0。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/armv8_reg/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/25/cpu/armv8_reg/" class="post-title-link" itemprop="url">ARMv8 寄存器</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-25 15:11:47 / 修改时间：17:11:28" itemprop="dateCreated datePublished" datetime="2022-09-25T15:11:47+08:00">2022-09-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="执行状态"><a href="#执行状态" class="headerlink" title="执行状态"></a>执行状态</h2><p>在 ARMv8 架构定义了两种执行状态：AArch64 以及 AArch32。这两种执行状态分别用于描述执行使用 64 位宽的通用寄存器或者使用 32 位宽的通用寄存器。系统运行在 64 位状态下的时候名字叫 Xn，运行在 32 位的时候就叫 Wn。32 位 W 寄存器构成相应 64 位 X 寄存器的低32位部分。</p>
+<p><img src="/images/cpu/arm/reg.png" alt="img"></p>
+<h2 id="通用寄存器"><a href="#通用寄存器" class="headerlink" title="通用寄存器"></a>通用寄存器</h2><p><img src="/images/cpu/arm/reg2.png" alt="img"><br><img src="/images/cpu/arm/armv8_register.png" alt="img"></p>
+<p>AArch64执行状态拥有 31 个通用寄存器，可以在任何时间和所有异常级别访问。</p>
+<ul>
+<li><p>X0-X7：参数/结果寄存器，被调用子程序返回前无需恢复。</p>
+</li>
+<li><p>X8：间接结果未知寄存器，用于保存子程序返回地址，尽量不使用</p>
+</li>
+<li><p>X9-X15：临时寄存器，使用需要保存现场，返回时需要恢复现场。</p>
+</li>
+<li><p>X16 X17：程序内调用临时寄存器，使用需要保存现场，返回时需要恢复现场。</p>
+</li>
+<li><p>X18：平台寄存器，保留用于平台 ABI，尽量不使用</p>
+</li>
+<li><p>X19-X28：被保存的寄存器，这些寄存器保存在被调用者帧中。使用需要保存现场，返回时需要恢复现场。</p>
+</li>
+<li><p>X29：帧指针寄存器（FP），保存函数栈基地址。</p>
+</li>
+<li><p>X30：链接寄存器（LR）</p>
+</li>
+<li><p>X31：堆栈指针寄存器 SP 或零寄存器 ZXR</p>
+</li>
+</ul>
+<h2 id="特殊寄存器"><a href="#特殊寄存器" class="headerlink" title="特殊寄存器"></a>特殊寄存器</h2><p><img src="/images/cpu/arm/armv8%E7%89%B9%E6%AE%8A%E5%AF%84%E5%AD%98%E5%99%A8.png" alt="img"></p>
+<ul>
+<li>Program Counter：PC程序计数寄存器，是一个各个EL通用的一个寄存器。</li>
+<li>Stack Pointer: 栈顶指针寄存器，用来描述各个栈顶的指针寄存器。这个寄存器在每个EL都会存在一个SP_EL0, SP_EL1, SP_EL2, SP_EL3. 通过此寄存器就可以确定当前在那个EL。</li>
+<li>Saved Program Status Register: 程序状态寄存器。</li>
+<li>Exception Link Register: 异常链接寄存器，保存着异常状态返回的地址。</li>
+</ul>
+<p>比如当一个异常发生时，处理器必须去处理异常。处理异常时候就需要使用SPSR寄存器保存异常处理前的处理器状态，就是所谓的硬件上保存现场。当处理器处理完异常后，就需要从异常返回，则就需要从ELR寄存器中返回，然后再使用SPSR寄存器恢复现场即可。</p>
+<h2 id="NEON和浮点寄存器"><a href="#NEON和浮点寄存器" class="headerlink" title="NEON和浮点寄存器"></a>NEON和浮点寄存器</h2><p>armV8有32个128bit的浮点寄存器 V0-V31， 这些寄存器用来处理标量浮点运算时保存浮点操作数，或NEON 操作时保存标量和向量操作数。</p>
+<p><img src="/images/cpu/arm/armv8_simd_reg.png" alt="img"></p>
+<h2 id="兼容ARMv7"><a href="#兼容ARMv7" class="headerlink" title="兼容ARMv7"></a>兼容ARMv7</h2><p><img src="/images/cpu/arm/armv8_reg_map.png" alt="img"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/armv7_reg/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/25/cpu/armv7_reg/" class="post-title-link" itemprop="url">ARMv7 寄存器</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-25 14:54:02 / 修改时间：15:28:13" itemprop="dateCreated datePublished" datetime="2022-09-25T14:54:02+08:00">2022-09-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="ARMv7寄存器"><a href="#ARMv7寄存器" class="headerlink" title="ARMv7寄存器"></a>ARMv7寄存器</h2><p>ARM处理器共有37个寄存器。其中包括：31个通用寄存器（包括PC在内）和6个状态寄存器。</p>
+<p><img src="/images/cpu/arm/reg.jpg" alt="img"></p>
+<h3 id="通用寄存器"><a href="#通用寄存器" class="headerlink" title="通用寄存器"></a>通用寄存器</h3><p>通用寄存器包括R0-R15，均为32位寄存器，可以分为3类：</p>
+<p><strong>未分组寄存器(R0-R7)</strong></p>
+<p>在所有运行模式下，未分组寄存器都指向同一个物理寄存器。在中断或异常处理进行异常模式转换时，由于不同的处理器运行模式均使用相同的物理寄存器，所以可能造成寄存器中数据的破坏。</p>
+<p><strong>分组寄存器(R8-R14)</strong></p>
+<p>对于分组寄存器，他们每次所访问的物理寄存器都与当前的处理器运行模式相关。</p>
+<p>R13常用作存放堆栈指针，用户也可以使用其他寄存器存放堆栈指针，但在Thumb指令集下，某些指令强制要求使用R13存放堆栈指针。</p>
+<p>R14称为链接寄存器（LR，Link Register），当执行子程序时，R14可得到R15（PC）的备份，执行完子程序后，又将R14的值复制回PC，即使用R14保存返回地址。</p>
+<p><strong>程序计数器PC（R15）</strong></p>
+<p>寄存器R15用作程序计数器（PC），在ARM状态下，位[1:0]为0，位[31:2]用于保存PC；在Thumb状态下,位[0]为0，位[31:1]用于保存PC。</p>
+<p>由于ARM体系结构采用了多级流水线技术，对于ARM指令集而言，PC总是指向当前指令的下两条指令的地址，即PC的值为当前指令的地址值加8个字节。</p>
+<h3 id="状态寄存器"><a href="#状态寄存器" class="headerlink" title="状态寄存器"></a>状态寄存器</h3><ul>
+<li>CPSR（Current Program Status Register）当前程序状态寄存器1个。</li>
+<li>SPSR（Saved Progarm Status Register）备份程序状态寄存器6个，用于异常发生时保存CPSR的值，异常退出时恢复CPSR。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/arm-arch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/25/cpu/arm-arch/" class="post-title-link" itemprop="url">arm体系架构</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-25 11:23:54 / 修改时间：15:11:00" itemprop="dateCreated datePublished" datetime="2022-09-25T11:23:54+08:00">2022-09-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="ARM指令集架构命名"><a href="#ARM指令集架构命名" class="headerlink" title="ARM指令集架构命名"></a>ARM指令集架构命名</h2><blockquote>
+<p>| ARMv | n | variants | x（variants） |</p>
+</blockquote>
+<ul>
+<li>ARMv – 固定字符，即ARM Version</li>
+<li>n – 指令集版本号。迄今为之，ARM架构版本发布了8个系列，所以n=[1:8]。</li>
+<li>variants – 变种</li>
+<li>x（variants） – 排除x后指定的变种</li>
+</ul>
+<p>常见的variants有以下字母可选：</p>
+<ul>
+<li>T – Thumb指令集</li>
+<li>M – 长乘法指令</li>
+<li>E – 增强型DSP指令</li>
+<li>J – Java加速器Jazelle</li>
+<li>SIMD – ARM媒体功能扩展</li>
+<li>D – Debug，提供调试支持</li>
+<li>I – 芯片上带有内置的ICE，从而支持程序内的断点和数据空间的观察点设置。</li>
+</ul>
+<p>比如：ARMv5TxM表示ARM指令集版本为5，支持T变种，不支持M变种。</p>
+<h2 id="ARM体系变种"><a href="#ARM体系变种" class="headerlink" title="ARM体系变种"></a>ARM体系变种</h2><p><strong>T变种</strong></p>
+<p>thumb指令集是ARM指令集的一个子集重新编码而成的。它使ARM更加高效地进行运作。</p>
+<p>ARM的指令长度为32位，而Thumb指令长度只有16位，对于一些冗余空余位的操作来讲的话，在使用16位的基础上，明显比使用32位更加高效。但是thumb自身也有一定的局限性：</p>
+<ul>
+<li><p>完成相同的操作时，Thumb指令通常情况下需要比ARM更多的指令。</p>
+</li>
+<li><p>Thumb指令集是不包含异常处理时的一些指令的</p>
+</li>
+</ul>
+<p>因此ARM是不能舍弃ARM的32位指令的，它与16位的Thumb指令配合才能更加有效率地执行。</p>
+<p><strong>M变种</strong></p>
+<p>增加了两条长乘法的ARM指令：</p>
+<ul>
+<li><p>长乘法操作：32位整数乘以32位整数，生成64位整数</p>
+</li>
+<li><p>长乘加操作：32位整数乘以32位整数，然后加上加上32位整数，生成64位整数</p>
+</li>
+</ul>
+<p>它其实做版本3中正式引入，版本2的时候仅是有了这个思想的，然后在版本4以后，M变种就变成了系统中的标准部分。我们也不再说M变种了，因为我们在开发ARM过程中直接是使用相应的指令的。</p>
+<p><strong>E变种</strong></p>
+<p>增强型DSP指令，针对于ARM的应用范围越来越广阔，为了满足DSP算法，就需要增强这个算法的处理性能。</p>
+<ul>
+<li><p>增加了新的16位数据乘法与乘加操作指令</p>
+</li>
+<li><p>实现饱和的带符号数的加减法操作指令</p>
+</li>
+<li><p>进行双字数据操作的指令，包含LDRD、STDR、MCRR\MRRC</p>
+</li>
+<li><p>cache预取指令PLD</p>
+</li>
+</ul>
+<p>E变种是在版本5T中开始使用的。值得注意的是：早期的E变种未有包含LDRD、STRD、MCRR\MRRC、PLD。</p>
+<p><strong>J变种</strong></p>
+<p>ARM能跑android和java不得不归功于这个变种——java加数器jazelle，与一般的java虚拟机相比，它将java代码运行速度提高了整整8倍，而功耗竟降低了80%。</p>
+<p><strong>SIMD变种</strong></p>
+<p>媒体功能扩展，它将音频\视频处理性能提高了4倍。</p>
+<ul>
+<li>音频\视频处理性能提高了4倍</li>
+<li>提供小数算术运算</li>
+<li>可同时进行两个16位操作数或者4个8位操作数的运算</li>
+<li>用户可以定义饱和运算模式</li>
+<li>两套16位操作数的乘加/乘减运算</li>
+<li>32位乘以32位的小数MAC</li>
+</ul>
+<h2 id="ARM处理器系列命名"><a href="#ARM处理器系列命名" class="headerlink" title="ARM处理器系列命名"></a>ARM处理器系列命名</h2><p>在 ARMv3 ~ ARMv6 时期规则：</p>
+<blockquote>
+<p>ARM{x}{y}{z}{T}{D}{M}{I}{E}{J}{F}{-S}</p>
+</blockquote>
+<ul>
+<li>x – 处理器系列</li>
+<li>y – 存储管理/保护单元</li>
+<li>z – cache</li>
+<li>T – 支持Thumb指令集</li>
+<li>D – 支持片上调试</li>
+<li>M – 支持快速乘法器</li>
+<li>I – 支持Embedded ICE，支持嵌入式跟踪调试</li>
+<li>E – 支持增强型DSP指令</li>
+<li>J – 支持Jazelle</li>
+<li>F – 具备向量浮点单元VFP</li>
+<li>-S – 可综合版本</li>
+</ul>
+<p>比如：ARM926 是 ARM9系列的，2个存储管理/保护单元，6个Cache</p>
+<p>在 ARMv7 后期，统一用 <strong>Cortex</strong> 作为主名，分为了3个款式：A、R、M &amp; SC：</p>
+<ul>
+<li>A 系列，应用级处理器，手机。</li>
+<li>R 系列，实时处理器，执行一个指令段的耗时是固定时钟周期数。</li>
+<li>M 系列，微处理器单片机。</li>
+<li>SC（SecurCore）系列，主打安全，面向支付、政府、SIM 卡。</li>
+</ul>
+<h2 id="ARM处理器工作模式"><a href="#ARM处理器工作模式" class="headerlink" title="ARM处理器工作模式"></a>ARM处理器工作模式</h2><ul>
+<li><p>用户模式（usr，User Mode）：ARM处理器正常的程序执行状态。</p>
+</li>
+<li><p>快速中断模式（fiq，Fast Interrupt Request Mode）：用于高速数据传输或通道处理。当触发快速中断时进入此模式。</p>
+</li>
+<li><p>外部中断模式（irq，Interrupt Request Mode）：用于通用的中断处理。当触发外部中断时进入此模式。</p>
+</li>
+<li><p>管理模式（svc，Supervisor Mode）：操作系统使用的保护模式。在系统复位或执行软件中断指令SWI时进入。</p>
+</li>
+<li><p>数据访问中止模式（abt，Abort Mode）：当数据或指令预取中止时进入该模式，可用于虚拟存储及存储保护。</p>
+</li>
+<li><p>系统模式（sys，System Mode）：运行具有特权的操作系统任务。</p>
+</li>
+<li><p>未定义指令中止模式（und，Undefined Mode）：当未定义的指令执行时进入该模式，可用于支持硬件协处理器的软件仿真。</p>
+</li>
+</ul>
+<p>除了用户模式之外，其余六种模式都是特权模式。除了用户模式和系统模式之外，其余五种模式都是异常模式。</p>
+<p>在特权模式下程序可以访问所有的系统资源。非特权模式和特权模式之间的区别在于有些操作只能在特权模式下才被允许，例如直接改变模式和中断使能等。而且为了保证数据安全，一般MMU会对地址空间进行划分，只有特权模式才能访问所有的地址空间。而用户模式如果需要访问硬件，必须切换到特权模式下，才允许访问硬件。</p>
+<p><strong>工作模式的切换</strong></p>
+<ul>
+<li><p>执行软中断（SWI）或复位命令（Reset）指令。如果在用户模式下执行SWI指令，CPU就进入管理（Supervisor）模式。当然，在其他模式下执行SWI，也会进入该模式，不过一般操作系统不会这么做，因为除了用户模式属于非特权模式，其他模式都属于特权模式。执行SWI指令一般是为了访问系统资源，而在特权模式下可以访问所有的系统资源。SWI指令一般用来为操作系统提供API接口。</p>
+</li>
+<li><p>外部中断。如果发生了外部中断，CPU就会进入IRQ或FIQ模式。</p>
+</li>
+<li><p>CPU执行过程中产生异常。最典型的异常是由于MMU保护所引起的内存访问异常，此时CPU会切换到Abort模式。如果是无效指令，则会进入Undefined模式。</p>
+</li>
+<li><p>有一种模式是CPU无法自动进入的，这种模式就是System模式，要进入System模式必须由程序员编写指令来实现。要进入System模式只需改变CPSR的模式位为System模式对应的模式位即可。进入System模式一般是为了利用System模式和用户模式下的寄存器相同的特点，因此一般情况下，操作系统在通过SWI进入Supervisor模式后，做一些操作后，就进入System模式。</p>
+</li>
+<li><p>在任何特权模式下，都可以通过修改CPSR的MODE域来进入其他模式。不过需要注意的是由于修改的CPSR是该模式下的影子CPSR，即SPSR，因此并不是实际的CPSR，所以一般的做法是修改影子CPSR，然后执行一个MOVS指令来恢复执行某个断点并切换到新模式。</p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/cpu/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/25/cpu/cpu/" class="post-title-link" itemprop="url">处理器设计</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-25 11:13:36 / 修改时间：11:23:32" itemprop="dateCreated datePublished" datetime="2022-09-25T11:13:36+08:00">2022-09-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="ISA"><a href="#ISA" class="headerlink" title="ISA"></a>ISA</h2><p>ISA（Instruction Set Architecture）指令集架构定义了一个处理器支持的指令和指令的字节级编码，包括很多个部分：</p>
+<ul>
+<li>指令集</li>
+<li>指令集编码</li>
+<li>基本数据类型</li>
+<li>一组编程规范</li>
+<li>寄存器</li>
+<li>寻址模式</li>
+<li>存储体系</li>
+<li>异常事件处理</li>
+<li>中断</li>
+<li>外部I/O</li>
+</ul>
+<p><strong>CISC</strong>（Complex Instruction Set Computer，复杂指令集计算机）的每个指令可执行若干低阶操作，诸如从内存读取、储存、和计算操作，全部集于单一指令之中。CISC特点：</p>
+<ul>
+<li><p>指令系统庞大，指令功能复杂，指令格式、寻址方式多；</p>
+</li>
+<li><p>绝大多数指令需多个机器周期完成；- 各种指令都可访问存储器；</p>
+</li>
+<li><p>采用微程序控制；</p>
+</li>
+<li><p>有专用寄存器，少量；</p>
+</li>
+<li><p>难以用优化编译技术生成高效的目标代码程序；</p>
+</li>
+</ul>
+<p>在CISC指令集的各种指令中，大约有20%的指令会被反复使用，占整个程序代码的80%。而余下的80%的指令却不经常使用，在程序设计中只占20%。</p>
+<p><strong>RISC</strong>（Reduced Instruction Set Computer，精简指令集计算机）对指令数目和寻址方式都做了精简，使其实现更容易，指令并行执行程度更好，编译器的效率更高。它能够以更快的速度执行操作。RISC设计的根本原则量对流水线的优化。RISC特点：</p>
+<ul>
+<li>统一指令编码（例如，所有指令中的op-code永远位于同样的位元位置、等长指令），可快速解译；</li>
+<li>泛用的暂存器，所有暂存器可用于所有内容，以及编译器设计的单纯化（不过暂存器中区分了整数和浮点数）；</li>
+<li>单纯的寻址模式（复杂寻址模式以简单计算指令序列取代）。</li>
+<li>硬件中支援少数资料型别（例如，一些CISC电脑中存有处理字节字串的指令。这在RISC电脑中不太可能出现）。</li>
+<li>所有计算都要在寄存器中完成。而寄存器和内存的通信则由单独的指令完成。</li>
+<li>有非常多的通用寄存器，并采用了重叠寄存器窗口和寄存器堆等技术使寄存器资源得到充分的利用。</li>
+</ul>
+<p><strong>CISC和RISC的区别</strong></p>
+<ul>
+<li>指令系统：RISC设计者把主要精力放在那些经常使用的指令上，尽量使它们具有简单高效的特色。对不常用的功能，常通过组合指令来完成。因此，在RISC机器上实现特殊功能时，效率可能较低。但可以利用流水技术和超标量技术加以改进和弥补。而CISC计算机的指令系统比较丰富，有专用指令来完成特定的功能。因此，处理特殊任务效率较高。</li>
+<li>存储器操作：RISC对存储器操作有限制，使控制简单化；而CISC机器的存储器操作指令多，操作直接。</li>
+<li>程序：RISC汇编语言程序一般需要较大的内存空间，实现特殊功能时程序复杂，不易设计；而CISC汇编语言程序编程相对简单，科学计算及复杂操作的程序社设计相对容易，效率较高。</li>
+<li>中断：RISC机器在一条指令执行的适当地方可以响应中断；而CISC机器是在一条指令执行结束后响应中断。</li>
+<li>CPU：RISC CPU包含有较少的单元电路，因而面积小、功耗低；而CISCCPU包含有丰富的电路单元，因而功能强、面积大、功耗大。</li>
+<li>设计周期：RISC微处理器结构简单，布局紧凑，设计周期短，且易于采用最新技术；CISC微处理器结构复杂，设计周期长。</li>
+<li>用户使用：RISC微处理器结构简单，指令规整，性能容易把握，易学易用；CISC微处理器结构复杂，功能强大，实现特殊功能容易。</li>
+<li>应用范围：由于RISC指令系统的确定与特定的应用领域有关，故RISC机器更适合于专用机；而CISC机器则更适合于通用机。</li>
+</ul>
+<h2 id="流水线"><a href="#流水线" class="headerlink" title="流水线"></a>流水线</h2><p>MIPS处理器在设计时，将处理器的执行过程划分为5个阶段：IF取指、ID译码、EX执行、MEM内存数据读或写、WB数据写回到通用寄存器中。</p>
+<p><img src="/images/cpu/%E6%B5%81%E6%B0%B4%E7%BA%BF.jpg" alt="img"></p>
+<p>流水线在实际执行过程中会遇到一些因素导致流水线停顿，这些就被称为流水线冒险。</p>
+<p><strong>结构冒险</strong></p>
+<p>流水线中取指阶段和读写存储器阶段都需要访问存储器，处理器中，程序和数据存储器没有分开，IF和MEM操作同时访问存储器导致其中一个操作要等待。哈弗架构不存在这个问题。</p>
+<p><strong>数据冒险</strong></p>
+<p>由于从指令取指到数据更新至存储器/寄存器之间具有时钟延迟，当出现某些指令的组合时，可能会导致后面的指令使用了错误的数据。</p>
+<p>解决方法一是加入几个cycle的等待，但这影响了执行效率。另一种更好的解决办法是使用直通（Forwarding）技术。当硬件检测到当前指令的源操作数正好在EX/MEM流水线寄存器中时，就直接将EX/MEM寄存器的值传递给ALU的输入，而不是从寄存器堆中读数据。</p>
+<p><strong>控制冒险</strong></p>
+<p>由于使用流水线操作，在当前指令正在执行时，后面的很多条指令已经完成了取指和译码等步骤。然而，程序中有很多跳转语句，如果程序的实际执行路径是要跳转到其它的地址去执行，那么流水线中已经做的这些取指和译码工作就白做了，这就是流水线的控制冒险。</p>
+<p>此时处理器需要排空流水线，跳转到新的地址处重新进入流水线。x86处理器使用硬件冲刷流水线来保证发生跳转时，流水线能正确执行。在TI的DSP中，硬件不处理这些冒险，而是通过软件的方式，在跳转语句后增加5个NOP操作来保证流水线正确，编译器也可以将指令乱序，用有效指令代替NOP指令。</p>
+<h2 id="分支预测"><a href="#分支预测" class="headerlink" title="分支预测"></a>分支预测</h2><p>流水线的控制冒险将可能引起流水线排空，这对程序性能的损害是巨大的，流水线越深，损害越大。现代的很多处理器采用了分支预测技术来避免跳转带来的损失。</p>
+<p>采用分支预测，处理器猜测进入哪个分支，并且基于预测的结果来取指、译码。如果猜测正确，就能节省时间，若果猜测错误，则刷新流水线，在新的地址上取指、译码。因此，分支预测需要有足够的准确性。</p>
+<p>介绍两种简单的分支预测算法：</p>
+<ul>
+<li><p>1位预测：如果该跳转指令上一次发生跳转，就预测这一次也会跳转，如果上一次没有跳转，就预测这一次也没有跳转。</p>
+</li>
+<li><p>2位预测：用2bit计数器保存跳转信息，如果跳转执行就加1，跳转未执行就减1,。当计数器值为0和1时，就预测该分支不执行；当计数器值为2和3时，就预测这个分支执行。</p>
+</li>
+</ul>
+<p>分支预测会消耗大量的资源，很多低功耗处理器没有分支预测，取而代之的是使用条件执行来减少跳转指令，如TI的DSP和ARM的cortex系列内核等。</p>
+<h2 id="乱序执行"><a href="#乱序执行" class="headerlink" title="乱序执行"></a>乱序执行</h2><p>指令在执行时常常因为一些限制而等待，后面的指令都要等待。如果处理器足够智能，就可以先执行后面不依赖该数据的指令，这就是处理器的乱序执行（out -of-order execution）。</p>
+<p>乱序执行最大的障碍就是指令间的相关性。指令间相关大致有三种情况：</p>
+<ul>
+<li>寄存器相关，即前后指令使用了相同的寄存器。</li>
+<li>控制相关，跳转指令之后执行哪些指令需要依赖于跳转的结果。</li>
+<li>数据相关，即后面指令需要的数据依赖于前面指令的计算结果。</li>
+</ul>
+<p>对于寄存器相关，处理器通过<strong>寄存器重命名</strong>技术解决这一问题。相同的ISA寄存器可以映射到不同的物理寄存器，经过映射后，新的指令就可以使用不同的物理寄存器，指令间的相关性也就消除了。</p>
+<p>对于控制相关，处理器通过分支预测来决定哪些指令将会得到执行。</p>
+<p>对于数据相关，这往往是由程序算法特性以及程序的设计共同决定的，它和处理器无关，和程序员以及编译器有关。在很多时候，编程人员可以通过调整代码设计将数据间的相关性降至最小。如下面这段代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x = a + b;</span><br><span class="line">y = x + c;</span><br><span class="line">z = y + d;</span><br></pre></td></tr></table></figure>
+
+<p>可以改写成：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x = a + b;</span><br><span class="line">y = c + d;</span><br><span class="line">z = x + y;</span><br></pre></td></tr></table></figure>
+
+<p>乱序执行比顺序执行要耗费更多的处理器资源，通常只有高端处理器才会使用。</p>
+<h2 id="并行设计"><a href="#并行设计" class="headerlink" title="并行设计"></a>并行设计</h2><p><strong>指令并行</strong></p>
+<p>多发射是指将多条指令同时发射到不同的译码器或者后续处理流水线中。</p>
+<p>超标量是指一个时钟周期内能发射多条指令的流水线架构，内部有多个执行单元，</p>
+<p><strong>数据并行</strong></p>
+<p>SIMD（Single Instruction Multiple Data，单指令多数据）指令通过一条语句处理多个数据。在多媒体应用中，同一操作会重复处理多个数据，SIMD指令就特别适合处理这一类数据。</p>
+<p><strong>线程并行</strong></p>
+<p>线程并行的方式有：单核内多线程、多核、多处理器。</p>
+<p>超线程是Intel公司提出的一种提高CPU性能的技术，就是将一个物理CPU当作两个逻辑CPU使用，使CPU可以同时执行多重线程，从而发挥更大的效率。超线程技术利用特殊的硬件指令，把两个逻辑内核模拟成两个物理芯片，让单个处理器都能使用线程级并行计算，进而兼容多线程操作系统和应用软件，减少CPU的闲置时间，提高CPU的运行效率。</p>
+<h2 id="核间通信"><a href="#核间通信" class="headerlink" title="核间通信"></a>核间通信</h2><p>多核处理器的多个核之间会共用处理器的外设与接口，如内存控制器、PCI-E接口等，通常也会共享一段Cache。核与核之间有时需要交换信息，因此核间连接/通信方式的选取也很关键。常见的几种多核组织结构：</p>
+<ul>
+<li><p>Bus结构比较简单，缺点是每两个内核通信都要占用总线，导致其它核不能通信，通信效率低。</p>
+</li>
+<li><p>Switch结构通信效率最高。但如果核太多，这种连接方式需耗费大量的互联资源，通常4个核左右的处理器采用这种方式。</p>
+</li>
+<li><p>Ring结构介于Bus和Switch结构之间。1和3通信需要经过2，越近的两个核通信效率越高，通信连线并不复杂，实现成本也低。通常8个核左右采用这种方式，Intel的很多处理器采用这种结构。</p>
+</li>
+<li><p>Mesh结构适用于核数非常多的情况，类似于二维的Ring结构。</p>
+</li>
+</ul>
+<p><img src="/images/cpu/%E5%A4%9A%E6%A0%B8%E7%BB%84%E7%BB%87%E7%BB%93%E6%9E%84.jpg" alt="img"></p>
+<p>因为核间通信会影响内核的运算效率，1个核可以做5件事情，并不代表4个核可以做20件事情，核越多时，数据交换延时越长。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/tool/gcc_name/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/25/tool/gcc_name/" class="post-title-link" itemprop="url">交叉编译工具链命名规则</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-25 11:00:13 / 修改时间：11:08:27" itemprop="dateCreated datePublished" datetime="2022-09-25T11:00:13+08:00">2022-09-25</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -408,110 +1128,58 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="编译选项"><a href="#编译选项" class="headerlink" title="编译选项"></a>编译选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">--help</span><br><span class="line">--target-help</span><br><span class="line">显示 gcc 帮助说明。‘target-help’是显示目标机器特定的命令行选项。</span><br><span class="line"></span><br><span class="line">--version</span><br><span class="line">显示 gcc 版本号和版权信息。</span><br><span class="line"></span><br><span class="line">-wall</span><br><span class="line">显示警告信息；</span><br><span class="line"></span><br><span class="line">-o outfile</span><br><span class="line">输出到指定的文件。</span><br><span class="line"></span><br><span class="line">-x language</span><br><span class="line">指明使用的编程语言，包括：c c++ assembler none 。 ‘none’意味着恢复默认行为，即根据文件的扩展名猜测源文件的语言。</span><br><span class="line"></span><br><span class="line">-v</span><br><span class="line">打印较多信息，显示编译器调用的程序。</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">-#</span><span class="language-bash"><span class="comment">##</span></span></span><br><span class="line">与 -v 类似，但选项被引号括住，并且不执行命令。</span><br><span class="line"></span><br><span class="line">-E</span><br><span class="line">仅作预处理，不进行编译、汇编和链接。</span><br><span class="line"></span><br><span class="line">-S</span><br><span class="line">仅编译到汇编语言，不进行汇编和链接。</span><br><span class="line"></span><br><span class="line">-c</span><br><span class="line">仅编译、汇编到目标代码，不进行链接。</span><br><span class="line"></span><br><span class="line">-C</span><br><span class="line">告诉预处理器不要丢弃注释，配合-E选项使用。</span><br><span class="line"></span><br><span class="line">-P</span><br><span class="line">告诉预处理器不要产生#line命令，配合-E选项使用。</span><br><span class="line"></span><br><span class="line">-pipe</span><br><span class="line">使用管道代替临时文件。</span><br><span class="line"></span><br><span class="line">-combine</span><br><span class="line">将多个源文件一次性传递给汇编器。</span><br><span class="line"></span><br><span class="line">-fsanitize=address</span><br><span class="line">gcc从4.8版本起，集成了Address Sanitizer工具，可以用来检查内存访问的错误，编译时指定`-fsanitize=address -g`，可以检测内存泄漏、堆栈和全局内存越界访问、free后继续使用、局部内存被外层使用和Initialization order bugs问题。</span><br></pre></td></tr></table></figure>
-
-<h2 id="链接选项"><a href="#链接选项" class="headerlink" title="链接选项"></a>链接选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">-l library</span><br><span class="line">-llibrary</span><br><span class="line">进行链接时搜索名为library的库。</span><br><span class="line"></span><br><span class="line">-Ldir</span><br><span class="line">把dir 加入到搜索库文件的路径列表中。</span><br><span class="line"></span><br><span class="line">-Idir</span><br><span class="line">把dir 加入到搜索头文件的路径列表中。</span><br><span class="line"></span><br><span class="line">-Dname</span><br><span class="line">预定义一个名为name 的宏，值为1。</span><br><span class="line"></span><br><span class="line">-Dname=definition</span><br><span class="line">预定义名为name ，值为definition 的宏。</span><br><span class="line"></span><br><span class="line">-ggdb</span><br><span class="line">-ggdblevel</span><br><span class="line">为调试器 gdb 生成调试信息。level 可以为1，2，3，默认值为2。</span><br><span class="line"></span><br><span class="line">-g</span><br><span class="line">-glevel</span><br><span class="line">生成操作系统本地格式的调试信息，level 取值同上。</span><br><span class="line"></span><br><span class="line">-s</span><br><span class="line">去除可执行文件中的符号表和重定位信息。用于减小可执行文件的大小。</span><br><span class="line"></span><br><span class="line">-static</span><br><span class="line">禁止使用动态库</span><br><span class="line"></span><br><span class="line">-share</span><br><span class="line">尽量使用动态库</span><br><span class="line"></span><br><span class="line">-nostdlib</span><br><span class="line">不连接系统标准启动文件和标准库文件，只把指定的文件传递给连接器。</span><br><span class="line"></span><br><span class="line">-rdynamic</span><br><span class="line">指示连接器把所有符号都添加到动态符号表（.dynsym）里，以便那些使用符号表的函数使用，如dlopen() 或 backtrace()。</span><br></pre></td></tr></table></figure>
-
-<h2 id="优化项"><a href="#优化项" class="headerlink" title="优化项"></a>优化项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-O0 禁止编译器进行优化。默认为此项。</span><br><span class="line">-O1 尝试优化编译时间和可执行文件大小。</span><br><span class="line"></span><br><span class="line">-O2 更多的优化，会尝试几乎全部的优化功能，但不会进行“空间换时间”的优化方法。</span><br><span class="line"></span><br><span class="line">-O3 在 -O2 的基础上再打开一些优化选项：-finline-functions， -funswitch-loops 和 -fgcse-after-reload。</span><br><span class="line"></span><br><span class="line">-Os 对生成文件大小进行优化。它会打开 -O2 开的全部选项，除了会那些增加文件大小的。</span><br></pre></td></tr></table></figure>
-
-<h2 id="指定标准"><a href="#指定标准" class="headerlink" title="指定标准"></a>指定标准</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">-ansi 支持符合ANSI标准的C程序。这样就会关闭GNU C中某些不兼容ANSI C的特性。</span><br><span class="line"></span><br><span class="line">-std=c89 指明使用标准 ISO C90 作为标准来编译程序。</span><br><span class="line"></span><br><span class="line">-std=c99 指明使用标准 ISO C99 作为标准来编译程序。</span><br><span class="line"></span><br><span class="line">-std=c++98 指明使用标准 C++98 作为标准来编译程序。</span><br><span class="line"></span><br><span class="line">-std=gnu9x 使用 ISO C99 再加上 GNU 的一些扩展。</span><br><span class="line"></span><br><span class="line">-fno-asm 不把asm, inline或typeof当作关键字，因此这些词可以用做标识符。用 __asm__， __inline__和__typeof__能够替代它们。 `-ansi&#x27; 隐含声明了`-fno-asm&#x27;。</span><br><span class="line"></span><br><span class="line">-fgnu89-inline 告诉编译器在 C99 模式下看到 inline 函数时使用传统的 GNU 句法。</span><br></pre></td></tr></table></figure>
-
-<h2 id="C选项"><a href="#C选项" class="headerlink" title="C选项"></a>C选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">-pedantic</span><br><span class="line">以ANSI/ISO C标准列出的所有警告</span><br><span class="line"></span><br><span class="line">-fsigned-char</span><br><span class="line">把char定义为有符号类型，如同signed char。</span><br><span class="line"></span><br><span class="line">-funsigned-char</span><br><span class="line">把char定义为无符号类型，如同unsigned char。</span><br><span class="line"></span><br><span class="line">-traditional</span><br><span class="line">尝试支持传统C编译器的某些方面。详见GNU C手册。</span><br><span class="line"></span><br><span class="line">-fno-builtin</span><br><span class="line">-fno-builtin-function</span><br><span class="line">不接受没有 __builtin_ 前缀的函数作为内建函数。</span><br><span class="line"></span><br><span class="line">-trigraphs</span><br><span class="line">支持ANSI C的三联符（ trigraphs）。-ansi选项隐含声明了此选项。</span><br><span class="line"></span><br><span class="line">-fsigned-bitfields</span><br><span class="line">-funsigned-bitfields</span><br><span class="line">如果没有明确声明signed或unsigned修饰符，这些选项用来定义有符号位域或无符号位域。缺省情况下，位域是有符号的，因为它们继承的基本整数类型，如int，是有符号数。</span><br><span class="line"></span><br><span class="line">-fno-strict-aliasing</span><br><span class="line">启用严格别名规则，“-fno-strict-aliasing”表示禁用严格别名规则，当gcc的编译优化参数为“-O2”、“-O3”和“-Os”时，默认会打开“-fstrict-aliasing”。</span><br></pre></td></tr></table></figure>
-
-<h2 id="C-选项"><a href="#C-选项" class="headerlink" title="C++选项"></a>C++选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-fsyntax-only</span><br><span class="line">检查代码中的语法错误，但除此之外不要做任何事情。</span><br><span class="line"></span><br><span class="line">-ffor-scope</span><br><span class="line">从头开始执行程序，也允许进行重定向。</span><br><span class="line"></span><br><span class="line">-fno-rtti</span><br><span class="line">关闭对 dynamic_cast 和 typeid 的支持。如果你不需要这些功能，关闭它会节省一些空间。</span><br></pre></td></tr></table></figure>
-
-<h2 id="机器选项"><a href="#机器选项" class="headerlink" title="机器选项"></a>机器选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">-mtune=cpu-type</span><br><span class="line">为指定类型的 CPU 生成代码。cpu-type 可以是：i386，i486，i586，pentium，i686，pentium4 等等。</span><br><span class="line"></span><br><span class="line">-msse</span><br><span class="line">-msse2</span><br><span class="line">-mmmx</span><br><span class="line">-mno-sse</span><br><span class="line">-mno-sse2</span><br><span class="line">-mno-mmx</span><br><span class="line">使用或者不使用MMX，SSE，SSE2指令。</span><br><span class="line"></span><br><span class="line">-m32</span><br><span class="line">-m64</span><br><span class="line">生成32位/64位机器上的代码。</span><br><span class="line"></span><br><span class="line">-mpush-args</span><br><span class="line">-mno-push-args</span><br><span class="line">（不）使用 push 指令来进行存储参数。默认是使用。</span><br><span class="line"></span><br><span class="line">-mregparm=num</span><br><span class="line">当传递整数参数时，控制所使用寄存器的个数。</span><br></pre></td></tr></table></figure>
-
-<h2 id="依赖文件"><a href="#依赖文件" class="headerlink" title="依赖文件"></a>依赖文件</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">-M</span><br><span class="line">生成文件的依赖关系，依赖项是源文件中引用的所有头文件，同时也把一些标准库的头文件包含了进来。</span><br><span class="line"></span><br><span class="line">-MM</span><br><span class="line">生成文件的依赖关系，和 -M 类似，但不包含标准库的头文件。</span><br><span class="line"></span><br><span class="line">-MG</span><br><span class="line">要求把缺失的头文件按存在对待，并且假定他们和源文件在同一目录下，必须和`-M`选项一起用。</span><br><span class="line"></span><br><span class="line">-MF [file]</span><br><span class="line">当使用了-M或-MM选项时，则把依赖关系写入名为file的文件中。若同时也使用了-MD或-MMD,-MF将覆写输出的依赖文件的名称 。</span><br><span class="line"></span><br><span class="line">-MD</span><br><span class="line">等同于 -M -MF file，但是默认关闭了 -E 选项。其输出的文件名是基于 -o 选项，若给定了 -o 选项，则输出的文件名是 -o 指定的文件名，并添加 .d 后缀，若没有给定，则输入的文件名作为输出的文件名，并添加 .d 后缀，同时继续指定的编译工作。</span><br><span class="line"></span><br><span class="line">-MMD</span><br><span class="line">类似于-MD”，但是输出的依赖文件中，不包含标准头文件。</span><br><span class="line"></span><br><span class="line">-MP</span><br><span class="line">生成的依赖文件里面，依赖规则中的所有 .h 依赖项都会在该文件中生成一个伪目标，其不依赖任何其他依赖项。该伪规则将避免删除了对应的头文件而没有更新Makefile去匹配新的依赖关系而导致 make 出错的情况出现。</span><br><span class="line"></span><br><span class="line">-MT Target</span><br><span class="line">在生成的依赖文件中，指定依赖规则中的目标。</span><br></pre></td></tr></table></figure>
-
-<h2 id="其他项"><a href="#其他项" class="headerlink" title="其他项"></a>其他项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-finline-functions</span><br><span class="line">把所有简单的函数内联进调用者。编译器会探索式地决定哪些函数足够简单，值得做这种内联。</span><br><span class="line"></span><br><span class="line">-fstrict-aliasing</span><br><span class="line">施加最强的别名规则（aliasing rules）。</span><br><span class="line"></span><br><span class="line">-fPIC</span><br><span class="line">告诉编译器产生与位置无关代码，在产生的代码中，没有绝对地址，全部使用相对地址，故而代码可以被加载器加载到内存的任意位置，都可以正确的执行。这正是共享库所要求的，共享库被加载时，在内存的位置不是固定的。如果不加-fPIC，则加载.so文件的代码段时，代码段引用的数据对象需要重定位， 重定位会修改代码段的内容，这就造成每个使用这个.so文件代码段的进程在内核里都会生成这个.so文件代码段的拷贝。</span><br></pre></td></tr></table></figure>
-
-<hr>
-<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/347611674">https://zhuanlan.zhihu.com/p/347611674</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/24/tool/perf/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/24/tool/perf/" class="post-title-link" itemprop="url">perf</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-24 19:07:35" itemprop="dateCreated datePublished" datetime="2022-09-24T19:07:35+08:00">2022-09-24</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>静态代码检测工具或平台：cppcheck、PC-lint、Coverity、QAC C/C++、Clang-Tidy、Clang Static Analyzer、SonarCube+sonar-cxx、Facebook的infer  Tscancode</p>
-<p>profiling工具：gnu prof、Oprofile、google gperftools、perf、intel VTune、AMD CodeAnalyst</p>
-<p>内存泄漏：valgrind、AddressSanitizer、mtrace、dmalloc、ccmalloc、memwatch、debug_new gperftools</p>
-<p>CPU使用率：pidstat、vmstat、mpstat、top、sar</p>
-<p>上下文切换：pidstat、vmstat</p>
-<p>CPU负载：uptime、top</p>
-<p>磁盘I/O：iostat、dstat、sar</p>
-<p>系统调用追踪：strace pstack</p>
-<p>文件系统空间：df</p>
-<p>内存容量：free、vmstat、sar</p>
-<p>进程内存分布：pmap</p>
-<p>软中断硬中断：/proc/softirqs、/proc/interrupts</p>
-<p>网络吞吐量：iftop、nethogs、sar</p>
-<p>网络I/O：dstat、tcpdump、sar</p>
-<p>网络延迟：ping</p>
-<p>网络状态：netstat ss tcpdump</p>
-<hr>
-<p><a target="_blank" rel="noopener" href="https://www.brendangregg.com/">https://www.brendangregg.com/</a></p>
+          <p>交叉编译工具链是一个由编译器、连接器和解释器组成的综合开发环境，交叉编译工具链主要由binutils、gcc和glibc三个部分组成。有时出于减小 libc 库大小的考虑，也可以用别的 c 库来代替 glibc，例如 uClibc、dietlibc 和 newlib。</p>
+<p><strong>分类</strong></p>
+<p>从授权上，分为免费授权版和付费授权版。免费版目前有三大主流工具商提供，第一是GNU（提供源码，自行编译制作），第二是 Codesourcery，第三是Linora。收费版有ARM原厂提供的armcc、IAR提供的编译器等等。</p>
+<ul>
+<li><p>arm-none-linux-gnueabi-gcc：是 Codesourcery 公司（目前已经被Mentor收购）基于GCC推出的的ARM交叉编译工具。可用于交叉编译ARM（32位）系统中所有环节的代码，包括裸机程序、u-boot、Linux kernel、filesystem和App应用程序。</p>
+</li>
+<li><p>arm-linux-gnueabihf-gcc：是由 Linaro 公司基于GCC推出的的ARM交叉编译工具。可用于交叉编译ARM（32位）系统中所有环节的代码，包括裸机程序、u-boot、Linux kernel、filesystem和App应用程序。</p>
+</li>
+<li><p>aarch64-linux-gnu-gcc：是由 Linaro 公司基于GCC推出的的ARM交叉编译工具。可用于交叉编译ARMv8 64位目标中的裸机程序、u-boot、Linux kernel、filesystem和App应用程序。</p>
+</li>
+<li><p>arm-none-elf-gcc：是 Codesourcery 公司（目前已经被Mentor收购）基于GCC推出的的ARM交叉编译工具。可用于交叉编译ARM MCU（32位）芯片，如ARM7、ARM9、Cortex-M/R芯片程序。</p>
+</li>
+<li><p>arm-none-eabi-gcc：是 GNU 推出的的ARM交叉编译工具。可用于交叉编译ARM MCU（32位）芯片，如ARM7、ARM9、Cortex-M/R芯片程序。</p>
+</li>
+</ul>
+<p><strong>命名规则</strong></p>
+<p>交叉编译工具链的命名规则为：arch [-vendor] [-os] [-(gnu)eabi]</p>
+<ul>
+<li><p>arch - 体系架构，如ARM，MIPS</p>
+</li>
+<li><p>vendor - 工具链提供商</p>
+</li>
+<li><p>os - 目标操作系统</p>
+</li>
+<li><p>eabi - 嵌入式应用二进制接口（Embedded Application Binary Interface）</p>
+</li>
+</ul>
+<p>根据对操作系统的支持与否，ARM GCC可分为支持和不支持操作系统，如：</p>
+<ul>
+<li><p>arm-none-eabi：这个是没有操作系统的，不支持那些跟操作系统关系密切的函数，使用newlib这个专用于嵌入式系统的C库。</p>
+</li>
+<li><p>arm-none-linux-eabi 用于Linux的，使用Glibc。</p>
+</li>
+</ul>
+<p>arm-none-eabi-gcc（ARM architecture，no vendor，not target an operating system，complies with the ARM EABI）<br>用于编译 ARM 架构的裸机系统（包括 ARM Linux 的 boot、kernel，不适用编译 Linux 应用 Application），一般适合 ARM7、Cortex-M 和 Cortex-R 内核的芯片使用。</p>
+<p>arm-none-linux-gnueabi-gcc(ARM architecture, no vendor, creates binaries that run on the Linux operating system, and uses the GNU EABI)主要用于基于ARM架构的Linux系统，可用于编译 ARM 架构的 u-boot、Linux内核、linux应用等。arm-none-linux-gnueabi基于GCC，使用Glibc库，经过 Codesourcery 公司优化过推出的编译器。arm-none-linux-gnueabi-xxx 交叉编译工具的浮点运算非常优秀。一般ARM9、ARM11、Cortex-A 内核，带有 Linux 操作系统的会用到。</p>
+<p>arm-linux-gnueabi-gcc 和 arm-linux-gnueabihf-gcc两个交叉编译器分别适用于 armel 和 armhf 两个不同的架构，armel 和 armhf 这两种架构在对待浮点运算采取了不同的策略（有 fpu 的 arm 才能支持这两种浮点运算策略）。</p>
+<p>其实这两个交叉编译器只不过是 gcc 的选项 -mfloat-abi 的默认值不同。gcc 的选项 -mfloat-abi 有三种值 soft、softfp、hard（其中后两者都要求 arm 里有 fpu 浮点运算单元，soft 与后两者是兼容的，但 softfp 和 hard 两种模式互不兼容）：</p>
+<ul>
+<li><p>soft： 不用fpu进行浮点计算，即使有fpu浮点运算单元也不用，而是使用软件模式。</p>
+</li>
+<li><p>softfp： armel架构（对应的编译器为 arm-linux-gnueabi-gcc ）采用的默认值，用fpu计算，但是传参数用普通寄存器传，这样中断的时候，只需要保存普通寄存器，中断负荷小，但是参数需要转换成浮点的再计算。</p>
+</li>
+<li><p>hard： armhf架构（对应的编译器 arm-linux-gnueabihf-gcc ）采用的默认值，用fpu计算，传参数也用fpu中的浮点寄存器传，省去了转换，性能最好，但是中断负荷高。</p>
+</li>
+</ul>
+<p><strong>交叉编译器下载</strong></p>
+<p>arm-none-linux-gnueabi-gcc下载：<a target="_blank" rel="noopener" href="http://www.veryarm.com/">www.veryarm.com</a></p>
+<p>arm-linux-gnueabihf-gcc下载：<a target="_blank" rel="noopener" href="http://www.veryarm.com/">www.veryarm.com</a></p>
+<p>aarch64-linux-gnu-gcc下载：<a target="_blank" rel="noopener" href="http://www.veryarm.com/">www.veryarm.com</a></p>
+<p>arm-none-elf-gcc下载：<a target="_blank" rel="noopener" href="http://www.veryarm.com/">www.veryarm.com</a></p>
+<p>arm-none-eabi-gcc下载：<a target="_blank" rel="noopener" href="http://www.veryarm.com/">www.veryarm.com</a></p>
 
       
     </div>
@@ -531,7 +1199,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/24/algo/BFS/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/tool/GitFlow/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -545,155 +1213,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/09/24/algo/BFS/" class="post-title-link" itemprop="url">广度优先算法</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-24 19:07:35" itemprop="dateCreated datePublished" datetime="2022-09-24T19:07:35+08:00">2022-09-24</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algo/" itemprop="url" rel="index"><span itemprop="name">algo</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>广度优先指的是从图的一个未遍历的节点出发，先遍历这个节点的相邻节点，再依次遍历每个相邻节点的相邻节点。</p>
-<p><img src="/images/code/algo/BFS1.gif" alt="img"></p>
-<p>广度优先遍历也叫层序遍历，也可以用队列来实现。</p>
-<p><img src="/images/code/algo/BFS.gif" alt="img"></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">bfs</span><span class="params">(Node root)</span> &#123; </span><br><span class="line">    <span class="keyword">if</span> (root == <span class="literal">null</span>) &#123; </span><br><span class="line">        <span class="keyword">return</span>; </span><br><span class="line">    &#125; </span><br><span class="line">    Queue&lt;Node&gt; stack = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;(); </span><br><span class="line">    stack.add(root); </span><br><span class="line"> </span><br><span class="line">    <span class="keyword">while</span> (!stack.isEmpty()) &#123; </span><br><span class="line">        <span class="type">Node</span> <span class="variable">node</span> <span class="operator">=</span> stack.poll(); </span><br><span class="line">        System.out.println(<span class="string">&quot;value = &quot;</span> + node.value); </span><br><span class="line">        <span class="type">Node</span> <span class="variable">left</span> <span class="operator">=</span> node.left; </span><br><span class="line">        <span class="keyword">if</span> (left != <span class="literal">null</span>) &#123; </span><br><span class="line">            stack.add(left); </span><br><span class="line">        &#125; </span><br><span class="line">        <span class="type">Node</span> <span class="variable">right</span> <span class="operator">=</span> node.right; </span><br><span class="line">        <span class="keyword">if</span> (right != <span class="literal">null</span>) &#123; </span><br><span class="line">            stack.add(right); </span><br><span class="line">        &#125; </span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/24/algo/DFS/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/24/algo/DFS/" class="post-title-link" itemprop="url">深度优先算法</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-24 19:07:35" itemprop="dateCreated datePublished" datetime="2022-09-24T19:07:35+08:00">2022-09-24</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algo/" itemprop="url" rel="index"><span itemprop="name">algo</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>深度优先遍历主要思路是从图中一个未访问的顶点开始，沿着一条路一直走到底，然后从这条路尽头的节点回退到上一个节点，再从另一条路开始走到底，不断递归重复此过程，直到所有的顶点都遍历完成，它的特点是不撞南墙不回头，先走完一条路，再换一条路继续走</p>
-<p>深度优先的递归实现其实就是前序遍历，依次遍历当前节点，左节点，右节点即可，对于左右节点来说，再依次遍历它们的左右节点即可，以此不断递归下去，直到叶节点递归终止。</p>
-<p><img src="/images/code/algo/DFS.png" alt="img"></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123; </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">Node</span> &#123; </span><br><span class="line">        <span class="keyword">public</span> <span class="type">int</span> value; </span><br><span class="line">        <span class="keyword">public</span> Node left; </span><br><span class="line">        <span class="keyword">public</span> Node right; </span><br><span class="line"> </span><br><span class="line">        <span class="keyword">public</span> <span class="title function_">Node</span><span class="params">(<span class="type">int</span> value, Node left, Node right)</span> &#123; </span><br><span class="line">            <span class="built_in">this</span>.value = value; </span><br><span class="line">            <span class="built_in">this</span>.left = left; </span><br><span class="line">            <span class="built_in">this</span>.right = right; </span><br><span class="line">        &#125; </span><br><span class="line">    &#125; </span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">dfs</span><span class="params">(Node treeNode)</span> &#123; </span><br><span class="line">        <span class="keyword">if</span> (treeNode == <span class="literal">null</span>) &#123; </span><br><span class="line">            <span class="keyword">return</span>; </span><br><span class="line">        &#125; </span><br><span class="line">        <span class="comment">// 遍历节点 </span></span><br><span class="line">        process(treeNode) </span><br><span class="line">        <span class="comment">// 遍历左节点 </span></span><br><span class="line">        dfs(treeNode.left); </span><br><span class="line">        <span class="comment">// 遍历右节点 </span></span><br><span class="line">        dfs(treeNode.right); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>非递归实现利用栈来将要遍历的节点压栈，然后出栈后检查此节点是否还有未遍历的节点，有的话压栈，没有的话不断出栈。</p>
-<ol>
-<li>先遍历当前节点，然后把右节点压栈，再压左节点。</li>
-<li>弹栈，拿到栈顶的节点，如果节点不为空，重复步骤 1， 如果为空，结束遍历。</li>
-</ol>
-<p><img src="/images/code/algo/DFS.gif" alt="img"></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">dfsWithStack</span><span class="params">(Node root)</span> &#123; </span><br><span class="line">    <span class="keyword">if</span> (root == <span class="literal">null</span>) &#123; </span><br><span class="line">        <span class="keyword">return</span>; </span><br><span class="line">    &#125; </span><br><span class="line"> </span><br><span class="line">    Stack&lt;Node&gt; stack = <span class="keyword">new</span> <span class="title class_">Stack</span>&lt;&gt;(); </span><br><span class="line">    <span class="comment">// 先把根节点压栈 </span></span><br><span class="line">    stack.push(root); </span><br><span class="line">    <span class="keyword">while</span> (!stack.isEmpty()) &#123; </span><br><span class="line">        <span class="type">Node</span> <span class="variable">treeNode</span> <span class="operator">=</span> stack.pop(); </span><br><span class="line">        <span class="comment">// 遍历节点 </span></span><br><span class="line">        process(treeNode) </span><br><span class="line"> </span><br><span class="line">        <span class="comment">// 先压右节点 </span></span><br><span class="line">        <span class="keyword">if</span> (treeNode.right != <span class="literal">null</span>) &#123; </span><br><span class="line">            stack.push(treeNode.right); </span><br><span class="line">        &#125; </span><br><span class="line"> </span><br><span class="line">        <span class="comment">// 再压左节点 </span></span><br><span class="line">        <span class="keyword">if</span> (treeNode.left != <span class="literal">null</span>) &#123; </span><br><span class="line">            stack.push(treeNode.left); </span><br><span class="line">        &#125; </span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/tool/vim/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/04/tool/vim/" class="post-title-link" itemprop="url">vim插件与配置</a>
+            <a href="/2022/09/25/tool/GitFlow/" class="post-title-link" itemprop="url">GitFlow分支策略</a>
         </h1>
 
         <div class="post-meta">
@@ -704,7 +1224,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2022-09-04 20:23:47 / 修改时间：22:26:42" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
+              <time title="创建时间：2022-09-25 10:55:13 / 修改时间：11:00:02" itemprop="dateCreated datePublished" datetime="2022-09-25T10:55:13+08:00">2022-09-25</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -712,7 +1232,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/tool/" itemprop="url" rel="index"><span itemprop="name">tool</span></a>
+                  <a href="/categories/git/" itemprop="url" rel="index"><span itemprop="name">git</span></a>
                 </span>
             </span>
 
@@ -727,633 +1247,36 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br></pre></td><td class="code"><pre><span class="line">&quot; 设置当文件被改动时自动载入</span><br><span class="line">set autoread</span><br><span class="line"></span><br><span class="line">&quot;代码补全</span><br><span class="line">set completeopt=preview,menu</span><br><span class="line"></span><br><span class="line">&quot;允许插件  </span><br><span class="line">filetype plugin on</span><br><span class="line"></span><br><span class="line">&quot;共享剪贴板  </span><br><span class="line">set clipboard+=unnamed</span><br><span class="line"></span><br><span class="line">&quot;从不备份  </span><br><span class="line">set nobackup</span><br><span class="line"></span><br><span class="line">&quot;自动保存</span><br><span class="line">set autowrite</span><br><span class="line">set ruler                   &quot; 打开状态栏标尺</span><br><span class="line">set cursorline              &quot; 突出显示当前行</span><br><span class="line"></span><br><span class="line">&quot; 高亮光标所在的行列</span><br><span class="line">highlight CursorLine   cterm=NONE ctermbg=black ctermfg=NONE guibg=NONE guifg=NONE</span><br><span class="line">highlight CursorColumn cterm=NONE ctermbg=black ctermfg=NONE guibg=NONE guifg=NONE</span><br><span class="line"></span><br><span class="line">&quot; CursorLine 和 CursorColumn 分别表示当前所在的行列，cterm 表示为原生vim设置样式，设置为NONE表示可以自定义设置。ctermbg 设置终端vim的背景色；ctermfg 设置终端vim的前景色。guibg 和 guifg 分别是设置gvim的背景色和前景色</span><br><span class="line"></span><br><span class="line">set magic                   &quot; 设置魔术</span><br><span class="line">set guioptions-=T           &quot; 隐藏工具栏</span><br><span class="line">set guioptions-=m           &quot; 隐藏菜单栏</span><br><span class="line"></span><br><span class="line">&quot; 设置在状态行显示的信息</span><br><span class="line">&quot;set foldcolumn=0</span><br><span class="line">&quot;set foldmethod=indent</span><br><span class="line">&quot;set foldlevel=3</span><br><span class="line">&quot;set foldenable              &quot; 开始折叠</span><br><span class="line"></span><br><span class="line">&quot; 不要使用vi的键盘模式，而是vim自己的</span><br><span class="line">set nocompatible</span><br><span class="line"></span><br><span class="line">&quot; 语法高亮</span><br><span class="line">set syntax=on</span><br><span class="line"></span><br><span class="line">&quot; 配色方案</span><br><span class="line">&quot;&quot;colorscheme darkblue</span><br><span class="line"></span><br><span class="line">&quot; 去掉输入错误的提示声音</span><br><span class="line">set noeb</span><br><span class="line"></span><br><span class="line">&quot; 在处理未保存或只读文件的时候，弹出确认</span><br><span class="line">set confirm</span><br><span class="line"></span><br><span class="line">&quot; 自动缩进</span><br><span class="line">set autoindent</span><br><span class="line">set cindent</span><br><span class="line"></span><br><span class="line">&quot; Tab键的宽度</span><br><span class="line">set tabstop=2</span><br><span class="line"></span><br><span class="line">&quot; 统一缩进为4</span><br><span class="line">set softtabstop=2</span><br><span class="line">set shiftwidth=2</span><br><span class="line"></span><br><span class="line">&quot; 不要用空格代替制表符</span><br><span class="line">set noexpandtab</span><br><span class="line"></span><br><span class="line">&quot; 在行和段开始处使用制表符</span><br><span class="line">set smarttab</span><br><span class="line"></span><br><span class="line">&quot; 显示行号</span><br><span class="line">set number</span><br><span class="line"></span><br><span class="line">&quot; 历史记录数</span><br><span class="line">set history=1000</span><br><span class="line"></span><br><span class="line">&quot;禁止生成临时文件</span><br><span class="line">set nobackup</span><br><span class="line">set noswapfile</span><br><span class="line"></span><br><span class="line">&quot;搜索逐字符高亮</span><br><span class="line">set hlsearch</span><br><span class="line">set incsearch</span><br><span class="line"></span><br><span class="line">&quot;行内替换</span><br><span class="line">set gdefault</span><br><span class="line"></span><br><span class="line">&quot;编码设置</span><br><span class="line">set enc=utf-8</span><br><span class="line">set fencs=utf-8,GB18030,ucs-bom,default,latin1</span><br><span class="line"></span><br><span class="line">&quot;语言设置</span><br><span class="line">set langmenu=zh_CN.UTF-8</span><br><span class="line">set helplang=cn</span><br><span class="line"></span><br><span class="line">&quot; 总是显示状态行</span><br><span class="line">set laststatus=2</span><br><span class="line"></span><br><span class="line">&quot; 命令行（在状态行下）的高度，默认为1，这里是2</span><br><span class="line">set cmdheight=2</span><br><span class="line"></span><br><span class="line">&quot; 侦测文件类型</span><br><span class="line">filetype on</span><br><span class="line"></span><br><span class="line">&quot; 载入文件类型插件</span><br><span class="line">filetype plugin on</span><br><span class="line"></span><br><span class="line">&quot; 为特定文件类型载入相关缩进文件</span><br><span class="line">filetype indent on</span><br><span class="line"></span><br><span class="line">&quot; 保存全局变量</span><br><span class="line">set viminfo+=!</span><br><span class="line"></span><br><span class="line">&quot; 带有如下符号的单词不要被换行分割</span><br><span class="line">set iskeyword+=_,$,@,%,#,-</span><br><span class="line"></span><br><span class="line">&quot; 字符间插入的像素行数目</span><br><span class="line">set linespace=0</span><br><span class="line"></span><br><span class="line">&quot; 增强模式中的命令行自动完成操作</span><br><span class="line">set wildmenu</span><br><span class="line"></span><br><span class="line">&quot; 使回格键（backspace）正常处理indent, eol, start等</span><br><span class="line">set backspace=2</span><br><span class="line"></span><br><span class="line">&quot; 允许backspace和光标键跨越行边界</span><br><span class="line">set whichwrap+=&lt;,&gt;,h,l</span><br><span class="line"></span><br><span class="line">&quot; 可以在buffer的任何地方使用鼠标（类似office中在工作区双击鼠标定位）</span><br><span class="line">set mouse=a</span><br><span class="line">set selection=exclusive</span><br><span class="line">set selectmode=mouse,key</span><br><span class="line"></span><br><span class="line">&quot; 通过使用: commands命令，告诉我们文件的哪一行被改变过</span><br><span class="line">set report=0</span><br><span class="line"></span><br><span class="line">&quot; 在被分割的窗口间显示空白，便于阅读</span><br><span class="line">set fillchars=vert:\ ,stl:\ ,stlnc:\</span><br><span class="line"></span><br><span class="line">&quot; 高亮显示匹配的括号</span><br><span class="line">set showmatch</span><br><span class="line"></span><br><span class="line">&quot; 匹配括号高亮的时间（单位是十分之一秒）</span><br><span class="line">set matchtime=1</span><br><span class="line"></span><br><span class="line">&quot; 光标移动到buffer的顶部和底部时保持3行距离</span><br><span class="line">set scrolloff=3</span><br><span class="line"></span><br><span class="line">&quot; 为C程序提供自动缩进</span><br><span class="line">set smartindent</span><br><span class="line"></span><br><span class="line">&quot; 高亮显示普通txt文件（需要txt.vim脚本）</span><br><span class="line">au BufRead,BufNewFile *  setfiletype txt</span><br><span class="line"></span><br><span class="line">&quot;自动补全</span><br><span class="line">:inoremap ( ()<span class="tag">&lt;<span class="name">ESC</span>&gt;</span>i</span><br><span class="line">:inoremap &#123; &#123;&#125;<span class="tag">&lt;<span class="name">ESC</span>&gt;</span>i</span><br><span class="line">:inoremap [ []<span class="tag">&lt;<span class="name">ESC</span>&gt;</span>i</span><br><span class="line">:inoremap &quot; &quot;&quot;<span class="tag">&lt;<span class="name">ESC</span>&gt;</span>i</span><br><span class="line">:inoremap &#x27; &#x27;&#x27;<span class="tag">&lt;<span class="name">ESC</span>&gt;</span>i</span><br><span class="line"></span><br><span class="line">&quot; 按tab键依次选择</span><br><span class="line">set wildmenu</span><br><span class="line"></span><br><span class="line">&quot;配置规则</span><br><span class="line">set wildmode=longest,list,full</span><br><span class="line"></span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; cscope  设置</span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">:cs add cscope.out</span><br><span class="line"></span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; Tag List  设置</span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">nmap <span class="tag">&lt;<span class="name">F5</span>&gt;</span> :TlistToggle<span class="tag">&lt;<span class="name">CR</span>&gt;</span></span><br><span class="line"></span><br><span class="line">let Tlist_Ctags_Cmd=&quot;/usr/bin/ctags&quot;  &quot;ctags程序位置</span><br><span class="line">let Tlist_Inc_Winwidth=0        &quot;window width change off</span><br><span class="line">let Tlist_Auto_Open=0           &quot;vim 开始时window open=off</span><br><span class="line">let Tlist_Use_Left_Window=1     &quot;显示在左侧</span><br><span class="line">let Tlist_Show_One_File=1       &quot;不同时显示多个文件的tag，只显示当前文件的    </span><br><span class="line">let Tlist_Exit_OnlyWindow=1     &quot;如果taglist窗口是最后一个窗口，则退出vim   </span><br><span class="line">set ut=100</span><br><span class="line"></span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; NERDTree  设置</span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">nmap <span class="tag">&lt;<span class="name">F8</span>&gt;</span> :NERDTreeToggle<span class="tag">&lt;<span class="name">CR</span>&gt;</span></span><br><span class="line">let NERDTreeWinPos=&quot;right&quot;</span><br><span class="line"></span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; SrcExpl  设置</span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; // The switch of the Source Explorer </span><br><span class="line">nmap <span class="tag">&lt;<span class="name">F7</span>&gt;</span> :SrcExplToggle<span class="tag">&lt;<span class="name">CR</span>&gt;</span> </span><br><span class="line"></span><br><span class="line">&quot; // Set the height of Source Explorer window </span><br><span class="line">let g:SrcExpl_winHeight = 8 </span><br><span class="line"></span><br><span class="line">&quot; // Set 100 ms for refreshing the Source Explorer </span><br><span class="line">let g:SrcExpl_refreshTime = 100 </span><br><span class="line"></span><br><span class="line">&quot; // Set &quot;Enter&quot; key to jump into the exact definition context </span><br><span class="line">let g:SrcExpl_jumpKey = &quot;<span class="tag">&lt;<span class="name">ENTER</span>&gt;</span>&quot; </span><br><span class="line"></span><br><span class="line">&quot; // Set &quot;Space&quot; key for back from the definition context </span><br><span class="line">let g:SrcExpl_gobackKey = &quot;<span class="tag">&lt;<span class="name">SPACE</span>&gt;</span>&quot; </span><br><span class="line"></span><br><span class="line">&quot; // In order to avoid conflicts, the Source Explorer should know what plugins except</span><br><span class="line">&quot; // itself are using buffers. And you need add their buffer names into below list</span><br><span class="line">&quot; // according to the command &quot;:buffers!&quot;</span><br><span class="line">let g:SrcExpl_pluginList = [</span><br><span class="line">        \ &quot;__Tag_List__&quot;,</span><br><span class="line">        \ &quot;_NERD_tree_&quot;,</span><br><span class="line">        \ &quot;Source_Explorer&quot;</span><br><span class="line">    \ ]</span><br><span class="line"></span><br><span class="line">&quot; // The color schemes used by Source Explorer. There are five color schemes</span><br><span class="line">&quot; // supported for now - Red, Cyan, Green, Yellow and Magenta. Source Explorer</span><br><span class="line">&quot; // will pick up one of them randomly when initialization.</span><br><span class="line">let g:SrcExpl_colorSchemeList = [</span><br><span class="line">        \ &quot;Red&quot;,</span><br><span class="line">        \ &quot;Cyan&quot;,</span><br><span class="line">        \ &quot;Green&quot;,</span><br><span class="line">        \ &quot;Yellow&quot;,</span><br><span class="line">        \ &quot;Magenta&quot;</span><br><span class="line">    \ ]</span><br><span class="line"></span><br><span class="line">&quot; // Enable/Disable the local definition searching, and note that this is not </span><br><span class="line">&quot; // guaranteed to work, the Source Explorer doesn&#x27;t check the syntax for now. </span><br><span class="line">&quot; // It only searches for a match with the keyword according to command &#x27;gd&#x27; </span><br><span class="line">let g:SrcExpl_searchLocalDef = 1 </span><br><span class="line"></span><br><span class="line">&quot; // Workaround for Vim bug @https://goo.gl/TLPK4K as any plugins using autocmd for</span><br><span class="line">&quot; // BufReadPre might have conflicts with Source Explorer. e.g. YCM, Syntastic etc.</span><br><span class="line">let g:SrcExpl_nestedAutoCmd = 1</span><br><span class="line"></span><br><span class="line">&quot; // Do not let the Source Explorer update the tags file when opening </span><br><span class="line">let g:SrcExpl_isUpdateTags = 0 </span><br><span class="line"></span><br><span class="line">&quot; // Use &#x27;Exuberant Ctags&#x27; with &#x27;--sort=foldcase -R .&#x27; or &#x27;-L cscope.files&#x27; to </span><br><span class="line">&quot; // create/update the tags file </span><br><span class="line">let g:SrcExpl_updateTagsCmd = &quot;ctags --sort=foldcase -R .&quot; </span><br><span class="line"></span><br><span class="line">&quot; // Set &quot;<span class="tag">&lt;<span class="name">F12</span>&gt;</span>&quot; key for updating the tags file artificially </span><br><span class="line">let g:SrcExpl_updateTagsKey = &quot;<span class="tag">&lt;<span class="name">F12</span>&gt;</span>&quot; </span><br><span class="line"></span><br><span class="line">&quot; // Set &quot;<span class="tag">&lt;<span class="name">F3</span>&gt;</span>&quot; key for displaying the previous definition in the jump list </span><br><span class="line">let g:SrcExpl_prevDefKey = &quot;<span class="tag">&lt;<span class="name">F3</span>&gt;</span>&quot; </span><br><span class="line"></span><br><span class="line">&quot; // Set &quot;<span class="tag">&lt;<span class="name">F4</span>&gt;</span>&quot; key for displaying the next definition in the jump list </span><br><span class="line">let g:SrcExpl_nextDefKey = &quot;<span class="tag">&lt;<span class="name">F4</span>&gt;</span>&quot; </span><br><span class="line"></span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; Trinity  设置</span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">nmap <span class="tag">&lt;<span class="name">F6</span>&gt;</span>  :TrinityToggleAll<span class="tag">&lt;<span class="name">CR</span>&gt;</span> </span><br><span class="line"></span><br><span class="line">vmap <span class="tag">&lt;<span class="name">c-c</span>&gt;</span> &quot;+y</span><br></pre></td></tr></table></figure>
-
-<h2 id="插件"><a href="#插件" class="headerlink" title="插件"></a>插件</h2><h3 id="ctags"><a href="#ctags" class="headerlink" title="ctags"></a>ctags</h3><p>ctags 默认并不会提取所有标识符的tag标签，以下命令可以生成更加详细的tag文件</p>
-<blockquote>
-<p>ctags -R –c-kinds=+c+d+e+f+g+m+n+s+t+u+v –fields=+liaS –extra=+q –langmap=c:+.h.s.S –exclude=build/*</p>
-</blockquote>
-<p>可以在Vim尾行模式或Vim配置文件 .~/.vimrc 中通过以下命令显式地指定tag文件路径：<code>:set tags+=tags文件路径</code></p>
-<p><code>--list-kinds=c++</code> 可列出C++支持生成的标签类型的全量列表：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">c     类classes)</span><br><span class="line">d     宏定义(macro definitions)</span><br><span class="line">e     枚举变量(enumerators)</span><br><span class="line">f     函数定义(function definitions)</span><br><span class="line">g     枚举类型(enumeration names)</span><br><span class="line">l     局部变量(local variables)，默认不提取</span><br><span class="line">m     类、结构体、联合体(class, struct, and union members)</span><br><span class="line">n     命名空间(namespaces)</span><br><span class="line">p     函数原型(function prototypes)，默认不提取</span><br><span class="line">s     结构体类型(structure names)</span><br><span class="line">t     类型定义(typedefs)</span><br><span class="line">u     联合体类型(union names)</span><br><span class="line">v     变量定义(variable definitions)</span><br><span class="line">x     外部变量(external and forward variable declarations)，默认不提取</span><br></pre></td></tr></table></figure>
-
-<p>局部对象、函数声明、外部变量等类型默认不会生成标签，所以在上面的ctags命令中显式加上了这些类型，用于生成所有类型的标签。</p>
-<p><code>--list-maps</code> 查看默认情况下支持那些语言，每一种支持的语言支持的文件扩展名是什么。</p>
-<p><code>--list-kinds=c++</code> 查看c++语言可以识别哪些语法元素。</p>
-<p><code>--langmap=c++:+.hpp</code> 认定某种扩展名的文件为某种语法语言文件</p>
-<p><code>fields=+iaS</code> 表明ctags要求描述的信息</p>
+          <p>GitFlow通常包含五种类型的分支：</p>
 <ul>
-<li>i 表示如果有继承，要标明父类；</li>
-<li>a 表示如果是类的成员，要标明其访问权限</li>
-<li>S 表示如果是函数，则生成的tag文件要标识函数的原型</li>
-<li>K 表示要显示语法元素类型的全称；</li>
-<li>z 表示在显示语法元素的类型时，使用格式kind:type。</li>
+<li><p>Master分支：主干分支，是可以部署到生产环境中的代码，只允许从其他分支合并，不允许向Master分支直接提交代码。</p>
+</li>
+<li><p>Develop分支：开发分支，用来集成测试最新合入的开发成果，包含要发布到下一个Release的代码。这个主要用于与合并Feature分支合并。</p>
+</li>
+<li><p>Feature分支：特性分支，从Develop分支拉出，每个新特性的开发对应一个特性分支，用于开发人员提交代码并进行自测。自测完成后，会将Feature分支的代码合并至Develop分支，进入下一个Release。</p>
+</li>
+<li><p>Release分支：发布分支，发布新版本时，基于Develop分支创建，发布完成后，合并到Master和Develop分支。</p>
+</li>
+<li><p>Hotfix分支：热修复分支，生产环境发现新Bug时创建的临时分支，问题验证通过后，合并到Master和Develop分支，这样这个改动就会进入下一个Release。</p>
+</li>
 </ul>
-<p><code>extra=+q</code> 表示强制要求ctags对同一个语法元素 再 记一行(如果某个语法元素是类的一个成员，ctags默认会给其记录一行)，这样可以保证在Vim中多个同名函数可以通过路径不同来区分。</p>
-<p><code>--exclude=</code> 路径不能加./。</p>
-<p><code>Ctrl + ]</code> 转跳到光标所在函数定义处；<code>Ctrl + t</code>跳回；</p>
-<h3 id="cscope"><a href="#cscope" class="headerlink" title="cscope"></a>cscope</h3><blockquote>
-<p>cscope -Rbqk</p>
-</blockquote>
-<ul>
-<li>R : 对目录和子目录下所有文件都递归创建索引</li>
-<li>b : 生成数据库后不进入查询界面</li>
-<li>q : 建立cscope.in.out和cscope.po.out，可加快搜索速度</li>
-<li>k : 不在预定义的系统路径中搜索(如：/usr/include)</li>
-<li>i: 指定保存文件列表的文件名（cscope.files），可以使用”–“，表示由标准输入获得文件列表。</li>
-<li>I dir: 在-I选项指出的目录中查找头文件</li>
-<li>u: 扫描所有文件，重新生成交叉索引文件</li>
-<li>C: 搜索时忽略大小写</li>
-<li>P path: 在以相对路径表示的文件前加上的path，这样不用切换到数据库文件所在的目录也可以使用。</li>
-</ul>
-<p>在代码所在根目录下，用vim打开代码，导入索引文件：<code>:cs add cscope.out</code>就可以使用以下命令了：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">:cs find s &#123;name&#125; : 查找c语言符号，即查找函数名、宏、枚举值等出现的地方</span><br><span class="line">:cs find g &#123;name&#125; : 查找函数、宏、枚举等定义的位置，类似ctags所提供的功能</span><br><span class="line">:cs find c &#123;name&#125; : 找出使用name的地方</span><br><span class="line">:cs find t &#123;name&#125; : 找出name的字串</span><br><span class="line">:cs find e &#123;name&#125; : 查找egrep模式，相当于egrep功能，但查找速度快多了</span><br><span class="line">:cs find f &#123;name&#125; : 查找并打开文件，类似vim的find功能</span><br><span class="line">:cs find i &#123;name&#125; : 查找include此文件的文件</span><br><span class="line">:cs find d &#123;name&#125; : 查找调用本函数的函数</span><br></pre></td></tr></table></figure>
-
-<p>Cscope缺省只解析C文件(.c和.h)、lex文件(.l)和yacc文件(.y)，虽然它也可以支持C++以及Java，但它在扫描目录时会跳过C++及Java后缀的文件。如果你希望cscope解析C++或Java文件，需要把这些文件的名字和路径保存在一个名为cscope.files的文件。当cscope发现在当前目录中存在cscope.files时，就会为cscope.files中列出的所有文件生成索引数据库。通常我们使用 find 来生成cscope.files文件。</p>
-<h3 id="taglist"><a href="#taglist" class="headerlink" title="taglist"></a>taglist</h3><p><a target="_blank" rel="noopener" href="https://www.vim.org/scripts/script.php?script_id=273">https://www.vim.org/scripts/script.php?script_id=273</a></p>
-<p>在Vim命令行下运行”:Tlist”就可以打开Taglist窗口，再次运行”:Tlist”则关闭。左右窗口切换Ctrl+ww在taglist窗口中，还可以使用下面的快捷键：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;CR&gt;          跳到光标下tag所定义的位置，用鼠标双击此tag功能也一样</span><br><span class="line">o             在一个新打开的窗口中显示光标下tag</span><br><span class="line">&lt;Space&gt;       显示光标下tag的原型定义</span><br><span class="line">u             更新taglist窗口中的tag</span><br><span class="line">s             更改排序方式，在按名字排序和按出现顺序排序间切换</span><br><span class="line">x             taglist窗口放大和缩小，方便查看较长的tag</span><br><span class="line">+             打开一个折叠，同zo</span><br><span class="line">-             将tag折叠起来，同zc</span><br><span class="line">*             打开所有的折叠，同zR</span><br><span class="line">=             将所有tag折叠起来，同zM</span><br><span class="line">[[            跳到前一个文件</span><br><span class="line">]]            跳到后一个文件</span><br><span class="line">q             关闭taglist窗口</span><br><span class="line">&lt;F1&gt;          显示帮助</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&quot; Tag List  设置</span><br><span class="line">nmap <span class="tag">&lt;<span class="name">F5</span>&gt;</span> :TlistToggle<span class="tag">&lt;<span class="name">CR</span>&gt;</span></span><br><span class="line"></span><br><span class="line">let Tlist_Ctags_Cmd=&quot;/home/luoyou/home/usr/bin/ctags&quot;  &quot;ctags程序位置</span><br><span class="line">let Tlist_Inc_Winwidth=0     &quot;window width change off</span><br><span class="line">let Tlist_Auto_Open=0        &quot;vim 开始时window open=off</span><br><span class="line">let Tlist_Use_Left_Window=1  &quot;显示在左侧</span><br><span class="line">let Tlist_Show_One_File=1    &quot;不同时显示多个文件的tag，只显示当前文件的    </span><br><span class="line">let Tlist_Exit_OnlyWindow=1  &quot;如果taglist窗口是最后一个窗口，则退出vim   </span><br><span class="line">let Tlist_File_Fold_Auto_Close=1             &quot; 自动折叠</span><br><span class="line">set ut=100</span><br></pre></td></tr></table></figure>
-
-<h3 id="Trinity"><a href="#Trinity" class="headerlink" title="Trinity"></a>Trinity</h3><p><a target="_blank" rel="noopener" href="https://github.com/wenlongche/Trinity">https://github.com/wenlongche/Trinity</a></p>
-<h3 id="NERD-tree"><a href="#NERD-tree" class="headerlink" title="NERD tree"></a>NERD tree</h3><p>要用Trinity插件包里的NERD_tree.vim</p>
-<h3 id="SrcExpl"><a href="#SrcExpl" class="headerlink" title="SrcExpl"></a>SrcExpl</h3><p><a target="_blank" rel="noopener" href="https://www.vim.org/scripts/script.php?script_id=2179">https://www.vim.org/scripts/script.php?script_id=2179</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/net/ntp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/04/net/ntp/" class="post-title-link" itemprop="url">ntp</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>NTP是计算机系统中的时钟同步协议，是基于用户数据报协议（UDP），端口号是123。</p>
-<p>对于同步过程，NTP依赖于协调世界时（UTC），该时间是从分层系统中的各个客户端和服务器获得的。时钟同步的工作过程：</p>
+<p>通常开发过程中新特性的开发过程如下：</p>
 <ol>
-<li>客户端发送一个NTP报文给服务器，该报文带有它离开客户端时的时间戳T1。</li>
-<li>当NTP报文到达服务器时，服务器加上自己的时间戳T2。</li>
-<li>当NTP报文离开服务器时，服务器再加上自己的时间戳T3。</li>
-<li>当客户端接收到该响应报文时，客户端的本地时间为T4。</li>
+<li><p>从Develop分支拉取一条Feature分支，在此分支上进行新功能开发。</p>
+</li>
+<li><p>完成开发后，将Feature分支合入到Develop分支，并进行开发环境的验证。</p>
+</li>
+<li><p>开发环境验证完成后，从Develop分支拉取一条Release分支，到测试环境进行ST/UT测试。</p>
+</li>
+<li><p>测试发现问题，提问题单修改，代码提交到Release分支上。</p>
+</li>
+<li><p>问题单都解决完后，可将Release分支合入Master分支。</p>
+</li>
+<li><p>待发布版本时，直接将Master分支代码部署到生产环境。</p>
+</li>
 </ol>
-<p><img src="/images/net/ntp.png"></p>
-<p>如此客户端相对服务器的时间差为((T2-T1) + (T3-T4)) / 2，然后根据时间差来设定自己的时钟，使之与服务器的时钟同步。</p>
-<h2 id="报文格式"><a href="#报文格式" class="headerlink" title="报文格式"></a>报文格式</h2><p><strong>数据报文格式</strong></p>
-<p><img src="/images/net/ntp_package.png"></p>
-<table>
-<thead>
-<tr>
-<th>字段名</th>
-<th>长度(bit)</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Leap Indicator</td>
-<td>2</td>
-<td>闰秒提示：<br/>0: 无leap秒调整<br/>1: 一天的最后一分钟为61秒<br/>2: 一天的最后一分钟为59秒<br/>3:表示告警状态，时钟未被同步。</td>
-</tr>
-<tr>
-<td>Version Number</td>
-<td>3</td>
-<td>NTP的版本号，目前值为3。</td>
-</tr>
-<tr>
-<td>Mode</td>
-<td>3</td>
-<td>NTP的工作模式。不同值表示的含义如下：<br/>0：reserved，保留。<br/>1：symmetric active，主动对等体模式。<br/>2：symmetric passive，被动对等体模式。<br/>3：client，客户模式。<br/>4：server，服务器模式。<br/>5：broadcast，广播模式。<br/>6：reserved for NTP control messages，NTP控制报文。<br/>7：reserved for private use，内部使用预留。</td>
-</tr>
-<tr>
-<td>Stratum</td>
-<td>8</td>
-<td>时钟的层数，定义了时钟的准确度。层数为1的时钟准确度最高，从1到15依次递减。<br/>0：未指定或无效<br/>1：主服务器<br/>2 – 15：辅助服务器<br/>16：未同步<br/>17 –255：保留</td>
-</tr>
-<tr>
-<td>Poll</td>
-<td>8</td>
-<td>轮询时间（8位有符号整数），即两个连续NTP报文之间最小间隔时间(s)。</td>
-</tr>
-<tr>
-<td>Precision</td>
-<td>8</td>
-<td>本地时钟精度（8位有符号整数）</td>
-</tr>
-<tr>
-<td>Root Delay</td>
-<td>32</td>
-<td>到主参考时钟的总往返延迟时间。</td>
-</tr>
-<tr>
-<td>Root Dispersion</td>
-<td>32</td>
-<td>本地时钟相对于主参考时钟的最大误差。</td>
-</tr>
-<tr>
-<td>Reference Identifier</td>
-<td>32</td>
-<td>标识特定参考时钟。</td>
-</tr>
-<tr>
-<td>Reference Timestamp</td>
-<td>64</td>
-<td>参考时间戳，本地时钟最后一次被设定或更新的时间。如果值为0表示本地时钟从未被同步过。</td>
-</tr>
-<tr>
-<td>Originate Timestamp</td>
-<td>64</td>
-<td>原始时间戳，NTP报文离开源端时的本地时间。</td>
-</tr>
-<tr>
-<td>Receive Timestamp</td>
-<td>64</td>
-<td>接受时间戳，NTP报文到达目的端的本地时间。</td>
-</tr>
-<tr>
-<td>Transmit Timestamp</td>
-<td>64</td>
-<td>传送时间戳目的端应答报文离开服务器端的本地时间。</td>
-</tr>
-<tr>
-<td>Authenticator</td>
-<td>96</td>
-<td>（可选）验证信息。</td>
-</tr>
-</tbody></table>
-<p><strong>控制报文格式</strong></p>
-<p><img src="/images/net/ntp_packet.png"></p>
-<table>
-<thead>
-<tr>
-<th>字段名</th>
-<th>长度(bit)</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>0</td>
-<td>2</td>
-<td>保留位。NTP本身不做处理。</td>
-</tr>
-<tr>
-<td>VN（Version Number）</td>
-<td>3</td>
-<td>NTP的版本号，目前值为3。</td>
-</tr>
-<tr>
-<td>6</td>
-<td>3</td>
-<td>表明是控制报文。</td>
-</tr>
-<tr>
-<td>REM</td>
-<td>3</td>
-<td>R：0表示命令，1表示响应。 E：0表示发送正常响应，1表示发送错误响应。 M：0表示最后一个分片，1表示其他。</td>
-</tr>
-<tr>
-<td>Op</td>
-<td>5</td>
-<td>操作码，表明命令的类型。</td>
-</tr>
-<tr>
-<td>Sequence</td>
-<td>16</td>
-<td>发送或接受到报文的顺序号。</td>
-</tr>
-<tr>
-<td>Status</td>
-<td>16</td>
-<td>表明当前系统的状态。</td>
-</tr>
-<tr>
-<td>Association ID</td>
-<td>16</td>
-<td>连接标示。</td>
-</tr>
-<tr>
-<td>Offset</td>
-<td>16</td>
-<td>偏移量。</td>
-</tr>
-<tr>
-<td>Count</td>
-<td>16</td>
-<td>数据域的长度。</td>
-</tr>
-<tr>
-<td>Data</td>
-<td>最大468</td>
-<td>包括发送报文或接受报文中的数据信息。</td>
-</tr>
-<tr>
-<td>Padding</td>
-<td>16</td>
-<td>填充字段。</td>
-</tr>
-<tr>
-<td>Authenticator</td>
-<td>96</td>
-<td>（可选）验证信息。</td>
-</tr>
-</tbody></table>
-<hr>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/hankgo/p/15586190.html">https://www.cnblogs.com/hankgo/p/15586190.html</a></p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiaotian_muzi/article/details/90718222">https://blog.csdn.net/xiaotian_muzi/article/details/90718222</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/hardware/RF/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/04/hardware/RF/" class="post-title-link" itemprop="url">无线电</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="电磁波"><a href="#电磁波" class="headerlink" title="电磁波"></a>电磁波</h2><p>电磁波的波长和频率成正比（光速=波长×频率）。</p>
-<p><strong>频率越高，波长越短，越趋近于直线传播（绕射能力越差）。频率越高，在传播介质中的衰减也越大。</strong></p>
-<h2 id="天线"><a href="#天线" class="headerlink" title="天线"></a>天线</h2><p><strong>天线长度应与波长成正比，大约在1/10~1/4之间</strong>，当天线的长度是无线电信号波长的1/4时，天线的发射和接收转换效率最高。</p>
-<h2 id="射频"><a href="#射频" class="headerlink" title="射频"></a>射频</h2><p>射频（Radio Frequency）是指频率范围在300KHz~300GHz的高频电磁波。频率低于100kHz的电磁波会被地表吸收，不能形成有效的传输。频率高于100kHz的电磁波可以在空气中传播，并经大气层外缘的电离层反射，形成远距离传输能力。</p>
-<p>900MHz的GSM频段，1.9GHz的4G LTE频段，3.5GHz的5G频段。</p>
-<p>基本频带(Baseband)是指一段特殊的频率带宽，也就是频率范围在零频附近（从直流到几百KHz）的这段带宽的信号。</p>
-<p><img src="/images/hardware/RF/sem_module.webp" alt="img"></p>
-<p>射频芯片指的就是将无线电信号转换成一定的无线电信号波形， 并通过天线谐振发送出去的一个电子元器件，它包括功率放大器、低噪声放大器和天线开关。射频芯片架构包括接收通道和发射通道两大部分。</p>
-<h2 id="检波"><a href="#检波" class="headerlink" title="检波"></a>检波</h2><p>检波又称振幅解调，它的作用是从已调制的高频振荡中恢复出原来的调制信号。从频谱上看，检波就是将幅度调制波中的边带信号不失真地从载波频率附近搬移到零频率附近。</p>
-<p>在测试和测量应用中，射频功率检波器用于精密测量射频功率，以及用作频谱和网络分析仪中输入保护电路的一部分。在通信和医疗应用中，射频检波器用于监测和控制发射功率和天线回波损耗。</p>
-<h2 id="基带"><a href="#基带" class="headerlink" title="基带"></a>基带</h2><p>基带（Base Band）是频谱中心点在0Hz的信号，有人也把基带叫做“未调制信号”。</p>
-<p>基带芯片可以认为是包括调制解调器，但不止于调制解调器，还包括信道编解码、信源编解码，以及一些信令处理。</p>
-<h2 id="LPWAN"><a href="#LPWAN" class="headerlink" title="LPWAN"></a>LPWAN</h2><p><img src="/images/hardware/RF/v2-da2f5994249683a8d1f301d9c84e95fe_720w.jpg" alt="img"></p>
-<p><strong>LPWAN</strong> (Low Power Wide Area Network，低功耗广域网)，特点是低功耗和广覆盖。也叫做蜂窝物联网。目前市场上主要的LPWAN技术包括NB-IoT、eMTC、LORA。</p>
-<p><img src="/images/hardware/RF/b622410ef1194adb8b52409d4ec0df39.png" alt="img"></p>
-<p><img src="/images/hardware/RF/8b307fed446e4b9899ce10a248141c9e.png" alt="img"></p>
-<p><strong>IMSI</strong> 国际移动用户识别码，是区别移动用户的标识，储存在SIM卡中，可用于区别移动用户的有效信息，通过IMSI可反查运营商、归属地、手机号码等信息，在接入网络时会到运营商服务器中进行验证。格式：15位0-9的数字。</p>
-<p><strong>ICCID</strong> SIM卡卡号，是卡的标识，不作接入网络的鉴权认证，可在SIM卡卡后查询到。格式：大多为19或20位0-9的数字，亦存在6位/12位的情况。</p>
-<h2 id="NB-IoT"><a href="#NB-IoT" class="headerlink" title="NB-IoT"></a>NB-IoT</h2><p>NB-IoT（窄带物联网），Narrow Band Internet of Things。</p>
-<h2 id="ZigBee"><a href="#ZigBee" class="headerlink" title="ZigBee"></a>ZigBee</h2><p>ZigBee是基于IEEE802.15.4标准的低功耗局域网协议，可工作在2.4GHz(全球流行)、868MHz(欧洲流行)和915 MHz(美国流行)3个频段上,分别具有最高250kbit/s、20kbit/s和40kbit/s的传输速率，它的传输距离在10-75m的范围内。</p>
-<ul>
-<li><p>低功耗：在低耗电待机模式下，2节5号干电池可支持1个节点工作6-24个月，甚至更长。这是ZigBee的突出优势。相比之下蓝牙可以工作数周、WiFi可以工作数小时;</p>
-</li>
-<li><p>低成本：通过大幅简化协议是成本很低（不足蓝牙的1/10），降低了对通信控制器的要求，按预测分析，以8051的8位微控制器测算，全功能的主节点需要32KB代码，子功能节点少至4KB代码，而且ZigBee的协议专利免费;</p>
-</li>
-<li><p>低速率：ZigBee工作在250kbps的通讯速率，满足低速率传输数据的应用需求;</p>
-</li>
-<li><p>近距离：传输范围一般介于10～100m之间，在增加RF发射功率后，亦可增加到1-3km。这指的是相邻节点间的距离。如果通过路由和节点间通信的接力，传输距离将可以更远;</p>
-</li>
-<li><p>短时延：ZigBee的响应速度较快，一般从睡眠转入工作状态只需15ms，节点连接进入网络只需30ms，进一步节省了电能。相比较，蓝牙需要3-10s、WiFi需要3s;</p>
-</li>
-<li><p>高容量：ZigBee可采用星状、片状和网状网络结构，由一个主节点管理若干子节点，最多一个主节点可管理254个子节点;同时主节点还可由上一层网络节点管理，最多可组成65000个节点的大网;</p>
-</li>
-<li><p>高安全：ZigBee提供了三级安全模式，包括无安全设定、使用接入控制清单（ACL）防止非法获取数据以及采用高级加密标准（AES128）的对称密码，以灵活确定其安全属性;</p>
-</li>
-<li><p>免执照频段：采用直接序列扩频在工业科学医疗2.4GHz（全球）频段。</p>
-</li>
-</ul>
-<h2 id="Z-Wave"><a href="#Z-Wave" class="headerlink" title="Z-Wave"></a>Z-Wave</h2><p>Z-Wave是一种基于射频的、低成本、低功耗、高可靠、适于网络的短距离无线通信技术。工作频带为908.42MHz(美国)~868.42MHz(欧洲)，采用FSK(BFSK/GFSK)调制方式，数据传输速率可达40 kbps，信号的有效覆盖范围在室内是30m，室外可超过100m，适合于窄带宽应用场合。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/kernel/kernel_make/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/04/kernel/kernel_make/" class="post-title-link" itemprop="url">kernel make and menuconfig</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>指定交叉工具和平台。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm defconfig</span><br><span class="line">make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm menuconfig</span><br></pre></td></tr></table></figure>
-
-<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><ul>
-<li>屏蔽编译信息</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make &gt; /dev/null</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>使用<code>make -j&lt;n&gt;</code>参数加速编译</p>
-</li>
-<li><p>指定编译某些模块</p>
-</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make M=drivers/i2c/ modules</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>使用 verbose 模式，将每一步执行的命令都打印出来，并重定向到一个文件中去，这样以后可以方便地查找模块之间的依赖关系。</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make V=1 &gt; ~/bak.txt</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>使用 ccache 提高编译速度，使用 ccache时，需要更改源码树根目录下面的 Makefile 文件，在 CC 和 HOSTCC 变量的定义前添加 ccache。<a target="_blank" rel="noopener" href="http://ccache.samba.org/">ccache主页</a>。</li>
-</ul>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CC = ccache <span class="variable">$(CROSS_COMPILE)</span>gcc</span><br><span class="line">HOSTCC = ccache gcc</span><br></pre></td></tr></table></figure>
-
-<h2 id="编译文档"><a href="#编译文档" class="headerlink" title="编译文档"></a>编译文档</h2><p>使用下面的一些命令可以在 Documentation/DocBook/目录下，生成一些文档。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">make htmldocs //生成 HTML 文件</span><br><span class="line">make pdfdocs  //生成 PDF 文件</span><br><span class="line">make psdocs   //生成 Postscript 文件</span><br><span class="line">make mandocs  //生成 Kernel API 手册</span><br><span class="line">make installmandocs //将 Kernel API 手册页安装到 man 程序能够找到的目录中</span><br></pre></td></tr></table></figure>
-
-<h2 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h2><p>1.缺少libncurses5-dev</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make menuconfig requires the ncurses libraries.</span><br></pre></td></tr></table></figure>
-
-<p>2.没有安装u-boot-tools</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkimage command not found – U-Boot images will not be built</span><br></pre></td></tr></table></figure>
-
-<p>3.源文件编译生成的.o文件和模块目标文件xxx.o重名。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">module license &#x27;unspecified&#x27; taints kernel.</span><br><span class="line">Disabling lock debugging due to kernel taint</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/linux/nfs_tftp_samb_ssh/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/04/linux/nfs_tftp_samb_ssh/" class="post-title-link" itemprop="url">install ssh samba nfs tftp service</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="SSH"><a href="#SSH" class="headerlink" title="SSH"></a>SSH</h2><p>SSH(Secure Shell)，是建立在应用层和传输层基础上的安全协议，可以通过网络登录远程系统，能够有效防<br>止远程管理过程中的信息泄露问题。</p>
-<p>1.安装ssh服务</p>
-<blockquote>
-<p>sudo apt-get install openssh-server</p>
-</blockquote>
-<p>2.启动ssh服务</p>
-<blockquote>
-<p>sudo service ssh start</p>
-</blockquote>
-<h2 id="Samba"><a href="#Samba" class="headerlink" title="Samba"></a>Samba</h2><p>1.安装Samba</p>
-<blockquote>
-<p>sudo apt-get install samba samba-common</p>
-</blockquote>
-<p>2.创建分享目录，配置samba，修改<code>/etc/samba/smb.conf</code>，用<code>testparm</code>命令检查配置文件的语法错误。</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[global]</span><br><span class="line">    allow insecure wide links = yes</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[homes]</span><br><span class="line">    create mask = 0775</span><br><span class="line">    directory mask = 0775</span><br><span class="line">    valid users = %S</span><br><span class="line">    read only = no</span><br><span class="line">    writable = yes</span><br><span class="line">    browseable = no</span><br><span class="line">    follow symlinks = yes</span><br><span class="line">    wide links = yes</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[share]</span><br><span class="line">    comment = share folder</span><br><span class="line">    path = /share</span><br><span class="line">    create mask = 0777</span><br><span class="line">    directory mask = 0777</span><br><span class="line">    read only = no</span><br><span class="line">    writable = yes</span><br><span class="line">    public = yes</span><br><span class="line">    browseable = yes</span><br></pre></td></tr></table></figure>
-
-<p>3.添加登入共享文件夹的用户名和密码，其中用户名必须为linux中的用户。</p>
-<blockquote>
-<p>sudo smbpasswd -a root</p>
-</blockquote>
-<p>4.重启samba服务</p>
-<blockquote>
-<p>service smbd restart</p>
-</blockquote>
-<h2 id="NFS"><a href="#NFS" class="headerlink" title="NFS"></a>NFS</h2><p>NFS(Network File-System)网络文件系统，可以通过网络让不同机器、不同系统之间可以实现文件共享。</p>
-<p>1.安装nfs相关软件</p>
-<blockquote>
-<p>sudo apt-get install nfs-kernel-server nfs-common</p>
-</blockquote>
-<p>2.修改配置，添加共享目录，<code>sudo vim /etc/exports</code>。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/nfsroot *(rw,sync,no_root_squash,no_subtree_check)</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>/nfsroot  ：共享的目录</p>
-</li>
-<li><p>*：指定哪些用户可以访问，<br>*所有可以ping同该主机的用户；</p>
-</li>
-</ul>
-<p>192.168.1.* 指定网段，在该网段中的用户可以挂载；<br>192.168.1.12 只有该用户能挂载；</p>
-<ul>
-<li>(ro,sync,no_root_squash)： 权限，<br>ro : 只读；<br>rw : 读写；<br>sync : 数据同步写入内存和硬盘；<br>no_root_squash: 不降低root用户的权限；</li>
-</ul>
-<p>3.创建共享目录，并设置目录权限</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo mkdir /nfsroot</span><br><span class="line">sudo chmod -R 777 /nfsroot</span><br><span class="line">sudo chown –R nobody /nfsroot</span><br></pre></td></tr></table></figure>
-
-<p>4.重新启动nfs服务</p>
-<blockquote>
-<p>sudo service nfs-kernel-server restart</p>
-</blockquote>
-<p>5.挂载自测</p>
-<blockquote>
-<p>mount -t nfs localhost:/nfsroot ~/test -o nolock</p>
-</blockquote>
-<h2 id="TFTP"><a href="#TFTP" class="headerlink" title="TFTP"></a>TFTP</h2><p>TFTP(Trivial File Transfer Protocol,简单文件传输协议)是用来在客户机和服务器之间进行简单文件传输的协议。</p>
-<p>1.安装tftp服务</p>
-<blockquote>
-<p>sudo apt-get install xinetd tftp tftpd</p>
-</blockquote>
-<p>2.新建/etc/xinetd.d/tftp配置文件，指定的用户和tftp服务器根路径，若不存在，则需创建该目录，并设置访问权限。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">service tftp</span><br><span class="line">&#123;</span><br><span class="line">    socket_type = dgram</span><br><span class="line">    wait = yes </span><br><span class="line">    user = luou</span><br><span class="line">    protocol = udp </span><br><span class="line">    server = /usr/sbin/in.tftpd</span><br><span class="line">    server_args = -s /tftp</span><br><span class="line">    disable = no</span><br><span class="line">    per_source = 11</span><br><span class="line">    cps =100 2</span><br><span class="line">    flags =IPv4</span><br></pre></td></tr></table></figure>
-
-<p>3.重启xinetd服务</p>
-<blockquote>
-<p>sudo /etc/init.d/xinetd restart</p>
-</blockquote>
+<p><img src="/images/git/GitFlow.png" alt="img"></p>
+<p>GitFlow的优点是每个分支都有明确的定义，严格按照GitFlow管理项目代码的话，很难出现代码混乱。其缺点是：如果特性分支过多的话很容易造成代码冲突，从而提高了合入的成本。由于每次提交都涉及多个分支，所以不适合提交频率较高的项目。</p>
 
       
     </div>
@@ -1373,7 +1296,7 @@
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/22/">22</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1438,7 +1361,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">203</span>
+          <span class="site-state-item-count">214</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1451,7 +1374,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">42</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

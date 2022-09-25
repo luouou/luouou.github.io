@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="ARM指令集架构命名 | ARMv | n | variants | x（variants） |   ARMv – 固定字符，即ARM Version n – 指令集版本号。迄今为之，ARM架构版本发布了8个系列，所以n&#x3D;[1:8]。 variants – 变种 x（variants） – 排除x后指定的变种  常见的variants有以下字母可选：  T – Thumb指令集 M – 长乘法指令">
+<meta property="og:type" content="article">
+<meta property="og:title" content="arm体系架构">
+<meta property="og:url" content="http://example.com/2022/09/25/cpu/arm-arch/index.html">
+<meta property="og:site_name" content="nullptr">
+<meta property="og:description" content="ARM指令集架构命名 | ARMv | n | variants | x（variants） |   ARMv – 固定字符，即ARM Version n – 指令集版本号。迄今为之，ARM架构版本发布了8个系列，所以n&#x3D;[1:8]。 variants – 变种 x（variants） – 排除x后指定的变种  常见的variants有以下字母可选：  T – Thumb指令集 M – 长乘法指令">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-09-25T03:23:54.035Z">
+<meta property="article:modified_time" content="2022-09-25T07:11:00.564Z">
+<meta property="article:author" content="ubun2">
+<meta property="article:tag" content="cpu">
+<meta property="article:tag" content="arm">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2022/09/25/cpu/arm-arch/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>arm体系架构 | nullptr</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nullptr</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">吾生也有涯 而知也无涯</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/arm-arch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          arm体系架构
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-25 11:23:54 / 修改时间：15:11:00" itemprop="dateCreated datePublished" datetime="2022-09-25T11:23:54+08:00">2022-09-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="ARM指令集架构命名"><a href="#ARM指令集架构命名" class="headerlink" title="ARM指令集架构命名"></a>ARM指令集架构命名</h2><blockquote>
+<p>| ARMv | n | variants | x（variants） |</p>
+</blockquote>
+<ul>
+<li>ARMv – 固定字符，即ARM Version</li>
+<li>n – 指令集版本号。迄今为之，ARM架构版本发布了8个系列，所以n=[1:8]。</li>
+<li>variants – 变种</li>
+<li>x（variants） – 排除x后指定的变种</li>
+</ul>
+<p>常见的variants有以下字母可选：</p>
+<ul>
+<li>T – Thumb指令集</li>
+<li>M – 长乘法指令</li>
+<li>E – 增强型DSP指令</li>
+<li>J – Java加速器Jazelle</li>
+<li>SIMD – ARM媒体功能扩展</li>
+<li>D – Debug，提供调试支持</li>
+<li>I – 芯片上带有内置的ICE，从而支持程序内的断点和数据空间的观察点设置。</li>
+</ul>
+<p>比如：ARMv5TxM表示ARM指令集版本为5，支持T变种，不支持M变种。</p>
+<h2 id="ARM体系变种"><a href="#ARM体系变种" class="headerlink" title="ARM体系变种"></a>ARM体系变种</h2><p><strong>T变种</strong></p>
+<p>thumb指令集是ARM指令集的一个子集重新编码而成的。它使ARM更加高效地进行运作。</p>
+<p>ARM的指令长度为32位，而Thumb指令长度只有16位，对于一些冗余空余位的操作来讲的话，在使用16位的基础上，明显比使用32位更加高效。但是thumb自身也有一定的局限性：</p>
+<ul>
+<li><p>完成相同的操作时，Thumb指令通常情况下需要比ARM更多的指令。</p>
+</li>
+<li><p>Thumb指令集是不包含异常处理时的一些指令的</p>
+</li>
+</ul>
+<p>因此ARM是不能舍弃ARM的32位指令的，它与16位的Thumb指令配合才能更加有效率地执行。</p>
+<p><strong>M变种</strong></p>
+<p>增加了两条长乘法的ARM指令：</p>
+<ul>
+<li><p>长乘法操作：32位整数乘以32位整数，生成64位整数</p>
+</li>
+<li><p>长乘加操作：32位整数乘以32位整数，然后加上加上32位整数，生成64位整数</p>
+</li>
+</ul>
+<p>它其实做版本3中正式引入，版本2的时候仅是有了这个思想的，然后在版本4以后，M变种就变成了系统中的标准部分。我们也不再说M变种了，因为我们在开发ARM过程中直接是使用相应的指令的。</p>
+<p><strong>E变种</strong></p>
+<p>增强型DSP指令，针对于ARM的应用范围越来越广阔，为了满足DSP算法，就需要增强这个算法的处理性能。</p>
+<ul>
+<li><p>增加了新的16位数据乘法与乘加操作指令</p>
+</li>
+<li><p>实现饱和的带符号数的加减法操作指令</p>
+</li>
+<li><p>进行双字数据操作的指令，包含LDRD、STDR、MCRR\MRRC</p>
+</li>
+<li><p>cache预取指令PLD</p>
+</li>
+</ul>
+<p>E变种是在版本5T中开始使用的。值得注意的是：早期的E变种未有包含LDRD、STRD、MCRR\MRRC、PLD。</p>
+<p><strong>J变种</strong></p>
+<p>ARM能跑android和java不得不归功于这个变种——java加数器jazelle，与一般的java虚拟机相比，它将java代码运行速度提高了整整8倍，而功耗竟降低了80%。</p>
+<p><strong>SIMD变种</strong></p>
+<p>媒体功能扩展，它将音频\视频处理性能提高了4倍。</p>
+<ul>
+<li>音频\视频处理性能提高了4倍</li>
+<li>提供小数算术运算</li>
+<li>可同时进行两个16位操作数或者4个8位操作数的运算</li>
+<li>用户可以定义饱和运算模式</li>
+<li>两套16位操作数的乘加/乘减运算</li>
+<li>32位乘以32位的小数MAC</li>
+</ul>
+<h2 id="ARM处理器系列命名"><a href="#ARM处理器系列命名" class="headerlink" title="ARM处理器系列命名"></a>ARM处理器系列命名</h2><p>在 ARMv3 ~ ARMv6 时期规则：</p>
+<blockquote>
+<p>ARM{x}{y}{z}{T}{D}{M}{I}{E}{J}{F}{-S}</p>
+</blockquote>
+<ul>
+<li>x – 处理器系列</li>
+<li>y – 存储管理/保护单元</li>
+<li>z – cache</li>
+<li>T – 支持Thumb指令集</li>
+<li>D – 支持片上调试</li>
+<li>M – 支持快速乘法器</li>
+<li>I – 支持Embedded ICE，支持嵌入式跟踪调试</li>
+<li>E – 支持增强型DSP指令</li>
+<li>J – 支持Jazelle</li>
+<li>F – 具备向量浮点单元VFP</li>
+<li>-S – 可综合版本</li>
+</ul>
+<p>比如：ARM926 是 ARM9系列的，2个存储管理/保护单元，6个Cache</p>
+<p>在 ARMv7 后期，统一用 <strong>Cortex</strong> 作为主名，分为了3个款式：A、R、M &amp; SC：</p>
+<ul>
+<li>A 系列，应用级处理器，手机。</li>
+<li>R 系列，实时处理器，执行一个指令段的耗时是固定时钟周期数。</li>
+<li>M 系列，微处理器单片机。</li>
+<li>SC（SecurCore）系列，主打安全，面向支付、政府、SIM 卡。</li>
+</ul>
+<h2 id="ARM处理器工作模式"><a href="#ARM处理器工作模式" class="headerlink" title="ARM处理器工作模式"></a>ARM处理器工作模式</h2><ul>
+<li><p>用户模式（usr，User Mode）：ARM处理器正常的程序执行状态。</p>
+</li>
+<li><p>快速中断模式（fiq，Fast Interrupt Request Mode）：用于高速数据传输或通道处理。当触发快速中断时进入此模式。</p>
+</li>
+<li><p>外部中断模式（irq，Interrupt Request Mode）：用于通用的中断处理。当触发外部中断时进入此模式。</p>
+</li>
+<li><p>管理模式（svc，Supervisor Mode）：操作系统使用的保护模式。在系统复位或执行软件中断指令SWI时进入。</p>
+</li>
+<li><p>数据访问中止模式（abt，Abort Mode）：当数据或指令预取中止时进入该模式，可用于虚拟存储及存储保护。</p>
+</li>
+<li><p>系统模式（sys，System Mode）：运行具有特权的操作系统任务。</p>
+</li>
+<li><p>未定义指令中止模式（und，Undefined Mode）：当未定义的指令执行时进入该模式，可用于支持硬件协处理器的软件仿真。</p>
+</li>
+</ul>
+<p>除了用户模式之外，其余六种模式都是特权模式。除了用户模式和系统模式之外，其余五种模式都是异常模式。</p>
+<p>在特权模式下程序可以访问所有的系统资源。非特权模式和特权模式之间的区别在于有些操作只能在特权模式下才被允许，例如直接改变模式和中断使能等。而且为了保证数据安全，一般MMU会对地址空间进行划分，只有特权模式才能访问所有的地址空间。而用户模式如果需要访问硬件，必须切换到特权模式下，才允许访问硬件。</p>
+<p><strong>工作模式的切换</strong></p>
+<ul>
+<li><p>执行软中断（SWI）或复位命令（Reset）指令。如果在用户模式下执行SWI指令，CPU就进入管理（Supervisor）模式。当然，在其他模式下执行SWI，也会进入该模式，不过一般操作系统不会这么做，因为除了用户模式属于非特权模式，其他模式都属于特权模式。执行SWI指令一般是为了访问系统资源，而在特权模式下可以访问所有的系统资源。SWI指令一般用来为操作系统提供API接口。</p>
+</li>
+<li><p>外部中断。如果发生了外部中断，CPU就会进入IRQ或FIQ模式。</p>
+</li>
+<li><p>CPU执行过程中产生异常。最典型的异常是由于MMU保护所引起的内存访问异常，此时CPU会切换到Abort模式。如果是无效指令，则会进入Undefined模式。</p>
+</li>
+<li><p>有一种模式是CPU无法自动进入的，这种模式就是System模式，要进入System模式必须由程序员编写指令来实现。要进入System模式只需改变CPSR的模式位为System模式对应的模式位即可。进入System模式一般是为了利用System模式和用户模式下的寄存器相同的特点，因此一般情况下，操作系统在通过SWI进入Supervisor模式后，做一些操作后，就进入System模式。</p>
+</li>
+<li><p>在任何特权模式下，都可以通过修改CPSR的MODE域来进入其他模式。不过需要注意的是由于修改的CPSR是该模式下的影子CPSR，即SPSR，因此并不是实际的CPSR，所以一般的做法是修改影子CPSR，然后执行一个MOVS指令来恢复执行某个断点并切换到新模式。</p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/cpu/" rel="tag"># cpu</a>
+              <a href="/tags/arm/" rel="tag"># arm</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/09/25/cpu/cpu/" rel="prev" title="处理器设计">
+      <i class="fa fa-chevron-left"></i> 处理器设计
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/09/25/cpu/armv7_reg/" rel="next" title="ARMv7 寄存器">
+      ARMv7 寄存器 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ARM%E6%8C%87%E4%BB%A4%E9%9B%86%E6%9E%B6%E6%9E%84%E5%91%BD%E5%90%8D"><span class="nav-number">1.</span> <span class="nav-text">ARM指令集架构命名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ARM%E4%BD%93%E7%B3%BB%E5%8F%98%E7%A7%8D"><span class="nav-number">2.</span> <span class="nav-text">ARM体系变种</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ARM%E5%A4%84%E7%90%86%E5%99%A8%E7%B3%BB%E5%88%97%E5%91%BD%E5%90%8D"><span class="nav-number">3.</span> <span class="nav-text">ARM处理器系列命名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ARM%E5%A4%84%E7%90%86%E5%99%A8%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.</span> <span class="nav-text">ARM处理器工作模式</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ubun2</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">214</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ubun2</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

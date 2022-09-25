@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="ARM Trusted Firmware启动实现分为5个步骤：  BL1BL1是Trusted Boot ROM，就是BootRom，是信任链的根所在，位于ROM中。BL1主要目的是建立Trusted SRAM、exception vector、初始化串口等。然后找到并验证BL2（验签CSF头），然后跳转过去。  决定启动路径：冷启动还是热启动。 架构初始化：异常向量、CPU复位处理函数配置、控制">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ARM Trusted Firmware">
+<meta property="og:url" content="http://example.com/2022/09/25/cpu/ATF/index.html">
+<meta property="og:site_name" content="nullptr">
+<meta property="og:description" content="ARM Trusted Firmware启动实现分为5个步骤：  BL1BL1是Trusted Boot ROM，就是BootRom，是信任链的根所在，位于ROM中。BL1主要目的是建立Trusted SRAM、exception vector、初始化串口等。然后找到并验证BL2（验签CSF头），然后跳转过去。  决定启动路径：冷启动还是热启动。 架构初始化：异常向量、CPU复位处理函数配置、控制">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/cpu/arm/ATF3.png">
+<meta property="og:image" content="http://example.com/images/cpu/arm/ATF2.jpg">
+<meta property="og:image" content="http://example.com/images/cpu/arm/ATF.jpg">
+<meta property="og:image" content="http://example.com/images/cpu/arm/ATF.png">
+<meta property="article:published_time" content="2022-09-25T08:26:11.087Z">
+<meta property="article:modified_time" content="2022-09-25T13:26:56.794Z">
+<meta property="article:author" content="ubun2">
+<meta property="article:tag" content="arm">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/cpu/arm/ATF3.png">
+
+<link rel="canonical" href="http://example.com/2022/09/25/cpu/ATF/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>ARM Trusted Firmware | nullptr</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nullptr</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">吾生也有涯 而知也无涯</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/ATF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ARM Trusted Firmware
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-25 16:26:11 / 修改时间：21:26:56" itemprop="dateCreated datePublished" datetime="2022-09-25T16:26:11+08:00">2022-09-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>ARM Trusted Firmware启动实现分为5个步骤：</p>
+<p><img src="/images/cpu/arm/ATF3.png" alt="img"><br><img src="/images/cpu/arm/ATF2.jpg" alt="img"></p>
+<h2 id="BL1"><a href="#BL1" class="headerlink" title="BL1"></a>BL1</h2><p>BL1是Trusted Boot ROM，就是BootRom，是信任链的根所在，位于ROM中。BL1主要目的是建立Trusted SRAM、exception vector、初始化串口等。然后找到并验证BL2（验签CSF头），然后跳转过去。</p>
+<ul>
+<li>决定启动路径：冷启动还是热启动。</li>
+<li>架构初始化：异常向量、CPU复位处理函数配置、控制寄存器设置(SCRLR_EL3/SCR_EL3/CPTR_EL3/DAIF)</li>
+<li>平台初始化：使能Trusted Watchdog、初始化控制台、配置硬件一致性互联、配置MMU、初始化相关存储设备。</li>
+<li>固件更新处理</li>
+<li>BL2镜像加载和执行</li>
+</ul>
+<p>bl1_main()开始就是c程序了，那c运行依靠的堆和栈空间在哪里呢？在CPU内部的SRAM里。SRAM一启动就已经可以访问了，bl1_plat_arch_setup（）简单地在其中划分出来一块作为Trusted SRAM给c程序用，而不用像x86在cache里面扣一块出来，简单了很多。</p>
+<p>BL1镜像的异常向量表初始化了两个：一个是入口bl1_entrypoint，EL1镜像正常执行流程；另一个是SMC调用接口，EL2执行结束会通过SMC返回执行BL31。</p>
+<h2 id="BL2"><a href="#BL2" class="headerlink" title="BL2"></a>BL2</h2><p>BL2在Flash上，作为Trusted Boot Firmware，也叫Trusted Bootloader。</p>
+<ul>
+<li>架构初始化：EL1/EL0使能浮点单元和ASMID。</li>
+<li>平台初始化：控制台初始化、相关存储设备初始化、MMU、相关设备安全配置、</li>
+<li>SCP_BL2：系统控制核镜像加载，单独核处理系统功耗、时钟、复位等控制。</li>
+<li>寻找BL31，BL32和BL33镜像加载到RAM中，验签并运行BL31。</li>
+</ul>
+<h2 id="BL31"><a href="#BL31" class="headerlink" title="BL31"></a>BL31</h2><p>BL31是EL3 Runtime Firmware，一般为SML，管理SMC执行处理和中断，运行在secure monitor中，通过SMC指令在Secure World和Non-Secure World之间进行切换。它的主要任务是找到BL32，验签，并运行BL32。</p>
+<ul>
+<li>PSCI服务初始化，后续提供CPU功耗管理操作。</li>
+<li>BL32镜像运行初始化。</li>
+<li>初始化非安全EL2或EL1，跳转到BL33执行。</li>
+<li>负责安全非安全世界切换。</li>
+<li>进行安全服务请求的分发。</li>
+</ul>
+<h2 id="BL32"><a href="#BL32" class="headerlink" title="BL32"></a>BL32</h2><p>BL32是Trust OS，，它是一个可信安全的OS运行在EL1并在EL0启动可信任APP（如指纹信息，移动支付的密码等），并在Trust OS运行完成后通过SMC指令返回BL31，BL31找到BL33，验签并切换到Non-Seucre World运行BL33。</p>
+<h2 id="BL33"><a href="#BL33" class="headerlink" title="BL33"></a>BL33</h2><p>BL33运行的都是非安全固件，如UEFI 或u-boot。</p>
+<p><img src="/images/cpu/arm/ATF.jpg" alt="img"><br><img src="/images/cpu/arm/ATF.png" alt="img"></p>
+<hr>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/arnoldlu/p/14175126.html">https://www.cnblogs.com/arnoldlu/p/14175126.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/arm/" rel="tag"># arm</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/09/25/cpu/armv8/" rel="prev" title="ARMv8 架构">
+      <i class="fa fa-chevron-left"></i> ARMv8 架构
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/09/25/cpu/TrustZone/" rel="next" title="TrustZone">
+      TrustZone <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#BL1"><span class="nav-number">1.</span> <span class="nav-text">BL1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BL2"><span class="nav-number">2.</span> <span class="nav-text">BL2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BL31"><span class="nav-number">3.</span> <span class="nav-text">BL31</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BL32"><span class="nav-number">4.</span> <span class="nav-text">BL32</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BL33"><span class="nav-number">5.</span> <span class="nav-text">BL33</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ubun2</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">214</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ubun2</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
