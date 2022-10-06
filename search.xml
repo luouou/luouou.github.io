@@ -12160,16 +12160,19 @@
       </categories>
   </entry>
   <entry>
-    <title>二分法的标准写法</title>
+    <title>二分法搜索</title>
     <url>/2022/06/07/algo/binary/</url>
-    <content><![CDATA[<p>对于二分法，我们常用的取中位数的算法是这样的：</p>
+    <content><![CDATA[<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="type">static</span> <span class="type">int</span> <span class="title">binary</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> data)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> min = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> max = arr.length - <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> mid;</span><br><span class="line">    <span class="keyword">while</span> (min &lt;= max) &#123;</span><br><span class="line">        mid = (min + max) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span> (arr[mid] &gt; data) &#123;</span><br><span class="line">            max = mid - <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[mid] &lt; data) &#123;</span><br><span class="line">            min = mid + <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> mid;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种取中位数的方式，当 min 和 max 很大的时候，会出现溢出的情况，从而导致数组访问出错。</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line">mid = (min + max) / <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
 
-<p>但当 min 和 max 很大的时候，会出现溢出的情况，从而导致数组访问出错。改进的办法是将加法变成减法。</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="type">static</span> <span class="type">int</span> <span class="title">binary</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> data)</span> </span>&#123;</span><br><span class="line">        <span class="type">int</span> min = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> max = arr.length - <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> mid;</span><br><span class="line">        <span class="keyword">while</span> (min &lt;= max) &#123;</span><br><span class="line">            <span class="comment">// 防止溢出</span></span><br><span class="line">            mid =  min + (max - min) / <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span> (arr[mid] &gt; data) &#123;</span><br><span class="line">                max = mid - <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[mid] &lt; data) &#123;</span><br><span class="line">                min = mid + <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> mid;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>改进的办法是将加法变成减法。</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 防止溢出</span></span><br><span class="line">mid =  min + (max - min) / <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
 
-<p>还有一种更高效的办法是使用位运算。</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="type">static</span> <span class="type">int</span> <span class="title">binary</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> data)</span> </span>&#123;</span><br><span class="line">       <span class="type">int</span> min = <span class="number">0</span>;</span><br><span class="line">       <span class="type">int</span> max = arr.length - <span class="number">1</span>;</span><br><span class="line">       <span class="type">int</span> mid;</span><br><span class="line">       <span class="keyword">while</span> (min &lt;= max) &#123;</span><br><span class="line">           <span class="comment">// 无符号位运算符的优先级较低，先括起来</span></span><br><span class="line">           mid =  min + ((max - min) &gt;&gt;&gt; <span class="number">1</span>);</span><br><span class="line">           <span class="keyword">if</span> (arr[mid] &gt; data) &#123;</span><br><span class="line">               max = mid - <span class="number">1</span>;</span><br><span class="line">           &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[mid] &lt; data) &#123;</span><br><span class="line">               min = mid + <span class="number">1</span>;</span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               <span class="keyword">return</span> mid;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>]]></content>
+<p>更高效的办法是使用位运算。</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 无符号位运算符的优先级较低，先括起来</span></span><br><span class="line">mid =  min + ((max - min) &gt;&gt;&gt; <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+]]></content>
       <categories>
         <category>algorithm</category>
       </categories>
@@ -12293,17 +12296,20 @@
       </categories>
   </entry>
   <entry>
-    <title>数据结构-图</title>
+    <title>图</title>
     <url>/2022/06/07/algo/graph/</url>
     <content><![CDATA[<h2 id="图的定义"><a href="#图的定义" class="headerlink" title="图的定义"></a>图的定义</h2><p>图（Graph）是由顶点的有穷非空集合和顶点之间边的集合组成，通常为：G(V,E)，其中，G表示一个图，V是图G中顶点的集合，E是图G中边的集合。</p>
-<p><strong>无向边</strong>：顶点vi到vj之间的边没有方向。则称这条边为无向边（Edge），用无序偶对(Vi,Vj)来表示。</p>
+<p>树中的元素称为节点，图中的元素叫作<strong>顶点</strong>。图一个顶点可以与任意其他顶点建立连接关系，这种建立的关系叫<strong>边</strong>。顶点相连接的边的条数，顶点的<strong>度</strong>。</p>
+<p>边有方向的图叫作<strong>有向图</strong>，边没有方向的图就叫作<strong>无向图</strong>。</p>
+<p>无向图中的<strong>度</strong>表示一个顶点有多少条边，在有向图中，顶点的<strong>入度</strong>表示有多少条边指向这个顶点，顶点的<strong>出度</strong>表示有多少条边是以这个顶点为起点指向其他顶点。</p>
+<p><strong>无向边</strong>：顶点vi到vj之间的边没有方向，则称这条边为无向边，用无序偶对(Vi,Vj)来表示。</p>
 <p><strong>无向图</strong>：图中的任意两个顶点之间的边都是无向边。</p>
 <p><img src="/images/code/algo/graph/undir.png" alt="无向图"></p>
-<p>上图的无向图G1，可以表示成：G1=(V1,{E1})，其中顶点集合V1={A,B,C,D}；边集合E1={(A,B),(B,C)(C,D),(D,A),(A,C)}</p>
-<p><strong>有向边</strong>：顶点vi到vj的边有方向。 也称为<strong>弧（Arc）</strong>。有向边用带尖括号的有序偶对&lt;vi,vj&gt;来表示。其中vi称为弧尾（Tail），vj称为弧头（Head）。</p>
+<p>上图的无向图G1，可以表示成：G1=(V1,{E1})，其中顶点集合V1={A,B,C,D}；边集合E1={(A,B),(B,C)(C,D),(D,A),(A,C)}。</p>
+<p><strong>有向边</strong>：顶点vi到vj的边有方向。 也称为<strong>弧</strong>。有向边用带尖括号的有序偶对&lt;vi,vj&gt;来表示。其中vi称为弧尾，vj称为弧头。</p>
 <p><strong>有向图</strong>：图中任意两个顶点之间都是有向边。</p>
 <p><img src="/images/code/algo/graph/dir.png" alt="有向图"></p>
-<p>上图的有向图G2，可以表示成：G2=(V2,{E2})，其中顶点集合V2={A,B,C,D}；弧集合E2={(A,D),(B,A)(C,A),(B,C)}</p>
+<p>上图的有向图G2，可以表示成：G2=(V2,{E2})，其中顶点集合V2={A,B,C,D}；弧集合E2={(A,D),(B,A)(C,A),(B,C)}。</p>
 <p><strong>简单图</strong>：在图中，如果不存在顶点到其自身的边，且同一条边不重复出现。</p>
 <p><strong>无向完全图</strong>：在无向图中，任意两个顶点之间都存在边，也就是说每个顶点都要与除它以外的顶点连线。此时边的数量公式为：n(n-1)/2 。</p>
 <p><img src="/images/code/algo/graph/allundir.png" alt="无向完全图"></p>
@@ -12311,14 +12317,14 @@
 <p><img src="/images/code/algo/graph/alldir.png" alt="有向完全图"></p>
 <p>对于一个具有n个顶点和e条边的图，存在这样的边界：无向图：0&lt;=e&lt;=n(n-1)/2，有向图：0&lt;=e&lt;=n(n-1)。</p>
 <p>有很少条边或弧的图称为<strong>稀疏图</strong>，反之称为<strong>稠密图</strong>，这是一个很模糊的概念。</p>
-<p><strong>子图（Subgraph）</strong>：假设两个图G=(V,{E})和G’=(V’,{E’})，如果集合V’⊆V，且集合E’⊆E，则称G’是G的子图。</p>
-<p>与图的边或弧相关的数叫做<strong>权（Weigh）</strong>，带权的图称为<strong>网（Network）</strong>。</p>
-<h2 id="边与顶点的关系"><a href="#边与顶点的关系" class="headerlink" title="边与顶点的关系"></a>边与顶点的关系</h2><p>对于无向图G=(V,{E})，如果边(v,v’)∈E，则称顶点v和v’互为邻接点（Adjacent），即v和v’相邻接，边(v,v’)依附（incident）于顶点v和v’，或者说(v,v’)与顶点v和v’相关联。<strong>顶点v的度</strong>（Degree）是和v相关联的边的数目，记为TD(v)。图中边的个数是各个顶点度数之和的一半：e=1/2∑TD(vi)。</p>
-<p>对于有向图G=(V,{E})，如果弧&lt;v,v’&gt;∈E，则称顶点v邻接到顶点v’，顶点v’邻接自顶点v。弧&lt;v,v’&gt;和顶点v,v’相关联，以顶点为头的弧的数目称为<strong>顶点v的入度</strong>（InDegree），记为ID(v)，以v为尾的弧的数目称为<strong>顶点v的出度</strong>（OutDegree），记为OD(v)；顶点v的度为TD(v)=ID(v)+OD(v)。边的个数为：e=∑ID(vi)=∑OD(vi)。</p>
-<h2 id="路径"><a href="#路径" class="headerlink" title="路径"></a>路径</h2><p><strong>路径（Path）</strong>：图中从顶点v到v’的顶点序列。在树中根结点到任意结点的路径是唯一的，但在图中顶点与顶点之间的路径并不唯一。</p>
+<p><strong>子图</strong>：假设两个图G=(V,{E})和G’=(V’,{E’})，如果集合V’⊆V，且集合E’⊆E，则称G’是G的子图。</p>
+<p>图的边或弧都有一个权重的图称为<strong>网</strong>。</p>
+<p><strong>路径</strong></p>
+<p><strong>路径（Path）</strong>：图中从顶点v到v’的顶点序列。在树中根结点到任意结点的路径是唯一的，但在图中顶点与顶点之间的路径并不唯一。</p>
 <p><strong>路径长度</strong>：路径上的边或弧的数目。</p>
 <p><strong>回路（Cycle）</strong>：路径中第一个顶点到最后一个顶都是同一个顶点。<strong>简单路径</strong>：路径中不存在重复出现顶点。<strong>简单回路</strong>：除了第一个顶点和最后一个顶点，路径中不存在重复出现顶点，也称<strong>简单环</strong>。</p>
-<h2 id="连通图"><a href="#连通图" class="headerlink" title="连通图"></a>连通图</h2><p>在无向图中如果顶点v到顶点v’有路径，则称v和v’是连通的。如果图中任意两个顶点vi、vj∈E，且vi和vj都是连通的。则称该图为<strong>连通图（connected graph）</strong>。无向图中的极大连通子图称为<strong>连通分量</strong>，它强调：</p>
+<p><strong>连通图</strong></p>
+<p>在无向图中如果顶点v到顶点v’有路径，则称v和v’是连通的。如果图中任意两个顶点vi、vj∈E，且vi和vj都是连通的。则称该图为<strong>连通图（connected graph）</strong>。无向图中的极大连通子图称为<strong>连通分量</strong>，它强调：</p>
 <ul>
 <li>要是子图</li>
 <li>子图要是连通的</li>
@@ -12327,11 +12333,16 @@
 </ul>
 <p>任何连通图的连通分量只有一个，即是其自身，非连通的无向图有多个连通分量。</p>
 <p>在有向图G中，如果对于每一对、∈V、≠，从到和从到都存在路径，则称G是<strong>强连通图</strong>。有向图中的极大强连通子图称做有向图的<strong>强连通分量</strong>。</p>
-<h3 id="连通图生成树"><a href="#连通图生成树" class="headerlink" title="连通图生成树"></a>连通图生成树</h3><p><strong>生成树</strong>(SpanningTree)是连通图的包含图中的所有顶点的极小连通子图。即生成树包含图中的全部的n个顶点，但只有足以构成一棵树的n-1条边。图的生成树不惟一。从不同的顶点出发进行遍历，可以得到不同的生成树。</p>
+<p><strong>连通图生成树</strong></p>
+<p><strong>生成树</strong>(SpanningTree)是连通图的包含图中的所有顶点的极小连通子图。即生成树包含图中的全部的n个顶点，但只有足以构成一棵树的n-1条边。图的生成树不惟一。从不同的顶点出发进行遍历，可以得到不同的生成树。</p>
 <p>如果一个有向图恰有一个顶点的入度为0（根结点），其余顶点的入度均为1，则是一棵<strong>有向树</strong>。一个有向图的生成森林由若干棵有向树组成，含有图中全部顶点，但只有足以构成若干棵不相交的有向树的弧。</p>
-<h2 id="图的存储结构"><a href="#图的存储结构" class="headerlink" title="图的存储结构"></a>图的存储结构</h2><h3 id="邻接矩阵"><a href="#邻接矩阵" class="headerlink" title="邻接矩阵"></a>邻接矩阵</h3>]]></content>
+<h2 id="图的存储"><a href="#图的存储" class="headerlink" title="图的存储"></a>图的存储</h2><h3 id="邻接矩阵"><a href="#邻接矩阵" class="headerlink" title="邻接矩阵"></a>邻接矩阵</h3><p>邻接矩阵的底层依赖一个二维数组。对于无向图来说，如果顶点 i 与顶点 j 之间有边，我们就将 $A[i][j]$ 和 $A[j][i]$ 标记为 1；对于有向图来说，如果顶点 i 到顶点 j 之间，有一条箭头从顶点 i 指向顶点 j 的边，那我们就将 $A[i][j]$ 标记为 1。同理，如果有一条箭头从顶点 j 指向顶点 i 的边，我们就将 $A[j][i]$ 标记为 1。对于带权图，数组中就存储相应的权重。</p>
+<p><img src="/images/code/algo/graph/AdjacencyMatrix.png" alt="邻接矩阵"></p>
+<h3 id="邻接表"><a href="#邻接表" class="headerlink" title="邻接表"></a>邻接表</h3><p>邻接表的每个顶点对应一条链表，链表中存储的是与这个顶点相连接的其他顶点。</p>
+<p><img src="/images/code/algo/graph/AdjacencyList.png" alt="邻接表"></p>
+]]></content>
       <categories>
-        <category>数据结构</category>
+        <category>algorithm</category>
       </categories>
   </entry>
   <entry>
@@ -12589,7 +12600,7 @@
 <p><a href="https://www.cnblogs.com/wuqinglong/p/9709048.html">https://www.cnblogs.com/wuqinglong/p/9709048.html</a></p>
 ]]></content>
       <categories>
-        <category>数据结构</category>
+        <category>algorithm</category>
       </categories>
   </entry>
   <entry>
@@ -15500,11 +15511,18 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
   <entry>
     <title>Linux Kernel Architecture</title>
     <url>/2022/06/07/kernel/kernel_arch/</url>
-    <content><![CDATA[<h2 id="linux系统结构"><a href="#linux系统结构" class="headerlink" title="linux系统结构"></a>linux系统结构</h2><img src="/images/kernel/kernel/linux_arch.jpeg" alt="Unix/Linux系统分层结构" style="zoom: 33%;" />
+    <content><![CDATA[<p>Linux的内核是一种宏内核，主要有以下特征：</p>
+<ul>
+<li>支持动态加载内核模块</li>
+<li>支持对称多处理（SMP）</li>
+<li>支持抢占，允许内核运行的任务有优先执行的能力</li>
+<li>不区分线程和进程</li>
+</ul>
+<h2 id="linux系统结构"><a href="#linux系统结构" class="headerlink" title="linux系统结构"></a>linux系统结构</h2><img src="/images/kernel/kernel/linux_arch.jpeg" alt="Unix/Linux系统分层结构" style="zoom: 33%;" />
 
 <p><img src="/images/kernel/kernel/linux-arch.webp" alt="Linux系统层次结构"></p>
 <p>最上面是用户空间，这是用户应用程序执行的地方。用户空间之下是内核空间，GNU C Library （glibc）也位于这里，它提供了连接内核的系统调用接口，还提供了在用户空间应用程序和内核之间进行转换的机制。</p>
-<p>Linux 内核可以进一步划分成三层。最上面是系统调用接口。之下是内核代码，是与处理器体系结构无关的通用代码。最下面是依赖于特定处理器体系结构的代码，称为 BSP（Board Support Package）。</p>
+<p>Linux 内核可以进一步划分成三层，最上面是系统调用接口，之下是内核代码，是与处理器体系结构无关的通用代码，最下面是依赖于特定处理器体系结构的代码，称为 BSP（Board Support Package）。</p>
 <h2 id="内核架构"><a href="#内核架构" class="headerlink" title="内核架构"></a>内核架构</h2><p><img src="/images/kernel/kernel/kernel_struct.webp" alt="linux内核架构"></p>
 <p>Linux内核的主要组件有：系统调用接口、进程调度、内存管理、虚拟文件系统、网络协议栈、进程间通信、设备驱动程序和硬件架构的相关代码。</p>
 <p>LXR (Linux Cross Reference)是一个内核的源代码浏览工具，<a href="http://lxr.linux.no/%E3%80%82">http://lxr.linux.no/。</a></p>
@@ -15517,105 +15535,109 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
 <th align="left">源码功能简介</th>
 </tr>
 </thead>
+</table>
+<table>
+<thead>
+<tr>
+<th><strong>目录</strong></th>
+<th><strong>说明</strong></th>
+</tr>
+</thead>
 <tbody><tr>
-<td align="left">/Documentation</td>
-<td align="left">说明文档，对每个目录的具体作用进行说明。</td>
+<td>arch</td>
+<td>特定体系结构的代码</td>
 </tr>
 <tr>
-<td align="left">/arch</td>
-<td align="left">不同 CPU 架构下的核心代码。其中的每一个子目录都代表 Linux 支持的 CPU 架构。</td>
+<td>block</td>
+<td>块设备I/O层</td>
 </tr>
 <tr>
-<td align="left">/block</td>
-<td align="left">块设备通用函数。</td>
+<td>crypo</td>
+<td>加密API</td>
 </tr>
 <tr>
-<td align="left">/certs</td>
-<td align="left">与证书相关。</td>
+<td>certs</td>
+<td>与证书相关。</td>
 </tr>
 <tr>
-<td align="left">/crypto</td>
-<td align="left">常见的加密算法的C 语言实现代码，譬如 crc32、md5、sha1 等。</td>
+<td>Documentation</td>
+<td>内核源码文档</td>
 </tr>
 <tr>
-<td align="left">/drivers</td>
-<td align="left">内核中所有设备的驱动程序，其中的每一个子目录对应一种设备驱动。</td>
+<td>drivers</td>
+<td>设备驱动程序</td>
 </tr>
 <tr>
-<td align="left">/include</td>
-<td align="left">内核编译通用的头文件。</td>
+<td>firmware</td>
+<td>使用某些驱动程序而需要的设备固件</td>
 </tr>
 <tr>
-<td align="left">/init</td>
-<td align="left">内核初始化的核心代码。</td>
+<td>fs</td>
+<td>VFS和各种文件系统</td>
 </tr>
 <tr>
-<td align="left">/ipc</td>
-<td align="left">内核中进程间的通信代码。</td>
+<td>include</td>
+<td>内核头文件</td>
 </tr>
 <tr>
-<td align="left">/kernel</td>
-<td align="left">内核的核心代码，此目录下实现了大多数 Linux 系统的内核函数。与处理器架构相关的内核代码在 /kernel/$ARCH/kernel。</td>
+<td>init</td>
+<td>内核引导和初始化</td>
 </tr>
 <tr>
-<td align="left">/lib</td>
-<td align="left">内核共用的函数库，与处理器架构相关的库在 /kernel/$ARCH/lib。</td>
+<td>ipc</td>
+<td>进程间通信代码</td>
 </tr>
 <tr>
-<td align="left">/mm</td>
-<td align="left">内存管理代码，譬如页式存储管理内存的分配和释放等。与具体处理器架构相关的内存管理代码位于 /arch/$ARCH/mm 目录下。</td>
+<td>kernel</td>
+<td>核心子系统，如调度程序</td>
 </tr>
 <tr>
-<td align="left">/net</td>
-<td align="left">网络通信相关代码。</td>
+<td>lib</td>
+<td>同样内核函数</td>
 </tr>
 <tr>
-<td align="left">/samples</td>
-<td align="left">示例代码。</td>
+<td>mm</td>
+<td>内存管理子系统和VM</td>
 </tr>
 <tr>
-<td align="left">/scripts</td>
-<td align="left">用于内核配置的脚本文件，用于实现内核配置的图形界面。</td>
+<td>net</td>
+<td>网络子系统</td>
 </tr>
 <tr>
-<td align="left">/security</td>
-<td align="left">安全性相关的代码。</td>
+<td>samples</td>
+<td>示例，示范代码</td>
 </tr>
 <tr>
-<td align="left">/sound</td>
-<td align="left">与音频有关的代码，包括与音频有关的驱动程序 [2]。</td>
+<td>scripts</td>
+<td>编译内核所用的脚本</td>
 </tr>
 <tr>
-<td align="left">/tools</td>
-<td align="left">Linux 中的常用工具。</td>
+<td>security</td>
+<td>Linux 安全模块</td>
 </tr>
 <tr>
-<td align="left">/usr</td>
-<td align="left">该目录中的代码为内核尚未完全启动时执行用户空间代码提供了支持。</td>
+<td>sound</td>
+<td>语音子系统</td>
 </tr>
 <tr>
-<td align="left">/virt</td>
-<td align="left">此文件夹包含了虚拟化代码，它允许用户一次运行多个操作系统。</td>
+<td>usr</td>
+<td>早期用户空间代码（所谓的initramfs）</td>
 </tr>
 <tr>
-<td align="left">COPYING</td>
-<td align="left">许可和授权信息。</td>
+<td>tools</td>
+<td>在Linux开发中有用的工具</td>
 </tr>
 <tr>
-<td align="left">CREDITS</td>
-<td align="left">贡献者列表。</td>
+<td>virt</td>
+<td>虚拟化基础结构</td>
 </tr>
 <tr>
-<td align="left">Kbuild</td>
-<td align="left">内核设定脚本，可以对内核中的变量进行设定。</td>
+<td>COPYING</td>
+<td>许可和授权信息。</td>
 </tr>
 <tr>
-<td align="left">Kconfig</td>
-<td align="left">配置哪些文件编译，那些文件不用编译 [4]。</td>
-</tr>
-<tr>
-<td align="left">Makefile</td>
-<td align="left">该文件将编译参数、编译所需的文件和必要的信息传给编译器。</td>
+<td>CREDITS</td>
+<td>贡献者列表。</td>
 </tr>
 </tbody></table>
 <h2 id="drivers目录"><a href="#drivers目录" class="headerlink" title="drivers目录"></a>drivers目录</h2><p><strong>accessibility</strong>  这些驱动提供支持一些辅助设备。在Linux 3.9.4中，这个文件夹中只有一个驱动就是盲文设备驱动。</p>
@@ -16070,7 +16092,7 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
   <entry>
     <title>udev</title>
     <url>/2022/06/07/kernel/udev/</url>
-    <content><![CDATA[<h2 id="udev"><a href="#udev" class="headerlink" title="udev"></a>udev</h2><p>udev 完全在用户态工作，利用设备加入或移除时内核所发送的热插拔事件(hotplug event)来工作。在热插拔时，设备的详细信息会由内核输出到位于/sys 的sysfs 文件系统。udev 的设备命名策略、权限控制和事件处理都是在用户态下完成的，它利用 sysfs 中的信息来进行创建设备文件节点等工作。</p>
+    <content><![CDATA[<h2 id="udev"><a href="#udev" class="headerlink" title="udev"></a>udev</h2><p>udev负责在用户空间，根据用户设置的规则，在监测到设备热插拔事件后，在/dev/下自动创建并命名设备文件节点，也可以自动设置设备属性。热插拔时，设备的详细信息会由内核输出到sysfs 文件系统。udev 的设备命名策略、权限控制和事件处理都是在用户态下完成的，它利用 sysfs 中的信息来进行创建设备文件节点等工作。</p>
 <p>udev 根据系统中硬件设备的状态动态更新、创建和删除设备文件，进行设备文件的等，因此/dev 目录下只包含系统中真正存在的设备。linux在设备被发现的时候加载驱动模块。</p>
 <p>udev主页 <a href="http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html">http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html</a></p>
 <p>udev包下载 <a href="http://www.us.kernel.org/pub/linux/utils/kernel/hotplug/">http://www.us.kernel.org/pub/linux/utils/kernel/hotplug/</a></p>
@@ -16101,7 +16123,41 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
 <li><p>内核提供的名称:如果以前的几个步骤都没有被提供，默认的内核将被指定给该设备。</p>
 </li>
 </ol>
-<h2 id="udev规则文件"><a href="#udev规则文件" class="headerlink" title="udev规则文件"></a>udev规则文件</h2><p>udev 的规则文件以行为单位，以“#”开头的行代表注释行。其余的每一行代表一个规则。每个规则分成一个或多个匹配和赋值部分。匹配部分用匹配专用的关键字来表示，相应的赋值部分用赋值专用的关键字来表示。匹配关键字包括:ACTION(行为)、KERNEL(匹配内核设备名)、BUS(匹配总线类型)、SYSFS(匹配从 sysfs 得到的信息，比如 label、vendor、USB 序列号)、SUBSYSTEM(匹配子系统名)等，赋值关键字包括:NAME(创建的设备文件名)、SYMLINK(符号创建链接名)、OWNER(设置设备的所有者)、GROUP(设置设备的组)、IMPORT(调用外部程序)等。</p>
+<h2 id="udev规则文件"><a href="#udev规则文件" class="headerlink" title="udev规则文件"></a>udev规则文件</h2><p><strong>配置文件</strong></p>
+<p>udev的配置文件位于 /etc/udev/ 和 /lib/udev/。<br>udev 的主配置文件是 /etc/udev/udev.conf。 它包含一套变量，允许用户修改 udev 默认值。可以设置的变量如下：</p>
+<ul>
+<li>udev_root  设备目录，默认是/dev</li>
+<li>udev_log   日志等级（表示严重程度），跟 syslog 一致，例如：err, info, debug。</li>
+</ul>
+<p><strong>规则文件</strong></p>
+<p>udev的规则文件一般位于 /lib/udev/rules.d/，也可以位于 /etc/udev/rules.d/(优先)。规则文件以 .rules 作为扩展名。规则文件的每一行都是 key=value 格式，代表一个规则，key 分为匹配型和赋值型 key。</p>
+<p>当所有匹配型 key 都匹配时，该规则即被采用，赋值型 key就会获得相应的值。也可以重命名网络接口，创建到设备节点的符号链或运行一个指定程序来处理该事件。</p>
+<p>一条规则由多个 key=value 组成，以英文逗号隔开。 每个key 有一个操作，取决于操作符，有效的操作符如下：</p>
+<ul>
+<li>==    比较是否相等</li>
+<li>!=    比较是否不相等</li>
+<li>=     给一个key 赋值。表示一个列表的key会被重置，并且把这个唯一的值传给它</li>
+<li>+=    将一个值增加到key中</li>
+<li>:=    将一个值传给一个key，并且不允许再修改这个key。</li>
+</ul>
+<p><strong>匹配型KEY</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ACTION     匹配事件的动作名</span><br><span class="line">DEVPATH    匹配事件的设备devpath</span><br><span class="line">KERNEL     匹配事件的设备名</span><br><span class="line">NAME       匹配网络接口或者设备节点的名字。NAME 只有在前面的规则赋值之后才可以使用。</span><br><span class="line">SYMLINK    匹配设备节点符号链的名字。SYMLINK 只有在前面的规则赋值之后才可以使用。可以有多个 symlinks，只需要匹配一个。</span><br><span class="line">SUBSYSTEM  匹配设备子系统名</span><br><span class="line">BUS        匹配总线类型</span><br><span class="line">SYSFS      匹配从 sysfs 得到的信息，比如 label、vendor、USB 序列号</span><br><span class="line">DRIVER               匹配设备的驱动名。只对绑定到一个驱动的设备有用。</span><br><span class="line">ATTR &#123; filename &#125;    匹配事件设备的sysfs 属性。</span><br><span class="line">KERNELS         向上搜索devpath，直到找到一个匹配的设备名</span><br><span class="line">SUBSYSTEMS      向上搜索devpath，直到找到一个匹配的子系统名</span><br><span class="line">DRIVERS         向上搜索devpath，直到找到一个匹配的驱动名</span><br><span class="line">ATTRS&#123; filename &#125;    向上搜索devpath，直到找到一个含匹配 sysfs 属性的设备</span><br><span class="line">ENV&#123; key &#125;</span><br><span class="line">TAG             设备的 tag</span><br><span class="line">TEST&#123;octal mode mask&#125;   测试一个文件是否存在，可以指定一个8进制的模式掩码。</span><br><span class="line">PROGRAM     执行一个程序。如果程序成功返回， key 为 true。设备的属性被放在被执行进程的环境变量中，该程序的输出为 stdout， 可以从 RESULT 这个 key 读取。</span><br><span class="line">RESULT      匹配最近一次PROGRAM 调用的返回字符串。它应该在 PROGRAM 之后使用</span><br></pre></td></tr></table></figure>
+
+<p>支持一些通配符：</p>
+<ul>
+<li><ul>
+<li>代表任意个字符</li>
+</ul>
+</li>
+<li>? 代表一定有一个任意字符</li>
+<li><input disabled="" type="checkbox"> 代表一定有一个在括号内的字符</li>
+</ul>
+<p><strong>匹配型KEY</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">NAME     创建的设备文件名</span><br><span class="line">SYMLINK  符号创建链接名</span><br><span class="line">OWNER    设置设备的所有者</span><br><span class="line">GROUP    设置设备的组</span><br><span class="line">MODE</span><br><span class="line">ATTR &#123; key &#125;</span><br><span class="line">ENV &#123; key &#125;</span><br><span class="line">TAG</span><br><span class="line">RUN</span><br><span class="line">LABEL              GOTO 可以跳到的地方</span><br><span class="line">GOTO               跳到下一个带有匹配名字的 LABEL 处。</span><br><span class="line">IMPORT &#123; type &#125;    调用外部程序</span><br><span class="line">WAIT_FOR</span><br><span class="line">OPTIONS</span><br></pre></td></tr></table></figure>
+
+<p>NAME,  SYMLINK,   PROGRAM,   OWNER,  GROUP、MODE 和 RUN 这些 field 支持一个简单的、类似于 printf 函数的格式字符串替换。可用的字符替换如下：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">$kernel,  %k: 该设备的内核名字(%k 替换$kernel)</span><br><span class="line">$number,  %n：该设备的内核号码。例如 sda3 的内核号码是 <span class="number">3</span>。</span><br><span class="line">$devpath, %p：该设备的 devpath</span><br><span class="line">$id,   %b：当向上搜索devpath，寻找 SUBSYSTEMS， KERNELS， DRIVERS 和 ATTRS 时，被匹配的设备名字</span><br><span class="line">$driver：当向上搜索devpath，寻找 SUBSYSTEMS， KERNELS， DRIVERS 和 ATTRS 时，被匹配的驱动名字</span><br><span class="line">$attr &#123; file &#125;, %s &#123; file &#125;：一个被发现的设备的sysfs 属性的值。如果该设备没有该属性，且前面的 KERNELS,  SUBSYSTEMS,  DRIVERS或 ATTRS 测试选择的是一个父设备，那么就用父设备的属性。如果属性是一个符号链，符号链的最后一个元素作为返回值。</span><br><span class="line">$env &#123; key &#125;, %E &#123; key &#125;：一个设备属性值</span><br><span class="line">$major, %M：该设备的内核主号码</span><br><span class="line">$minor, %m：该设备的内核次号码</span><br><span class="line">$result, %c：由 PROGRAM 调用的外部程序返回的字符串。如果这个字符串包含空格，可以用 %c&#123;N&#125; 选中第N个字段。如果这个数字N，后面有一个 + 字符， 则表示选中从这个字段开始的所有后面的字符串 %c &#123; N + &#125;</span><br><span class="line">$parent, %p：父设备的节点名字</span><br><span class="line">$name：设备节点的名字，用一个空格作为分隔符。该值只有在前面的规则赋值之后才存在，或者是remove事件。</span><br><span class="line">$links：当前符号链的列表，用空格隔开。该值只有在前面的规则赋值之后才存在，或者是remove事件。</span><br><span class="line">$root, %r：udev_root 的值</span><br><span class="line">$sys, %S：sysfs 挂载点</span><br><span class="line">$tempnode, %N：在真正的设备节点创建之前，创建的一个临时的设备节点的名字，这个临时设备节点供外部程序使用。</span><br><span class="line">$$：<span class="string">&#x27;$&#x27;</span>字符自己</span><br><span class="line">%%：<span class="string">&#x27;%&#x27;</span> 字符自己</span><br></pre></td></tr></table></figure>
+
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">SUBSYSTEM==&quot;net&quot;, ACTION==&quot;add&quot;, SYSFS&#123;address&#125;==&quot;00:0d:87:f6:59:f3&quot;, IMPORT=&quot;/sbin/rename_netiface %k eth0&quot;</span><br></pre></td></tr></table></figure>
 
 <h2 id="udevadm"><a href="#udevadm" class="headerlink" title="udevadm"></a>udevadm</h2><p>udevadm可用于控制服务、 请求内核事件、管理事件队列、进行简单的调试。</p>
@@ -16117,7 +16173,7 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
 <p>位置参数用于指定一个或多个设备，它可以是 一个设备名(必须以 <code>/dev/</code> 开头)、 一个 sys 路径(必须以 <code>/sys/</code> 开头)、 一个设备单元(必须以 “<code>.device</code>“ 结尾)。详见 <a href="http://www.jinbuguo.com/systemd/systemd.device.html#">systemd.device(5)</a> 手册。</p>
 <ul>
 <li><p><code>-q</code>, <code>--query=*TYPE*</code></p>
-<p>提取特定类型的设备信息。 <em>TYPE</em> 可以是下列值之一： <code>name</code>, <code>symlink</code>, <code>path</code>, <code>property</code>, <code>all</code>(默认值)</p>
+<p>提取特定类型的设备信息。 <em>TYPE</em> 可以是下列值之一：<code>name</code>, <code>symlink</code>, <code>path</code>, <code>property</code>, <code>all</code>(默认值)</p>
 </li>
 <li><p><code>-p</code>, <code>--path=*DEVPATH*</code></p>
 <p>该设备在 <code>/sys</code> 目录下的路径(例如 <code>[/sys]/class/block/sda</code>)。 因为此选项是位置参数以 <code>/sys/</code> 开头时的替代， 所以通常将 <strong>udevadm info –path=/class/block/sda</strong> 直接简写为 <strong>udevadm info /sys/class/block/sda</strong></p>
@@ -16129,7 +16185,7 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
 <p>以绝对路径显示 <code>--query=name</code> 与 <code>--query=symlink</code> 的查询结果</p>
 </li>
 <li><p><code>-a</code>, <code>--attribute-walk</code></p>
-<p>按照udev规则的格式，显示所有可用于匹配该设备的sysfs属性： 从该设备自身开始，沿着设备树向上回溯(一直到树根)， 显示沿途每个设备的sysfs属性。</p>
+<p>按照udev规则的格式，显示所有可用于匹配该设备的sysfs属性：从该设备自身开始，沿着设备树向上回溯(一直到树根)， 显示沿途每个设备的sysfs属性。</p>
 </li>
 <li><p><code>-x</code>, <code>--export</code></p>
 <p>以 键=’值’ 的格式输出此设备的属性(注意，值两边有单引号界定)。 仅在指定了 <code>--query=property</code> 或 <code>--device-id-of-file=*FILE*</code> 的情况下才有效。</p>
@@ -16160,10 +16216,10 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
 <p>并不真正触发设备事件</p>
 </li>
 <li><p><code>-t</code>, <code>--type=*TYPE*</code></p>
-<p>仅触发特定类型的设备， TYPE 可以是下列值之一： <strong>devices</strong>(默认值), <strong>subsystems</strong></p>
+<p>仅触发特定类型的设备， TYPE 可以是下列值之一：<strong>devices</strong>(默认值), <strong>subsystems</strong></p>
 </li>
 <li><p><code>-c</code>, <code>--action=*ACTION*</code></p>
-<p>指定触发哪种类型的设备事件，ACTION 可以是下列值之一： <strong>add</strong>, <strong>remove</strong>, <strong>change</strong>(默认值)</p>
+<p>指定触发哪种类型的设备事件，ACTION 可以是下列值之一：<strong>add</strong>, <strong>remove</strong>, <strong>change</strong>(默认值)</p>
 </li>
 <li><p><code>-s</code>, <code>--subsystem-match=*SUBSYSTEM*</code></p>
 <p>仅触发属于 <em>SUBSYSTEM</em> 子系统的设备事件。 可以在 <em>SUBSYSTEM</em> 中使用shell风格的通配符。 如果多次使用此选项，那么表示以 OR 逻辑连接每个匹配规则， 也就是说，所有匹配的子系统中的设备都会被触发。</p>
@@ -16221,7 +16277,7 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
 <p>向 systemd-udevd 发送”退出”信号并等待其退出。因为 <code>systemd-udevd.service</code> 中含有 <code>Restart=always</code> ，所以此选项实际是重启了 systemd-udevd 。 如果你想停止 <code>systemd-udevd.service</code> ，那么应该使用：<code>systemctl stop systemd-udevd-control.socket systemd-udevd-kernel.socket systemd-udevd.service</code></p>
 </li>
 <li><p><code>-l</code>, <code>--log-priority=*value*</code></p>
-<p>设置 <a href="http://www.jinbuguo.com/systemd/systemd-udevd.service.html#">systemd-udevd.service(8)</a> 的内部日志等级。 可以用数字或文本表示： r<code>emerg</code>(0), <code>alert</code>(1), <code>crit</code>(2), <code>err</code>(3), <code>warning</code>(4), <code>notice</code>(5), <code>info</code>(6), <code>debug</code>(7)</p>
+<p>设置 <a href="http://www.jinbuguo.com/systemd/systemd-udevd.service.html#">systemd-udevd.service(8)</a> 的内部日志等级。 可以用数字或文本表示：r<code>emerg</code>(0), <code>alert</code>(1), <code>crit</code>(2), <code>err</code>(3), <code>warning</code>(4), <code>notice</code>(5), <code>info</code>(6), <code>debug</code>(7)</p>
 </li>
 <li><p><code>-s</code>, <code>--stop-exec-queue</code></p>
 <p>向 systemd-udevd 发送”禁止处理事件”信号， 这样所有新发生的事件都将进入等候队列。</p>
@@ -16275,7 +16331,7 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
 <p>指定模拟哪种类型的设备事件，ACTION 可以是下列值之一：<strong>add</strong>(默认值), <strong>remove</strong>, <strong>change</strong></p>
 </li>
 <li><p><code>-N</code>, <code>--resolve-names=early|late|never</code></p>
-<p>指定 udevadm 何时解析用户与组的名称： <code>early</code>(默认值) 表示在规则的解析阶段； <code>late</code> 表示在每个事件发生的时候； <code>never</code> 表示从不解析， 所有设备的属主与属组都是 root 。</p>
+<p>指定 udevadm 何时解析用户与组的名称：<code>early</code>(默认值) 表示在规则的解析阶段； <code>late</code> 表示在每个事件发生的时候； <code>never</code> 表示从不解析， 所有设备的属主与属组都是 root 。</p>
 </li>
 <li><p><code>-h</code>, <code>--help</code></p>
 <p>显示简短的帮助信息并退出。</p>
@@ -20467,11 +20523,11 @@ tcpdump ip multicast
 </ul>
 <p><strong>迭代器失效</strong>：</p>
 <ul>
-<li><p>数组型数据结构：该容器元素是分配在连续的内存中，insert和erase操作，都会使得删除点和插入点之后的元素挪位置，所以，插入点和删除掉之后的迭代器全部失效，也就是说<code>insert(*iter)</code>或<code>erase(*iter)</code>，然后在iter++，是没有意义的。解决方法：erase(*iter)的返回值是下一个有效迭代器的值。</p>
+<li><p>对于数组型容器(如vector,deque)，其元素的内存是连续分配的，insert和erase操作都会使得删除点和插入点之后的元素向前挪位置，所以，插入点和删除掉之后的迭代器全部失效。比如在<code>erase(*iter++)</code>后，iter++是没有意义的，可使用<code>erase(*iter)</code>的返回值作为下一个有效迭代器的值。</p>
 </li>
-<li><p>链表型数据结构：对于list型的数据结构，使用了不连续分配的内存，删除运算使指向删除位置的迭代器失效，但是不会失效其他迭代器。解决办法两种，erase(*iter)会返回下一个有效迭代器的值，或者erase(iter++).</p>
+<li><p>对于链表型容器(如list)，使用的是不连续内存，插入、删除一个结点并不会对其他结点造成影响。删除运算只会使当前的迭代器失效。解决办法两种：使用erase(*iter)方法返回的下一个有效迭代器，或erase(iter++)。</p>
 </li>
-<li><p>树形数据结构： 使用红黑树来存储数据，插入不会使得任何迭代器失效；删除运算使指向删除位置的迭代器失效，但是不会失效其他迭代器。erase迭代器只是被删元素的迭代器失效，但是返回值为void，所以要采用erase(iter++)的方式删除迭代器。</p>
+<li><p>对于树形容器(如map, set,multimap,multiset)，使用红黑树来存储数据，插入不会使得任何迭代器失效，删除运算仅仅会使当前的iterator失效。因为其erase()方法没有返回值，故只能采用<code>erase(iter++)</code>的方式删除迭代器。</p>
 </li>
 </ul>
 <h2 id="algorithm"><a href="#algorithm" class="headerlink" title="algorithm"></a>algorithm</h2><p>STL提供了一套常用的算法，在实现上是一种函数模板。不改变容器中元素的顺序和内容的算法称为非变序算法，反之为变序算法。</p>
@@ -21765,35 +21821,6 @@ tcpdump ip multicast
       <categories>
         <category>makefile</category>
       </categories>
-  </entry>
-  <entry>
-    <title>perf</title>
-    <url>/2022/09/24/tool/perf/</url>
-    <content><![CDATA[<p>静态代码检测工具或平台：cppcheck、PC-lint、Coverity、QAC C/C++、Clang-Tidy、Clang Static Analyzer、SonarCube+sonar-cxx、Facebook的infer  Tscancode</p>
-<p>profiling工具：gnu prof、Oprofile、google gperftools、perf、intel VTune、AMD CodeAnalyst</p>
-<p>内存泄漏：valgrind、AddressSanitizer、mtrace、dmalloc、ccmalloc、memwatch、debug_new gperftools</p>
-<p>CPU使用率：pidstat、vmstat、mpstat、top、sar</p>
-<p>上下文切换：pidstat、vmstat</p>
-<p>CPU负载：uptime、top</p>
-<p>磁盘I/O：iostat、dstat、sar</p>
-<p>系统调用追踪：strace pstack</p>
-<p>文件系统空间：df</p>
-<p>内存容量：free、vmstat、sar</p>
-<p>进程内存分布：pmap</p>
-<p>软中断硬中断：/proc/softirqs、/proc/interrupts</p>
-<p>网络吞吐量：iftop、nethogs、sar</p>
-<p>网络I/O：dstat、tcpdump、sar</p>
-<p>网络延迟：ping</p>
-<p>网络状态：netstat ss tcpdump</p>
-<hr>
-<p><a href="https://www.brendangregg.com/">https://www.brendangregg.com/</a></p>
-]]></content>
-      <categories>
-        <category>linux</category>
-      </categories>
-      <tags>
-        <tag>perf</tag>
-      </tags>
   </entry>
   <entry>
     <title>Regex</title>
@@ -23876,13 +23903,18 @@ tcpdump ip multicast
   <entry>
     <title>广度优先算法</title>
     <url>/2022/09/24/algo/BFS/</url>
-    <content><![CDATA[<p>广度优先指的是从图的一个未遍历的节点出发，先遍历这个节点的相邻节点，再依次遍历每个相邻节点的相邻节点。</p>
-<p><img src="/images/code/algo/BFS1.gif" alt="img"></p>
-<p>广度优先遍历也叫层序遍历，也可以用队列来实现。</p>
-<p><img src="/images/code/algo/BFS.gif" alt="img"></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">bfs</span><span class="params">(Node root)</span> &#123; </span><br><span class="line">    <span class="keyword">if</span> (root == <span class="literal">null</span>) &#123; </span><br><span class="line">        <span class="keyword">return</span>; </span><br><span class="line">    &#125; </span><br><span class="line">    Queue&lt;Node&gt; stack = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;(); </span><br><span class="line">    stack.add(root); </span><br><span class="line"> </span><br><span class="line">    <span class="keyword">while</span> (!stack.isEmpty()) &#123; </span><br><span class="line">        <span class="type">Node</span> <span class="variable">node</span> <span class="operator">=</span> stack.poll(); </span><br><span class="line">        System.out.println(<span class="string">&quot;value = &quot;</span> + node.value); </span><br><span class="line">        <span class="type">Node</span> <span class="variable">left</span> <span class="operator">=</span> node.left; </span><br><span class="line">        <span class="keyword">if</span> (left != <span class="literal">null</span>) &#123; </span><br><span class="line">            stack.add(left); </span><br><span class="line">        &#125; </span><br><span class="line">        <span class="type">Node</span> <span class="variable">right</span> <span class="operator">=</span> node.right; </span><br><span class="line">        <span class="keyword">if</span> (right != <span class="literal">null</span>) &#123; </span><br><span class="line">            stack.add(right); </span><br><span class="line">        &#125; </span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+    <content><![CDATA[<p>广度优先搜索采用地毯式层层推进策略，从起始顶点出发，先遍历这个节点的相邻节点，再依次遍历每个相邻节点的相邻节点，依次往外遍历。</p>
+<p>广度优先搜索需要借助队列来实现，遍历得到的路径就是起始顶点到终止顶点的最短路径。</p>
+<p><strong>树的遍历</strong></p>
+<p>对于二叉树，广度优先遍历其实就是层序遍历。</p>
+<p><img src="/images/code/algo/search/BFS.gif" alt="img"></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">bfs</span><span class="params">(Node root)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (root == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    Queue&lt;Node&gt; stack = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;();</span><br><span class="line">    stack.add(root);</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">while</span> (!stack.isEmpty()) &#123;</span><br><span class="line">        <span class="type">Node</span> <span class="variable">node</span> <span class="operator">=</span> stack.poll();</span><br><span class="line">        System.out.println(<span class="string">&quot;value = &quot;</span> + node.value);</span><br><span class="line"></span><br><span class="line">        <span class="type">Node</span> <span class="variable">left</span> <span class="operator">=</span> node.left;</span><br><span class="line">        <span class="keyword">if</span> (left != <span class="literal">null</span>) &#123;</span><br><span class="line">            stack.add(left);</span><br><span class="line">        &#125; </span><br><span class="line"></span><br><span class="line">        <span class="type">Node</span> <span class="variable">right</span> <span class="operator">=</span> node.right;</span><br><span class="line">        <span class="keyword">if</span> (right != <span class="literal">null</span>) &#123;</span><br><span class="line">            stack.add(right);</span><br><span class="line">        &#125; </span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>图的遍历</strong></p>
+<p><img src="/images/code/algo/search/BFS2.png" alt="img"></p>
+]]></content>
       <categories>
-        <category>algo</category>
+        <category>algorithm</category>
       </categories>
   </entry>
   <entry>
@@ -23908,27 +23940,31 @@ tcpdump ip multicast
 <p>散列表两个核心问题是<strong>散列函数设计</strong>和<strong>散列冲突解决</strong>。解决散列冲突方法有开放寻址法和链表法。散列函数设计的好坏决定了散列冲突的概率，也就决定散列表的性能。</p>
 ]]></content>
       <categories>
-        <category>数据结构</category>
+        <category>algorithm</category>
       </categories>
   </entry>
   <entry>
     <title>深度优先算法</title>
     <url>/2022/09/24/algo/DFS/</url>
-    <content><![CDATA[<p>深度优先遍历主要思路是从图中一个未访问的顶点开始，沿着一条路一直走到底，然后从这条路尽头的节点回退到上一个节点，再从另一条路开始走到底，不断递归重复此过程，直到所有的顶点都遍历完成，它的特点是不撞南墙不回头，先走完一条路，再换一条路继续走</p>
-<p>深度优先的递归实现其实就是前序遍历，依次遍历当前节点，左节点，右节点即可，对于左右节点来说，再依次遍历它们的左右节点即可，以此不断递归下去，直到叶节点递归终止。</p>
-<p><img src="/images/code/algo/DFS.png" alt="img"></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123; </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">Node</span> &#123; </span><br><span class="line">        <span class="keyword">public</span> <span class="type">int</span> value; </span><br><span class="line">        <span class="keyword">public</span> Node left; </span><br><span class="line">        <span class="keyword">public</span> Node right; </span><br><span class="line"> </span><br><span class="line">        <span class="keyword">public</span> <span class="title function_">Node</span><span class="params">(<span class="type">int</span> value, Node left, Node right)</span> &#123; </span><br><span class="line">            <span class="built_in">this</span>.value = value; </span><br><span class="line">            <span class="built_in">this</span>.left = left; </span><br><span class="line">            <span class="built_in">this</span>.right = right; </span><br><span class="line">        &#125; </span><br><span class="line">    &#125; </span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">dfs</span><span class="params">(Node treeNode)</span> &#123; </span><br><span class="line">        <span class="keyword">if</span> (treeNode == <span class="literal">null</span>) &#123; </span><br><span class="line">            <span class="keyword">return</span>; </span><br><span class="line">        &#125; </span><br><span class="line">        <span class="comment">// 遍历节点 </span></span><br><span class="line">        process(treeNode) </span><br><span class="line">        <span class="comment">// 遍历左节点 </span></span><br><span class="line">        dfs(treeNode.left); </span><br><span class="line">        <span class="comment">// 遍历右节点 </span></span><br><span class="line">        dfs(treeNode.right); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    <content><![CDATA[<p>深度优先遍历主要思路是从图中一个未访问的顶点开始，沿着一条路一直走到底，不撞南墙不回头，先走完一条路，然后从这条路尽头的节点回退到上一个节点，再从另一条路开始走到底，不断递归重复此过程，直到所有的顶点都遍历完成。</p>
+<p>深度优先搜索采用回溯思想，适合用递归或栈来实现。遍历得到的路径并不是最短路径。</p>
+<p><strong>树的遍历</strong></p>
+<p>对于二叉树，深度优先的递归实现其实就是前序遍历。</p>
+<p><img src="/images/code/algo/search/DFS.png" alt="img"></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123; </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">Node</span> &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="type">int</span> value;</span><br><span class="line">        <span class="keyword">public</span> Node left;</span><br><span class="line">        <span class="keyword">public</span> Node right;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">public</span> <span class="title function_">Node</span><span class="params">(<span class="type">int</span> value, Node left, Node right)</span> &#123;</span><br><span class="line">            <span class="built_in">this</span>.value = value;</span><br><span class="line">            <span class="built_in">this</span>.left = left;</span><br><span class="line">            <span class="built_in">this</span>.right = right;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">dfs</span><span class="params">(Node treeNode)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (treeNode == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 遍历节点</span></span><br><span class="line">        process(treeNode)</span><br><span class="line">        <span class="comment">// 遍历左节点</span></span><br><span class="line">        dfs(treeNode.left);</span><br><span class="line">        <span class="comment">// 遍历右节点</span></span><br><span class="line">        dfs(treeNode.right);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>非递归实现利用栈来将要遍历的节点压栈，然后出栈后检查此节点是否还有未遍历的节点，有的话压栈，没有的话不断出栈。</p>
 <ol>
 <li>先遍历当前节点，然后把右节点压栈，再压左节点。</li>
-<li>弹栈，拿到栈顶的节点，如果节点不为空，重复步骤 1， 如果为空，结束遍历。</li>
+<li>弹栈，拿到栈顶的节点，如果节点不为空，重复步骤1， 如果为空，结束遍历。</li>
 </ol>
-<p><img src="/images/code/algo/DFS.gif" alt="img"></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">dfsWithStack</span><span class="params">(Node root)</span> &#123; </span><br><span class="line">    <span class="keyword">if</span> (root == <span class="literal">null</span>) &#123; </span><br><span class="line">        <span class="keyword">return</span>; </span><br><span class="line">    &#125; </span><br><span class="line"> </span><br><span class="line">    Stack&lt;Node&gt; stack = <span class="keyword">new</span> <span class="title class_">Stack</span>&lt;&gt;(); </span><br><span class="line">    <span class="comment">// 先把根节点压栈 </span></span><br><span class="line">    stack.push(root); </span><br><span class="line">    <span class="keyword">while</span> (!stack.isEmpty()) &#123; </span><br><span class="line">        <span class="type">Node</span> <span class="variable">treeNode</span> <span class="operator">=</span> stack.pop(); </span><br><span class="line">        <span class="comment">// 遍历节点 </span></span><br><span class="line">        process(treeNode) </span><br><span class="line"> </span><br><span class="line">        <span class="comment">// 先压右节点 </span></span><br><span class="line">        <span class="keyword">if</span> (treeNode.right != <span class="literal">null</span>) &#123; </span><br><span class="line">            stack.push(treeNode.right); </span><br><span class="line">        &#125; </span><br><span class="line"> </span><br><span class="line">        <span class="comment">// 再压左节点 </span></span><br><span class="line">        <span class="keyword">if</span> (treeNode.left != <span class="literal">null</span>) &#123; </span><br><span class="line">            stack.push(treeNode.left); </span><br><span class="line">        &#125; </span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/images/code/algo/search/DFS.gif" alt="img"></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">dfsWithStack</span><span class="params">(Node root)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (root == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    Stack&lt;Node&gt; stack = <span class="keyword">new</span> <span class="title class_">Stack</span>&lt;&gt;();</span><br><span class="line">    <span class="comment">// 先把根节点压栈</span></span><br><span class="line">    stack.push(root);</span><br><span class="line">    <span class="keyword">while</span> (!stack.isEmpty()) &#123;</span><br><span class="line">        <span class="type">Node</span> <span class="variable">treeNode</span> <span class="operator">=</span> stack.pop();</span><br><span class="line">        <span class="comment">// 遍历节点</span></span><br><span class="line">        process(treeNode);</span><br><span class="line"> </span><br><span class="line">        <span class="comment">// 先压右节点</span></span><br><span class="line">        <span class="keyword">if</span> (treeNode.right != <span class="literal">null</span>) &#123;</span><br><span class="line">            stack.push(treeNode.right);</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="comment">// 再压左节点</span></span><br><span class="line">        <span class="keyword">if</span> (treeNode.left != <span class="literal">null</span>) &#123;</span><br><span class="line">            stack.push(treeNode.left);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>图的遍历</strong></p>
 ]]></content>
       <categories>
-        <category>algo</category>
+        <category>algorithm</category>
       </categories>
   </entry>
   <entry>
@@ -25325,13 +25361,40 @@ tcpdump ip multicast
   <entry>
     <title>堆</title>
     <url>/2022/09/25/algo/heap/</url>
-    <content><![CDATA[<p>堆是一种完全二叉树，每个节点的值都大于等于（或小于等于）其子树节点的值。对于每个节点的值都大于等于子树中每个节点值的堆叫<strong>大顶堆</strong>，<br>对于每个节点的值都小于等于子树中每个节点值的堆叫<strong>小顶堆</strong>。</p>
+    <content><![CDATA[<p>堆是一种完全二叉树，每个节点的值都大于等于（或小于等于）其子树节点的值。</p>
+<ul>
+<li>对于每个节点的值都大于等于子树中每个节点值的堆叫<strong>大顶堆</strong>，</li>
+<li>对于每个节点的值都小于等于子树中每个节点值的堆叫<strong>小顶堆</strong>。</li>
+</ul>
 <p>堆比较适合用数组来存储。</p>
-<p>新插入的元素直接放到堆的最后，之前的堆不符合堆定义的话，就需要进行调整，让其重新满足堆的特性，这个过程叫作<strong>堆化</strong>。</p>
-<p>堆化就是顺着节点所在的路径，向上或者向下进行对比，然后交换。从下往上堆化是让新插入的节点与父节点对比大小。如果不满足子节点小于等于父节点的大小关系，就互换两个节点。一直重复这个过程，直到比对到根节点。</p>
+<p><img src="/images/code/algo/heap/heap.png" alt="heap"></p>
+<h2 id="堆化"><a href="#堆化" class="headerlink" title="堆化"></a>堆化</h2><p>堆的元素变动后，不符合堆定义的话，就需要进行调整，让其重新满足堆的特性，这个过程叫作堆化。堆化就是顺着节点所在的路径，向上或者向下进行对比，然后交换。</p>
+<p><strong>插入元素</strong></p>
+<p>插入的元素直接放到堆的最后，从下往上堆化，让新插入的节点与父节点对比大小，如果不满足子节点小于等于父节点的大小关系，就互换两个节点。一直重复这个过程，直到比对到根节点。</p>
+<p><img src="/images/code/algo/heap/add.png" alt="堆化"></p>
+<p><strong>删除堆顶元素</strong></p>
+<p>删除堆顶元素后，就需要把第二大的元素放到堆顶，然后再迭代地删除第二大节点，以此类推，直到叶子节点被删除，但这样操作完成后的堆不再满足完全二叉树的特性。</p>
+<p><img src="/images/code/algo/heap/del1.png" alt="堆化"></p>
+<p>正确做法是先把最后一个节点放到堆顶，然后从上往下的堆化。</p>
+<p><img src="/images/code/algo/heap/del2.png" alt="堆化"></p>
+<p>一个包含 $n$ 个节点的完全二叉树高度小于 $log_{2}n$，堆化的时间复杂度跟树的高度成正比等于 $O(log\ n)$。</p>
+<h2 id="建堆"><a href="#建堆" class="headerlink" title="建堆"></a>建堆</h2><p>建堆就是将数组原地建成一个堆，从后往前处理数组，找到第一个非叶子节点，然后依次从上往下堆化，堆化过程只要比较和交换数组元素。</p>
+<p><img src="/images/code/algo/heap/create.png" alt="建堆"></p>
+<h2 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h2><p>建堆后，如果是个大顶堆，那么排序步骤如下：</p>
+<ol>
+<li><p>取堆顶元素，与数组下标最后的元素交换位置，因为就是堆顶就是最大的元素，这样就排好了最大元素。</p>
+</li>
+<li><p>堆顶元素移除后发生堆化，将剩下的n−1个元素重新构建成堆。</p>
+</li>
+<li><p>再取堆顶的元素，交换至下标为 $n−1$ 的位置，一直重复这个过程，直到最后堆中只剩下标为 $1$ 的一个元素。</p>
+</li>
+</ol>
+<p><img src="/images/code/algo/heap/sort.png" alt="排序"></p>
+<p>堆排序是原地排序算法。堆排序包括建堆和排序两个操作，建堆过程的时间复杂度是 $O(n)$，排序过程的时间复杂度是 $O(nlog \  n)$，所以，堆排序整体的时间复杂度是 $O(nlog \  n)$。</p>
+<p>堆排序不是稳定的排序算法，因为在排序的过程，存在将堆的最后一个节点跟堆顶节点互换的操作，所以就有可能改变值相同数据的原始相对顺序。</p>
 ]]></content>
       <categories>
-        <category>数据结构</category>
+        <category>algorithm</category>
       </categories>
   </entry>
   <entry>
@@ -25856,5 +25919,22 @@ tcpdump ip multicast
       <tags>
         <tag>gcc</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>打印斐波那契数列</title>
+    <url>/2022/10/02/algo/Fibonacci/</url>
+    <content><![CDATA[<p>斐波那契数列又称黄金分割数列、因数学家列昂纳多·斐波那契以兔子繁殖为例子而引入，又称为兔子数列。在数学上，斐波纳契数列以如下被以递归的方法定义：F(0)=0, F(1)=1, F(n)=F(n-1)+F(n-2)（n&gt;=2，n∈N*）。</p>
+<p><strong>直接赋值法</strong></p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Fibonacci_1</span><span class="params">(<span class="type">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> b = <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> c = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">        <span class="keyword">if</span> (i &lt; <span class="number">2</span>) &#123;</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;1 &quot;</span>;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        c = a + b;</span><br><span class="line">        cout &lt;&lt; c &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">        a = b;</span><br><span class="line">        b = c;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>数组法</strong></p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Fibonacci_2</span><span class="params">(<span class="type">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> *array = <span class="keyword">new</span> <span class="type">int</span>[n + <span class="number">2</span>];</span><br><span class="line">    array[<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">    array[<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">        <span class="keyword">if</span> (i &gt; <span class="number">1</span>) &#123;</span><br><span class="line">            array[i] = array[i - <span class="number">1</span>] + array[i - <span class="number">2</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        cout &lt;&lt; array[i] &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span>[] array;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>递归法</strong></p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">static</span> <span class="type">int</span> <span class="title">fibonacci</span><span class="params">(<span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (n &lt; <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">fibonacci</span>(n - <span class="number">1</span>) + <span class="built_in">fibonacci</span>(n - <span class="number">2</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Fibonacci_3</span><span class="params">(<span class="type">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="built_in">fibonacci</span>(i) &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>algorithm</category>
+      </categories>
   </entry>
 </search>

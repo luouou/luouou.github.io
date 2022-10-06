@@ -20,19 +20,19 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="linux系统结构   最上面是用户空间，这是用户应用程序执行的地方。用户空间之下是内核空间，GNU C Library （glibc）也位于这里，它提供了连接内核的系统调用接口，还提供了在用户空间应用程序和内核之间进行转换的机制。 Linux 内核可以进一步划分成三层。最上面是系统调用接口。之下是内核代码，是与处理器体系结构无关的通用代码。最下面是依赖于特定处理器体系结构的代码，称为 BSP（B">
+  <meta name="description" content="Linux的内核是一种宏内核，主要有以下特征：  支持动态加载内核模块 支持对称多处理（SMP） 支持抢占，允许内核运行的任务有优先执行的能力 不区分线程和进程  linux系统结构   最上面是用户空间，这是用户应用程序执行的地方。用户空间之下是内核空间，GNU C Library （glibc）也位于这里，它提供了连接内核的系统调用接口，还提供了在用户空间应用程序和内核之间进行转换的机制。 L">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux Kernel Architecture">
 <meta property="og:url" content="http://example.com/2022/06/07/kernel/kernel_arch/index.html">
 <meta property="og:site_name" content="nullptr">
-<meta property="og:description" content="linux系统结构   最上面是用户空间，这是用户应用程序执行的地方。用户空间之下是内核空间，GNU C Library （glibc）也位于这里，它提供了连接内核的系统调用接口，还提供了在用户空间应用程序和内核之间进行转换的机制。 Linux 内核可以进一步划分成三层。最上面是系统调用接口。之下是内核代码，是与处理器体系结构无关的通用代码。最下面是依赖于特定处理器体系结构的代码，称为 BSP（B">
+<meta property="og:description" content="Linux的内核是一种宏内核，主要有以下特征：  支持动态加载内核模块 支持对称多处理（SMP） 支持抢占，允许内核运行的任务有优先执行的能力 不区分线程和进程  linux系统结构   最上面是用户空间，这是用户应用程序执行的地方。用户空间之下是内核空间，GNU C Library （glibc）也位于这里，它提供了连接内核的系统调用接口，还提供了在用户空间应用程序和内核之间进行转换的机制。 L">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/images/kernel/kernel/linux_arch.jpeg">
 <meta property="og:image" content="http://example.com/images/kernel/kernel/linux-arch.webp">
 <meta property="og:image" content="http://example.com/images/kernel/kernel/kernel_struct.webp">
 <meta property="og:image" content="http://example.com/images/kernel/kernel/linux_kernel_map.svg">
 <meta property="article:published_time" content="2022-06-07T08:05:44.533Z">
-<meta property="article:modified_time" content="2022-06-08T09:21:31.353Z">
+<meta property="article:modified_time" content="2022-10-06T08:10:49.556Z">
 <meta property="article:author" content="ubun2">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/images/kernel/kernel/linux_arch.jpeg">
@@ -215,7 +215,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+                <time title="修改时间：2022-10-06 16:10:49" itemprop="dateModified" datetime="2022-10-06T16:10:49+08:00">2022-10-06</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -245,11 +245,18 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="linux系统结构"><a href="#linux系统结构" class="headerlink" title="linux系统结构"></a>linux系统结构</h2><img src="/images/kernel/kernel/linux_arch.jpeg" alt="Unix/Linux系统分层结构" style="zoom: 33%;" />
+        <p>Linux的内核是一种宏内核，主要有以下特征：</p>
+<ul>
+<li>支持动态加载内核模块</li>
+<li>支持对称多处理（SMP）</li>
+<li>支持抢占，允许内核运行的任务有优先执行的能力</li>
+<li>不区分线程和进程</li>
+</ul>
+<h2 id="linux系统结构"><a href="#linux系统结构" class="headerlink" title="linux系统结构"></a>linux系统结构</h2><img src="/images/kernel/kernel/linux_arch.jpeg" alt="Unix/Linux系统分层结构" style="zoom: 33%;" />
 
 <p><img src="/images/kernel/kernel/linux-arch.webp" alt="Linux系统层次结构"></p>
 <p>最上面是用户空间，这是用户应用程序执行的地方。用户空间之下是内核空间，GNU C Library （glibc）也位于这里，它提供了连接内核的系统调用接口，还提供了在用户空间应用程序和内核之间进行转换的机制。</p>
-<p>Linux 内核可以进一步划分成三层。最上面是系统调用接口。之下是内核代码，是与处理器体系结构无关的通用代码。最下面是依赖于特定处理器体系结构的代码，称为 BSP（Board Support Package）。</p>
+<p>Linux 内核可以进一步划分成三层，最上面是系统调用接口，之下是内核代码，是与处理器体系结构无关的通用代码，最下面是依赖于特定处理器体系结构的代码，称为 BSP（Board Support Package）。</p>
 <h2 id="内核架构"><a href="#内核架构" class="headerlink" title="内核架构"></a>内核架构</h2><p><img src="/images/kernel/kernel/kernel_struct.webp" alt="linux内核架构"></p>
 <p>Linux内核的主要组件有：系统调用接口、进程调度、内存管理、虚拟文件系统、网络协议栈、进程间通信、设备驱动程序和硬件架构的相关代码。</p>
 <p>LXR (Linux Cross Reference)是一个内核的源代码浏览工具，<a target="_blank" rel="noopener" href="http://lxr.linux.no/%E3%80%82">http://lxr.linux.no/。</a></p>
@@ -262,105 +269,109 @@
 <th align="left">源码功能简介</th>
 </tr>
 </thead>
+</table>
+<table>
+<thead>
+<tr>
+<th><strong>目录</strong></th>
+<th><strong>说明</strong></th>
+</tr>
+</thead>
 <tbody><tr>
-<td align="left">/Documentation</td>
-<td align="left">说明文档，对每个目录的具体作用进行说明。</td>
+<td>arch</td>
+<td>特定体系结构的代码</td>
 </tr>
 <tr>
-<td align="left">/arch</td>
-<td align="left">不同 CPU 架构下的核心代码。其中的每一个子目录都代表 Linux 支持的 CPU 架构。</td>
+<td>block</td>
+<td>块设备I/O层</td>
 </tr>
 <tr>
-<td align="left">/block</td>
-<td align="left">块设备通用函数。</td>
+<td>crypo</td>
+<td>加密API</td>
 </tr>
 <tr>
-<td align="left">/certs</td>
-<td align="left">与证书相关。</td>
+<td>certs</td>
+<td>与证书相关。</td>
 </tr>
 <tr>
-<td align="left">/crypto</td>
-<td align="left">常见的加密算法的C 语言实现代码，譬如 crc32、md5、sha1 等。</td>
+<td>Documentation</td>
+<td>内核源码文档</td>
 </tr>
 <tr>
-<td align="left">/drivers</td>
-<td align="left">内核中所有设备的驱动程序，其中的每一个子目录对应一种设备驱动。</td>
+<td>drivers</td>
+<td>设备驱动程序</td>
 </tr>
 <tr>
-<td align="left">/include</td>
-<td align="left">内核编译通用的头文件。</td>
+<td>firmware</td>
+<td>使用某些驱动程序而需要的设备固件</td>
 </tr>
 <tr>
-<td align="left">/init</td>
-<td align="left">内核初始化的核心代码。</td>
+<td>fs</td>
+<td>VFS和各种文件系统</td>
 </tr>
 <tr>
-<td align="left">/ipc</td>
-<td align="left">内核中进程间的通信代码。</td>
+<td>include</td>
+<td>内核头文件</td>
 </tr>
 <tr>
-<td align="left">/kernel</td>
-<td align="left">内核的核心代码，此目录下实现了大多数 Linux 系统的内核函数。与处理器架构相关的内核代码在 /kernel/$ARCH/kernel。</td>
+<td>init</td>
+<td>内核引导和初始化</td>
 </tr>
 <tr>
-<td align="left">/lib</td>
-<td align="left">内核共用的函数库，与处理器架构相关的库在 /kernel/$ARCH/lib。</td>
+<td>ipc</td>
+<td>进程间通信代码</td>
 </tr>
 <tr>
-<td align="left">/mm</td>
-<td align="left">内存管理代码，譬如页式存储管理内存的分配和释放等。与具体处理器架构相关的内存管理代码位于 /arch/$ARCH/mm 目录下。</td>
+<td>kernel</td>
+<td>核心子系统，如调度程序</td>
 </tr>
 <tr>
-<td align="left">/net</td>
-<td align="left">网络通信相关代码。</td>
+<td>lib</td>
+<td>同样内核函数</td>
 </tr>
 <tr>
-<td align="left">/samples</td>
-<td align="left">示例代码。</td>
+<td>mm</td>
+<td>内存管理子系统和VM</td>
 </tr>
 <tr>
-<td align="left">/scripts</td>
-<td align="left">用于内核配置的脚本文件，用于实现内核配置的图形界面。</td>
+<td>net</td>
+<td>网络子系统</td>
 </tr>
 <tr>
-<td align="left">/security</td>
-<td align="left">安全性相关的代码。</td>
+<td>samples</td>
+<td>示例，示范代码</td>
 </tr>
 <tr>
-<td align="left">/sound</td>
-<td align="left">与音频有关的代码，包括与音频有关的驱动程序 [2]。</td>
+<td>scripts</td>
+<td>编译内核所用的脚本</td>
 </tr>
 <tr>
-<td align="left">/tools</td>
-<td align="left">Linux 中的常用工具。</td>
+<td>security</td>
+<td>Linux 安全模块</td>
 </tr>
 <tr>
-<td align="left">/usr</td>
-<td align="left">该目录中的代码为内核尚未完全启动时执行用户空间代码提供了支持。</td>
+<td>sound</td>
+<td>语音子系统</td>
 </tr>
 <tr>
-<td align="left">/virt</td>
-<td align="left">此文件夹包含了虚拟化代码，它允许用户一次运行多个操作系统。</td>
+<td>usr</td>
+<td>早期用户空间代码（所谓的initramfs）</td>
 </tr>
 <tr>
-<td align="left">COPYING</td>
-<td align="left">许可和授权信息。</td>
+<td>tools</td>
+<td>在Linux开发中有用的工具</td>
 </tr>
 <tr>
-<td align="left">CREDITS</td>
-<td align="left">贡献者列表。</td>
+<td>virt</td>
+<td>虚拟化基础结构</td>
 </tr>
 <tr>
-<td align="left">Kbuild</td>
-<td align="left">内核设定脚本，可以对内核中的变量进行设定。</td>
+<td>COPYING</td>
+<td>许可和授权信息。</td>
 </tr>
 <tr>
-<td align="left">Kconfig</td>
-<td align="left">配置哪些文件编译，那些文件不用编译 [4]。</td>
-</tr>
-<tr>
-<td align="left">Makefile</td>
-<td align="left">该文件将编译参数、编译所需的文件和必要的信息传给编译器。</td>
+<td>CREDITS</td>
+<td>贡献者列表。</td>
 </tr>
 </tbody></table>
 <h2 id="drivers目录"><a href="#drivers目录" class="headerlink" title="drivers目录"></a>drivers目录</h2><p><strong>accessibility</strong>  这些驱动提供支持一些辅助设备。在Linux 3.9.4中，这个文件夹中只有一个驱动就是盲文设备驱动。</p>
@@ -573,13 +584,13 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-count">41</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

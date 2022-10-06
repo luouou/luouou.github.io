@@ -190,7 +190,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/algo/graph/" class="post-title-link" itemprop="url">数据结构-图</a>
+            <a href="/2022/06/07/algo/graph/" class="post-title-link" itemprop="url">图</a>
         </h1>
 
         <div class="post-meta">
@@ -207,7 +207,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+                <time title="修改时间：2022-10-04 16:17:22" itemprop="dateModified" datetime="2022-10-04T16:17:22+08:00">2022-10-04</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -215,7 +215,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
                 </span>
             </span>
 
@@ -231,14 +231,17 @@
 
       
           <h2 id="图的定义"><a href="#图的定义" class="headerlink" title="图的定义"></a>图的定义</h2><p>图（Graph）是由顶点的有穷非空集合和顶点之间边的集合组成，通常为：G(V,E)，其中，G表示一个图，V是图G中顶点的集合，E是图G中边的集合。</p>
-<p><strong>无向边</strong>：顶点vi到vj之间的边没有方向。则称这条边为无向边（Edge），用无序偶对(Vi,Vj)来表示。</p>
+<p>树中的元素称为节点，图中的元素叫作<strong>顶点</strong>。图一个顶点可以与任意其他顶点建立连接关系，这种建立的关系叫<strong>边</strong>。顶点相连接的边的条数，顶点的<strong>度</strong>。</p>
+<p>边有方向的图叫作<strong>有向图</strong>，边没有方向的图就叫作<strong>无向图</strong>。</p>
+<p>无向图中的<strong>度</strong>表示一个顶点有多少条边，在有向图中，顶点的<strong>入度</strong>表示有多少条边指向这个顶点，顶点的<strong>出度</strong>表示有多少条边是以这个顶点为起点指向其他顶点。</p>
+<p><strong>无向边</strong>：顶点vi到vj之间的边没有方向，则称这条边为无向边，用无序偶对(Vi,Vj)来表示。</p>
 <p><strong>无向图</strong>：图中的任意两个顶点之间的边都是无向边。</p>
 <p><img src="/images/code/algo/graph/undir.png" alt="无向图"></p>
-<p>上图的无向图G1，可以表示成：G1=(V1,{E1})，其中顶点集合V1={A,B,C,D}；边集合E1={(A,B),(B,C)(C,D),(D,A),(A,C)}</p>
-<p><strong>有向边</strong>：顶点vi到vj的边有方向。 也称为<strong>弧（Arc）</strong>。有向边用带尖括号的有序偶对&lt;vi,vj&gt;来表示。其中vi称为弧尾（Tail），vj称为弧头（Head）。</p>
+<p>上图的无向图G1，可以表示成：G1=(V1,{E1})，其中顶点集合V1={A,B,C,D}；边集合E1={(A,B),(B,C)(C,D),(D,A),(A,C)}。</p>
+<p><strong>有向边</strong>：顶点vi到vj的边有方向。 也称为<strong>弧</strong>。有向边用带尖括号的有序偶对&lt;vi,vj&gt;来表示。其中vi称为弧尾，vj称为弧头。</p>
 <p><strong>有向图</strong>：图中任意两个顶点之间都是有向边。</p>
 <p><img src="/images/code/algo/graph/dir.png" alt="有向图"></p>
-<p>上图的有向图G2，可以表示成：G2=(V2,{E2})，其中顶点集合V2={A,B,C,D}；弧集合E2={(A,D),(B,A)(C,A),(B,C)}</p>
+<p>上图的有向图G2，可以表示成：G2=(V2,{E2})，其中顶点集合V2={A,B,C,D}；弧集合E2={(A,D),(B,A)(C,A),(B,C)}。</p>
 <p><strong>简单图</strong>：在图中，如果不存在顶点到其自身的边，且同一条边不重复出现。</p>
 <p><strong>无向完全图</strong>：在无向图中，任意两个顶点之间都存在边，也就是说每个顶点都要与除它以外的顶点连线。此时边的数量公式为：n(n-1)/2 。</p>
 <p><img src="/images/code/algo/graph/allundir.png" alt="无向完全图"></p>
@@ -246,14 +249,14 @@
 <p><img src="/images/code/algo/graph/alldir.png" alt="有向完全图"></p>
 <p>对于一个具有n个顶点和e条边的图，存在这样的边界：无向图：0&lt;=e&lt;=n(n-1)/2，有向图：0&lt;=e&lt;=n(n-1)。</p>
 <p>有很少条边或弧的图称为<strong>稀疏图</strong>，反之称为<strong>稠密图</strong>，这是一个很模糊的概念。</p>
-<p><strong>子图（Subgraph）</strong>：假设两个图G=(V,{E})和G’=(V’,{E’})，如果集合V’⊆V，且集合E’⊆E，则称G’是G的子图。</p>
-<p>与图的边或弧相关的数叫做<strong>权（Weigh）</strong>，带权的图称为<strong>网（Network）</strong>。</p>
-<h2 id="边与顶点的关系"><a href="#边与顶点的关系" class="headerlink" title="边与顶点的关系"></a>边与顶点的关系</h2><p>对于无向图G=(V,{E})，如果边(v,v’)∈E，则称顶点v和v’互为邻接点（Adjacent），即v和v’相邻接，边(v,v’)依附（incident）于顶点v和v’，或者说(v,v’)与顶点v和v’相关联。<strong>顶点v的度</strong>（Degree）是和v相关联的边的数目，记为TD(v)。图中边的个数是各个顶点度数之和的一半：e=1/2∑TD(vi)。</p>
-<p>对于有向图G=(V,{E})，如果弧&lt;v,v’&gt;∈E，则称顶点v邻接到顶点v’，顶点v’邻接自顶点v。弧&lt;v,v’&gt;和顶点v,v’相关联，以顶点为头的弧的数目称为<strong>顶点v的入度</strong>（InDegree），记为ID(v)，以v为尾的弧的数目称为<strong>顶点v的出度</strong>（OutDegree），记为OD(v)；顶点v的度为TD(v)=ID(v)+OD(v)。边的个数为：e=∑ID(vi)=∑OD(vi)。</p>
-<h2 id="路径"><a href="#路径" class="headerlink" title="路径"></a>路径</h2><p><strong>路径（Path）</strong>：图中从顶点v到v’的顶点序列。在树中根结点到任意结点的路径是唯一的，但在图中顶点与顶点之间的路径并不唯一。</p>
+<p><strong>子图</strong>：假设两个图G=(V,{E})和G’=(V’,{E’})，如果集合V’⊆V，且集合E’⊆E，则称G’是G的子图。</p>
+<p>图的边或弧都有一个权重的图称为<strong>网</strong>。</p>
+<p><strong>路径</strong></p>
+<p><strong>路径（Path）</strong>：图中从顶点v到v’的顶点序列。在树中根结点到任意结点的路径是唯一的，但在图中顶点与顶点之间的路径并不唯一。</p>
 <p><strong>路径长度</strong>：路径上的边或弧的数目。</p>
 <p><strong>回路（Cycle）</strong>：路径中第一个顶点到最后一个顶都是同一个顶点。<strong>简单路径</strong>：路径中不存在重复出现顶点。<strong>简单回路</strong>：除了第一个顶点和最后一个顶点，路径中不存在重复出现顶点，也称<strong>简单环</strong>。</p>
-<h2 id="连通图"><a href="#连通图" class="headerlink" title="连通图"></a>连通图</h2><p>在无向图中如果顶点v到顶点v’有路径，则称v和v’是连通的。如果图中任意两个顶点vi、vj∈E，且vi和vj都是连通的。则称该图为<strong>连通图（connected graph）</strong>。无向图中的极大连通子图称为<strong>连通分量</strong>，它强调：</p>
+<p><strong>连通图</strong></p>
+<p>在无向图中如果顶点v到顶点v’有路径，则称v和v’是连通的。如果图中任意两个顶点vi、vj∈E，且vi和vj都是连通的。则称该图为<strong>连通图（connected graph）</strong>。无向图中的极大连通子图称为<strong>连通分量</strong>，它强调：</p>
 <ul>
 <li>要是子图</li>
 <li>子图要是连通的</li>
@@ -262,9 +265,14 @@
 </ul>
 <p>任何连通图的连通分量只有一个，即是其自身，非连通的无向图有多个连通分量。</p>
 <p>在有向图G中，如果对于每一对、∈V、≠，从到和从到都存在路径，则称G是<strong>强连通图</strong>。有向图中的极大强连通子图称做有向图的<strong>强连通分量</strong>。</p>
-<h3 id="连通图生成树"><a href="#连通图生成树" class="headerlink" title="连通图生成树"></a>连通图生成树</h3><p><strong>生成树</strong>(SpanningTree)是连通图的包含图中的所有顶点的极小连通子图。即生成树包含图中的全部的n个顶点，但只有足以构成一棵树的n-1条边。图的生成树不惟一。从不同的顶点出发进行遍历，可以得到不同的生成树。</p>
+<p><strong>连通图生成树</strong></p>
+<p><strong>生成树</strong>(SpanningTree)是连通图的包含图中的所有顶点的极小连通子图。即生成树包含图中的全部的n个顶点，但只有足以构成一棵树的n-1条边。图的生成树不惟一。从不同的顶点出发进行遍历，可以得到不同的生成树。</p>
 <p>如果一个有向图恰有一个顶点的入度为0（根结点），其余顶点的入度均为1，则是一棵<strong>有向树</strong>。一个有向图的生成森林由若干棵有向树组成，含有图中全部顶点，但只有足以构成若干棵不相交的有向树的弧。</p>
-<h2 id="图的存储结构"><a href="#图的存储结构" class="headerlink" title="图的存储结构"></a>图的存储结构</h2><h3 id="邻接矩阵"><a href="#邻接矩阵" class="headerlink" title="邻接矩阵"></a>邻接矩阵</h3>
+<h2 id="图的存储"><a href="#图的存储" class="headerlink" title="图的存储"></a>图的存储</h2><h3 id="邻接矩阵"><a href="#邻接矩阵" class="headerlink" title="邻接矩阵"></a>邻接矩阵</h3><p>邻接矩阵的底层依赖一个二维数组。对于无向图来说，如果顶点 i 与顶点 j 之间有边，我们就将 $A[i][j]$ 和 $A[j][i]$ 标记为 1；对于有向图来说，如果顶点 i 到顶点 j 之间，有一条箭头从顶点 i 指向顶点 j 的边，那我们就将 $A[i][j]$ 标记为 1。同理，如果有一条箭头从顶点 j 指向顶点 i 的边，我们就将 $A[j][i]$ 标记为 1。对于带权图，数组中就存储相应的权重。</p>
+<p><img src="/images/code/algo/graph/AdjacencyMatrix.png" alt="邻接矩阵"></p>
+<h3 id="邻接表"><a href="#邻接表" class="headerlink" title="邻接表"></a>邻接表</h3><p>邻接表的每个顶点对应一条链表，链表中存储的是与这个顶点相连接的其他顶点。</p>
+<p><img src="/images/code/algo/graph/AdjacencyList.png" alt="邻接表"></p>
+
       
     </div>
 
@@ -297,7 +305,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/07/algo/binary/" class="post-title-link" itemprop="url">二分法的标准写法</a>
+            <a href="/2022/06/07/algo/binary/" class="post-title-link" itemprop="url">二分法搜索</a>
         </h1>
 
         <div class="post-meta">
@@ -314,7 +322,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+                <time title="修改时间：2022-10-04 16:21:53" itemprop="dateModified" datetime="2022-10-04T16:21:53+08:00">2022-10-04</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -337,14 +345,17 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>对于二分法，我们常用的取中位数的算法是这样的：</p>
+          <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="type">static</span> <span class="type">int</span> <span class="title">binary</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> data)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> min = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> max = arr.length - <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> mid;</span><br><span class="line">    <span class="keyword">while</span> (min &lt;= max) &#123;</span><br><span class="line">        mid = (min + max) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span> (arr[mid] &gt; data) &#123;</span><br><span class="line">            max = mid - <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[mid] &lt; data) &#123;</span><br><span class="line">            min = mid + <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> mid;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种取中位数的方式，当 min 和 max 很大的时候，会出现溢出的情况，从而导致数组访问出错。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mid = (min + max) / <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
 
-<p>但当 min 和 max 很大的时候，会出现溢出的情况，从而导致数组访问出错。改进的办法是将加法变成减法。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="type">static</span> <span class="type">int</span> <span class="title">binary</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> data)</span> </span>&#123;</span><br><span class="line">        <span class="type">int</span> min = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> max = arr.length - <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> mid;</span><br><span class="line">        <span class="keyword">while</span> (min &lt;= max) &#123;</span><br><span class="line">            <span class="comment">// 防止溢出</span></span><br><span class="line">            mid =  min + (max - min) / <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span> (arr[mid] &gt; data) &#123;</span><br><span class="line">                max = mid - <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[mid] &lt; data) &#123;</span><br><span class="line">                min = mid + <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> mid;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>改进的办法是将加法变成减法。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 防止溢出</span></span><br><span class="line">mid =  min + (max - min) / <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
 
-<p>还有一种更高效的办法是使用位运算。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="type">static</span> <span class="type">int</span> <span class="title">binary</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> data)</span> </span>&#123;</span><br><span class="line">       <span class="type">int</span> min = <span class="number">0</span>;</span><br><span class="line">       <span class="type">int</span> max = arr.length - <span class="number">1</span>;</span><br><span class="line">       <span class="type">int</span> mid;</span><br><span class="line">       <span class="keyword">while</span> (min &lt;= max) &#123;</span><br><span class="line">           <span class="comment">// 无符号位运算符的优先级较低，先括起来</span></span><br><span class="line">           mid =  min + ((max - min) &gt;&gt;&gt; <span class="number">1</span>);</span><br><span class="line">           <span class="keyword">if</span> (arr[mid] &gt; data) &#123;</span><br><span class="line">               max = mid - <span class="number">1</span>;</span><br><span class="line">           &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[mid] &lt; data) &#123;</span><br><span class="line">               min = mid + <span class="number">1</span>;</span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               <span class="keyword">return</span> mid;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>更高效的办法是使用位运算。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 无符号位运算符的优先级较低，先括起来</span></span><br><span class="line">mid =  min + ((max - min) &gt;&gt;&gt; <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
       
     </div>
 
@@ -1068,7 +1079,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+                <time title="修改时间：2022-10-06 16:10:49" itemprop="dateModified" datetime="2022-10-06T16:10:49+08:00">2022-10-06</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1091,11 +1102,18 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="linux系统结构"><a href="#linux系统结构" class="headerlink" title="linux系统结构"></a>linux系统结构</h2><img src="/images/kernel/kernel/linux_arch.jpeg" alt="Unix/Linux系统分层结构" style="zoom: 33%;" />
+          <p>Linux的内核是一种宏内核，主要有以下特征：</p>
+<ul>
+<li>支持动态加载内核模块</li>
+<li>支持对称多处理（SMP）</li>
+<li>支持抢占，允许内核运行的任务有优先执行的能力</li>
+<li>不区分线程和进程</li>
+</ul>
+<h2 id="linux系统结构"><a href="#linux系统结构" class="headerlink" title="linux系统结构"></a>linux系统结构</h2><img src="/images/kernel/kernel/linux_arch.jpeg" alt="Unix/Linux系统分层结构" style="zoom: 33%;" />
 
 <p><img src="/images/kernel/kernel/linux-arch.webp" alt="Linux系统层次结构"></p>
 <p>最上面是用户空间，这是用户应用程序执行的地方。用户空间之下是内核空间，GNU C Library （glibc）也位于这里，它提供了连接内核的系统调用接口，还提供了在用户空间应用程序和内核之间进行转换的机制。</p>
-<p>Linux 内核可以进一步划分成三层。最上面是系统调用接口。之下是内核代码，是与处理器体系结构无关的通用代码。最下面是依赖于特定处理器体系结构的代码，称为 BSP（Board Support Package）。</p>
+<p>Linux 内核可以进一步划分成三层，最上面是系统调用接口，之下是内核代码，是与处理器体系结构无关的通用代码，最下面是依赖于特定处理器体系结构的代码，称为 BSP（Board Support Package）。</p>
 <h2 id="内核架构"><a href="#内核架构" class="headerlink" title="内核架构"></a>内核架构</h2><p><img src="/images/kernel/kernel/kernel_struct.webp" alt="linux内核架构"></p>
 <p>Linux内核的主要组件有：系统调用接口、进程调度、内存管理、虚拟文件系统、网络协议栈、进程间通信、设备驱动程序和硬件架构的相关代码。</p>
 <p>LXR (Linux Cross Reference)是一个内核的源代码浏览工具，<a target="_blank" rel="noopener" href="http://lxr.linux.no/%E3%80%82">http://lxr.linux.no/。</a></p>
@@ -1108,105 +1126,109 @@
 <th align="left">源码功能简介</th>
 </tr>
 </thead>
+</table>
+<table>
+<thead>
+<tr>
+<th><strong>目录</strong></th>
+<th><strong>说明</strong></th>
+</tr>
+</thead>
 <tbody><tr>
-<td align="left">/Documentation</td>
-<td align="left">说明文档，对每个目录的具体作用进行说明。</td>
+<td>arch</td>
+<td>特定体系结构的代码</td>
 </tr>
 <tr>
-<td align="left">/arch</td>
-<td align="left">不同 CPU 架构下的核心代码。其中的每一个子目录都代表 Linux 支持的 CPU 架构。</td>
+<td>block</td>
+<td>块设备I/O层</td>
 </tr>
 <tr>
-<td align="left">/block</td>
-<td align="left">块设备通用函数。</td>
+<td>crypo</td>
+<td>加密API</td>
 </tr>
 <tr>
-<td align="left">/certs</td>
-<td align="left">与证书相关。</td>
+<td>certs</td>
+<td>与证书相关。</td>
 </tr>
 <tr>
-<td align="left">/crypto</td>
-<td align="left">常见的加密算法的C 语言实现代码，譬如 crc32、md5、sha1 等。</td>
+<td>Documentation</td>
+<td>内核源码文档</td>
 </tr>
 <tr>
-<td align="left">/drivers</td>
-<td align="left">内核中所有设备的驱动程序，其中的每一个子目录对应一种设备驱动。</td>
+<td>drivers</td>
+<td>设备驱动程序</td>
 </tr>
 <tr>
-<td align="left">/include</td>
-<td align="left">内核编译通用的头文件。</td>
+<td>firmware</td>
+<td>使用某些驱动程序而需要的设备固件</td>
 </tr>
 <tr>
-<td align="left">/init</td>
-<td align="left">内核初始化的核心代码。</td>
+<td>fs</td>
+<td>VFS和各种文件系统</td>
 </tr>
 <tr>
-<td align="left">/ipc</td>
-<td align="left">内核中进程间的通信代码。</td>
+<td>include</td>
+<td>内核头文件</td>
 </tr>
 <tr>
-<td align="left">/kernel</td>
-<td align="left">内核的核心代码，此目录下实现了大多数 Linux 系统的内核函数。与处理器架构相关的内核代码在 /kernel/$ARCH/kernel。</td>
+<td>init</td>
+<td>内核引导和初始化</td>
 </tr>
 <tr>
-<td align="left">/lib</td>
-<td align="left">内核共用的函数库，与处理器架构相关的库在 /kernel/$ARCH/lib。</td>
+<td>ipc</td>
+<td>进程间通信代码</td>
 </tr>
 <tr>
-<td align="left">/mm</td>
-<td align="left">内存管理代码，譬如页式存储管理内存的分配和释放等。与具体处理器架构相关的内存管理代码位于 /arch/$ARCH/mm 目录下。</td>
+<td>kernel</td>
+<td>核心子系统，如调度程序</td>
 </tr>
 <tr>
-<td align="left">/net</td>
-<td align="left">网络通信相关代码。</td>
+<td>lib</td>
+<td>同样内核函数</td>
 </tr>
 <tr>
-<td align="left">/samples</td>
-<td align="left">示例代码。</td>
+<td>mm</td>
+<td>内存管理子系统和VM</td>
 </tr>
 <tr>
-<td align="left">/scripts</td>
-<td align="left">用于内核配置的脚本文件，用于实现内核配置的图形界面。</td>
+<td>net</td>
+<td>网络子系统</td>
 </tr>
 <tr>
-<td align="left">/security</td>
-<td align="left">安全性相关的代码。</td>
+<td>samples</td>
+<td>示例，示范代码</td>
 </tr>
 <tr>
-<td align="left">/sound</td>
-<td align="left">与音频有关的代码，包括与音频有关的驱动程序 [2]。</td>
+<td>scripts</td>
+<td>编译内核所用的脚本</td>
 </tr>
 <tr>
-<td align="left">/tools</td>
-<td align="left">Linux 中的常用工具。</td>
+<td>security</td>
+<td>Linux 安全模块</td>
 </tr>
 <tr>
-<td align="left">/usr</td>
-<td align="left">该目录中的代码为内核尚未完全启动时执行用户空间代码提供了支持。</td>
+<td>sound</td>
+<td>语音子系统</td>
 </tr>
 <tr>
-<td align="left">/virt</td>
-<td align="left">此文件夹包含了虚拟化代码，它允许用户一次运行多个操作系统。</td>
+<td>usr</td>
+<td>早期用户空间代码（所谓的initramfs）</td>
 </tr>
 <tr>
-<td align="left">COPYING</td>
-<td align="left">许可和授权信息。</td>
+<td>tools</td>
+<td>在Linux开发中有用的工具</td>
 </tr>
 <tr>
-<td align="left">CREDITS</td>
-<td align="left">贡献者列表。</td>
+<td>virt</td>
+<td>虚拟化基础结构</td>
 </tr>
 <tr>
-<td align="left">Kbuild</td>
-<td align="left">内核设定脚本，可以对内核中的变量进行设定。</td>
+<td>COPYING</td>
+<td>许可和授权信息。</td>
 </tr>
 <tr>
-<td align="left">Kconfig</td>
-<td align="left">配置哪些文件编译，那些文件不用编译 [4]。</td>
-</tr>
-<tr>
-<td align="left">Makefile</td>
-<td align="left">该文件将编译参数、编译所需的文件和必要的信息传给编译器。</td>
+<td>CREDITS</td>
+<td>贡献者列表。</td>
 </tr>
 </tbody></table>
 <h2 id="drivers目录"><a href="#drivers目录" class="headerlink" title="drivers目录"></a>drivers目录</h2><p><strong>accessibility</strong>  这些驱动提供支持一些辅助设备。在Linux 3.9.4中，这个文件夹中只有一个驱动就是盲文设备驱动。</p>
@@ -1762,13 +1784,13 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-count">41</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
