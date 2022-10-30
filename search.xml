@@ -17052,7 +17052,7 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
       </tags>
   </entry>
   <entry>
-    <title>update gcc version</title>
+    <title>update-alternatives</title>
     <url>/2022/06/07/linux/update-alternatives/</url>
     <content><![CDATA[<p>查看系统已装的gcc</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ll /usr/bin/gcc*</span><br></pre></td></tr></table></figure>
@@ -17075,7 +17075,7 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">alias gcc=&#x27;/usr/bin/gcc-5&#x27;</span><br><span class="line">alias g++=&#x27;/usr/bin/g++-5&#x27;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>gcc</category>
+        <category>linux</category>
       </categories>
   </entry>
   <entry>
@@ -23911,6 +23911,8 @@ tcpdump ip multicast
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">bfs</span><span class="params">(Node root)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (root == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    Queue&lt;Node&gt; stack = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;();</span><br><span class="line">    stack.add(root);</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">while</span> (!stack.isEmpty()) &#123;</span><br><span class="line">        <span class="type">Node</span> <span class="variable">node</span> <span class="operator">=</span> stack.poll();</span><br><span class="line">        System.out.println(<span class="string">&quot;value = &quot;</span> + node.value);</span><br><span class="line"></span><br><span class="line">        <span class="type">Node</span> <span class="variable">left</span> <span class="operator">=</span> node.left;</span><br><span class="line">        <span class="keyword">if</span> (left != <span class="literal">null</span>) &#123;</span><br><span class="line">            stack.add(left);</span><br><span class="line">        &#125; </span><br><span class="line"></span><br><span class="line">        <span class="type">Node</span> <span class="variable">right</span> <span class="operator">=</span> node.right;</span><br><span class="line">        <span class="keyword">if</span> (right != <span class="literal">null</span>) &#123;</span><br><span class="line">            stack.add(right);</span><br><span class="line">        &#125; </span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p><strong>图的遍历</strong></p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">dfs</span><span class="params">(vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; &amp;mat)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    queue&lt;pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&gt; q;</span><br><span class="line">    <span class="type">int</span> dirs[<span class="number">4</span>][<span class="number">2</span>] = &#123;&#123;<span class="number">-1</span>, <span class="number">0</span>&#125;, &#123;<span class="number">1</span>, <span class="number">0</span>&#125;, &#123;<span class="number">0</span>, <span class="number">-1</span>&#125;, &#123;<span class="number">0</span>, <span class="number">1</span>&#125;&#125;;</span><br><span class="line">    <span class="type">int</span> m = mat[<span class="number">0</span>].<span class="built_in">size</span>();</span><br><span class="line">    <span class="type">int</span> n = mat.<span class="built_in">size</span>();</span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">stop</span>(m, <span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(n, <span class="number">-1</span>));</span><br><span class="line">    vector&lt;vector&lt;pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&gt;&gt; <span class="built_in">route</span>(m, vector&lt;pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&gt;(n, &#123;<span class="number">0</span>, <span class="number">0</span>&#125;));</span><br><span class="line"></span><br><span class="line">    q.<span class="built_in">push</span>(&#123;<span class="number">0</span>, <span class="number">0</span>&#125;); </span><br><span class="line">    stop[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span>(!q.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">        <span class="keyword">auto</span> pos = q.<span class="built_in">front</span>();</span><br><span class="line">        q.<span class="built_in">pop</span>();</span><br><span class="line">        <span class="type">int</span> x = pos.first;</span><br><span class="line">        <span class="type">int</span> y = pos.second;</span><br><span class="line">        <span class="comment">// cout &lt;&lt; x &lt;&lt; &quot;, &quot; &lt;&lt; y &lt;&lt; endl;</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; ++i) &#123;</span><br><span class="line">            <span class="type">int</span> dx = x + dirs[i][<span class="number">0</span>];</span><br><span class="line">            <span class="type">int</span> dy = y + dirs[i][<span class="number">1</span>];</span><br><span class="line">            <span class="keyword">if</span> (dx &gt;= <span class="number">0</span> &amp;&amp; dx &lt; m &amp;&amp; dy &gt;= <span class="number">0</span> &amp;&amp; dy &lt; n) &#123;</span><br><span class="line">                <span class="keyword">if</span> ((mat[dx][dy] == <span class="number">0</span>) &amp;&amp; (stop[dx][dy] == <span class="number">-1</span>)) &#123;</span><br><span class="line">                    stop[dx][dy] = stop[x][y] + <span class="number">1</span>;</span><br><span class="line">                    route[dx][dy] = &#123;x, y&#125;;</span><br><span class="line">                    q.<span class="built_in">push</span>(&#123;dx, dy&#125;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> &amp;v : stop) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span> &amp;it : v) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%2d &quot;</span>, it);</span><br><span class="line">        &#125;</span><br><span class="line">        cout &lt;&lt; endl;</span><br><span class="line">    &#125; </span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> x = m - <span class="number">1</span>, y = n - <span class="number">1</span>; (x != <span class="number">0</span> || y != <span class="number">0</span>);) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;(%d, %d) &lt;- &quot;</span>, x, y);</span><br><span class="line">        <span class="keyword">auto</span> tmp = route[x][y];</span><br><span class="line">        x = tmp.first;</span><br><span class="line">        y = tmp.second;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;(0, 0)&quot;</span> &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> stop[m<span class="number">-1</span>][n<span class="number">-1</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; mat = &#123;&#123;<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>&#125;,</span><br><span class="line">                               &#123;<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>&#125;,</span><br><span class="line">                               &#123;<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>&#125;,</span><br><span class="line">                               &#123;<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>&#125;,</span><br><span class="line">                               &#123;<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>&#125;&#125;;</span><br><span class="line">    cout &lt;&lt; <span class="built_in">dfs</span>(mat) &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p><img src="/images/code/algo/search/BFS2.png" alt="img"></p>
 ]]></content>
       <categories>
@@ -25470,7 +25472,8 @@ tcpdump ip multicast
   <entry>
     <title>ARMv8 寄存器</title>
     <url>/2022/09/25/cpu/armv8_reg/</url>
-    <content><![CDATA[<h2 id="执行状态"><a href="#执行状态" class="headerlink" title="执行状态"></a>执行状态</h2><p>在 ARMv8 架构定义了两种执行状态：AArch64 以及 AArch32。这两种执行状态分别用于描述执行使用 64 位宽的通用寄存器或者使用 32 位宽的通用寄存器。系统运行在 64 位状态下的时候名字叫 Xn，运行在 32 位的时候就叫 Wn。32 位 W 寄存器构成相应 64 位 X 寄存器的低32位部分。</p>
+    <content><![CDATA[<h2 id="执行状态"><a href="#执行状态" class="headerlink" title="执行状态"></a>执行状态</h2><p>在 ARMv8 架构定义了两种执行状态：AArch64 以及 AArch32。这两种执行状态分别用于描述执行使用 64 位宽的通用寄存器或者使用 32 位宽的通用寄存器。系统运行在 64 位状态下的时候名字叫 Xn，运行在 32 位的时候就叫 Wn。</p>
+<p>32位W寄存器使用对应64位X寄存器的低32位，即W0对应X0的低32位，W1对应X1的低32位，以此类推。读取W寄存器时，将会舍弃高32位的数据。写入W寄存器时，会将高32位清0，例如将0xFFFFFFFF写入W0后，X0中的值位0x00000000FFFFFFFF。</p>
 <p><img src="/images/cpu/arm/reg.png" alt="img"></p>
 <h2 id="通用寄存器"><a href="#通用寄存器" class="headerlink" title="通用寄存器"></a>通用寄存器</h2><p><img src="/images/cpu/arm/reg2.png" alt="img"><br><img src="/images/cpu/arm/armv8_register.png" alt="img"></p>
 <p>AArch64执行状态拥有 31 个通用寄存器，可以在任何时间和所有异常级别访问。</p>
@@ -25494,14 +25497,130 @@ tcpdump ip multicast
 <li><p>X31：堆栈指针寄存器 SP 或零寄存器 ZXR</p>
 </li>
 </ul>
-<h2 id="特殊寄存器"><a href="#特殊寄存器" class="headerlink" title="特殊寄存器"></a>特殊寄存器</h2><p><img src="/images/cpu/arm/armv8%E7%89%B9%E6%AE%8A%E5%AF%84%E5%AD%98%E5%99%A8.png" alt="img"></p>
+<h2 id="特殊寄存器"><a href="#特殊寄存器" class="headerlink" title="特殊寄存器"></a>特殊寄存器</h2><p><strong>Zero register(WZR, XZR)</strong></p>
+<p>当访问zero寄存器，所有的写入都被丢弃，所有的读取都返回0，AArch32执行状态使用WZR指令访问zero寄存器，AArch64执行状态使用XZR访问zero寄存器。</p>
+<p><img src="/images/cpu/arm/armv8%E7%89%B9%E6%AE%8A%E5%AF%84%E5%AD%98%E5%99%A8.png" alt="img"></p>
+<p><strong>Program Counter(PC)</strong></p>
+<p>程序计数寄存器，是一个各个异常级别通用的一个寄存器。PC寄存器不能作为命名寄存器访问，而是通过确定的指令隐含的访问，如相对PC的加载和产生地址。PC寄存器不能明确的作为数据处理指令或加载指令的目的寄存器。</p>
+<p><strong>Stack Pointer(SP)</strong></p>
+<p>栈顶指针寄存器，用来描述各个栈顶的指针寄存器。每个异常级别都拥有一个SP寄存器：SP_EL0, SP_EL1, SP_EL2, SP_EL3. 通过此寄存器就可以确定当前在那个EL。AArch32执行状态使用WSP访问当前栈指针寄存器，AArch64执行状态使用SP访问当前栈指针寄存器。</p>
+<p><strong>Saved Program Status Register(SPSR)</strong></p>
+<p>当异常发生时，处理器的状态将会被保存到相应异常级别的SPSR寄存器中。异常发生后，在处理异常之前，处理器会自动的将PSTATE寄存器的内容保存到SPSR中，异常返回时，会将SPSR保存的处理器状态恢复到PSTATE中。ARMv8定义的SPSR寄存器兼容ARMv7中的SPSR寄存器，只使用低32位。</p>
+<p><img src="/images/cpu/arm/SPSR.png" alt="img"></p>
+<p>各个位域定义如下：</p>
 <ul>
-<li>Program Counter：PC程序计数寄存器，是一个各个EL通用的一个寄存器。</li>
-<li>Stack Pointer: 栈顶指针寄存器，用来描述各个栈顶的指针寄存器。这个寄存器在每个EL都会存在一个SP_EL0, SP_EL1, SP_EL2, SP_EL3. 通过此寄存器就可以确定当前在那个EL。</li>
-<li>Saved Program Status Register: 程序状态寄存器。</li>
-<li>Exception Link Register: 异常链接寄存器，保存着异常状态返回的地址。</li>
+<li>N 符号位（N flag）</li>
+<li>Z 0标志（Z flag）</li>
+<li>C 操作进位（C flag）</li>
+<li>V 溢出标志（V flag）</li>
+<li>SS 用于软件调试。异常发生的时候，通过设置MDSCR_EL1.SS为1启动单步调试机制</li>
+<li>IL 不合法的执行状态（非法异常），保存自PSTATE.IL</li>
+<li>D 处理器状态调试掩码。指示是否屏蔽来自观察点、断点和软件步骤调试事件的调试异常</li>
+<li>A 软件错误掩码位</li>
+<li>I IRQ掩码位</li>
+<li>F FIQ掩码位</li>
+<li>M[4] 发生异常时处理器的执行状态，0表示AArch64</li>
+<li>M[3:0] M[3:2]发生异常的级别；M[1]保留；M[0]根据此选择栈指针寄存器，0表示t，1表示h。可以通过异常级别的栈指针后缀表明所选的栈指针。</li>
 </ul>
+<p><strong>Exception Link Register (ELR)</strong></p>
+<p>异常链接寄存器，保存着异常返回地址。</p>
 <p>比如当一个异常发生时，处理器必须去处理异常。处理异常时候就需要使用SPSR寄存器保存异常处理前的处理器状态，就是所谓的硬件上保存现场。当处理器处理完异常后，就需要从异常返回，则就需要从ELR寄存器中返回，然后再使用SPSR寄存器恢复现场即可。</p>
+<h2 id="Processor-state-PSTATE"><a href="#Processor-state-PSTATE" class="headerlink" title="Processor state(PSTATE)"></a>Processor state(PSTATE)</h2><p>在AArch64执行状态中，处理器的状态使用PSTATE描述，但PSTATE不是寄存器，而是处理器状态各个位域的总称。</p>
+<p>在AArch64执行状态中，使用ERET命令从异常中返回，即将SPSR_ELn寄存器中保存的发生异常时的处理器状态恢复到PSTATE中。SPSR_ELn中保存了发生异常时ALU的标志、执行状态、异常级别及处理器branches。处理器从异常返回后的执行地址保存在ELR_ELn中。</p>
+<h2 id="系统寄存器"><a href="#系统寄存器" class="headerlink" title="系统寄存器"></a>系统寄存器</h2><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>寄存器</th>
+<th>描述</th>
+<th>允许的异常级别</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ACTLR_ELn</td>
+<td>辅助控制寄存器</td>
+<td>控制处理器详细的特性</td>
+<td>1，2，3</td>
+</tr>
+<tr>
+<td>CCSIDR_ELn</td>
+<td>当前Cache Size ID寄存器</td>
+<td>当前架构所选择cache的信息</td>
+<td>1</td>
+</tr>
+<tr>
+<td>CLIDR_ELn</td>
+<td>Cache Level ID寄存器</td>
+<td>每个级别的cache类型及实现</td>
+<td>1，2，3</td>
+</tr>
+<tr>
+<td>CNTFRQ_ELn</td>
+<td>计时器频率寄存器</td>
+<td>反应了系统定时器的频率</td>
+<td>0</td>
+</tr>
+<tr>
+<td>CNTPCT_ELn</td>
+<td>计时器物理计数寄存器</td>
+<td>保存了当前64位计数值</td>
+<td>0</td>
+</tr>
+<tr>
+<td>CNTKCTL_ELn</td>
+<td>内核计时器控制寄存器</td>
+<td>控制从虚拟计数器生成事件流</td>
+<td>1</td>
+</tr>
+<tr>
+<td>CPACR_ELn</td>
+<td>协处理器访问控制寄存器</td>
+<td>控制访问Trace、 floating-point及NEON</td>
+<td>1</td>
+</tr>
+<tr>
+<td>CSSELR_ELn</td>
+<td>Cache Size选择寄存器</td>
+<td>定义了要求的cache级别、cache类型及指令cache或数据cache</td>
+<td>1</td>
+</tr>
+<tr>
+<td>CNTP_CTL_ELn</td>
+<td>物理计时器控制寄存器</td>
+<td>EL1物理计时器的控制寄存器</td>
+<td>0</td>
+</tr>
+<tr>
+<td>ELR_ELn</td>
+<td>Exception Link Register</td>
+<td>保存异常返回地址</td>
+<td>1，2，3</td>
+</tr>
+<tr>
+<td>ESR_ELn</td>
+<td>Exception Syndrome Register</td>
+<td>保存了发生异常的原因</td>
+<td>1，2，3</td>
+</tr>
+<tr>
+<td>FAR_ELn</td>
+<td>Fault Address Register</td>
+<td>保存了virtual faulting address</td>
+<td>1，2，3</td>
+</tr>
+<tr>
+<td>SCTLR_ELn</td>
+<td>系统控制寄存器</td>
+<td>控制架构特性，如MMU、caches及对齐检查</td>
+<td>0，1，2，3</td>
+</tr>
+<tr>
+<td>SPSR_ELn</td>
+<td>Saved Program Status Registe</td>
+<td>发生异常时，保存处理器的状态</td>
+<td>abt，fiq，irq， und，1，2，3</td>
+</tr>
+</tbody></table>
 <h2 id="NEON和浮点寄存器"><a href="#NEON和浮点寄存器" class="headerlink" title="NEON和浮点寄存器"></a>NEON和浮点寄存器</h2><p>armV8有32个128bit的浮点寄存器 V0-V31， 这些寄存器用来处理标量浮点运算时保存浮点操作数，或NEON 操作时保存标量和向量操作数。</p>
 <p><img src="/images/cpu/arm/armv8_simd_reg.png" alt="img"></p>
 <h2 id="兼容ARMv7"><a href="#兼容ARMv7" class="headerlink" title="兼容ARMv7"></a>兼容ARMv7</h2><p><img src="/images/cpu/arm/armv8_reg_map.png" alt="img"></p>
@@ -25739,7 +25858,8 @@ tcpdump ip multicast
 <p>SIMD（Single Instruction Multiple Data，单指令多数据）指令通过一条语句处理多个数据。在多媒体应用中，同一操作会重复处理多个数据，SIMD指令就特别适合处理这一类数据。</p>
 <p><strong>线程并行</strong></p>
 <p>线程并行的方式有：单核内多线程、多核、多处理器。</p>
-<p>超线程是Intel公司提出的一种提高CPU性能的技术，就是将一个物理CPU当作两个逻辑CPU使用，使CPU可以同时执行多重线程，从而发挥更大的效率。超线程技术利用特殊的硬件指令，把两个逻辑内核模拟成两个物理芯片，让单个处理器都能使用线程级并行计算，进而兼容多线程操作系统和应用软件，减少CPU的闲置时间，提高CPU的运行效率。</p>
+<p>流水线是一种在垂直方向上对指令处理进行重叠来提升性能的技术，相对地，在水平方向上将指令进行重叠的技术称为<strong>超标量</strong>（superscalar）。也就是说，在没有相互依赖关系的前提下，多条指令可以同时执行。</p>
+<p>超线程是Intel公司提出的一种提高CPU性能的技术，就是将一个物理CPU当作两个逻辑CPU使用，使CPU可以同时执行多重线程，同时处理多个取出并执行指令的控制流程，从而将没有相互依赖关系的运算同时送入运算器中。超线程技术利用特殊的硬件指令，把两个逻辑内核模拟成两个物理芯片，让单个处理器都能使用线程级并行计算，进而兼容多线程操作系统和应用软件，减少CPU的闲置时间，提高CPU的运行效率。</p>
 <h2 id="核间通信"><a href="#核间通信" class="headerlink" title="核间通信"></a>核间通信</h2><p>多核处理器的多个核之间会共用处理器的外设与接口，如内存控制器、PCI-E接口等，通常也会共享一段Cache。核与核之间有时需要交换信息，因此核间连接/通信方式的选取也很关键。常见的几种多核组织结构：</p>
 <ul>
 <li><p>Bus结构比较简单，缺点是每两个内核通信都要占用总线，导致其它核不能通信，通信效率低。</p>
@@ -25864,11 +25984,11 @@ tcpdump ip multicast
 <p><strong>分类</strong></p>
 <p>从授权上，分为免费授权版和付费授权版。免费版目前有三大主流工具商提供，第一是GNU（提供源码，自行编译制作），第二是 Codesourcery，第三是Linora。收费版有ARM原厂提供的armcc、IAR提供的编译器等等。</p>
 <ul>
-<li><p>arm-none-linux-gnueabi-gcc：是 Codesourcery 公司（目前已经被Mentor收购）基于GCC推出的的ARM交叉编译工具。可用于交叉编译ARM（32位）系统中所有环节的代码，包括裸机程序、u-boot、Linux kernel、filesystem和App应用程序。</p>
-</li>
 <li><p>arm-linux-gnueabihf-gcc：是由 Linaro 公司基于GCC推出的的ARM交叉编译工具。可用于交叉编译ARM（32位）系统中所有环节的代码，包括裸机程序、u-boot、Linux kernel、filesystem和App应用程序。</p>
 </li>
 <li><p>aarch64-linux-gnu-gcc：是由 Linaro 公司基于GCC推出的的ARM交叉编译工具。可用于交叉编译ARMv8 64位目标中的裸机程序、u-boot、Linux kernel、filesystem和App应用程序。</p>
+</li>
+<li><p>arm-none-linux-gnueabi-gcc：是 Codesourcery 公司（目前已经被Mentor收购）基于GCC推出的的ARM交叉编译工具。可用于交叉编译ARM（32位）系统中所有环节的代码，包括裸机程序、u-boot、Linux kernel、filesystem和App应用程序。</p>
 </li>
 <li><p>arm-none-elf-gcc：是 Codesourcery 公司（目前已经被Mentor收购）基于GCC推出的的ARM交叉编译工具。可用于交叉编译ARM MCU（32位）芯片，如ARM7、ARM9、Cortex-M/R芯片程序。</p>
 </li>
@@ -25896,8 +26016,7 @@ tcpdump ip multicast
 </ul>
 <p>arm-none-eabi-gcc（ARM architecture，no vendor，not target an operating system，complies with the ARM EABI）<br>用于编译 ARM 架构的裸机系统（包括 ARM Linux 的 boot、kernel，不适用编译 Linux 应用 Application），一般适合 ARM7、Cortex-M 和 Cortex-R 内核的芯片使用。</p>
 <p>arm-none-linux-gnueabi-gcc(ARM architecture, no vendor, creates binaries that run on the Linux operating system, and uses the GNU EABI)主要用于基于ARM架构的Linux系统，可用于编译 ARM 架构的 u-boot、Linux内核、linux应用等。arm-none-linux-gnueabi基于GCC，使用Glibc库，经过 Codesourcery 公司优化过推出的编译器。arm-none-linux-gnueabi-xxx 交叉编译工具的浮点运算非常优秀。一般ARM9、ARM11、Cortex-A 内核，带有 Linux 操作系统的会用到。</p>
-<p>arm-linux-gnueabi-gcc 和 arm-linux-gnueabihf-gcc两个交叉编译器分别适用于 armel 和 armhf 两个不同的架构，armel 和 armhf 这两种架构在对待浮点运算采取了不同的策略（有 fpu 的 arm 才能支持这两种浮点运算策略）。</p>
-<p>其实这两个交叉编译器只不过是 gcc 的选项 -mfloat-abi 的默认值不同。gcc 的选项 -mfloat-abi 有三种值 soft、softfp、hard（其中后两者都要求 arm 里有 fpu 浮点运算单元，soft 与后两者是兼容的，但 softfp 和 hard 两种模式互不兼容）：</p>
+<p>arm-linux-gnueabi-gcc 和 arm-linux-gnueabihf-gcc两个交叉编译器分别适用于 armel 和 armhf 两个不同的架构，armel 和 armhf 这两种架构在对待浮点运算采取了不同的策略（有 fpu 的 arm 才能支持这两种浮点运算策略）。其实这两个交叉编译器只不过是 gcc 的选项 -mfloat-abi 的默认值不同。gcc 的选项 -mfloat-abi 有三种值 soft、softfp、hard（其中后两者都要求 arm 里有 fpu 浮点运算单元，soft 与后两者是兼容的，但 softfp 和 hard 两种模式互不兼容）：</p>
 <ul>
 <li><p>soft： 不用fpu进行浮点计算，即使有fpu浮点运算单元也不用，而是使用软件模式。</p>
 </li>
@@ -25930,8 +26049,24 @@ tcpdump ip multicast
 <p><strong>数组法</strong></p>
 <figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Fibonacci_2</span><span class="params">(<span class="type">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> *array = <span class="keyword">new</span> <span class="type">int</span>[n + <span class="number">2</span>];</span><br><span class="line">    array[<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">    array[<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">        <span class="keyword">if</span> (i &gt; <span class="number">1</span>) &#123;</span><br><span class="line">            array[i] = array[i - <span class="number">1</span>] + array[i - <span class="number">2</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        cout &lt;&lt; array[i] &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span>[] array;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><strong>递归法</strong></p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">static</span> <span class="type">int</span> <span class="title">fibonacci</span><span class="params">(<span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (n &lt; <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">fibonacci</span>(n - <span class="number">1</span>) + <span class="built_in">fibonacci</span>(n - <span class="number">2</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Fibonacci_3</span><span class="params">(<span class="type">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="built_in">fibonacci</span>(i) &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>暴力递归法</strong></p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">fibonacci</span><span class="params">(<span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (n &lt; <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">fibonacci</span>(n - <span class="number">1</span>) + <span class="built_in">fibonacci</span>(n - <span class="number">2</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Fibonacci_3</span><span class="params">(<span class="type">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="built_in">fibonacci</span>(i) &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>带备忘录的递归解法</strong></p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">memo</span><span class="params">(<span class="number">64</span>, <span class="number">0</span>)</span></span>;</span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">fibonacci_memo</span><span class="params">(<span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (n &lt; <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (memo[n] != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> memo[n];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    memo[n] = <span class="built_in">fibonacci_memo</span>(n - <span class="number">1</span>) + <span class="built_in">fibonacci_memo</span>(n - <span class="number">2</span>);</span><br><span class="line">    <span class="keyword">return</span> memo[n];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Fibonacci</span><span class="params">(<span class="type">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="built_in">fibonacci_memo</span>(i) &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>dp 数组的迭代解法</strong></p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">fibonacci_dp</span><span class="params">(<span class="type">int</span> n)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">dp</span><span class="params">(n + <span class="number">1</span>, <span class="number">0</span>)</span></span>;</span><br><span class="line">    dp[<span class="number">0</span>] = dp[<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">2</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        dp[i] = dp[i - <span class="number">1</span>] + dp[i - <span class="number">2</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> dp[n];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Fibonacci</span><span class="params">(<span class="type">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="built_in">fibonacci_dp</span>(i) &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>algorithm</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>动态规划</title>
+    <url>/2022/10/30/algo/dynamic/</url>
+    <content><![CDATA[<p>动态规划的核心思想就是穷举求最值，如果暴力穷举的话效率会极其低下，需要「备忘录」或者「DP table」来优化穷举过程，避免不必要的计算。</p>
+<p>带备忘录的递归解法叫做「自顶向下」，动态规划叫做「自底向上」</p>
 ]]></content>
       <categories>
         <category>algorithm</category>

@@ -176,6 +176,88 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/poll/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/kernel/poll/" class="post-title-link" itemprop="url">poll</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="poll"><a href="#poll" class="headerlink" title="poll"></a>poll</h2><p>使用非阻塞 I/O的应用程序通常会使用 select()和 poll()查询是否可对设备进行无阻塞的访问。应用层调用select()最终会引发设备驱动中的 poll()函数被执行。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="title function_">int</span> <span class="params">(*poll)</span> <span class="params">(<span class="keyword">struct</span> file *, <span class="keyword">struct</span> poll_table *)</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLIN      0x0001</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLPRI     0x0002</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLOUT     0x0004</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLERR     0x0008</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLHUP     0x0010</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLNVAL    0x0020</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLRDNORM  0x0040</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLRDBAND  0x0080</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLWRNORM  0x0100</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLWRBAND  0x0200</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLMSG     0x0400</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLREMOVE  0x1000</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLRDHUP       0x2000</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">poll_wait</span><span class="params">(<span class="keyword">struct</span> file * filp, <span class="type">wait_queue_head_t</span> * wait_address, poll_table *p)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>驱动要实现poll函数，主要工作为：对可能引起设备文件状态变化的等待队列调用 poll_wait()函数，将对应的等待队列头添加到 poll_table中，poll_wait()并不会引起阻塞。返回表示是否能对设备进行无阻塞读、写访问的掩码。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">xxx_poll</span><span class="params">(<span class="keyword">struct</span> file *filp, <span class="keyword">struct</span> poll_table_struct *wait)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> mask = <span class="number">0</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">xxx_object</span> *<span class="title">dev</span> =</span> filp-&gt;private_data;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    poll_wait(filp, &amp;dev-&gt;read_wait, wait);</span><br><span class="line">    poll_wait(filp, &amp;dev-&gt;write_wait, wait);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (...) <span class="comment">//可读 </span></span><br><span class="line">    &#123;</span><br><span class="line">        mask |= POLLIN | POLLRDNORM; <span class="comment">/*数据可获得*/</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (...) <span class="comment">//可写 </span></span><br><span class="line">    &#123;</span><br><span class="line">        mask |= POLLOUT | POLLWRNORM; <span class="comment">/*数据可写入*/</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> mask;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/select.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*清除一个文件描述符集*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_ZERO</span><span class="params">(fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*将一个文件描述符从文件描述符集中清除*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_CLR</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*将一个文件描述符加入文件描述符集*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_SET</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*判断文件描述符是否被置位*/</span></span><br><span class="line"><span class="type">int</span>  <span class="title function_">FD_ISSET</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">select</span><span class="params">(<span class="type">int</span> nfds, fd_set *readfds, fd_set *writefds,</span></span><br><span class="line"><span class="params">                  fd_set *exceptfds, <span class="keyword">struct</span> timeval *timeout)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>readfds、writefds、exceptfds 分别是被 select()监视的读、写和异常处理的文件描述符集合，numfds 参数是要检查的最高的文件描述符加1，timeout 参数是超时时间。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/platform/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1367,84 +1449,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/iniparser/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/c/iniparser/" class="post-title-link" itemprop="url">iniparser 开源库</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:28:24" itemprop="dateModified" datetime="2022-06-08T17:28:24+08:00">2022-06-08</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>iniparser是针对INI文件的解析器。</p>
-<h2 id="ini文件"><a href="#ini文件" class="headerlink" title="ini文件"></a>ini文件</h2><p>ini文件的最基本组成单元就是key，每个key都有一个name和对应的value：</p>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">;注释以分号开头</span></span><br><span class="line"><span class="attr">name</span>=value <span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<p>多个Key可以被归类为一组，即section。组名定义要独立一行，并用中括号括起来：</p>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[section]</span></span><br><span class="line"><span class="attr">name</span>=value12</span><br></pre></td></tr></table></figure>
-
-<p>在section声明下的keys都会和该section关联起来。一个section的作用域会在下一个section声明的地方结束，如果没有下一个section的声明，那么该section的结束地方就是该文件末尾，section是不可以嵌套的。定位一个key是用section:key来表示的，所以不同section下的key的名称是可以相同的。</p>
-<p>iniparser库处理名称的时候，会统一换成小写，所以section和key的命名是大小写无关的。</p>
-<h2 id="API"><a href="#API" class="headerlink" title="API"></a>API</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;iniparser.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_getnsec</span><span class="params">(dictionary * d)</span>;  </span><br><span class="line"><span class="comment">//获取dictionary对象的section个数</span></span><br><span class="line"> </span><br><span class="line"><span class="type">char</span> * <span class="title function_">iniparser_getsecname</span><span class="params">(dictionary * d, <span class="type">int</span> n)</span>; </span><br><span class="line"><span class="comment">//获取dictionary对象的第n个section的名字</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">iniparser_dump_ini</span><span class="params">(dictionary * d, FILE * f)</span>;  </span><br><span class="line"><span class="comment">//保存dictionary对象到file</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">iniparser_dumpsection_ini</span><span class="params">(dictionary * d, <span class="type">char</span> * s, FILE * f)</span>; </span><br><span class="line"><span class="comment">//保存dictionary对象一个section到file</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">iniparser_dump</span><span class="params">(dictionary * d, FILE * f)</span>;  </span><br><span class="line"><span class="comment">//保存dictionary对象到file</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_getsecnkeys</span><span class="params">(dictionary * d, <span class="type">char</span> * s)</span>;    </span><br><span class="line"><span class="comment">//获取dictionary对象某个section下的key个数</span></span><br><span class="line"> </span><br><span class="line"><span class="type">char</span> ** <span class="title function_">iniparser_getseckeys</span><span class="params">(dictionary * d, <span class="type">char</span> * s)</span>; </span><br><span class="line"><span class="comment">//获取dictionary对象某个section下所有的key</span></span><br><span class="line"> </span><br><span class="line"><span class="type">char</span> * <span class="title function_">iniparser_getstring</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">char</span> * def)</span>;   </span><br><span class="line"><span class="comment">//返回dictionary对象的section:key对应的字串值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_getint</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">int</span> notfound)</span>;   </span><br><span class="line"><span class="comment">//返回idictionary对象的section:key对应的整形值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">double</span> <span class="title function_">iniparser_getdouble</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">double</span> notfound)</span>;  </span><br><span class="line"><span class="comment">//返回dictionary对象的section:key对应的双浮点值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_getboolean</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">int</span> notfound)</span>;   </span><br><span class="line"><span class="comment">//返回dictionary对象的section:key对应的布尔值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_set</span><span class="params">(dictionary * ini, <span class="type">const</span> <span class="type">char</span> * entry, <span class="type">const</span> <span class="type">char</span> * val)</span>;  </span><br><span class="line"><span class="comment">//设置dictionary对象的某个section:key的值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">iniparser_unset</span><span class="params">(dictionary * ini, <span class="type">const</span> <span class="type">char</span> * entry)</span>; </span><br><span class="line"><span class="comment">//删除dictionary对象中某个section:key</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_find_entry</span><span class="params">(dictionary * ini, <span class="type">const</span> <span class="type">char</span> * entry)</span> ;    </span><br><span class="line"><span class="comment">//判断dictionary对象中是否存在某个section:key</span></span><br><span class="line"> </span><br><span class="line">dictionary * <span class="title function_">iniparser_load</span><span class="params">(<span class="type">const</span> <span class="type">char</span> * ininame)</span>;  </span><br><span class="line"><span class="comment">//解析dictionary对象并返回(分配内存)dictionary对象</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">iniparser_freedict</span><span class="params">(dictionary * d)</span>;    </span><br><span class="line"><span class="comment">//释放dictionary对象(内存)</span></span><br><span class="line"> </span><br><span class="line"><span class="type">unsigned</span> <span class="title function_">dictionary_hash</span><span class="params">(<span class="type">const</span> <span class="type">char</span> * key)</span>; </span><br><span class="line"><span class="comment">//计算关键词的hash值</span></span><br><span class="line"> </span><br><span class="line">dictionary * <span class="title function_">dictionary_new</span><span class="params">(<span class="type">int</span> size)</span>;  </span><br><span class="line"><span class="comment">//创建dictionary对象</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">dictionary_del</span><span class="params">(dictionary * vd)</span>;   </span><br><span class="line"><span class="comment">//删除dictionary对象</span></span><br><span class="line"> </span><br><span class="line"><span class="type">char</span> * <span class="title function_">dictionary_get</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">char</span> * def)</span>;    </span><br><span class="line"><span class="comment">//获取dictionary对象的key值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">dictionary_set</span><span class="params">(dictionary * vd, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">const</span> <span class="type">char</span> * val)</span>;    </span><br><span class="line"><span class="comment">//设置dictionary对象的key值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">dictionary_unset</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key)</span>;    </span><br><span class="line"><span class="comment">//删除dictionary对象的key值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">dictionary_dump</span><span class="params">(dictionary * d, FILE * out)</span>;   </span><br><span class="line"><span class="comment">//保存dictionary对象</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[tcp]</span></span><br><span class="line"><span class="comment">;for tcp communication</span></span><br><span class="line"> </span><br><span class="line"><span class="attr">port</span> = <span class="number">8000</span><span class="comment">;</span></span><br><span class="line"><span class="attr">ip</span> = <span class="number">127.0</span>.<span class="number">0.1</span><span class="comment">;</span></span><br><span class="line"><span class="attr">family</span> = AF_INET<span class="comment">;</span></span><br><span class="line"> </span><br><span class="line"><span class="section">[serial port]</span></span><br><span class="line"><span class="comment">;for serial port communication</span></span><br><span class="line"> </span><br><span class="line"><span class="attr">speed</span> = <span class="number">9600</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;iniparser.h&quot;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    dictionary *ini;</span><br><span class="line">    <span class="type">int</span> n = <span class="number">0</span>;</span><br><span class="line">    <span class="type">char</span> *str;</span><br><span class="line"></span><br><span class="line">    ini = iniparser_load(<span class="string">&quot;example.ini&quot;</span>);<span class="comment">//parser the file</span></span><br><span class="line">    <span class="keyword">if</span>(ini == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>,<span class="string">&quot;can not open %s&quot;</span>,<span class="string">&quot;example.ini&quot;</span>);</span><br><span class="line">        <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;dictionary obj:\n&quot;</span>);</span><br><span class="line">    iniparser_dump(ini,<span class="built_in">stderr</span>);<span class="comment">//save ini to stderr</span></span><br><span class="line"> </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n%s:\n&quot;</span>,iniparser_getsecname(ini,<span class="number">0</span>));<span class="comment">//get section name</span></span><br><span class="line"></span><br><span class="line">    n = iniparser_getint(ini,<span class="string">&quot;tcp:port&quot;</span>,<span class="number">-1</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;port : %d\n&quot;</span>,n);</span><br><span class="line"></span><br><span class="line">    str = iniparser_getstring(ini,<span class="string">&quot;tcp:ip&quot;</span>,<span class="string">&quot;null&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;ip : %s\n&quot;</span>,str);</span><br><span class="line"></span><br><span class="line">    str = iniparser_getstring(ini,<span class="string">&quot;tcp:family&quot;</span>,<span class="string">&quot;null&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;family : %s\n&quot;</span>,str);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n%s:\n&quot;</span>,iniparser_getsecname(ini,<span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    n = iniparser_getint(ini,<span class="string">&quot;serial port:speed&quot;</span>,<span class="number">-1</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;speed : %d\n&quot;</span>,n);</span><br><span class="line"></span><br><span class="line">    iniparser_freedict(ini);<span class="comment">//free dirctionary obj</span></span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1514,7 +1518,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">214</span>
+          <span class="site-state-item-count">215</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
