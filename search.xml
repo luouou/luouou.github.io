@@ -18836,109 +18836,6 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
       </tags>
   </entry>
   <entry>
-    <title>IP and MAC</title>
-    <url>/2022/06/21/net/ip-mac/</url>
-    <content><![CDATA[<h2 id="IP"><a href="#IP" class="headerlink" title="IP"></a>IP</h2><h3 id="IPv4"><a href="#IPv4" class="headerlink" title="IPv4"></a>IPv4</h3><p>IPv4 地址共32位，每 8 位作为一组，用点分十进制的表示方式，包含两部分：网络号负责标识该 IP 地址是属于哪个子网的；主机号负责标识同一子网下的不同主机。</p>
-<p>子网掩码也是32bit，为1的部分表示网络号，为0的部分表示主机号，将子网掩码和IP地址相与，可以计算出网络号和主机号。主机号部分全部为0代表整个子网，主机号部分全部为1代表广播地址，向子网上所有设备发送包。</p>
-<p><img src="/images/net/tcpip/ip_name.png" alt="ip_name"></p>
-<p>本地回环地址127.0.0.1指的是本机地址，等效于localhost或本机IP。不会跟着网络情况的变化而变化。它代表设备的本地虚拟接口，被看作是永远不会宕掉的接口。127.0.0.1 ~ 127.255.255.254范围都是本地回环地址。作用是测试本机的网络配置，能ping通说明本机网络协议正常。</p>
-<p>IP 地址分为A类、B类、C类、D类、E类，其中D类和E类没有主机号的，所以不可用于主机 IP，D类常被用于多播，E类预留未使用。</p>
-<p><img src="/images/net/tcpip/ip_class.webp" alt="ip_class"></p>
-<p><img src="/images/net/tcpip/ip_class.png" alt="ip_class"></p>
-<h3 id="IP头"><a href="#IP头" class="headerlink" title="IP头"></a>IP头</h3><p><img src="/images/net/tcpip/ip_head.png" alt="img"></p>
-<p>经过分片之后的 IP 数据，只能由目标主机进行重组，路由器并不会重组。</p>
-<h3 id="IPv6"><a href="#IPv6" class="headerlink" title="IPv6"></a>IPv6</h3><p>IPv6 地址⻓度是 128 位，以每 16 位作为一组，每组用冒号:隔开。</p>
-<p>IPv6 的地址主要有以下类型地址:</p>
-<ul>
-<li>单播地址，用于一对一的通信</li>
-<li>组播地址，用于一对多的通信</li>
-<li>任播地址，用于通信最近的节点，最近的节点是由路由协议决定</li>
-<li>没有广播地址</li>
-</ul>
-<p><img src="/images/net/tcpip/ipv6.png" alt="img"></p>
-<ul>
-<li><p>取消了首部校验和字段。 因为在数据链路层和传输层都会校验，因此 IPv6 直接取消了 IP 的校验。</p>
-</li>
-<li><p>取消了分片/重新组装相关字段。 分片与重组是耗时的过程，IPv6 不允许在中间路由器进行分片与重组，这种操作只能在源与目标主机，这将大大提高了路由器转发的速度。</p>
-</li>
-<li><p>取消选项字段。 选项字段不再是标准 IP 首部的一部分了，但它并没有消失，而是可能出现在 IPv6 首部中的下一个首部指出的位置上。删除该选项字段使的 IPv6 的首部成为固定⻓度的 40 字节。</p>
-</li>
-</ul>
-<h2 id="IP协议"><a href="#IP协议" class="headerlink" title="IP协议"></a>IP协议</h2><p>IP 协议(Internet Protocol)负责在主机和网络之间寻址和路由数据包。</p>
-<p>IP地址的网络地址这一部分是用于进行路由控制，路由控制表中记录着网络地址与下一步应该发送至路由器的地址。在发送 IP 包时，首先要确定 IP 包首部中的目标地址，再从路由控制表中找到与该地址具有相同网络地址的记录，根据该记录将 IP 包转发给相应的下一个路由器。如果路由控制表中存在多条相同网络地址的记录，就选择相同位数最多的网络地址，也就是最⻓匹配。</p>
-<p>IP 模块会添加 IP 头部和 MAC 头部这两种头部。IP 头部包含目的地的 IP 地址，MAC 头部包含 MAC 地址。IP 协议会查找下一个路由器的MAC 地址，并将这个地址写入 MAC 头部中。这样一来，以太网协议就知道要将这个包发到哪一个路由器上了。</p>
-<h3 id="DNS"><a href="#DNS" class="headerlink" title="DNS"></a>DNS</h3><p>DNS(Domain Name System)域名服务系统，将域名网址自动解析为具体的 IP 地址。</p>
-<p>查询 IP 地址时，浏览器会使用系统 Socket 库中的解析器， 向 DNS 服务器发送查询消息，然后 DNS 服务器会从域名与 IP 地址的对照表中查找相应的记录，并返回 IP 地址。客户端的查询消息包含以下 3 种信息：</p>
-<ul>
-<li>域名：服务器、邮件服务器(邮件地址中 @ 后面的部分)的名称。</li>
-<li>Class：网络的信息标识。如今 Class 的值永远是代表互联网的 IN。</li>
-<li>记录类型：表示域名对应何种类型的记录。例如，当类型为 A 时，表示域名对应的是 IP 地址；当类型为 MX 时，表示域名对应的是邮件服务器。对于不同的记录类型，服务器向客户端返回的信息也会不同。</li>
-</ul>
-<p><img src="/images/net/dns_msg.png" alt="dns_msg"></p>
-<h3 id="ARP"><a href="#ARP" class="headerlink" title="ARP"></a>ARP</h3><p>ARP 用于根据 IP 地址查询相应的以太网 MAC 地址。</p>
-<p>主机会通过广播发送 ARP 请求，这个包中包含了想要查询的 MAC 地址的主机 IP 地址。当同个链路中的所有设备收到 ARP 请求时，会去拆开 ARP 请求包里的内容，如果 ARP 请求包中的目标 IP地址与自己的 IP 地址一致，那么这个设备就将自己的 MAC 地址塞入 ARP 响应包返回给主机。通常操作系统会把获取的 MAC 地址缓存起来，可以使用 <code>arp -a</code> 命令来查看。</p>
-<p>RARP 协议是根据 MAC 地址求 IP 地址。</p>
-<h3 id="DHCP"><a href="#DHCP" class="headerlink" title="DHCP"></a>DHCP</h3><p>DHCP(Dynamic Host Configuration Protocol)动态主机配置协议。能实现自动设置 IP 地址、统一管理 IP 地址分配。DHCP 服务器分配的 IP 地址只能在租期内使用。</p>
-<h4 id="udhcpc"><a href="#udhcpc" class="headerlink" title="udhcpc"></a>udhcpc</h4><p>默认的目录文件是/usr/share/udhcpc/default.script，当udhcpc 取得了IP地址之后，会把从DHCP server 得到的信息带入 script执行。</p>
-<h3 id="NET"><a href="#NET" class="headerlink" title="NET"></a>NET</h3><p>NAT就是同个公司、家庭、教室内的主机对外部通信时，把私有 IP 地址转换成公有 IP 地址。</p>
-<h3 id="ICMP"><a href="#ICMP" class="headerlink" title="ICMP"></a>ICMP</h3><p>ICMP(Internet Control Message Protocol)互联网控制报文协议，用于告知网络包传送过程中产生的错误以及各种控制信息。在 IP 通信中如果某个 IP 包因为某种原因未能达到目标地址，那么这个具体的原因将由 ICMP 负责通知。</p>
-<h3 id="IGMP"><a href="#IGMP" class="headerlink" title="IGMP"></a>IGMP</h3><p>被IP主机用来向本地多路广播路由器报告主机组成员的协议。</p>
-<h2 id="路由器"><a href="#路由器" class="headerlink" title="路由器"></a>路由器</h2><p>路由器是按照IP 协议传输包的设备，根据接收到的包的 IP 头部中记录的接收方 IP 地址，在路由表中进行查询，以此判断转发目标。</p>
-<p>路由器已经集成了集线器和交换机的功能，俗称三层网络设备，每个端口都具有 MAC 地址和 IP 地址，只接收与自身地址匹配的包，不匹配的包则直接丢弃。</p>
-<p><img src="/images/net/route_map.png" alt="img"></p>
-<p>路由器忽略主机号部分，只匹配网络号。路由表的子网掩码列只是用来在匹配目标地址时告诉路由器应该匹配多少个比特。根据目标地址和子网掩码匹配到某条记录后，路由器就会将网络包交给接口列中指定的端口，并转发到网关列中指定的 IP 地址。跃点计数表示距离目标 IP 地址的距离的远近。数字越小表示距离目的地越近；数字越大表示距离目的地越远。</p>
-<p>路由表中子网掩码为 0.0.0.0 的记录表示默认路由，这一行配置的网关地址被称为默认网关，无论任何地址都能匹配到这一条记录。</p>
-<p>路由器优先选择主机号比特数越短，跃点计数较小的记录。如果在路由表中无法找到匹配的记录，路由器会丢弃这个包，并通过ICMP 消息告知发送方 。</p>
-<p>路由器会更新 IP 头部中的 TTL字段。TTL 字段表示包的有效期，包每经过一个路由器的转发，这个值就会减 1，当这个值变成 0 时，就表示超过了有效期，这个包就会被丢弃。</p>
-<p>对于长度大于输出端口MTU的转发包，路由器会根据IP 头部中的标志字段，确认是否可以分片。如果查询标志字段发现不能分片，那么就只能丢弃这个包，并通过ICMP 消息通知发送方。在分片中，TCP 头部及其后面的部分都是可分片的数据，每一份数据前面会加上 IP 头部。</p>
-<p>路由转发和IP 模块发送包的过程是相同的，会在包前面加上 MAC 头部，也是从路由表的网关列中查找出下一个路由器的 IP 地址，如果网关是一个 IP 地址，则这个IP 地址就是我们要转发到的目标地址；如果网关为空 ，则 IP 头部中的接收方 IP 地址就是要转发到的目标地址。然后通过 ARP 根据 IP 地址查询出 MAC 地址，然后将 MAC 地址写入 MAC 头部。</p>
-<p>内网与互联网连接需要地址转换。地址转换的基本原理是在转发网络包时对 IP 头部中的 IP 地址和端口号进行改写。因为公网IP只有一个，所以要根据不同的端口号区分内网不同的私有地址，路由器会保存私有地址与端口号对应的记录。如果私有地址和端口号没有保存在对应表中，外网是无法访问私有地址的，除非手动添加记录。</p>
-<h2 id="MAC"><a href="#MAC" class="headerlink" title="MAC"></a>MAC</h2><p>MAC 地址共有 48 bit，用来唯一标识设备，在网卡生产时写入 ROM 里的，网卡驱动程序读取并分配给 MAC模块。通过 ARP 可以查询目标路由器的 MAC 地址。</p>
-<table>
-<thead>
-<tr>
-<th align="center">bit</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">1</td>
-<td>0 单播地址<br/>1 多播地址</td>
-</tr>
-<tr>
-<td align="center">2</td>
-<td>0 全局地址<br/>1 本地地址</td>
-</tr>
-<tr>
-<td align="center">3-24</td>
-<td>厂商识别码</td>
-</tr>
-<tr>
-<td align="center">25-48</td>
-<td>网卡唯一标识</td>
-</tr>
-</tbody></table>
-<p>MAC 头部是以太网使用的头部，它包含了接收方和发送方的 MAC 地址等信息，其作用就是将包送达路由器。</p>
-<p><img src="/images/net/tcpip/mac_head.png" alt="img"></p>
-<h2 id="网卡"><a href="#网卡" class="headerlink" title="网卡"></a>网卡</h2><p>网卡驱动从 IP 模块获取包之后，会将其复制到网卡内的缓冲区中，然后向MAC 模块发送发送包的命令。MAC 模块会将包从缓冲区中取出，并在开头加上报头和起始帧分界符，在末尾加上用于检测错误的帧校验序列。再将数字信息按每个比特转换成电信号，然后由 PHY信号收发模块发送出去。</p>
-<p><img src="/images/net/tcpip/pack.png" alt="img"></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">修改MAC地址</span></span><br><span class="line">ifconfig eth0 hw ether 12:34:56:78:90:12</span><br></pre></td></tr></table></figure>
-
-<h2 id="交换机"><a href="#交换机" class="headerlink" title="交换机"></a>交换机</h2><p>交换机将网络包原样转发到目的地，交换机根据 MAC 地址表查找 MAC 地址，然后将信号发送到相应的端口。交换机的 MAC 地址表主要包含两个信息:设备的 MAC 地址，和该设备连接在交换机的端口。</p>
-<p>如果MAC地址表中找不到指定的 MAC 地址。这可能是因为具有该地址的设备还没有向交换机发送过包，或者这个设备一段时间没有工作导致地址被从地址表中删除了。这种情况下，交换机会将包转发到除了源端口之外的所有端口。</p>
-<p>交换机是基于以太网设计的，俗称二层网络设备，交换机工作在全双工模式。</p>
-<p><img src="/images/net/switch.png" alt="img"></p>
-<p>交换机会自行更新或删除地址表中的记录，当收到包时会将发送方 MAC 地址以及其输入端口的号码写入MAC 地址表中，当端口上的设备长时间不工作，就会删除记录。</p>
-<p>计算机的网卡本身具有 MAC 地址，并通过核对收到的包的接收方 MAC 地址判断是不是发给自己的，如果不是发给自己的则丢弃。相对地，交换机的端口不具有 MAC 地址的端口，故不会核对接收方 MAC 地址，而是直接接收所有的包并存放到缓冲区中。</p>
-<h2 id="集线器"><a href="#集线器" class="headerlink" title="集线器"></a>集线器</h2><p>集线器是根据以太网协议工作的设备，集线器里有一张以太网协议的表，根据以太网头部中记录的目的地信息查出相应的传输方向，在子网中将网络包传输到下一个转发设备。</p>
-<p>集线器将信号广播给所有连接到它网络。集线器的接口中有一个 MDI/MDI-X 切换开关，MDI 就是对 RJ-45 接口和信号收发模块进行直连接线，而 MDI-X 则是交叉接线。</p>
-<p>集线器工作在半双工模式。</p>
-]]></content>
-      <categories>
-        <category>net</category>
-      </categories>
-  </entry>
-  <entry>
     <title>ethernet and MAC</title>
     <url>/2022/06/07/net/eth/</url>
     <content><![CDATA[<h2 id="网卡"><a href="#网卡" class="headerlink" title="网卡"></a>网卡</h2><p>以太网接口由MAC控制器物理层接口PHY组成。PHY整合了大量模拟硬件，而MAC是典型的全数字器件。考虑到芯片面积及模拟/数字混合架构的原因，通常，将MAC集成进微控制器而将PHY留在片外。</p>
@@ -26065,11 +25962,205 @@ tcpdump ip multicast
   <entry>
     <title>动态规划</title>
     <url>/2022/10/30/algo/dynamic/</url>
-    <content><![CDATA[<p>动态规划的核心思想就是穷举求最值，如果暴力穷举的话效率会极其低下，需要「备忘录」或者「DP table」来优化穷举过程，避免不必要的计算。</p>
-<p>带备忘录的递归解法叫做「自顶向下」，动态规划叫做「自底向上」</p>
-]]></content>
+    <content><![CDATA[<ol>
+<li>存在「重叠子问题」，子问题相互独立。</li>
+<li>具备「最优子结构」，能通过子问题的最值得到原问题的最值。</li>
+<li>列出「状态转移方程」：明确「状态」 -&gt; 定义 dp 数组/函数的含义 -&gt; 明确「选择」-&gt; 明确 base case。</li>
+</ol>
+<p>动态规划的核心思想就是穷举求最值，如果暴力穷举的话效率会极其低下，需要「备忘录」或者「DP table」来优化穷举过程，避免不必要的计算。其中带备忘录的递归解法叫做「自顶向下」，动态规划叫做「自底向上」。</p>
+<h2 id="菲波那切数列"><a href="#菲波那切数列" class="headerlink" title="菲波那切数列"></a>菲波那切数列</h2><p>斐波那契数列又称黄金分割数列、因数学家列昂纳多·斐波那契以兔子繁殖为例子而引入，又称为兔子数列。在数学上，斐波纳契数列以如下被以递归的方法定义：F(0)=0, F(1)=1, F(n)=F(n-1)+F(n-2)（n&gt;=2，n∈N*）。</p>
+<p>暴力递归</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">fibonacci</span><span class="params">(<span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (n &lt; <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> fibonacci(n - <span class="number">1</span>) + fibonacci(n - <span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>带备忘录的递归解法(自顶向下，通过备忘录剪枝)</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">fibonacci_memo</span><span class="params">(vector&lt;<span class="type">int</span>&gt; &amp;memo, <span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (n &lt; <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (memo[n] == <span class="number">-1</span>) &#123;</span><br><span class="line">        memo[n] = <span class="built_in">fibonacci_memo</span>(memo, n - <span class="number">1</span>) + <span class="built_in">fibonacci_memo</span>(memo, n - <span class="number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> memo[n];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">fibonacciMemo</span><span class="params">(<span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">memo</span><span class="params">(n+<span class="number">1</span>, <span class="number">-1</span>)</span></span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">fibonacci_memo</span>(memo, n);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>dp 数组的迭代解法（自底向上，使用循环迭代）</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">fibonacci_dp</span><span class="params">(<span class="type">int</span> n)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">dp</span><span class="params">(n + <span class="number">1</span>, <span class="number">0</span>)</span></span>;</span><br><span class="line">    dp[<span class="number">0</span>] = dp[<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">2</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        dp[i] = dp[i - <span class="number">1</span>] + dp[i - <span class="number">2</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> dp[n];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="凑零钱问题"><a href="#凑零钱问题" class="headerlink" title="凑零钱问题"></a>凑零钱问题</h2><p>有k种面值的硬币，面值分别为c1, c2 … ck，每种硬币的数量无限，再给一个总金额amount，问你最少需要几枚硬币凑出这个金额，如果不可能凑出，算法返回 -1 。</p>
+<p>凑零钱问题符合最优子结构，比如求 amount = 11 时的最少硬币数（原问题），如果知道凑出 amount = 10 的最少硬币数（子问题），只需把子问题的答案加一（再选一枚面值为 1 的硬币）就是原问题的答案。</p>
+<ol>
+<li><p>先确定「状态」，也就是原问题和子问题中变化的变量。由于硬币数量无限，所以唯一的状态就是目标金额amount。</p>
+</li>
+<li><p>然后确定dp函数的定义：函数 dp(n)表示，当前的目标金额是n，至少需要dp(n)个硬币凑出该金额。</p>
+</li>
+<li><p>然后确定「选择」并择优，也就是对于每个状态，可以做出什么选择改变当前状态。无论当前的目标金额是多少，选择就是从面额列表coins中选择一个硬币，然后目标金额就会减少。</p>
+</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function">def <span class="title">coinChange</span><span class="params">(coins: List[<span class="type">int</span>], amount: <span class="type">int</span>)</span>:</span></span><br><span class="line"><span class="function">    # 定义：要凑出金额 n，至少要 dp(n) 个硬币</span></span><br><span class="line"><span class="function">    def dp(n):</span></span><br><span class="line"><span class="function">        # 做选择，需要硬币最少的那个结果就是答案</span></span><br><span class="line"><span class="function">        for coin in coins:</span></span><br><span class="line"><span class="function">            res =</span> <span class="built_in">min</span>(res, <span class="number">1</span> + <span class="built_in">dp</span>(n - coin))</span><br><span class="line">        <span class="keyword">return</span> res</span><br><span class="line">    # 我们要求目标金额是 amount</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">dp</span>(amount)</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>最后明确 base case，显然目标金额为 0 时，所需硬币数量为 0；当目标金额小于 0 时，无解，返回 -1</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function">def <span class="title">coinChange</span><span class="params">(coins: List[<span class="type">int</span>], amount: <span class="type">int</span>)</span>:</span></span><br><span class="line"><span class="function">    def dp(n):</span></span><br><span class="line"><span class="function">        # base case</span></span><br><span class="line"><span class="function">        if n =</span>= <span class="number">0</span>: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        <span class="keyword">if</span> n &lt; <span class="number">0</span>: <span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line">        # 求最小值，所以初始化为正无穷</span><br><span class="line">        res = <span class="built_in">float</span>(<span class="string">&#x27;INF&#x27;</span>)</span><br><span class="line">        <span class="keyword">for</span> coin in coins:</span><br><span class="line">            subproblem = <span class="built_in">dp</span>(n - coin)</span><br><span class="line">            # 子问题无解，跳过</span><br><span class="line">            <span class="keyword">if</span> subproblem == <span class="number">-1</span>: <span class="keyword">continue</span></span><br><span class="line">            res = <span class="built_in">min</span>(res, <span class="number">1</span> + subproblem)</span><br><span class="line">        <span class="keyword">return</span> res <span class="keyword">if</span> res != <span class="built_in">float</span>(<span class="string">&#x27;INF&#x27;</span>) <span class="keyword">else</span> <span class="number">-1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">dp</span>(amount)</span><br></pre></td></tr></table></figure>
+
+<p>带备忘录的递归</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function">def <span class="title">coinChange</span><span class="params">(coins: List[<span class="type">int</span>], amount: <span class="type">int</span>)</span>:</span></span><br><span class="line"><span class="function">    # 备忘录</span></span><br><span class="line"><span class="function">    memo =</span> <span class="built_in">dict</span>()</span><br><span class="line">    <span class="function">def <span class="title">dp</span><span class="params">(n)</span>:</span></span><br><span class="line"><span class="function">        # 查备忘录，避免重复计算</span></span><br><span class="line"><span class="function">        if n in memo: return memo[n]</span></span><br><span class="line"><span class="function">        if n =</span>= <span class="number">0</span>: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        <span class="keyword">if</span> n &lt; <span class="number">0</span>: <span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line">        res = <span class="built_in">float</span>(<span class="string">&#x27;INF&#x27;</span>)</span><br><span class="line">        <span class="keyword">for</span> coin in coins:</span><br><span class="line">            subproblem = <span class="built_in">dp</span>(n - coin)</span><br><span class="line">            <span class="keyword">if</span> subproblem == <span class="number">-1</span>: <span class="keyword">continue</span></span><br><span class="line">            res = <span class="built_in">min</span>(res, <span class="number">1</span> + subproblem)</span><br><span class="line">        # 记入备忘录</span><br><span class="line">        memo[n] = res <span class="keyword">if</span> res != <span class="built_in">float</span>(<span class="string">&#x27;INF&#x27;</span>) <span class="keyword">else</span> <span class="number">-1</span></span><br><span class="line">        <span class="keyword">return</span> memo[n]</span><br><span class="line">      </span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">dp</span>(amount)</span><br></pre></td></tr></table></figure>
+
+<p>dp 数组迭代解法</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">coinChange</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; coins, <span class="type">int</span> amount)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 数组大小为 amount + 1，初始值也为 amount + 1</span></span><br><span class="line">    <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">dp</span><span class="params">(amount + <span class="number">1</span>, amount + <span class="number">1</span>)</span></span>;</span><br><span class="line">    <span class="comment">// base case</span></span><br><span class="line">    dp[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt; dp.<span class="built_in">size</span>(); i++) &#123;</span><br><span class="line">        <span class="comment">// 内层 for 在求所有子问题 + 1 的最小值</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> coin : coins) &#123;</span><br><span class="line">            <span class="comment">// 子问题无解，跳过</span></span><br><span class="line">            <span class="keyword">if</span> (i - coin &lt; <span class="number">0</span>) <span class="keyword">continue</span>;</span><br><span class="line">            dp[i] = <span class="built_in">min</span>(dp[i], <span class="number">1</span> + dp[i - coin]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> (dp[amount] == amount + <span class="number">1</span>) ? <span class="number">-1</span> : dp[amount];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="0-1-背包问题"><a href="#0-1-背包问题" class="headerlink" title="0-1 背包问题"></a>0-1 背包问题</h2><p>有一个可装载重量为 W 的背包和 N 个物品，每个物品有重量和价值两个属性。其中第 i 个物品的重量为 wt[i]，价值为 val[i]，现在让你用这个背包装物品，最多能装的价值是多少？</p>
+<p>明确两点，「状态」和「选择」。</p>
+<ol>
+<li><p>明确状态，状态有两个，就是「背包的容量」和「可选择的物品」。</p>
+</li>
+<li><p>明确选择，就是「装进背包」或者「不装进背包」。</p>
+</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> 状态<span class="number">1</span> in 状态<span class="number">1</span>的所有取值：</span><br><span class="line">    <span class="keyword">for</span> 状态<span class="number">2</span> in 状态<span class="number">2</span>的所有取值：</span><br><span class="line">        <span class="keyword">for</span> ...</span><br><span class="line">            dp[状态<span class="number">1</span>][状态<span class="number">2</span>][...] = 择优(选择<span class="number">1</span>，选择<span class="number">2.</span>..)</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>明确 dp 数组的定义：对于前 i 个物品，当前背包的容量为 w，这种情况下可以装的最大价值是 dp[i][w]。</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> i in [<span class="number">1.</span>.N]:</span><br><span class="line">    <span class="keyword">for</span> w in [<span class="number">1.</span>.W]:</span><br><span class="line">        dp[i][w] = <span class="built_in">max</span>(</span><br><span class="line">            dp[i<span class="number">-1</span>][w],  <span class="comment">// 不把物品 i 装进背包</span></span><br><span class="line">            dp[i<span class="number">-1</span>][w - wt[i<span class="number">-1</span>]] + val[i<span class="number">-1</span>]  <span class="comment">// 把物品 i 装进背包</span></span><br><span class="line">        )</span><br><span class="line"><span class="keyword">return</span> dp[N][W]</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>明确base case，就是 dp[0][..] = dp[..][0] = 0，因为没有物品或者背包没有空间的时候，能装的最大价值就是 0。</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">knapsack</span><span class="params">(<span class="type">int</span> W, <span class="type">int</span> N, vector&lt;<span class="type">int</span>&gt;&amp; wt, vector&lt;<span class="type">int</span>&gt;&amp; val)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// base case 已初始化</span></span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">dp</span>(N + <span class="number">1</span>, <span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(W + <span class="number">1</span>, <span class="number">0</span>));</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> w = <span class="number">1</span>; w &lt;= W; w++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (w - wt[i<span class="number">-1</span>] &lt; <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="comment">// 这种情况下只能选择不装入背包</span></span><br><span class="line">                dp[i][w] = dp[i - <span class="number">1</span>][w];</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 装入或者不装入背包，择优</span></span><br><span class="line">                dp[i][w] = <span class="built_in">max</span>(dp[i - <span class="number">1</span>][w - wt[i<span class="number">-1</span>]] + val[i<span class="number">-1</span>], </span><br><span class="line">                               dp[i - <span class="number">1</span>][w]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> dp[N][W];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="子集背包问题"><a href="#子集背包问题" class="headerlink" title="子集背包问题"></a>子集背包问题</h2><p>给定一个只包含正整数的非空数组。是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。</p>
+<ol>
+<li><p>明确「状态」和「选择」，状态就是「背包的容量」和「可选择的物品」，选择就是「装进背包」或者「不装进背包」。</p>
+</li>
+<li><p>明确dp数组的定义，dp[i][j] = x表示：对于前i个物品，当前背包的容量为j时，若x为true，则说明可以恰好将背包装满，若x为false，则说明不能恰好将背包装满。根据这个定义，我们想求的最终答案就是dp[N][sum/2]。</p>
+</li>
+<li><p>base case 就是dp[..][0] = true和dp[0][..] = false，因为背包没有空间的时候，就相当于装满了，而当没有物品可选择的时候，肯定没办法装满背包。</p>
+</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">canPartition</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> sum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> num : nums) sum += num;</span><br><span class="line">    <span class="comment">// 和为奇数时，不可能划分成两个和相等的集合</span></span><br><span class="line">    <span class="keyword">if</span> (sum % <span class="number">2</span> != <span class="number">0</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="type">int</span> n = nums.<span class="built_in">size</span>();</span><br><span class="line">    sum = sum / <span class="number">2</span>;</span><br><span class="line">    vector&lt;vector&lt;<span class="type">bool</span>&gt;&gt; <span class="built_in">dp</span>(n + <span class="number">1</span>, <span class="built_in">vector</span>&lt;<span class="type">bool</span>&gt;(sum + <span class="number">1</span>, <span class="literal">false</span>));</span><br><span class="line">    <span class="comment">// base case</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= n; i++)</span><br><span class="line">        dp[i][<span class="number">0</span>] = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">1</span>; j &lt;= sum; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (j - nums[i - <span class="number">1</span>] &lt; <span class="number">0</span>) &#123;</span><br><span class="line">               <span class="comment">// 背包容量不足，不能装入第 i 个物品</span></span><br><span class="line">                dp[i][j] = dp[i - <span class="number">1</span>][j]; </span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 装入或不装入背包</span></span><br><span class="line">                dp[i][j] = dp[i - <span class="number">1</span>][j] | dp[i - <span class="number">1</span>][j-nums[i<span class="number">-1</span>]];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> dp[n][sum];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意到dp[i][j]都是通过上一行dp[i-1][..]转移过来的，之前的数据都不会再使用了。所以可以进行状态压缩，将二维dp数组压缩为一维，节约空间复杂度：</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">canPartition</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> sum = <span class="number">0</span>, n = nums.<span class="built_in">size</span>();</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> num : nums) sum += num;</span><br><span class="line">    <span class="keyword">if</span> (sum % <span class="number">2</span> != <span class="number">0</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    sum = sum / <span class="number">2</span>;</span><br><span class="line">    <span class="function">vector&lt;<span class="type">bool</span>&gt; <span class="title">dp</span><span class="params">(sum + <span class="number">1</span>, <span class="literal">false</span>)</span></span>;</span><br><span class="line">    <span class="comment">// base case</span></span><br><span class="line">    dp[<span class="number">0</span>] = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) </span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = sum; j &gt;= <span class="number">0</span>; j--) </span><br><span class="line">            <span class="keyword">if</span> (j - nums[i] &gt;= <span class="number">0</span>) </span><br><span class="line">                dp[j] = dp[j] || dp[j - nums[i]];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> dp[sum];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="完全背包问题"><a href="#完全背包问题" class="headerlink" title="完全背包问题"></a>完全背包问题</h2><p>有一个背包，最大容量为amount，有一系列物品coins，每个物品的重量为coins[i]，每个物品的数量无限。请问有多少种方法，能够把背包恰好装满？</p>
+<ol>
+<li><p>明确「状态」和「选择」，状态就是「背包的容量」和「可选择的物品」，选择就是「装进背包」或者「不装进背包」。</p>
+</li>
+<li><p>明确 dp[i][j]数组的定义：若只使用前i个物品，当背包容量为j时，有dp[i][j]种方法可以装满背包。</p>
+</li>
+<li><p>base case 为dp[0][..] = 0， dp[..][0] = 1。因为如果不使用任何硬币面值，就无法凑出任何金额；如果凑出的目标金额为 0，那么不用装就满了。</p>
+</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">change</span><span class="params">(<span class="type">int</span> amount, <span class="type">int</span>[] coins)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> n = coins.length;</span><br><span class="line">    <span class="type">int</span>[][] dp = amount <span class="type">int</span>[n + <span class="number">1</span>][amount + <span class="number">1</span>];</span><br><span class="line">    <span class="comment">// base case</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= n; i++) </span><br><span class="line">        dp[i][<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">1</span>; j &lt;= amount; j++)</span><br><span class="line">            <span class="keyword">if</span> (j - coins[i<span class="number">-1</span>] &gt;= <span class="number">0</span>)</span><br><span class="line">                dp[i][j] = dp[i - <span class="number">1</span>][j] + dp[i][j - coins[i<span class="number">-1</span>]]; <span class="comment">//把这第i个物品装入背包</span></span><br><span class="line">            <span class="keyword">else</span> </span><br><span class="line">                dp[i][j] = dp[i - <span class="number">1</span>][j]; <span class="comment">//不把这第i个物品装入背包</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> dp[n][amount];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过观察可以发现，dp数组的转移只和dp[i][..]和dp[i-1][..]有关，所以可以压缩状态，进一步降低算法的空间复杂度：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">int change(int amount, int[] coins) &#123;</span><br><span class="line">    int n = coins.length;</span><br><span class="line">    int[] dp = new int[amount + 1];</span><br><span class="line">    dp[0] = 1; // base case</span><br><span class="line">    for (int i = 0; i &lt; n; i++)</span><br><span class="line">        for (int j = 1; j &lt;= amount; j++)</span><br><span class="line">            if (j - coins[i] &gt;= 0)</span><br><span class="line">                dp[j] = dp[j] + dp[j-coins[i]];</span><br><span class="line"></span><br><span class="line">    return dp[amount];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
       <categories>
         <category>algorithm</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>IP and MAC</title>
+    <url>/2022/06/21/net/ip/</url>
+    <content><![CDATA[<h2 id="IP"><a href="#IP" class="headerlink" title="IP"></a>IP</h2><h3 id="IPv4"><a href="#IPv4" class="headerlink" title="IPv4"></a>IPv4</h3><p>IPv4 地址共32位，每 8 位作为一组，用点分十进制的表示方式，包含两部分：网络号负责标识该 IP 地址是属于哪个子网的；主机号负责标识同一子网下的不同主机。</p>
+<p>子网掩码也是32bit，为1的部分表示网络号，为0的部分表示主机号，将子网掩码和IP地址相与，可以计算出网络号和主机号。主机号部分全部为0代表整个子网，主机号部分全部为1代表广播地址，向子网上所有设备发送包。</p>
+<p><img src="/images/net/tcpip/ip_name.png" alt="ip_name"></p>
+<p>本地回环地址127.0.0.1指的是本机地址，等效于localhost或本机IP。不会跟着网络情况的变化而变化。它代表设备的本地虚拟接口，被看作是永远不会宕掉的接口。127.0.0.1 ~ 127.255.255.254范围都是本地回环地址。作用是测试本机的网络配置，能ping通说明本机网络协议正常。</p>
+<p>IP 地址分为A类、B类、C类、D类、E类，其中D类和E类没有主机号的，所以不可用于主机 IP，D类常被用于多播，E类预留未使用。</p>
+<p><img src="/images/net/tcpip/ip_class.webp" alt="ip_class"></p>
+<p><img src="/images/net/tcpip/ip_class.png" alt="ip_class"></p>
+<h3 id="IP头"><a href="#IP头" class="headerlink" title="IP头"></a>IP头</h3><p><img src="/images/net/tcpip/ip_head.png" alt="img"></p>
+<p>经过分片之后的 IP 数据，只能由目标主机进行重组，路由器并不会重组。</p>
+<h3 id="IPv6"><a href="#IPv6" class="headerlink" title="IPv6"></a>IPv6</h3><p>IPv6 地址⻓度是 128 位，以每 16 位作为一组，每组用冒号:隔开。</p>
+<p>IPv6 的地址主要有以下类型地址:</p>
+<ul>
+<li>单播地址，用于一对一的通信</li>
+<li>组播地址，用于一对多的通信</li>
+<li>任播地址，用于通信最近的节点，最近的节点是由路由协议决定</li>
+<li>没有广播地址</li>
+</ul>
+<p><img src="/images/net/tcpip/ipv6.png" alt="img"></p>
+<ul>
+<li><p>取消了首部校验和字段。 因为在数据链路层和传输层都会校验，因此 IPv6 直接取消了 IP 的校验。</p>
+</li>
+<li><p>取消了分片/重新组装相关字段。 分片与重组是耗时的过程，IPv6 不允许在中间路由器进行分片与重组，这种操作只能在源与目标主机，这将大大提高了路由器转发的速度。</p>
+</li>
+<li><p>取消选项字段。 选项字段不再是标准 IP 首部的一部分了，但它并没有消失，而是可能出现在 IPv6 首部中的下一个首部指出的位置上。删除该选项字段使的 IPv6 的首部成为固定⻓度的 40 字节。</p>
+</li>
+</ul>
+<h2 id="IP协议"><a href="#IP协议" class="headerlink" title="IP协议"></a>IP协议</h2><p>IP 协议(Internet Protocol)负责在主机和网络之间寻址和路由数据包。</p>
+<p>IP地址的网络地址这一部分是用于进行路由控制，路由控制表中记录着网络地址与下一步应该发送至路由器的地址。在发送 IP 包时，首先要确定 IP 包首部中的目标地址，再从路由控制表中找到与该地址具有相同网络地址的记录，根据该记录将 IP 包转发给相应的下一个路由器。如果路由控制表中存在多条相同网络地址的记录，就选择相同位数最多的网络地址，也就是最⻓匹配。</p>
+<p>IP 模块会添加 IP 头部和 MAC 头部这两种头部。IP 头部包含目的地的 IP 地址，MAC 头部包含 MAC 地址。IP 协议会查找下一个路由器的MAC 地址，并将这个地址写入 MAC 头部中。这样一来，以太网协议就知道要将这个包发到哪一个路由器上了。</p>
+<h3 id="DNS"><a href="#DNS" class="headerlink" title="DNS"></a>DNS</h3><p>DNS(Domain Name System)域名服务系统，将域名网址自动解析为具体的 IP 地址。</p>
+<p>查询 IP 地址时，浏览器会使用系统 Socket 库中的解析器， 向 DNS 服务器发送查询消息，然后 DNS 服务器会从域名与 IP 地址的对照表中查找相应的记录，并返回 IP 地址。客户端的查询消息包含以下 3 种信息：</p>
+<ul>
+<li>域名：服务器、邮件服务器(邮件地址中 @ 后面的部分)的名称。</li>
+<li>Class：网络的信息标识。如今 Class 的值永远是代表互联网的 IN。</li>
+<li>记录类型：表示域名对应何种类型的记录。例如，当类型为 A 时，表示域名对应的是 IP 地址；当类型为 MX 时，表示域名对应的是邮件服务器。对于不同的记录类型，服务器向客户端返回的信息也会不同。</li>
+</ul>
+<p><img src="/images/net/dns_msg.png" alt="dns_msg"></p>
+<h3 id="ARP"><a href="#ARP" class="headerlink" title="ARP"></a>ARP</h3><p>ARP 用于根据 IP 地址查询相应的MAC 地址。</p>
+<p>主机会通过广播发送 ARP 请求，这个包中包含了想要查询的 MAC 地址的主机 IP 地址。当同个链路中的所有设备收到 ARP 请求时，会去拆开 ARP 请求包里的内容，如果 ARP 请求包中的目标 IP地址与自己的 IP 地址一致，那么这个设备就将自己的 MAC 地址塞入 ARP 响应包返回给主机。通常操作系统会把获取的 MAC 地址缓存起来，可以使用 <code>arp -a</code> 命令来查看。</p>
+<p>RARP 协议是根据 MAC 地址求 IP 地址。</p>
+<h3 id="DHCP"><a href="#DHCP" class="headerlink" title="DHCP"></a>DHCP</h3><p>DHCP(Dynamic Host Configuration Protocol)动态主机配置协议。能实现自动设置 IP 地址、统一管理 IP 地址分配。DHCP 服务器分配的 IP 地址只能在租期内使用。</p>
+<h4 id="udhcpc"><a href="#udhcpc" class="headerlink" title="udhcpc"></a>udhcpc</h4><p>默认的目录文件是/usr/share/udhcpc/default.script，当udhcpc 取得了IP地址之后，会把从DHCP server 得到的信息带入 script执行。</p>
+<h3 id="NET"><a href="#NET" class="headerlink" title="NET"></a>NET</h3><p>NAT就是同个公司、家庭、教室内的主机对外部通信时，把私有 IP 地址转换成公有 IP 地址。</p>
+<h3 id="ICMP"><a href="#ICMP" class="headerlink" title="ICMP"></a>ICMP</h3><p>ICMP(Internet Control Message Protocol)互联网控制报文协议，用于告知网络包传送过程中产生的错误以及各种控制信息。在 IP 通信中如果某个 IP 包因为某种原因未能达到目标地址，那么这个具体的原因将由 ICMP 负责通知。</p>
+<h3 id="IGMP"><a href="#IGMP" class="headerlink" title="IGMP"></a>IGMP</h3><p>IGMP(Internet Control Message Protocol)互联网控制报文协议，是主机用来向本地多路广播路由器报告主机组成员的协议。ping命令就是基于ICMP协议工作的。</p>
+<h2 id="路由器"><a href="#路由器" class="headerlink" title="路由器"></a>路由器</h2><p>路由器是按照IP 协议传输包的设备，根据接收到的包的 IP 头部中记录的接收方 IP 地址，在路由表中进行查询，以此判断转发目标。</p>
+<p>路由器已经集成了集线器和交换机的功能，俗称三层网络设备，每个端口都具有 MAC 地址和 IP 地址，只接收与自身地址匹配的包，不匹配的包则直接丢弃。</p>
+<p><img src="/images/net/route_map.png" alt="img"></p>
+<p>路由器忽略主机号部分，只匹配网络号。路由表的子网掩码列只是用来在匹配目标地址时告诉路由器应该匹配多少个比特。根据目标地址和子网掩码匹配到某条记录后，路由器就会将网络包交给接口列中指定的端口，并转发到网关列中指定的 IP 地址。跃点计数表示距离目标 IP 地址的距离的远近。数字越小表示距离目的地越近；数字越大表示距离目的地越远。</p>
+<p>路由表中子网掩码为 0.0.0.0 的记录表示默认路由，这一行配置的网关地址被称为默认网关，无论任何地址都能匹配到这一条记录。</p>
+<p>路由器优先选择主机号比特数越短，跃点计数较小的记录。如果在路由表中无法找到匹配的记录，路由器会丢弃这个包，并通过ICMP 消息告知发送方 。</p>
+<p>路由器会更新 IP 头部中的 TTL字段。TTL 字段表示包的有效期，包每经过一个路由器的转发，这个值就会减 1，当这个值变成 0 时，就表示超过了有效期，这个包就会被丢弃。</p>
+<p>对于长度大于输出端口MTU的转发包，路由器会根据IP 头部中的标志字段，确认是否可以分片。如果查询标志字段发现不能分片，那么就只能丢弃这个包，并通过ICMP 消息通知发送方。在分片中，TCP 头部及其后面的部分都是可分片的数据，每一份数据前面会加上 IP 头部。</p>
+<p>路由转发和IP 模块发送包的过程是相同的，会在包前面加上 MAC 头部，也是从路由表的网关列中查找出下一个路由器的 IP 地址，如果网关是一个 IP 地址，则这个IP 地址就是我们要转发到的目标地址；如果网关为空 ，则 IP 头部中的接收方 IP 地址就是要转发到的目标地址。然后通过 ARP 根据 IP 地址查询出 MAC 地址，然后将 MAC 地址写入 MAC 头部。</p>
+<p>内网与互联网连接需要地址转换。地址转换的基本原理是在转发网络包时对 IP 头部中的 IP 地址和端口号进行改写。因为公网IP只有一个，所以要根据不同的端口号区分内网不同的私有地址，路由器会保存私有地址与端口号对应的记录。如果私有地址和端口号没有保存在对应表中，外网是无法访问私有地址的，除非手动添加记录。</p>
+]]></content>
+      <categories>
+        <category>net</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>MAC</title>
+    <url>/2022/11/19/net/mac/</url>
+    <content><![CDATA[<h2 id="MAC"><a href="#MAC" class="headerlink" title="MAC"></a>MAC</h2><p>MAC(Medium Access Control)媒体访问控制，控制在往媒体上发送数据的先后，防止发生混乱。</p>
+<p>MAC 地址共有 48 bit，用来唯一标识设备，在网卡生产时写入 ROM 里的，网卡驱动程序读取并分配给 MAC模块。通过 ARP 可以查询目标路由器的 MAC 地址。</p>
+<table>
+<thead>
+<tr>
+<th align="center">bit</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1</td>
+<td>0 单播地址<br/>1 多播地址</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td>0 全局地址<br/>1 本地地址</td>
+</tr>
+<tr>
+<td align="center">3-24</td>
+<td>厂商识别码</td>
+</tr>
+<tr>
+<td align="center">25-48</td>
+<td>网卡唯一标识</td>
+</tr>
+</tbody></table>
+<p>MAC 头部是以太网使用的头部，它包含了接收方和发送方的 MAC 地址等信息，其作用就是将包送达路由器。</p>
+<p><img src="/images/net/tcpip/mac_head.png" alt="img"></p>
+<h2 id="网卡"><a href="#网卡" class="headerlink" title="网卡"></a>网卡</h2><p>网卡驱动从 IP 模块获取包之后，会将其复制到网卡内的缓冲区中，然后向MAC 模块发送发送包的命令。MAC 模块会将包从缓冲区中取出，并在开头加上报头和起始帧分界符，在末尾加上用于检测错误的帧校验序列。再将数字信息按每个比特转换成电信号，然后由 PHY信号收发模块发送出去。</p>
+<p><img src="/images/net/tcpip/pack.png" alt="img"></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">修改MAC地址</span></span><br><span class="line">ifconfig eth0 hw ether 12:34:56:78:90:12</span><br></pre></td></tr></table></figure>
+
+<h2 id="交换机"><a href="#交换机" class="headerlink" title="交换机"></a>交换机</h2><p>交换机将网络包原样转发到目的地，交换机根据 MAC 地址表查找 MAC 地址，然后将信号发送到相应的端口。交换机的 MAC 地址表主要包含两个信息:设备的 MAC 地址，和该设备连接在交换机的端口。</p>
+<p>交换机工作在全双工模式。</p>
+<p><img src="/images/net/switch.png" alt="img"></p>
+<p>交换机会自行更新或删除地址表中的记录，当收到包时会将发送方 MAC 地址以及其输入端口的号码写入MAC 地址表中，当端口上的设备长时间不工作，就会删除记录。</p>
+<p>计算机的网卡本身具有 MAC 地址，并通过核对收到的包的接收方 MAC 地址判断是不是发给自己的，如果不是发给自己的则丢弃。相对地，交换机的端口不具有 MAC 地址的端口，故不会核对接收方 MAC 地址，而是直接接收所有的包并存放到缓冲区中。</p>
+<h2 id="集线器"><a href="#集线器" class="headerlink" title="集线器"></a>集线器</h2><p>集线器工作在物理层，会将收到的数据广播给其它端口。集线器里有一张以太网协议的表，根据以太网头部中记录的目的地信息查出相应的传输方向，在子网中将网络包传输到下一个转发设备。</p>
+<p>集线器的接口中有一个 MDI/MDI-X 切换开关，MDI 就是对 RJ-45 接口和信号收发模块进行直连接线，而 MDI-X 则是交叉接线。</p>
+<p>集线器工作在半双工模式。</p>
+]]></content>
+      <categories>
+        <category>net</category>
       </categories>
   </entry>
 </search>

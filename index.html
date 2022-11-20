@@ -176,6 +176,113 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/11/19/net/mac/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/11/19/net/mac/" class="post-title-link" itemprop="url">MAC</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-11-19 15:08:35 / 修改时间：15:15:55" itemprop="dateCreated datePublished" datetime="2022-11-19T15:08:35+08:00">2022-11-19</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="MAC"><a href="#MAC" class="headerlink" title="MAC"></a>MAC</h2><p>MAC(Medium Access Control)媒体访问控制，控制在往媒体上发送数据的先后，防止发生混乱。</p>
+<p>MAC 地址共有 48 bit，用来唯一标识设备，在网卡生产时写入 ROM 里的，网卡驱动程序读取并分配给 MAC模块。通过 ARP 可以查询目标路由器的 MAC 地址。</p>
+<table>
+<thead>
+<tr>
+<th align="center">bit</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1</td>
+<td>0 单播地址<br/>1 多播地址</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td>0 全局地址<br/>1 本地地址</td>
+</tr>
+<tr>
+<td align="center">3-24</td>
+<td>厂商识别码</td>
+</tr>
+<tr>
+<td align="center">25-48</td>
+<td>网卡唯一标识</td>
+</tr>
+</tbody></table>
+<p>MAC 头部是以太网使用的头部，它包含了接收方和发送方的 MAC 地址等信息，其作用就是将包送达路由器。</p>
+<p><img src="/images/net/tcpip/mac_head.png" alt="img"></p>
+<h2 id="网卡"><a href="#网卡" class="headerlink" title="网卡"></a>网卡</h2><p>网卡驱动从 IP 模块获取包之后，会将其复制到网卡内的缓冲区中，然后向MAC 模块发送发送包的命令。MAC 模块会将包从缓冲区中取出，并在开头加上报头和起始帧分界符，在末尾加上用于检测错误的帧校验序列。再将数字信息按每个比特转换成电信号，然后由 PHY信号收发模块发送出去。</p>
+<p><img src="/images/net/tcpip/pack.png" alt="img"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">修改MAC地址</span></span><br><span class="line">ifconfig eth0 hw ether 12:34:56:78:90:12</span><br></pre></td></tr></table></figure>
+
+<h2 id="交换机"><a href="#交换机" class="headerlink" title="交换机"></a>交换机</h2><p>交换机将网络包原样转发到目的地，交换机根据 MAC 地址表查找 MAC 地址，然后将信号发送到相应的端口。交换机的 MAC 地址表主要包含两个信息:设备的 MAC 地址，和该设备连接在交换机的端口。</p>
+<p>交换机工作在全双工模式。</p>
+<p><img src="/images/net/switch.png" alt="img"></p>
+<p>交换机会自行更新或删除地址表中的记录，当收到包时会将发送方 MAC 地址以及其输入端口的号码写入MAC 地址表中，当端口上的设备长时间不工作，就会删除记录。</p>
+<p>计算机的网卡本身具有 MAC 地址，并通过核对收到的包的接收方 MAC 地址判断是不是发给自己的，如果不是发给自己的则丢弃。相对地，交换机的端口不具有 MAC 地址的端口，故不会核对接收方 MAC 地址，而是直接接收所有的包并存放到缓冲区中。</p>
+<h2 id="集线器"><a href="#集线器" class="headerlink" title="集线器"></a>集线器</h2><p>集线器工作在物理层，会将收到的数据广播给其它端口。集线器里有一张以太网协议的表，根据以太网头部中记录的目的地信息查出相应的传输方向，在子网中将网络包传输到下一个转发设备。</p>
+<p>集线器的接口中有一个 MDI/MDI-X 切换开关，MDI 就是对 RJ-45 接口和信号收发模块进行直连接线，而 MDI-X 则是交叉接线。</p>
+<p>集线器工作在半双工模式。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/10/30/algo/dynamic/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -199,10 +306,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-10-30 19:29:01 / 修改时间：19:52:29" itemprop="dateCreated datePublished" datetime="2022-10-30T19:29:01+08:00">2022-10-30</time>
+              <time title="创建时间：2022-10-30 19:29:01" itemprop="dateCreated datePublished" datetime="2022-10-30T19:29:01+08:00">2022-10-30</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-11-20 18:24:32" itemprop="dateModified" datetime="2022-11-20T18:24:32+08:00">2022-11-20</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -224,9 +337,92 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>动态规划的核心思想就是穷举求最值，如果暴力穷举的话效率会极其低下，需要「备忘录」或者「DP table」来优化穷举过程，避免不必要的计算。</p>
-<p>带备忘录的递归解法叫做「自顶向下」，动态规划叫做「自底向上」</p>
+          <ol>
+<li>存在「重叠子问题」，子问题相互独立。</li>
+<li>具备「最优子结构」，能通过子问题的最值得到原问题的最值。</li>
+<li>列出「状态转移方程」：明确「状态」 -&gt; 定义 dp 数组/函数的含义 -&gt; 明确「选择」-&gt; 明确 base case。</li>
+</ol>
+<p>动态规划的核心思想就是穷举求最值，如果暴力穷举的话效率会极其低下，需要「备忘录」或者「DP table」来优化穷举过程，避免不必要的计算。其中带备忘录的递归解法叫做「自顶向下」，动态规划叫做「自底向上」。</p>
+<h2 id="菲波那切数列"><a href="#菲波那切数列" class="headerlink" title="菲波那切数列"></a>菲波那切数列</h2><p>斐波那契数列又称黄金分割数列、因数学家列昂纳多·斐波那契以兔子繁殖为例子而引入，又称为兔子数列。在数学上，斐波纳契数列以如下被以递归的方法定义：F(0)=0, F(1)=1, F(n)=F(n-1)+F(n-2)（n&gt;=2，n∈N*）。</p>
+<p>暴力递归</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">fibonacci</span><span class="params">(<span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (n &lt; <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> fibonacci(n - <span class="number">1</span>) + fibonacci(n - <span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<p>带备忘录的递归解法(自顶向下，通过备忘录剪枝)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">fibonacci_memo</span><span class="params">(vector&lt;<span class="type">int</span>&gt; &amp;memo, <span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (n &lt; <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (memo[n] == <span class="number">-1</span>) &#123;</span><br><span class="line">        memo[n] = <span class="built_in">fibonacci_memo</span>(memo, n - <span class="number">1</span>) + <span class="built_in">fibonacci_memo</span>(memo, n - <span class="number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> memo[n];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">fibonacciMemo</span><span class="params">(<span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">memo</span><span class="params">(n+<span class="number">1</span>, <span class="number">-1</span>)</span></span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">fibonacci_memo</span>(memo, n);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>dp 数组的迭代解法（自底向上，使用循环迭代）</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">fibonacci_dp</span><span class="params">(<span class="type">int</span> n)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">dp</span><span class="params">(n + <span class="number">1</span>, <span class="number">0</span>)</span></span>;</span><br><span class="line">    dp[<span class="number">0</span>] = dp[<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">2</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        dp[i] = dp[i - <span class="number">1</span>] + dp[i - <span class="number">2</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> dp[n];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="凑零钱问题"><a href="#凑零钱问题" class="headerlink" title="凑零钱问题"></a>凑零钱问题</h2><p>有k种面值的硬币，面值分别为c1, c2 … ck，每种硬币的数量无限，再给一个总金额amount，问你最少需要几枚硬币凑出这个金额，如果不可能凑出，算法返回 -1 。</p>
+<p>凑零钱问题符合最优子结构，比如求 amount = 11 时的最少硬币数（原问题），如果知道凑出 amount = 10 的最少硬币数（子问题），只需把子问题的答案加一（再选一枚面值为 1 的硬币）就是原问题的答案。</p>
+<ol>
+<li><p>先确定「状态」，也就是原问题和子问题中变化的变量。由于硬币数量无限，所以唯一的状态就是目标金额amount。</p>
+</li>
+<li><p>然后确定dp函数的定义：函数 dp(n)表示，当前的目标金额是n，至少需要dp(n)个硬币凑出该金额。</p>
+</li>
+<li><p>然后确定「选择」并择优，也就是对于每个状态，可以做出什么选择改变当前状态。无论当前的目标金额是多少，选择就是从面额列表coins中选择一个硬币，然后目标金额就会减少。</p>
+</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">def <span class="title">coinChange</span><span class="params">(coins: List[<span class="type">int</span>], amount: <span class="type">int</span>)</span>:</span></span><br><span class="line"><span class="function">    # 定义：要凑出金额 n，至少要 dp(n) 个硬币</span></span><br><span class="line"><span class="function">    def dp(n):</span></span><br><span class="line"><span class="function">        # 做选择，需要硬币最少的那个结果就是答案</span></span><br><span class="line"><span class="function">        for coin in coins:</span></span><br><span class="line"><span class="function">            res =</span> <span class="built_in">min</span>(res, <span class="number">1</span> + <span class="built_in">dp</span>(n - coin))</span><br><span class="line">        <span class="keyword">return</span> res</span><br><span class="line">    # 我们要求目标金额是 amount</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">dp</span>(amount)</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>最后明确 base case，显然目标金额为 0 时，所需硬币数量为 0；当目标金额小于 0 时，无解，返回 -1</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">def <span class="title">coinChange</span><span class="params">(coins: List[<span class="type">int</span>], amount: <span class="type">int</span>)</span>:</span></span><br><span class="line"><span class="function">    def dp(n):</span></span><br><span class="line"><span class="function">        # base case</span></span><br><span class="line"><span class="function">        if n =</span>= <span class="number">0</span>: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        <span class="keyword">if</span> n &lt; <span class="number">0</span>: <span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line">        # 求最小值，所以初始化为正无穷</span><br><span class="line">        res = <span class="built_in">float</span>(<span class="string">&#x27;INF&#x27;</span>)</span><br><span class="line">        <span class="keyword">for</span> coin in coins:</span><br><span class="line">            subproblem = <span class="built_in">dp</span>(n - coin)</span><br><span class="line">            # 子问题无解，跳过</span><br><span class="line">            <span class="keyword">if</span> subproblem == <span class="number">-1</span>: <span class="keyword">continue</span></span><br><span class="line">            res = <span class="built_in">min</span>(res, <span class="number">1</span> + subproblem)</span><br><span class="line">        <span class="keyword">return</span> res <span class="keyword">if</span> res != <span class="built_in">float</span>(<span class="string">&#x27;INF&#x27;</span>) <span class="keyword">else</span> <span class="number">-1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">dp</span>(amount)</span><br></pre></td></tr></table></figure>
+
+<p>带备忘录的递归</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">def <span class="title">coinChange</span><span class="params">(coins: List[<span class="type">int</span>], amount: <span class="type">int</span>)</span>:</span></span><br><span class="line"><span class="function">    # 备忘录</span></span><br><span class="line"><span class="function">    memo =</span> <span class="built_in">dict</span>()</span><br><span class="line">    <span class="function">def <span class="title">dp</span><span class="params">(n)</span>:</span></span><br><span class="line"><span class="function">        # 查备忘录，避免重复计算</span></span><br><span class="line"><span class="function">        if n in memo: return memo[n]</span></span><br><span class="line"><span class="function">        if n =</span>= <span class="number">0</span>: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        <span class="keyword">if</span> n &lt; <span class="number">0</span>: <span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line">        res = <span class="built_in">float</span>(<span class="string">&#x27;INF&#x27;</span>)</span><br><span class="line">        <span class="keyword">for</span> coin in coins:</span><br><span class="line">            subproblem = <span class="built_in">dp</span>(n - coin)</span><br><span class="line">            <span class="keyword">if</span> subproblem == <span class="number">-1</span>: <span class="keyword">continue</span></span><br><span class="line">            res = <span class="built_in">min</span>(res, <span class="number">1</span> + subproblem)</span><br><span class="line">        # 记入备忘录</span><br><span class="line">        memo[n] = res <span class="keyword">if</span> res != <span class="built_in">float</span>(<span class="string">&#x27;INF&#x27;</span>) <span class="keyword">else</span> <span class="number">-1</span></span><br><span class="line">        <span class="keyword">return</span> memo[n]</span><br><span class="line">      </span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">dp</span>(amount)</span><br></pre></td></tr></table></figure>
+
+<p>dp 数组迭代解法</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">coinChange</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; coins, <span class="type">int</span> amount)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 数组大小为 amount + 1，初始值也为 amount + 1</span></span><br><span class="line">    <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">dp</span><span class="params">(amount + <span class="number">1</span>, amount + <span class="number">1</span>)</span></span>;</span><br><span class="line">    <span class="comment">// base case</span></span><br><span class="line">    dp[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt; dp.<span class="built_in">size</span>(); i++) &#123;</span><br><span class="line">        <span class="comment">// 内层 for 在求所有子问题 + 1 的最小值</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> coin : coins) &#123;</span><br><span class="line">            <span class="comment">// 子问题无解，跳过</span></span><br><span class="line">            <span class="keyword">if</span> (i - coin &lt; <span class="number">0</span>) <span class="keyword">continue</span>;</span><br><span class="line">            dp[i] = <span class="built_in">min</span>(dp[i], <span class="number">1</span> + dp[i - coin]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> (dp[amount] == amount + <span class="number">1</span>) ? <span class="number">-1</span> : dp[amount];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="0-1-背包问题"><a href="#0-1-背包问题" class="headerlink" title="0-1 背包问题"></a>0-1 背包问题</h2><p>有一个可装载重量为 W 的背包和 N 个物品，每个物品有重量和价值两个属性。其中第 i 个物品的重量为 wt[i]，价值为 val[i]，现在让你用这个背包装物品，最多能装的价值是多少？</p>
+<p>明确两点，「状态」和「选择」。</p>
+<ol>
+<li><p>明确状态，状态有两个，就是「背包的容量」和「可选择的物品」。</p>
+</li>
+<li><p>明确选择，就是「装进背包」或者「不装进背包」。</p>
+</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> 状态<span class="number">1</span> in 状态<span class="number">1</span>的所有取值：</span><br><span class="line">    <span class="keyword">for</span> 状态<span class="number">2</span> in 状态<span class="number">2</span>的所有取值：</span><br><span class="line">        <span class="keyword">for</span> ...</span><br><span class="line">            dp[状态<span class="number">1</span>][状态<span class="number">2</span>][...] = 择优(选择<span class="number">1</span>，选择<span class="number">2.</span>..)</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>明确 dp 数组的定义：对于前 i 个物品，当前背包的容量为 w，这种情况下可以装的最大价值是 dp[i][w]。</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i in [<span class="number">1.</span>.N]:</span><br><span class="line">    <span class="keyword">for</span> w in [<span class="number">1.</span>.W]:</span><br><span class="line">        dp[i][w] = <span class="built_in">max</span>(</span><br><span class="line">            dp[i<span class="number">-1</span>][w],  <span class="comment">// 不把物品 i 装进背包</span></span><br><span class="line">            dp[i<span class="number">-1</span>][w - wt[i<span class="number">-1</span>]] + val[i<span class="number">-1</span>]  <span class="comment">// 把物品 i 装进背包</span></span><br><span class="line">        )</span><br><span class="line"><span class="keyword">return</span> dp[N][W]</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>明确base case，就是 dp[0][..] = dp[..][0] = 0，因为没有物品或者背包没有空间的时候，能装的最大价值就是 0。</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">knapsack</span><span class="params">(<span class="type">int</span> W, <span class="type">int</span> N, vector&lt;<span class="type">int</span>&gt;&amp; wt, vector&lt;<span class="type">int</span>&gt;&amp; val)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// base case 已初始化</span></span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">dp</span>(N + <span class="number">1</span>, <span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(W + <span class="number">1</span>, <span class="number">0</span>));</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> w = <span class="number">1</span>; w &lt;= W; w++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (w - wt[i<span class="number">-1</span>] &lt; <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="comment">// 这种情况下只能选择不装入背包</span></span><br><span class="line">                dp[i][w] = dp[i - <span class="number">1</span>][w];</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 装入或者不装入背包，择优</span></span><br><span class="line">                dp[i][w] = <span class="built_in">max</span>(dp[i - <span class="number">1</span>][w - wt[i<span class="number">-1</span>]] + val[i<span class="number">-1</span>], </span><br><span class="line">                               dp[i - <span class="number">1</span>][w]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> dp[N][W];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="子集背包问题"><a href="#子集背包问题" class="headerlink" title="子集背包问题"></a>子集背包问题</h2><p>给定一个只包含正整数的非空数组。是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。</p>
+<ol>
+<li><p>明确「状态」和「选择」，状态就是「背包的容量」和「可选择的物品」，选择就是「装进背包」或者「不装进背包」。</p>
+</li>
+<li><p>明确dp数组的定义，dp[i][j] = x表示：对于前i个物品，当前背包的容量为j时，若x为true，则说明可以恰好将背包装满，若x为false，则说明不能恰好将背包装满。根据这个定义，我们想求的最终答案就是dp[N][sum/2]。</p>
+</li>
+<li><p>base case 就是dp[..][0] = true和dp[0][..] = false，因为背包没有空间的时候，就相当于装满了，而当没有物品可选择的时候，肯定没办法装满背包。</p>
+</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">canPartition</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> sum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> num : nums) sum += num;</span><br><span class="line">    <span class="comment">// 和为奇数时，不可能划分成两个和相等的集合</span></span><br><span class="line">    <span class="keyword">if</span> (sum % <span class="number">2</span> != <span class="number">0</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="type">int</span> n = nums.<span class="built_in">size</span>();</span><br><span class="line">    sum = sum / <span class="number">2</span>;</span><br><span class="line">    vector&lt;vector&lt;<span class="type">bool</span>&gt;&gt; <span class="built_in">dp</span>(n + <span class="number">1</span>, <span class="built_in">vector</span>&lt;<span class="type">bool</span>&gt;(sum + <span class="number">1</span>, <span class="literal">false</span>));</span><br><span class="line">    <span class="comment">// base case</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= n; i++)</span><br><span class="line">        dp[i][<span class="number">0</span>] = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">1</span>; j &lt;= sum; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (j - nums[i - <span class="number">1</span>] &lt; <span class="number">0</span>) &#123;</span><br><span class="line">               <span class="comment">// 背包容量不足，不能装入第 i 个物品</span></span><br><span class="line">                dp[i][j] = dp[i - <span class="number">1</span>][j]; </span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 装入或不装入背包</span></span><br><span class="line">                dp[i][j] = dp[i - <span class="number">1</span>][j] | dp[i - <span class="number">1</span>][j-nums[i<span class="number">-1</span>]];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> dp[n][sum];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意到dp[i][j]都是通过上一行dp[i-1][..]转移过来的，之前的数据都不会再使用了。所以可以进行状态压缩，将二维dp数组压缩为一维，节约空间复杂度：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">canPartition</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> sum = <span class="number">0</span>, n = nums.<span class="built_in">size</span>();</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> num : nums) sum += num;</span><br><span class="line">    <span class="keyword">if</span> (sum % <span class="number">2</span> != <span class="number">0</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    sum = sum / <span class="number">2</span>;</span><br><span class="line">    <span class="function">vector&lt;<span class="type">bool</span>&gt; <span class="title">dp</span><span class="params">(sum + <span class="number">1</span>, <span class="literal">false</span>)</span></span>;</span><br><span class="line">    <span class="comment">// base case</span></span><br><span class="line">    dp[<span class="number">0</span>] = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) </span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = sum; j &gt;= <span class="number">0</span>; j--) </span><br><span class="line">            <span class="keyword">if</span> (j - nums[i] &gt;= <span class="number">0</span>) </span><br><span class="line">                dp[j] = dp[j] || dp[j - nums[i]];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> dp[sum];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="完全背包问题"><a href="#完全背包问题" class="headerlink" title="完全背包问题"></a>完全背包问题</h2><p>有一个背包，最大容量为amount，有一系列物品coins，每个物品的重量为coins[i]，每个物品的数量无限。请问有多少种方法，能够把背包恰好装满？</p>
+<ol>
+<li><p>明确「状态」和「选择」，状态就是「背包的容量」和「可选择的物品」，选择就是「装进背包」或者「不装进背包」。</p>
+</li>
+<li><p>明确 dp[i][j]数组的定义：若只使用前i个物品，当背包容量为j时，有dp[i][j]种方法可以装满背包。</p>
+</li>
+<li><p>base case 为dp[0][..] = 0， dp[..][0] = 1。因为如果不使用任何硬币面值，就无法凑出任何金额；如果凑出的目标金额为 0，那么不用装就满了。</p>
+</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">change</span><span class="params">(<span class="type">int</span> amount, <span class="type">int</span>[] coins)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> n = coins.length;</span><br><span class="line">    <span class="type">int</span>[][] dp = amount <span class="type">int</span>[n + <span class="number">1</span>][amount + <span class="number">1</span>];</span><br><span class="line">    <span class="comment">// base case</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= n; i++) </span><br><span class="line">        dp[i][<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">1</span>; j &lt;= amount; j++)</span><br><span class="line">            <span class="keyword">if</span> (j - coins[i<span class="number">-1</span>] &gt;= <span class="number">0</span>)</span><br><span class="line">                dp[i][j] = dp[i - <span class="number">1</span>][j] + dp[i][j - coins[i<span class="number">-1</span>]]; <span class="comment">//把这第i个物品装入背包</span></span><br><span class="line">            <span class="keyword">else</span> </span><br><span class="line">                dp[i][j] = dp[i - <span class="number">1</span>][j]; <span class="comment">//不把这第i个物品装入背包</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> dp[n][amount];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过观察可以发现，dp数组的转移只和dp[i][..]和dp[i-1][..]有关，所以可以压缩状态，进一步降低算法的空间复杂度：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">int change(int amount, int[] coins) &#123;</span><br><span class="line">    int n = coins.length;</span><br><span class="line">    int[] dp = new int[amount + 1];</span><br><span class="line">    dp[0] = 1; // base case</span><br><span class="line">    for (int i = 0; i &lt; n; i++)</span><br><span class="line">        for (int j = 1; j &lt;= amount; j++)</span><br><span class="line">            if (j - coins[i] &gt;= 0)</span><br><span class="line">                dp[j] = dp[j] + dp[j-coins[i]];</span><br><span class="line"></span><br><span class="line">    return dp[amount];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -1217,185 +1413,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/cpu/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/25/cpu/cpu/" class="post-title-link" itemprop="url">处理器设计</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-25 11:13:36" itemprop="dateCreated datePublished" datetime="2022-09-25T11:13:36+08:00">2022-09-25</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-10-30 10:45:26" itemprop="dateModified" datetime="2022-10-30T10:45:26+08:00">2022-10-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="ISA"><a href="#ISA" class="headerlink" title="ISA"></a>ISA</h2><p>ISA（Instruction Set Architecture）指令集架构定义了一个处理器支持的指令和指令的字节级编码，包括很多个部分：</p>
-<ul>
-<li>指令集</li>
-<li>指令集编码</li>
-<li>基本数据类型</li>
-<li>一组编程规范</li>
-<li>寄存器</li>
-<li>寻址模式</li>
-<li>存储体系</li>
-<li>异常事件处理</li>
-<li>中断</li>
-<li>外部I/O</li>
-</ul>
-<p><strong>CISC</strong>（Complex Instruction Set Computer，复杂指令集计算机）的每个指令可执行若干低阶操作，诸如从内存读取、储存、和计算操作，全部集于单一指令之中。CISC特点：</p>
-<ul>
-<li><p>指令系统庞大，指令功能复杂，指令格式、寻址方式多；</p>
-</li>
-<li><p>绝大多数指令需多个机器周期完成；- 各种指令都可访问存储器；</p>
-</li>
-<li><p>采用微程序控制；</p>
-</li>
-<li><p>有专用寄存器，少量；</p>
-</li>
-<li><p>难以用优化编译技术生成高效的目标代码程序；</p>
-</li>
-</ul>
-<p>在CISC指令集的各种指令中，大约有20%的指令会被反复使用，占整个程序代码的80%。而余下的80%的指令却不经常使用，在程序设计中只占20%。</p>
-<p><strong>RISC</strong>（Reduced Instruction Set Computer，精简指令集计算机）对指令数目和寻址方式都做了精简，使其实现更容易，指令并行执行程度更好，编译器的效率更高。它能够以更快的速度执行操作。RISC设计的根本原则量对流水线的优化。RISC特点：</p>
-<ul>
-<li>统一指令编码（例如，所有指令中的op-code永远位于同样的位元位置、等长指令），可快速解译；</li>
-<li>泛用的暂存器，所有暂存器可用于所有内容，以及编译器设计的单纯化（不过暂存器中区分了整数和浮点数）；</li>
-<li>单纯的寻址模式（复杂寻址模式以简单计算指令序列取代）。</li>
-<li>硬件中支援少数资料型别（例如，一些CISC电脑中存有处理字节字串的指令。这在RISC电脑中不太可能出现）。</li>
-<li>所有计算都要在寄存器中完成。而寄存器和内存的通信则由单独的指令完成。</li>
-<li>有非常多的通用寄存器，并采用了重叠寄存器窗口和寄存器堆等技术使寄存器资源得到充分的利用。</li>
-</ul>
-<p><strong>CISC和RISC的区别</strong></p>
-<ul>
-<li>指令系统：RISC设计者把主要精力放在那些经常使用的指令上，尽量使它们具有简单高效的特色。对不常用的功能，常通过组合指令来完成。因此，在RISC机器上实现特殊功能时，效率可能较低。但可以利用流水技术和超标量技术加以改进和弥补。而CISC计算机的指令系统比较丰富，有专用指令来完成特定的功能。因此，处理特殊任务效率较高。</li>
-<li>存储器操作：RISC对存储器操作有限制，使控制简单化；而CISC机器的存储器操作指令多，操作直接。</li>
-<li>程序：RISC汇编语言程序一般需要较大的内存空间，实现特殊功能时程序复杂，不易设计；而CISC汇编语言程序编程相对简单，科学计算及复杂操作的程序社设计相对容易，效率较高。</li>
-<li>中断：RISC机器在一条指令执行的适当地方可以响应中断；而CISC机器是在一条指令执行结束后响应中断。</li>
-<li>CPU：RISC CPU包含有较少的单元电路，因而面积小、功耗低；而CISCCPU包含有丰富的电路单元，因而功能强、面积大、功耗大。</li>
-<li>设计周期：RISC微处理器结构简单，布局紧凑，设计周期短，且易于采用最新技术；CISC微处理器结构复杂，设计周期长。</li>
-<li>用户使用：RISC微处理器结构简单，指令规整，性能容易把握，易学易用；CISC微处理器结构复杂，功能强大，实现特殊功能容易。</li>
-<li>应用范围：由于RISC指令系统的确定与特定的应用领域有关，故RISC机器更适合于专用机；而CISC机器则更适合于通用机。</li>
-</ul>
-<h2 id="流水线"><a href="#流水线" class="headerlink" title="流水线"></a>流水线</h2><p>MIPS处理器在设计时，将处理器的执行过程划分为5个阶段：IF取指、ID译码、EX执行、MEM内存数据读或写、WB数据写回到通用寄存器中。</p>
-<p><img src="/images/cpu/%E6%B5%81%E6%B0%B4%E7%BA%BF.jpg" alt="img"></p>
-<p>流水线在实际执行过程中会遇到一些因素导致流水线停顿，这些就被称为流水线冒险。</p>
-<p><strong>结构冒险</strong></p>
-<p>流水线中取指阶段和读写存储器阶段都需要访问存储器，处理器中，程序和数据存储器没有分开，IF和MEM操作同时访问存储器导致其中一个操作要等待。哈弗架构不存在这个问题。</p>
-<p><strong>数据冒险</strong></p>
-<p>由于从指令取指到数据更新至存储器/寄存器之间具有时钟延迟，当出现某些指令的组合时，可能会导致后面的指令使用了错误的数据。</p>
-<p>解决方法一是加入几个cycle的等待，但这影响了执行效率。另一种更好的解决办法是使用直通（Forwarding）技术。当硬件检测到当前指令的源操作数正好在EX/MEM流水线寄存器中时，就直接将EX/MEM寄存器的值传递给ALU的输入，而不是从寄存器堆中读数据。</p>
-<p><strong>控制冒险</strong></p>
-<p>由于使用流水线操作，在当前指令正在执行时，后面的很多条指令已经完成了取指和译码等步骤。然而，程序中有很多跳转语句，如果程序的实际执行路径是要跳转到其它的地址去执行，那么流水线中已经做的这些取指和译码工作就白做了，这就是流水线的控制冒险。</p>
-<p>此时处理器需要排空流水线，跳转到新的地址处重新进入流水线。x86处理器使用硬件冲刷流水线来保证发生跳转时，流水线能正确执行。在TI的DSP中，硬件不处理这些冒险，而是通过软件的方式，在跳转语句后增加5个NOP操作来保证流水线正确，编译器也可以将指令乱序，用有效指令代替NOP指令。</p>
-<h2 id="分支预测"><a href="#分支预测" class="headerlink" title="分支预测"></a>分支预测</h2><p>流水线的控制冒险将可能引起流水线排空，这对程序性能的损害是巨大的，流水线越深，损害越大。现代的很多处理器采用了分支预测技术来避免跳转带来的损失。</p>
-<p>采用分支预测，处理器猜测进入哪个分支，并且基于预测的结果来取指、译码。如果猜测正确，就能节省时间，若果猜测错误，则刷新流水线，在新的地址上取指、译码。因此，分支预测需要有足够的准确性。</p>
-<p>介绍两种简单的分支预测算法：</p>
-<ul>
-<li><p>1位预测：如果该跳转指令上一次发生跳转，就预测这一次也会跳转，如果上一次没有跳转，就预测这一次也没有跳转。</p>
-</li>
-<li><p>2位预测：用2bit计数器保存跳转信息，如果跳转执行就加1，跳转未执行就减1,。当计数器值为0和1时，就预测该分支不执行；当计数器值为2和3时，就预测这个分支执行。</p>
-</li>
-</ul>
-<p>分支预测会消耗大量的资源，很多低功耗处理器没有分支预测，取而代之的是使用条件执行来减少跳转指令，如TI的DSP和ARM的cortex系列内核等。</p>
-<h2 id="乱序执行"><a href="#乱序执行" class="headerlink" title="乱序执行"></a>乱序执行</h2><p>指令在执行时常常因为一些限制而等待，后面的指令都要等待。如果处理器足够智能，就可以先执行后面不依赖该数据的指令，这就是处理器的乱序执行（out -of-order execution）。</p>
-<p>乱序执行最大的障碍就是指令间的相关性。指令间相关大致有三种情况：</p>
-<ul>
-<li>寄存器相关，即前后指令使用了相同的寄存器。</li>
-<li>控制相关，跳转指令之后执行哪些指令需要依赖于跳转的结果。</li>
-<li>数据相关，即后面指令需要的数据依赖于前面指令的计算结果。</li>
-</ul>
-<p>对于寄存器相关，处理器通过<strong>寄存器重命名</strong>技术解决这一问题。相同的ISA寄存器可以映射到不同的物理寄存器，经过映射后，新的指令就可以使用不同的物理寄存器，指令间的相关性也就消除了。</p>
-<p>对于控制相关，处理器通过分支预测来决定哪些指令将会得到执行。</p>
-<p>对于数据相关，这往往是由程序算法特性以及程序的设计共同决定的，它和处理器无关，和程序员以及编译器有关。在很多时候，编程人员可以通过调整代码设计将数据间的相关性降至最小。如下面这段代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x = a + b;</span><br><span class="line">y = x + c;</span><br><span class="line">z = y + d;</span><br></pre></td></tr></table></figure>
-
-<p>可以改写成：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x = a + b;</span><br><span class="line">y = c + d;</span><br><span class="line">z = x + y;</span><br></pre></td></tr></table></figure>
-
-<p>乱序执行比顺序执行要耗费更多的处理器资源，通常只有高端处理器才会使用。</p>
-<h2 id="并行设计"><a href="#并行设计" class="headerlink" title="并行设计"></a>并行设计</h2><p><strong>指令并行</strong></p>
-<p>多发射是指将多条指令同时发射到不同的译码器或者后续处理流水线中。</p>
-<p>超标量是指一个时钟周期内能发射多条指令的流水线架构，内部有多个执行单元，</p>
-<p><strong>数据并行</strong></p>
-<p>SIMD（Single Instruction Multiple Data，单指令多数据）指令通过一条语句处理多个数据。在多媒体应用中，同一操作会重复处理多个数据，SIMD指令就特别适合处理这一类数据。</p>
-<p><strong>线程并行</strong></p>
-<p>线程并行的方式有：单核内多线程、多核、多处理器。</p>
-<p>流水线是一种在垂直方向上对指令处理进行重叠来提升性能的技术，相对地，在水平方向上将指令进行重叠的技术称为<strong>超标量</strong>（superscalar）。也就是说，在没有相互依赖关系的前提下，多条指令可以同时执行。</p>
-<p>超线程是Intel公司提出的一种提高CPU性能的技术，就是将一个物理CPU当作两个逻辑CPU使用，使CPU可以同时执行多重线程，同时处理多个取出并执行指令的控制流程，从而将没有相互依赖关系的运算同时送入运算器中。超线程技术利用特殊的硬件指令，把两个逻辑内核模拟成两个物理芯片，让单个处理器都能使用线程级并行计算，进而兼容多线程操作系统和应用软件，减少CPU的闲置时间，提高CPU的运行效率。</p>
-<h2 id="核间通信"><a href="#核间通信" class="headerlink" title="核间通信"></a>核间通信</h2><p>多核处理器的多个核之间会共用处理器的外设与接口，如内存控制器、PCI-E接口等，通常也会共享一段Cache。核与核之间有时需要交换信息，因此核间连接/通信方式的选取也很关键。常见的几种多核组织结构：</p>
-<ul>
-<li><p>Bus结构比较简单，缺点是每两个内核通信都要占用总线，导致其它核不能通信，通信效率低。</p>
-</li>
-<li><p>Switch结构通信效率最高。但如果核太多，这种连接方式需耗费大量的互联资源，通常4个核左右的处理器采用这种方式。</p>
-</li>
-<li><p>Ring结构介于Bus和Switch结构之间。1和3通信需要经过2，越近的两个核通信效率越高，通信连线并不复杂，实现成本也低。通常8个核左右采用这种方式，Intel的很多处理器采用这种结构。</p>
-</li>
-<li><p>Mesh结构适用于核数非常多的情况，类似于二维的Ring结构。</p>
-</li>
-</ul>
-<p><img src="/images/cpu/%E5%A4%9A%E6%A0%B8%E7%BB%84%E7%BB%87%E7%BB%93%E6%9E%84.jpg" alt="img"></p>
-<p>因为核间通信会影响内核的运算效率，1个核可以做5件事情，并不代表4个核可以做20件事情，核越多时，数据交换延时越长。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1465,7 +1482,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">215</span>
+          <span class="site-state-item-count">216</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

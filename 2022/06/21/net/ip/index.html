@@ -23,7 +23,7 @@
   <meta name="description" content="IPIPv4IPv4 地址共32位，每 8 位作为一组，用点分十进制的表示方式，包含两部分：网络号负责标识该 IP 地址是属于哪个子网的；主机号负责标识同一子网下的不同主机。 子网掩码也是32bit，为1的部分表示网络号，为0的部分表示主机号，将子网掩码和IP地址相与，可以计算出网络号和主机号。主机号部分全部为0代表整个子网，主机号部分全部为1代表广播地址，向子网上所有设备发送包。  本地回环地址">
 <meta property="og:type" content="article">
 <meta property="og:title" content="IP and MAC">
-<meta property="og:url" content="http://example.com/2022/06/21/net/ip-mac/index.html">
+<meta property="og:url" content="http://example.com/2022/06/21/net/ip/index.html">
 <meta property="og:site_name" content="nullptr">
 <meta property="og:description" content="IPIPv4IPv4 地址共32位，每 8 位作为一组，用点分十进制的表示方式，包含两部分：网络号负责标识该 IP 地址是属于哪个子网的；主机号负责标识同一子网下的不同主机。 子网掩码也是32bit，为1的部分表示网络号，为0的部分表示主机号，将子网掩码和IP地址相与，可以计算出网络号和主机号。主机号部分全部为0代表整个子网，主机号部分全部为1代表广播地址，向子网上所有设备发送包。  本地回环地址">
 <meta property="og:locale" content="zh_CN">
@@ -34,16 +34,13 @@
 <meta property="og:image" content="http://example.com/images/net/tcpip/ipv6.png">
 <meta property="og:image" content="http://example.com/images/net/dns_msg.png">
 <meta property="og:image" content="http://example.com/images/net/route_map.png">
-<meta property="og:image" content="http://example.com/images/net/tcpip/mac_head.png">
-<meta property="og:image" content="http://example.com/images/net/tcpip/pack.png">
-<meta property="og:image" content="http://example.com/images/net/switch.png">
 <meta property="article:published_time" content="2022-06-21T10:40:36.884Z">
-<meta property="article:modified_time" content="2022-06-21T10:40:36.884Z">
+<meta property="article:modified_time" content="2022-11-19T07:17:39.455Z">
 <meta property="article:author" content="ubun2">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/images/net/tcpip/ip_name.png">
 
-<link rel="canonical" href="http://example.com/2022/06/21/net/ip-mac/">
+<link rel="canonical" href="http://example.com/2022/06/21/net/ip/">
 
 
 <script id="page-configurations">
@@ -191,7 +188,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/21/net/ip-mac/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/21/net/ip/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -216,6 +213,13 @@
 
               <time title="创建时间：2022-06-21 18:40:36" itemprop="dateCreated datePublished" datetime="2022-06-21T18:40:36+08:00">2022-06-21</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-11-19 15:17:39" itemprop="dateModified" datetime="2022-11-19T15:17:39+08:00">2022-11-19</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -281,14 +285,14 @@
 <li>记录类型：表示域名对应何种类型的记录。例如，当类型为 A 时，表示域名对应的是 IP 地址；当类型为 MX 时，表示域名对应的是邮件服务器。对于不同的记录类型，服务器向客户端返回的信息也会不同。</li>
 </ul>
 <p><img src="/images/net/dns_msg.png" alt="dns_msg"></p>
-<h3 id="ARP"><a href="#ARP" class="headerlink" title="ARP"></a>ARP</h3><p>ARP 用于根据 IP 地址查询相应的以太网 MAC 地址。</p>
+<h3 id="ARP"><a href="#ARP" class="headerlink" title="ARP"></a>ARP</h3><p>ARP 用于根据 IP 地址查询相应的MAC 地址。</p>
 <p>主机会通过广播发送 ARP 请求，这个包中包含了想要查询的 MAC 地址的主机 IP 地址。当同个链路中的所有设备收到 ARP 请求时，会去拆开 ARP 请求包里的内容，如果 ARP 请求包中的目标 IP地址与自己的 IP 地址一致，那么这个设备就将自己的 MAC 地址塞入 ARP 响应包返回给主机。通常操作系统会把获取的 MAC 地址缓存起来，可以使用 <code>arp -a</code> 命令来查看。</p>
 <p>RARP 协议是根据 MAC 地址求 IP 地址。</p>
 <h3 id="DHCP"><a href="#DHCP" class="headerlink" title="DHCP"></a>DHCP</h3><p>DHCP(Dynamic Host Configuration Protocol)动态主机配置协议。能实现自动设置 IP 地址、统一管理 IP 地址分配。DHCP 服务器分配的 IP 地址只能在租期内使用。</p>
 <h4 id="udhcpc"><a href="#udhcpc" class="headerlink" title="udhcpc"></a>udhcpc</h4><p>默认的目录文件是/usr/share/udhcpc/default.script，当udhcpc 取得了IP地址之后，会把从DHCP server 得到的信息带入 script执行。</p>
 <h3 id="NET"><a href="#NET" class="headerlink" title="NET"></a>NET</h3><p>NAT就是同个公司、家庭、教室内的主机对外部通信时，把私有 IP 地址转换成公有 IP 地址。</p>
 <h3 id="ICMP"><a href="#ICMP" class="headerlink" title="ICMP"></a>ICMP</h3><p>ICMP(Internet Control Message Protocol)互联网控制报文协议，用于告知网络包传送过程中产生的错误以及各种控制信息。在 IP 通信中如果某个 IP 包因为某种原因未能达到目标地址，那么这个具体的原因将由 ICMP 负责通知。</p>
-<h3 id="IGMP"><a href="#IGMP" class="headerlink" title="IGMP"></a>IGMP</h3><p>被IP主机用来向本地多路广播路由器报告主机组成员的协议。</p>
+<h3 id="IGMP"><a href="#IGMP" class="headerlink" title="IGMP"></a>IGMP</h3><p>IGMP(Internet Control Message Protocol)互联网控制报文协议，是主机用来向本地多路广播路由器报告主机组成员的协议。ping命令就是基于ICMP协议工作的。</p>
 <h2 id="路由器"><a href="#路由器" class="headerlink" title="路由器"></a>路由器</h2><p>路由器是按照IP 协议传输包的设备，根据接收到的包的 IP 头部中记录的接收方 IP 地址，在路由表中进行查询，以此判断转发目标。</p>
 <p>路由器已经集成了集线器和交换机的功能，俗称三层网络设备，每个端口都具有 MAC 地址和 IP 地址，只接收与自身地址匹配的包，不匹配的包则直接丢弃。</p>
 <p><img src="/images/net/route_map.png" alt="img"></p>
@@ -299,46 +303,6 @@
 <p>对于长度大于输出端口MTU的转发包，路由器会根据IP 头部中的标志字段，确认是否可以分片。如果查询标志字段发现不能分片，那么就只能丢弃这个包，并通过ICMP 消息通知发送方。在分片中，TCP 头部及其后面的部分都是可分片的数据，每一份数据前面会加上 IP 头部。</p>
 <p>路由转发和IP 模块发送包的过程是相同的，会在包前面加上 MAC 头部，也是从路由表的网关列中查找出下一个路由器的 IP 地址，如果网关是一个 IP 地址，则这个IP 地址就是我们要转发到的目标地址；如果网关为空 ，则 IP 头部中的接收方 IP 地址就是要转发到的目标地址。然后通过 ARP 根据 IP 地址查询出 MAC 地址，然后将 MAC 地址写入 MAC 头部。</p>
 <p>内网与互联网连接需要地址转换。地址转换的基本原理是在转发网络包时对 IP 头部中的 IP 地址和端口号进行改写。因为公网IP只有一个，所以要根据不同的端口号区分内网不同的私有地址，路由器会保存私有地址与端口号对应的记录。如果私有地址和端口号没有保存在对应表中，外网是无法访问私有地址的，除非手动添加记录。</p>
-<h2 id="MAC"><a href="#MAC" class="headerlink" title="MAC"></a>MAC</h2><p>MAC 地址共有 48 bit，用来唯一标识设备，在网卡生产时写入 ROM 里的，网卡驱动程序读取并分配给 MAC模块。通过 ARP 可以查询目标路由器的 MAC 地址。</p>
-<table>
-<thead>
-<tr>
-<th align="center">bit</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">1</td>
-<td>0 单播地址<br/>1 多播地址</td>
-</tr>
-<tr>
-<td align="center">2</td>
-<td>0 全局地址<br/>1 本地地址</td>
-</tr>
-<tr>
-<td align="center">3-24</td>
-<td>厂商识别码</td>
-</tr>
-<tr>
-<td align="center">25-48</td>
-<td>网卡唯一标识</td>
-</tr>
-</tbody></table>
-<p>MAC 头部是以太网使用的头部，它包含了接收方和发送方的 MAC 地址等信息，其作用就是将包送达路由器。</p>
-<p><img src="/images/net/tcpip/mac_head.png" alt="img"></p>
-<h2 id="网卡"><a href="#网卡" class="headerlink" title="网卡"></a>网卡</h2><p>网卡驱动从 IP 模块获取包之后，会将其复制到网卡内的缓冲区中，然后向MAC 模块发送发送包的命令。MAC 模块会将包从缓冲区中取出，并在开头加上报头和起始帧分界符，在末尾加上用于检测错误的帧校验序列。再将数字信息按每个比特转换成电信号，然后由 PHY信号收发模块发送出去。</p>
-<p><img src="/images/net/tcpip/pack.png" alt="img"></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">修改MAC地址</span></span><br><span class="line">ifconfig eth0 hw ether 12:34:56:78:90:12</span><br></pre></td></tr></table></figure>
-
-<h2 id="交换机"><a href="#交换机" class="headerlink" title="交换机"></a>交换机</h2><p>交换机将网络包原样转发到目的地，交换机根据 MAC 地址表查找 MAC 地址，然后将信号发送到相应的端口。交换机的 MAC 地址表主要包含两个信息:设备的 MAC 地址，和该设备连接在交换机的端口。</p>
-<p>如果MAC地址表中找不到指定的 MAC 地址。这可能是因为具有该地址的设备还没有向交换机发送过包，或者这个设备一段时间没有工作导致地址被从地址表中删除了。这种情况下，交换机会将包转发到除了源端口之外的所有端口。</p>
-<p>交换机是基于以太网设计的，俗称二层网络设备，交换机工作在全双工模式。</p>
-<p><img src="/images/net/switch.png" alt="img"></p>
-<p>交换机会自行更新或删除地址表中的记录，当收到包时会将发送方 MAC 地址以及其输入端口的号码写入MAC 地址表中，当端口上的设备长时间不工作，就会删除记录。</p>
-<p>计算机的网卡本身具有 MAC 地址，并通过核对收到的包的接收方 MAC 地址判断是不是发给自己的，如果不是发给自己的则丢弃。相对地，交换机的端口不具有 MAC 地址的端口，故不会核对接收方 MAC 地址，而是直接接收所有的包并存放到缓冲区中。</p>
-<h2 id="集线器"><a href="#集线器" class="headerlink" title="集线器"></a>集线器</h2><p>集线器是根据以太网协议工作的设备，集线器里有一张以太网协议的表，根据以太网头部中记录的目的地信息查出相应的传输方向，在子网中将网络包传输到下一个转发设备。</p>
-<p>集线器将信号广播给所有连接到它网络。集线器的接口中有一个 MDI/MDI-X 切换开关，MDI 就是对 RJ-45 接口和信号收发模块进行直连接线，而 MDI-X 则是交叉接线。</p>
-<p>集线器工作在半双工模式。</p>
 
     </div>
 
@@ -420,7 +384,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#IP"><span class="nav-number">1.</span> <span class="nav-text">IP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IPv4"><span class="nav-number">1.1.</span> <span class="nav-text">IPv4</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IP%E5%A4%B4"><span class="nav-number">1.2.</span> <span class="nav-text">IP头</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IPv6"><span class="nav-number">1.3.</span> <span class="nav-text">IPv6</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IP%E5%8D%8F%E8%AE%AE"><span class="nav-number">2.</span> <span class="nav-text">IP协议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DNS"><span class="nav-number">2.1.</span> <span class="nav-text">DNS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ARP"><span class="nav-number">2.2.</span> <span class="nav-text">ARP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DHCP"><span class="nav-number">2.3.</span> <span class="nav-text">DHCP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#udhcpc"><span class="nav-number">2.3.1.</span> <span class="nav-text">udhcpc</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NET"><span class="nav-number">2.4.</span> <span class="nav-text">NET</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ICMP"><span class="nav-number">2.5.</span> <span class="nav-text">ICMP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IGMP"><span class="nav-number">2.6.</span> <span class="nav-text">IGMP</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%AF%E7%94%B1%E5%99%A8"><span class="nav-number">3.</span> <span class="nav-text">路由器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MAC"><span class="nav-number">4.</span> <span class="nav-text">MAC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E5%8D%A1"><span class="nav-number">5.</span> <span class="nav-text">网卡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%A4%E6%8D%A2%E6%9C%BA"><span class="nav-number">6.</span> <span class="nav-text">交换机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E7%BA%BF%E5%99%A8"><span class="nav-number">7.</span> <span class="nav-text">集线器</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#IP"><span class="nav-number">1.</span> <span class="nav-text">IP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IPv4"><span class="nav-number">1.1.</span> <span class="nav-text">IPv4</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IP%E5%A4%B4"><span class="nav-number">1.2.</span> <span class="nav-text">IP头</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IPv6"><span class="nav-number">1.3.</span> <span class="nav-text">IPv6</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IP%E5%8D%8F%E8%AE%AE"><span class="nav-number">2.</span> <span class="nav-text">IP协议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DNS"><span class="nav-number">2.1.</span> <span class="nav-text">DNS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ARP"><span class="nav-number">2.2.</span> <span class="nav-text">ARP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DHCP"><span class="nav-number">2.3.</span> <span class="nav-text">DHCP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#udhcpc"><span class="nav-number">2.3.1.</span> <span class="nav-text">udhcpc</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NET"><span class="nav-number">2.4.</span> <span class="nav-text">NET</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ICMP"><span class="nav-number">2.5.</span> <span class="nav-text">ICMP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IGMP"><span class="nav-number">2.6.</span> <span class="nav-text">IGMP</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%AF%E7%94%B1%E5%99%A8"><span class="nav-number">3.</span> <span class="nav-text">路由器</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -433,7 +397,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">215</span>
+          <span class="site-state-item-count">216</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
