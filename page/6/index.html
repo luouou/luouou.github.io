@@ -275,6 +275,137 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/c/daemon/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/08/13/c/daemon/" class="post-title-link" itemprop="url">daemon process</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-08-13 21:56:50" itemprop="dateCreated datePublished" datetime="2022-08-13T21:56:50+08:00">2022-08-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>每一个系统与用户进行交流的界面称为终端，每一个从此终端开始运行的进程都会依附于这个终端，这个终端就称为这些进程的控制终端，当控制终端被关闭时，相应的进程都会自动关闭。</p>
+<p>守护进程(daemon)是一种在系统引导装入时起动，在系统关闭时终止，不会受到用户、终端或者其他的变化而影响，在后台运行没有控制终端的进程。</p>
+<h2 id="进程组"><a href="#进程组" class="headerlink" title="进程组"></a>进程组</h2><p>进程组是一个或多个进程的集合。进程组由进程组 ID 来惟一标识。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">setpgid</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">pid_t</span> pgid)</span>;</span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpgid</span><span class="params">(<span class="type">pid_t</span> pid)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpgrp</span><span class="params">(<span class="type">void</span>)</span>;                 <span class="comment">/* POSIX.1 version */</span></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpgrp</span><span class="params">(<span class="type">pid_t</span> pid)</span>;            <span class="comment">/* BSD version */</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">setpgrp</span><span class="params">(<span class="type">void</span>)</span>;                   <span class="comment">/* System V version */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">setpgrp</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">pid_t</span> pgid)</span>;  <span class="comment">/* BSD version */</span></span><br></pre></td></tr></table></figure>
+
+<p>setpgid()将pid进程的进程组ID设置为pgid。如果pid和pgid相等，则由pid指定的进程变成进程组组长，如果pid是0，则使用调用者的进程ID，如果pgid是0，则由pid指定的进程ID被用作为进程组ID。</p>
+<h2 id="会话"><a href="#会话" class="headerlink" title="会话"></a>会话</h2><p>会话是一个或多个进程组的集合，一个会话开始于用户登录，终止于用户退出，在此期间该用户运行的所有进程都属于这个会话。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">setsid</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>setsid()函数能够使进程完全独立出来，从而脱离其他进程的控制：</p>
+<ul>
+<li>让进程摆脱原会话的控制。</li>
+<li>让进程摆脱原进程组的控制。</li>
+<li>让进程摆脱原控制终端的控制。</li>
+</ul>
+<h2 id="守护进程"><a href="#守护进程" class="headerlink" title="守护进程"></a>守护进程</h2><ol>
+<li><p>首先fork一个子进程，然后让父进程exit。这样做实现了下面几点：(a)如果精灵进程是由一条shell命令起动的，那么父进程终止使得shell认为这条命令已经执行完成。(b)进程继承了父进程的进程组ID，其进程ID则是新分配的，这就保证了子进程不是一个进程组的首进程，这是setsid()调用的前提条件。</p>
+</li>
+<li><p>调用setsid()以创建一个新对话期，使调用进程：(a)成为新对话期的首进程，(b)成为一个新进程组的首进程，(c)没有控制终端。</p>
+</li>
+<li><p>将当前工作目录更改为/目录，保证工作目录所在的文件系统不能被卸载。</p>
+</li>
+<li><p>将文件权限掩码设置为0，方便进程操作文件。</p>
+</li>
+<li><p>关闭不再需要的文件描述符，从父进程那里继承打开了的文件，可能永远不会被守护进程读或写，但一样消耗系统资源，而且可能导致所在的文件系统无法被卸载。</p>
+</li>
+</ol>
+<p>守护进程没有控制终端，所以不能将错误信息输出到控制终端，可以使用syslog服务将程序中的出错信息输入到系统日志文件/var/log/syslog。</p>
+<h2 id="syslog"><a href="#syslog" class="headerlink" title="syslog"></a>syslog</h2><p>syslog是linux中的系统日志管理服务，通过守护进程syslogd来维护，该守护进程在启动时会读配置文件/etc/syslog.conf，该文件决定了不同种类的消息会发送向何处。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;syslog.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">openlog</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *ident, <span class="type">int</span> option, <span class="type">int</span> facility)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">syslog</span><span class="params">(<span class="type">int</span> priority, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">closelog</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>openlog用于打开系统日志服务的一个连接。ident参数定义消息的标签字符串，option参数：</p>
+<ul>
+<li>LOG_CONS  如果消息无法送到系统日志服务，则直接输出到系统控制终端</li>
+<li>LOG_NDELAY  立即打开系统日志服务的连接。在正常情况下，直接发送到第一条消息时才打开连接</li>
+<li>LOG_PERROR  将日志消息发送给 s y s l o g和stderr。</li>
+<li>LOG_PID  消息中包含进程的PID</li>
+</ul>
+<p>facility参数指定程序发送的消息类型：</p>
+<ul>
+<li>LOG_AUTHPRIV  安全/授权信息</li>
+<li>LOG_CRON  时间守护进程(cron 及 at)函数传入值</li>
+<li>LOG_DAEMON  其他系统守护进程</li>
+<li>LOG_KERN  内核信息</li>
+<li>LOG_LOCAL[0~7]  保留</li>
+<li>LOG_LPR  行打印机子系统</li>
+<li>LOG_MAIL  邮件子系统</li>
+<li>LOG_NEWS  新闻子系统</li>
+<li>LOG_SYSLOG  syslogd 内部所产生的信息</li>
+<li>LOG_USER  一般使用者等级信息</li>
+<li>LOG_UUCP  UUCP 子系统</li>
+</ul>
+<p>syslog是用于向日志文件中写入消息，format参数规定消息输出格式等。priority参数指定消息等级：</p>
+<ul>
+<li>LOG_EMERG  紧急(系统不可使用)</li>
+<li>LOG_ALERT  需要立即采取措施</li>
+<li>LOG_CRIT  重要情况</li>
+<li>LOG_ERR  错误消息</li>
+<li>LOG_WARNING  警告消息</li>
+<li>LOG_NOTICE  正常情况,但也是重要情况</li>
+<li>LOG_INFO  信息消息</li>
+<li>LOG_DEBUG  调试信息</li>
+</ul>
+<p>closelog是用于关闭系统日志服务的连接。</p>
+<h2 id="例程"><a href="#例程" class="headerlink" title="例程"></a>例程</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> i;</span><br><span class="line"><span class="type">pid_t</span> pid = fork();</span><br><span class="line"><span class="keyword">if</span> (pid == <span class="number">-1</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;fork&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (pid &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 打开系统日志服务 */</span></span><br><span class="line">openlog(<span class="string">&quot;daemon_syslog&quot;</span>, LOG_PID, LOG_DAEMON);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*创建新的会话组*/</span></span><br><span class="line"><span class="type">int</span> ret = setsid();</span><br><span class="line"><span class="keyword">if</span> (ret &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    syslog(LOG_ERR, <span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;setsid&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ret = chdir(<span class="string">&quot;/&quot;</span>);</span><br><span class="line"><span class="keyword">if</span> (ret &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    syslog(LOG_ERR, <span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;chdir&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">umask(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*关闭父进程的文件描述符*/</span></span><br><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; getdtablesize(); ++i) &#123;</span><br><span class="line">    close(i);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">syslog(LOG_INFO, <span class="string">&quot;daemon init\n&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/c/fileio/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -926,128 +1057,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/c/pthread/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/08/13/c/pthread/" class="post-title-link" itemprop="url">linux pthread</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-08-13 21:56:50" itemprop="dateCreated datePublished" datetime="2022-08-13T21:56:50+08:00">2022-08-13</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>进程是系统中程序执行和资源分配的基本单位，每个进程都拥有自己的数据段、代码段和堆栈段，这就造成进程在进行切换时需要消耗更多的处理器空转时间，为了减少上下文切换开销，进程在演化中出现了线程。</p>
-<p>线程处理器调度的最小单元。线程可以访问进程的内存空间和资源，并与同一进程中的其他线程共享，因此线程的上下文切换的开销比创建进程小很多。同进程一样，线程也将相关的执行状态和存储变量放在线程控制表内，一个进程可以有多个线程，也就是有多个线程控制表及堆栈寄存器，但却共享一个用户地址空间。由于线程共享了进程的资源和地址空间，因此任何线程对系统资源的操作都会给其他线程带来影响，必须考虑线程间资源访问的同步与互斥问题。</p>
-<p>线程按照其调度者可以分为用户级线程和核心级线程两种：</p>
-<ul>
-<li><p>用户级线程主要解决的是上下文切换的问题，它的调度算法和调度过程全部由用户自行选择决定，在运行时不需要内核支持。系统往往会提供一个用户空间的线程库，该线程库提供了线程的创建、调度和撤销等功能，而内核仍然仅对进程进行管理。如果一个进程中的某一个线程调用了一个阻塞的系统调用函数，那么该进程包括该进程中的其他所有线程也同时被阻塞。这种用户级线程的主要缺点是在一个进程中的多个线程的调度中无法发挥多处理器的优势。</p>
-</li>
-<li><p>内核级线程允许不同进程中的线程按照同一相对优先调度方法进行调度，这样就可以发挥多处理器的并发优势。</p>
-</li>
-</ul>
-<p>现在大多数系统都采用用户级线程与核心级线程并存的方法，一个用户级线程可以对应一个或几个核心级线程，这样既可满足多处理机系统的需要，也可以最大限度地减少调度开销。</p>
-<p>gcc在编译时要链接libpthread库<code>gcc -lpthread</code>。</p>
-<h2 id="线程库"><a href="#线程库" class="headerlink" title="线程库"></a>线程库</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_create</span><span class="params">(<span class="type">pthread_t</span> *thread, <span class="type">const</span> <span class="type">pthread_attr_t</span> *attr,</span></span><br><span class="line"><span class="params">                          <span class="type">void</span> *(*start_routine) (<span class="type">void</span> *), <span class="type">void</span> *arg)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">pthread_exit</span><span class="params">(<span class="type">void</span> *retval)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_join</span><span class="params">(<span class="type">pthread_t</span> thread, <span class="type">void</span> **retval)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cancel</span><span class="params">(<span class="type">pthread_t</span> thread)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_setcancelstate</span><span class="params">(<span class="type">int</span> state, <span class="type">int</span> *oldstate)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_setcanceltype</span><span class="params">(<span class="type">int</span> type, <span class="type">int</span> *oldtype)</span>;</span><br></pre></td></tr></table></figure>
-
-<h2 id="互斥锁"><a href="#互斥锁" class="headerlink" title="互斥锁"></a>互斥锁</h2><p>互斥锁是用一种简单的加锁方法来控制对共享资源按顺序进行原子操作。这个互斥锁只有两种状态，也就是上锁和解锁，在同一时刻只能有一个线程掌握某个互斥锁，拥有上锁状态的线程能够对共享资源进行操作，若其他线程希望上锁一个已经被上锁的互斥锁，则该线程就会挂起，直到上锁的线程释放掉互斥锁为止。</p>
-<p>互斥锁可以分为快速互斥锁、递归互斥锁和检错互斥锁，区别在于其他未占有互斥锁的线程在希望得到互斥锁时是否需要阻塞等待，默认为快速互斥锁。</p>
-<ul>
-<li>快速锁是指调用线程会阻塞，直至拥有互斥锁的线程解锁为止。</li>
-<li>递归互斥锁能够成功地返回，并且在调用线程互斥上多次加锁。</li>
-<li>检错互斥锁则为快速互斥锁的非阻塞版本，它会立即返回并返回一个错误信息。</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_init</span> <span class="params">(<span class="keyword">struct</span> __pthread_mutex *__restrict __mutex,</span></span><br><span class="line"><span class="params">                   <span class="type">const</span> <span class="type">pthread_mutexattr_t</span> *__restrict __attr)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_destroy</span> <span class="params">(<span class="keyword">struct</span> __pthread_mutex *__mutex)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_lock</span> <span class="params">(<span class="type">pthread_mutex_t</span> *__mutex)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_unlock</span> <span class="params">(<span class="type">pthread_mutex_t</span> *__mutex)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_trylock</span> <span class="params">(<span class="type">pthread_mutex_t</span> *__mutex)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>pthread_mutex_init()创建互斥锁，attr参数：</p>
-<ul>
-<li>PTHREAD_MUTEX_INITIALIZER  创建快速互斥锁</li>
-<li>PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP   创建递归互斥锁</li>
-<li>PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP  创建检错互斥锁</li>
-</ul>
-<h2 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;semaphore.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_init</span><span class="params">(<span class="type">sem_t</span> *sem, <span class="type">int</span> pshared, <span class="type">unsigned</span> <span class="type">int</span> value)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_wait</span><span class="params">(<span class="type">sem_t</span> *sem)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_trywait</span><span class="params">(<span class="type">sem_t</span> *sem)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_timedwait</span><span class="params">(<span class="type">sem_t</span> *sem, <span class="type">const</span> <span class="keyword">struct</span> timespec *abs_timeout)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_post</span><span class="params">(<span class="type">sem_t</span> *sem)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="type">int</span> <span class="title function_">sem_getvalue</span><span class="params">(<span class="type">sem_t</span> *sem, <span class="type">int</span> *sval)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_destroy</span><span class="params">(<span class="type">sem_t</span> *sem)</span>;</span><br></pre></td></tr></table></figure>
-
-<h2 id="线程属性"><a href="#线程属性" class="headerlink" title="线程属性"></a>线程属性</h2><p>pthread_create()函数的第二个参数attr表示线程的属性，默认为非绑定、非分离、缺省1M的堆栈以及与父进程同样级别的优先级。</p>
-<ul>
-<li><p>绑定属性：一个用户线程固定地分配给一个内核线程，可以保证在需要的时候总有一个内核线程与之对应。</p>
-</li>
-<li><p>非绑定属性：用户线程和内核线程的关系不是始终固定的，由系统来控制分配。</p>
-</li>
-<li><p>分离属性：线程结束时会立即释放它所占有的系统资源，如果这个线程运行非常快，可能在pthread_create()函数返回之前就终止了，系统就可能将线程号和系统资源移交给其他的线程使用，从而导致出错。</p>
-</li>
-<li><p>非分离属性：线程结束时要等 pthread_join()函数返回，才释放自己占用的系统资源。</p>
-</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* Scheduling algorithms.  */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SCHED_OTHER 0</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SCHED_FIFO  1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SCHED_RR    2</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sched_param</span> &#123;</span></span><br><span class="line">   <span class="type">int</span> sched_priority;     <span class="comment">/* Scheduling priority */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_init</span><span class="params">(<span class="type">pthread_attr_t</span> *attr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_destroy</span><span class="params">(<span class="type">pthread_attr_t</span> *attr)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_setscope</span><span class="params">(<span class="type">pthread_attr_t</span> *attr, <span class="type">int</span> scope)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_getscope</span><span class="params">(<span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">int</span> *scope)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_setdetachstate</span><span class="params">(<span class="type">pthread_attr_t</span> *attr, <span class="type">int</span> detachstate)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_getdetachstate</span><span class="params">(<span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">int</span> *detachstate)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_setschedpolicy</span><span class="params">(<span class="type">pthread_attr_t</span> *attr, <span class="type">int</span> policy)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_getschedpolicy</span><span class="params">(<span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">int</span> *policy)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_setschedparam</span><span class="params">(<span class="type">pthread_attr_t</span> *attr, <span class="type">const</span> <span class="keyword">struct</span> sched_param *param)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_getschedparam</span><span class="params">(<span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="keyword">struct</span> sched_param *param)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>pthread_attr_init() 初始化线程属性。pthread_attr_destroy() 对分配的属性结构指针进行清理和回收。</p>
-<p>pthread_attr_setscope() 设置绑定属性：</p>
-<ul>
-<li>PTHREAD_SCOPE_SYSTEM  绑定</li>
-<li>PTHREAD_SCOPE_PROCESS  非绑定</li>
-</ul>
-<p>pthread_attr_setdetachstate() 设置线程分离属性：</p>
-<ul>
-<li>PTHREAD_CREATE_DETACHED  分离</li>
-<li>PTHREAD _CREATE_JOINABLE  非分离</li>
-</ul>
-<p>pthread_attr_getschedparam() 获取线程优先级。pthread_attr_setschedparam() 设置线程优先级，设置之前可用sched_get_priority_max() 确定优先级的取値范围。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sched.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">sched_get_priority_max</span><span class="params">(<span class="type">int</span> policy)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sched_get_priority_min</span><span class="params">(<span class="type">int</span> policy)</span>;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/c/stdio/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1271,7 +1280,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/c/daemon/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/c/pthread/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1285,7 +1294,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/08/13/c/daemon/" class="post-title-link" itemprop="url">daemon process</a>
+            <a href="/2022/08/13/c/pthread/" class="post-title-link" itemprop="url">linux pthread</a>
         </h1>
 
         <div class="post-meta">
@@ -1318,71 +1327,62 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>每一个系统与用户进行交流的界面称为终端，每一个从此终端开始运行的进程都会依附于这个终端，这个终端就称为这些进程的控制终端，当控制终端被关闭时，相应的进程都会自动关闭。</p>
-<p>守护进程(daemon)是一种在系统引导装入时起动，在系统关闭时终止，不会受到用户、终端或者其他的变化而影响，在后台运行没有控制终端的进程。</p>
-<h2 id="进程组"><a href="#进程组" class="headerlink" title="进程组"></a>进程组</h2><p>进程组是一个或多个进程的集合。进程组由进程组 ID 来惟一标识。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">setpgid</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">pid_t</span> pgid)</span>;</span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpgid</span><span class="params">(<span class="type">pid_t</span> pid)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpgrp</span><span class="params">(<span class="type">void</span>)</span>;                 <span class="comment">/* POSIX.1 version */</span></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpgrp</span><span class="params">(<span class="type">pid_t</span> pid)</span>;            <span class="comment">/* BSD version */</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">setpgrp</span><span class="params">(<span class="type">void</span>)</span>;                   <span class="comment">/* System V version */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">setpgrp</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">pid_t</span> pgid)</span>;  <span class="comment">/* BSD version */</span></span><br></pre></td></tr></table></figure>
+          <p>进程是系统中程序执行和资源分配的基本单位，每个进程都拥有自己的数据段、代码段和堆栈段，这就造成进程在进行切换时需要消耗更多的处理器空转时间，为了减少上下文切换开销，进程在演化中出现了线程。</p>
+<p>线程处理器调度的最小单元。线程可以访问进程的内存空间和资源，并与同一进程中的其他线程共享，因此线程的上下文切换的开销比创建进程小很多。同进程一样，线程也将相关的执行状态和存储变量放在线程控制表内，一个进程可以有多个线程，也就是有多个线程控制表及堆栈寄存器，但却共享一个用户地址空间。由于线程共享了进程的资源和地址空间，因此任何线程对系统资源的操作都会给其他线程带来影响，必须考虑线程间资源访问的同步与互斥问题。</p>
+<p>线程按照其调度者可以分为用户级线程和核心级线程两种：</p>
+<ul>
+<li><p>用户级线程主要解决的是上下文切换的问题，它的调度算法和调度过程全部由用户自行选择决定，在运行时不需要内核支持。系统往往会提供一个用户空间的线程库，该线程库提供了线程的创建、调度和撤销等功能，而内核仍然仅对进程进行管理。如果一个进程中的某一个线程调用了一个阻塞的系统调用函数，那么该进程包括该进程中的其他所有线程也同时被阻塞。这种用户级线程的主要缺点是在一个进程中的多个线程的调度中无法发挥多处理器的优势。</p>
+</li>
+<li><p>内核级线程允许不同进程中的线程按照同一相对优先调度方法进行调度，这样就可以发挥多处理器的并发优势。</p>
+</li>
+</ul>
+<p>现在大多数系统都采用用户级线程与核心级线程并存的方法，一个用户级线程可以对应一个或几个核心级线程，这样既可满足多处理机系统的需要，也可以最大限度地减少调度开销。</p>
+<p>gcc在编译时要链接libpthread库<code>gcc -lpthread</code>。</p>
+<h2 id="线程库"><a href="#线程库" class="headerlink" title="线程库"></a>线程库</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_create</span><span class="params">(<span class="type">pthread_t</span> *thread, <span class="type">const</span> <span class="type">pthread_attr_t</span> *attr,</span></span><br><span class="line"><span class="params">                          <span class="type">void</span> *(*start_routine) (<span class="type">void</span> *), <span class="type">void</span> *arg)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">pthread_exit</span><span class="params">(<span class="type">void</span> *retval)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_join</span><span class="params">(<span class="type">pthread_t</span> thread, <span class="type">void</span> **retval)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cancel</span><span class="params">(<span class="type">pthread_t</span> thread)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_setcancelstate</span><span class="params">(<span class="type">int</span> state, <span class="type">int</span> *oldstate)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_setcanceltype</span><span class="params">(<span class="type">int</span> type, <span class="type">int</span> *oldtype)</span>;</span><br></pre></td></tr></table></figure>
 
-<p>setpgid()将pid进程的进程组ID设置为pgid。如果pid和pgid相等，则由pid指定的进程变成进程组组长，如果pid是0，则使用调用者的进程ID，如果pgid是0，则由pid指定的进程ID被用作为进程组ID。</p>
-<h2 id="会话"><a href="#会话" class="headerlink" title="会话"></a>会话</h2><p>会话是一个或多个进程组的集合，一个会话开始于用户登录，终止于用户退出，在此期间该用户运行的所有进程都属于这个会话。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">setsid</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+<h2 id="互斥锁"><a href="#互斥锁" class="headerlink" title="互斥锁"></a>互斥锁</h2><p>互斥锁是用一种简单的加锁方法来控制对共享资源按顺序进行原子操作。这个互斥锁只有两种状态，也就是上锁和解锁，在同一时刻只能有一个线程掌握某个互斥锁，拥有上锁状态的线程能够对共享资源进行操作，若其他线程希望上锁一个已经被上锁的互斥锁，则该线程就会挂起，直到上锁的线程释放掉互斥锁为止。</p>
+<p>互斥锁可以分为快速互斥锁、递归互斥锁和检错互斥锁，区别在于其他未占有互斥锁的线程在希望得到互斥锁时是否需要阻塞等待，默认为快速互斥锁。</p>
+<ul>
+<li>快速锁是指调用线程会阻塞，直至拥有互斥锁的线程解锁为止。</li>
+<li>递归互斥锁能够成功地返回，并且在调用线程互斥上多次加锁。</li>
+<li>检错互斥锁则为快速互斥锁的非阻塞版本，它会立即返回并返回一个错误信息。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_init</span> <span class="params">(<span class="keyword">struct</span> __pthread_mutex *__restrict __mutex,</span></span><br><span class="line"><span class="params">                   <span class="type">const</span> <span class="type">pthread_mutexattr_t</span> *__restrict __attr)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_destroy</span> <span class="params">(<span class="keyword">struct</span> __pthread_mutex *__mutex)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_lock</span> <span class="params">(<span class="type">pthread_mutex_t</span> *__mutex)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_unlock</span> <span class="params">(<span class="type">pthread_mutex_t</span> *__mutex)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_trylock</span> <span class="params">(<span class="type">pthread_mutex_t</span> *__mutex)</span>;</span><br></pre></td></tr></table></figure>
 
-<p>setsid()函数能够使进程完全独立出来，从而脱离其他进程的控制：</p>
+<p>pthread_mutex_init()创建互斥锁，attr参数：</p>
 <ul>
-<li>让进程摆脱原会话的控制。</li>
-<li>让进程摆脱原进程组的控制。</li>
-<li>让进程摆脱原控制终端的控制。</li>
+<li>PTHREAD_MUTEX_INITIALIZER  创建快速互斥锁</li>
+<li>PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP   创建递归互斥锁</li>
+<li>PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP  创建检错互斥锁</li>
 </ul>
-<h2 id="守护进程"><a href="#守护进程" class="headerlink" title="守护进程"></a>守护进程</h2><ol>
-<li><p>首先fork一个子进程，然后让父进程exit。这样做实现了下面几点：(a)如果精灵进程是由一条shell命令起动的，那么父进程终止使得shell认为这条命令已经执行完成。(b)进程继承了父进程的进程组ID，其进程ID则是新分配的，这就保证了子进程不是一个进程组的首进程，这是setsid()调用的前提条件。</p>
-</li>
-<li><p>调用setsid()以创建一个新对话期，使调用进程：(a)成为新对话期的首进程，(b)成为一个新进程组的首进程，(c)没有控制终端。</p>
-</li>
-<li><p>将当前工作目录更改为/目录，保证工作目录所在的文件系统不能被卸载。</p>
-</li>
-<li><p>将文件权限掩码设置为0，方便进程操作文件。</p>
-</li>
-<li><p>关闭不再需要的文件描述符，从父进程那里继承打开了的文件，可能永远不会被守护进程读或写，但一样消耗系统资源，而且可能导致所在的文件系统无法被卸载。</p>
-</li>
-</ol>
-<p>守护进程没有控制终端，所以不能将错误信息输出到控制终端，可以使用syslog服务将程序中的出错信息输入到系统日志文件/var/log/syslog。</p>
-<h2 id="syslog"><a href="#syslog" class="headerlink" title="syslog"></a>syslog</h2><p>syslog是linux中的系统日志管理服务，通过守护进程syslogd来维护，该守护进程在启动时会读配置文件/etc/syslog.conf，该文件决定了不同种类的消息会发送向何处。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;syslog.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">openlog</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *ident, <span class="type">int</span> option, <span class="type">int</span> facility)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">syslog</span><span class="params">(<span class="type">int</span> priority, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">closelog</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+<h2 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;semaphore.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_init</span><span class="params">(<span class="type">sem_t</span> *sem, <span class="type">int</span> pshared, <span class="type">unsigned</span> <span class="type">int</span> value)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_wait</span><span class="params">(<span class="type">sem_t</span> *sem)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_trywait</span><span class="params">(<span class="type">sem_t</span> *sem)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_timedwait</span><span class="params">(<span class="type">sem_t</span> *sem, <span class="type">const</span> <span class="keyword">struct</span> timespec *abs_timeout)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_post</span><span class="params">(<span class="type">sem_t</span> *sem)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="type">int</span> <span class="title function_">sem_getvalue</span><span class="params">(<span class="type">sem_t</span> *sem, <span class="type">int</span> *sval)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_destroy</span><span class="params">(<span class="type">sem_t</span> *sem)</span>;</span><br></pre></td></tr></table></figure>
 
-<p>openlog用于打开系统日志服务的一个连接。ident参数定义消息的标签字符串，option参数：</p>
+<h2 id="线程属性"><a href="#线程属性" class="headerlink" title="线程属性"></a>线程属性</h2><p>pthread_create()函数的第二个参数attr表示线程的属性，默认为非绑定、非分离、缺省1M的堆栈以及与父进程同样级别的优先级。</p>
 <ul>
-<li>LOG_CONS  如果消息无法送到系统日志服务，则直接输出到系统控制终端</li>
-<li>LOG_NDELAY  立即打开系统日志服务的连接。在正常情况下，直接发送到第一条消息时才打开连接</li>
-<li>LOG_PERROR  将日志消息发送给 s y s l o g和stderr。</li>
-<li>LOG_PID  消息中包含进程的PID</li>
+<li><p>绑定属性：一个用户线程固定地分配给一个内核线程，可以保证在需要的时候总有一个内核线程与之对应。</p>
+</li>
+<li><p>非绑定属性：用户线程和内核线程的关系不是始终固定的，由系统来控制分配。</p>
+</li>
+<li><p>分离属性：线程结束时会立即释放它所占有的系统资源，如果这个线程运行非常快，可能在pthread_create()函数返回之前就终止了，系统就可能将线程号和系统资源移交给其他的线程使用，从而导致出错。</p>
+</li>
+<li><p>非分离属性：线程结束时要等 pthread_join()函数返回，才释放自己占用的系统资源。</p>
+</li>
 </ul>
-<p>facility参数指定程序发送的消息类型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* Scheduling algorithms.  */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SCHED_OTHER 0</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SCHED_FIFO  1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SCHED_RR    2</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sched_param</span> &#123;</span></span><br><span class="line">   <span class="type">int</span> sched_priority;     <span class="comment">/* Scheduling priority */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_init</span><span class="params">(<span class="type">pthread_attr_t</span> *attr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_destroy</span><span class="params">(<span class="type">pthread_attr_t</span> *attr)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_setscope</span><span class="params">(<span class="type">pthread_attr_t</span> *attr, <span class="type">int</span> scope)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_getscope</span><span class="params">(<span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">int</span> *scope)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_setdetachstate</span><span class="params">(<span class="type">pthread_attr_t</span> *attr, <span class="type">int</span> detachstate)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_getdetachstate</span><span class="params">(<span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">int</span> *detachstate)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_setschedpolicy</span><span class="params">(<span class="type">pthread_attr_t</span> *attr, <span class="type">int</span> policy)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_getschedpolicy</span><span class="params">(<span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">int</span> *policy)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_setschedparam</span><span class="params">(<span class="type">pthread_attr_t</span> *attr, <span class="type">const</span> <span class="keyword">struct</span> sched_param *param)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_getschedparam</span><span class="params">(<span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="keyword">struct</span> sched_param *param)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>pthread_attr_init() 初始化线程属性。pthread_attr_destroy() 对分配的属性结构指针进行清理和回收。</p>
+<p>pthread_attr_setscope() 设置绑定属性：</p>
 <ul>
-<li>LOG_AUTHPRIV  安全/授权信息</li>
-<li>LOG_CRON  时间守护进程(cron 及 at)函数传入值</li>
-<li>LOG_DAEMON  其他系统守护进程</li>
-<li>LOG_KERN  内核信息</li>
-<li>LOG_LOCAL[0~7]  保留</li>
-<li>LOG_LPR  行打印机子系统</li>
-<li>LOG_MAIL  邮件子系统</li>
-<li>LOG_NEWS  新闻子系统</li>
-<li>LOG_SYSLOG  syslogd 内部所产生的信息</li>
-<li>LOG_USER  一般使用者等级信息</li>
-<li>LOG_UUCP  UUCP 子系统</li>
+<li>PTHREAD_SCOPE_SYSTEM  绑定</li>
+<li>PTHREAD_SCOPE_PROCESS  非绑定</li>
 </ul>
-<p>syslog是用于向日志文件中写入消息，format参数规定消息输出格式等。priority参数指定消息等级：</p>
+<p>pthread_attr_setdetachstate() 设置线程分离属性：</p>
 <ul>
-<li>LOG_EMERG  紧急(系统不可使用)</li>
-<li>LOG_ALERT  需要立即采取措施</li>
-<li>LOG_CRIT  重要情况</li>
-<li>LOG_ERR  错误消息</li>
-<li>LOG_WARNING  警告消息</li>
-<li>LOG_NOTICE  正常情况,但也是重要情况</li>
-<li>LOG_INFO  信息消息</li>
-<li>LOG_DEBUG  调试信息</li>
+<li>PTHREAD_CREATE_DETACHED  分离</li>
+<li>PTHREAD _CREATE_JOINABLE  非分离</li>
 </ul>
-<p>closelog是用于关闭系统日志服务的连接。</p>
-<h2 id="例程"><a href="#例程" class="headerlink" title="例程"></a>例程</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> i;</span><br><span class="line"><span class="type">pid_t</span> pid = fork();</span><br><span class="line"><span class="keyword">if</span> (pid == <span class="number">-1</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;fork&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (pid &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 打开系统日志服务 */</span></span><br><span class="line">openlog(<span class="string">&quot;daemon_syslog&quot;</span>, LOG_PID, LOG_DAEMON);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*创建新的会话组*/</span></span><br><span class="line"><span class="type">int</span> ret = setsid();</span><br><span class="line"><span class="keyword">if</span> (ret &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    syslog(LOG_ERR, <span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;setsid&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ret = chdir(<span class="string">&quot;/&quot;</span>);</span><br><span class="line"><span class="keyword">if</span> (ret &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    syslog(LOG_ERR, <span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;chdir&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">umask(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*关闭父进程的文件描述符*/</span></span><br><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; getdtablesize(); ++i) &#123;</span><br><span class="line">    close(i);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">syslog(LOG_INFO, <span class="string">&quot;daemon init\n&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>pthread_attr_getschedparam() 获取线程优先级。pthread_attr_setschedparam() 设置线程优先级，设置之前可用sched_get_priority_max() 确定优先级的取値范围。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sched.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">sched_get_priority_max</span><span class="params">(<span class="type">int</span> policy)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sched_get_priority_min</span><span class="params">(<span class="type">int</span> policy)</span>;</span><br></pre></td></tr></table></figure>
 
       
     </div>
