@@ -176,194 +176,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/net/tcpdump/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/26/net/tcpdump/" class="post-title-link" itemprop="url">tcpdump 使用指南</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-06-26 17:51:09 / 修改时间：18:44:41" itemprop="dateCreated datePublished" datetime="2022-06-26T17:51:09+08:00">2022-06-26</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">tcpdump [ -AdDeflLnNOpqRStuUvxX ] [ -c count ]</span><br><span class="line">           [ -C file_size ] [ -F file ]</span><br><span class="line">           [ -i interface ] [ -m module ] [ -M secret ]</span><br><span class="line">           [ -r file ] [ -s snaplen ] [ -T type ] [ -w file ]</span><br><span class="line">           [ -W filecount ]</span><br><span class="line">           [ -E spi@ipaddr algo:secret,...  ]</span><br><span class="line">           [ -y datalinktype ] [ -Z user ]</span><br><span class="line">           [ expression ]</span><br></pre></td></tr></table></figure>
-
-<h2 id="选项"><a href="#选项" class="headerlink" title="选项"></a>选项</h2><p><img src="/images/net/tcpdump.png"></p>
-<h2 id="表达式"><a href="#表达式" class="headerlink" title="表达式"></a>表达式</h2><p>可以使用表达式过滤指定类型的流量，有三种主要的表达式类型：</p>
-<ul>
-<li>类型（type）选项包含：host, net, port, portrange</li>
-<li>方向（dir）选项包含：src, dst, src or dst</li>
-<li>协议（proto）选项包含：tcp, udp, icmp, ip, ip6, arp, rarp,ether,wlan, fddi, tr, decnet</li>
-</ul>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p><strong>捕获所有流量</strong></p>
-<pre><code>tcpdump -i any
-</code></pre>
-<p><strong>指定网卡接口</strong></p>
-<pre><code>tcpdump -i eth0
-</code></pre>
-<p><strong>基于IP地址过滤</strong></p>
-<pre><code>tcpdump host 192.168.10.100
-</code></pre>
-<p><strong>查看包中的内容时，使用hex格式输出</strong></p>
-<pre><code>tcpdump -nnvXSs 0 -c1 icmp
-</code></pre>
-<p><strong>使用源和目的地址过滤</strong></p>
-<pre><code>tcpdump src 2.3.4.6
-tcpdump dst 3.4.5.6
-</code></pre>
-<p><strong>基于网段进行过滤</strong></p>
-<pre><code>tcpdump net 192.168.10.0/24
-</code></pre>
-<p><strong>基于端口进行过滤</strong></p>
-<pre><code>tcpdump port 8088
-</code></pre>
-<p><strong>过滤指定协议</strong></p>
-<pre><code>tcpdump icmp
-</code></pre>
-<p><strong>只显示IPV6流量</strong></p>
-<pre><code>tcpdump ip6
-</code></pre>
-<p><strong>使用端口范围过滤</strong></p>
-<pre><code>tcpdump portrange 21-23
-</code></pre>
-<p><strong>基于包的大小过滤流量</strong></p>
-<pre><code>tcpdump less 32
-tcpdump greater 64
-tcpdump &lt;=128
-</code></pre>
-<p><strong>过滤广播/多播数据包</strong></p>
-<pre><code>tcpdump ip broadcast
-tcpdump ip multicast
-</code></pre>
-<p><strong>将捕获的内容写入文件</strong></p>
-<pre><code>tcpdump port 8080 -w capturefile.pcap
-</code></pre>
-<p><strong>使用tcpdump加载之前保存的文件进行分析</strong></p>
-<pre><code>tcpdump -r capturefile.pcap
-</code></pre>
-<p><strong>设置不解析域名提升速度</strong></p>
-<ul>
-<li><code>-n</code>：不把ip转化成域名，直接显示 ip，避免执行 DNS lookups 的过程，速度会快很多</li>
-<li><code>-nn</code>：不把协议和端口号转化成名字，速度也会快很多。</li>
-<li><code>-N</code>：不打印出host 的域名部分.。比如,，如果设置了此选现，tcpdump 将会打印’nic’ 而不是 ‘nic.ddn.mil’.</li>
-</ul>
-<p><strong>控制详细内容的输出</strong></p>
-<ul>
-<li><code>-v</code>：产生详细的输出. 比如包的TTL，id标识，数据包长度，以及IP包的一些选项。同时它还会打开一些附加的包完整性检测，比如对IP或ICMP包头部的校验和。</li>
-<li><code>-vv</code>：产生比-v更详细的输出. 比如NFS回应包中的附加域将会被打印, SMB数据包也会被完全解码。（摘自网络，目前我还未使用过）</li>
-<li><code>-vvv</code>：产生比-vv更详细的输出。比如 telent 时所使用的SB, SE 选项将会被打印, 如果telnet同时使用的是图形界面，其相应的图形选项将会以16进制的方式打印出来（摘自网络，目前我还未使用过）</li>
-</ul>
-<p><strong>控制时间的显示</strong></p>
-<ul>
-<li><code>-t</code>：在每行的输出中不输出时间</li>
-<li><code>-tt</code>：在每行的输出中会输出时间戳</li>
-<li><code>-ttt</code>：输出每两行打印的时间间隔(以毫秒为单位)</li>
-<li><code>-tttt</code>：在每行打印的时间戳之前添加日期的打印（此种选项，输出的时间最直观）</li>
-</ul>
-<p><strong>显示数据包的头部</strong></p>
-<ul>
-<li><code>-x</code>：以16进制的形式打印每个包的头部数据（但不包括数据链路层的头部）</li>
-<li><code>-xx</code>：以16进制的形式打印每个包的头部数据（包括数据链路层的头部）</li>
-<li><code>-X</code>：以16进制和 ASCII码形式打印出每个包的数据(但不包括连接层的头部)，这在分析一些新协议的数据包很方便。</li>
-<li><code>-XX</code>：以16进制和 ASCII码形式打印出每个包的数据(包括连接层的头部)，这在分析一些新协议的数据包很方便。</li>
-</ul>
-<p><strong>对输出内容进行控制的参数</strong></p>
-<ul>
-<li><code>-D</code> : 显示所有可用网络接口的列表</li>
-<li><code>-e</code> : 每行的打印输出中将包括数据包的数据链路层头部信息</li>
-<li><code>-E</code> : 揭秘IPSEC数据</li>
-<li><code>-L</code> ：列出指定网络接口所支持的数据链路层的类型后退出</li>
-<li><code>-Z</code>：后接用户名，在抓包时会受到权限的限制。如果以root用户启动tcpdump，tcpdump将会有超级用户权限。</li>
-<li><code>-d</code>：打印出易读的包匹配码</li>
-<li><code>-dd</code>：以C语言的形式打印出包匹配码.</li>
-<li><code>-ddd</code>：以十进制数的形式打印出包匹配码</li>
-</ul>
-<h2 id="过滤规则组合"><a href="#过滤规则组合" class="headerlink" title="过滤规则组合"></a>过滤规则组合</h2><ul>
-<li>and：所有的条件都需要满足，也可以表示为 <code>&amp;&amp;</code></li>
-<li>or：只要有一个条件满足就可以，也可以表示为 <code>||</code></li>
-<li>not：取反，也可以使用 <code>!</code></li>
-</ul>
-<p>当你在使用多个过滤器进行组合时，有可能需要用到括号，而括号在 shell 中是特殊符号，因为你需要使用引号将其包含。例子如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump &#x27;src 10.0.2.4 and (dst port 8090 or 22)&#x27;</span><br></pre></td></tr></table></figure>
-
-<p>而在单个过滤器里，常常会判断一条件是否成立，这时候，就要使用下面两个符号</p>
-<ul>
-<li><code>=</code>：判断二者相等</li>
-<li><code>==</code>：判断二者相等</li>
-<li><code>!=</code>：判断二者不相等</li>
-</ul>
-<p>当你使用这两个符号时，tcpdump 还提供了一些关键字的接口来方便我们进行判断，比如</p>
-<ul>
-<li>if：表示网卡接口名、</li>
-<li>proc：表示进程名</li>
-<li>pid：表示进程 id</li>
-<li>svc：表示 service class</li>
-<li>dir：表示方向，in 和 out</li>
-<li>eproc：表示 effective process name</li>
-<li>epid：表示 effective process ID</li>
-</ul>
-<p>比如我现在要过滤来自进程名为 ntp 发出的流经 eth0 网卡的数据包，或者不流经 eth0 的入方向数据包，可以这样子写</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump &quot;( if=eth0 and proc=ntp ) || (if != en0 and dir=in)&quot;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wongbingming/p/13212306.html">https://www.cnblogs.com/wongbingming/p/13212306.html</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/cmd/wc/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1140,6 +952,83 @@ tcpdump ip multicast
   
   
 
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/cmd/man/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/26/cmd/man/" class="post-title-link" itemprop="url">man</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-06-26 15:56:04 / 修改时间：15:59:10" itemprop="dateCreated datePublished" datetime="2022-06-26T15:56:04+08:00">2022-06-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cmd/" itemprop="url" rel="index"><span itemprop="name">cmd</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>查看Linux中的指令帮助、配置文件帮助和编程帮助等信息。</p>
+<h2 id="选项"><a href="#选项" class="headerlink" title="选项"></a>选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-a：在所有的man帮助手册中搜索；</span><br><span class="line">-f：等价于whatis指令，显示给定关键字的简短描述信息；</span><br><span class="line">-P：指定内容时使用分页程序；</span><br><span class="line">-M：指定man手册搜索的路径。</span><br></pre></td></tr></table></figure>
+
+<h2 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h2><ul>
+<li>  数字：指定从哪本man手册中搜索帮助；</li>
+<li>  关键字：指定要搜索帮助的关键字。</li>
+</ul>
+<h2 id="数字代表内容"><a href="#数字代表内容" class="headerlink" title="数字代表内容"></a>数字代表内容</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">1：用户在shell环境可操作的命令或执行文件；</span><br><span class="line">2：系统内核可调用的函数与工具等</span><br><span class="line">3：一些常用的函数(function)与函数库(library)，大部分为C的函数库(libc)</span><br><span class="line">4：设备文件说明，通常在/dev下的文件</span><br><span class="line">5：配置文件或某些文件格式</span><br><span class="line">6：游戏(games)</span><br><span class="line">7：惯例与协议等，如Linux文件系统，网络协议，ASCII code等说明</span><br><span class="line">8：系统管理员可用的管理命令</span><br><span class="line">9：跟kernel有关的文件</span><br></pre></td></tr></table></figure>
+
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><p>我们输入<code>man ls</code>，它会在最左上角显示“LS（1）”，在这里，“LS”表示手册名称，而“（1）”表示该手册位于第一节章，同样，我们输<code>man ifconfig</code>它会在最左上角显示“IFCONFIG（8）”。也可以这样输入命令：“man [章节号] 手册名称”。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
   </div>
 
   
@@ -1209,7 +1098,7 @@ tcpdump ip multicast
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">216</span>
+          <span class="site-state-item-count">215</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

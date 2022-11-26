@@ -176,97 +176,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/string/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/c/string/" class="post-title-link" itemprop="url">string functions</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="strcpy"><a href="#strcpy" class="headerlink" title="strcpy"></a>strcpy</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span>* <span class="title function_">strcpy</span><span class="params">(<span class="type">char</span>* des, <span class="type">const</span> <span class="type">char</span>* src)</span></span><br><span class="line">&#123;</span><br><span class="line">    assert((des!=<span class="literal">NULL</span>) &amp;&amp; (src!=<span class="literal">NULL</span>)); </span><br><span class="line">    <span class="type">char</span> *address = des;  </span><br><span class="line">    <span class="keyword">while</span>((*des++ = *src++) != <span class="string">&#x27;\0&#x27;</span>)  </span><br><span class="line">        ;  </span><br><span class="line">    <span class="keyword">return</span> address;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>源指针所指的字符串内容是不能修改的，因此应该声明为 const 类型。</li>
-<li>要判断源指针和目的指针为空的情况，这里使用<code>assert</code>。</li>
-<li>要用一个临时变量保存目的串的首地址，最后返回这个首地址。</li>
-<li>函数返回 char* 的目的是为了支持链式表达式，即strcpy可以作为其他函数的实参。</li>
-</ul>
-<h3 id="strcat"><a href="#strcat" class="headerlink" title="strcat"></a>strcat</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span>* <span class="title function_">strcat</span><span class="params">(<span class="type">char</span>* des, <span class="type">const</span> <span class="type">char</span>* src)</span>   <span class="comment">// const表明为输入参数 </span></span><br><span class="line">&#123;  </span><br><span class="line">    assert((des!=<span class="literal">NULL</span>) &amp;&amp; (src!=<span class="literal">NULL</span>));</span><br><span class="line">    <span class="type">char</span>* address = des;</span><br><span class="line">    <span class="keyword">while</span>(*des != <span class="string">&#x27;\0&#x27;</span>)  <span class="comment">// 移动到字符串末尾</span></span><br><span class="line">        ++des;</span><br><span class="line">    <span class="keyword">while</span>(*des++ = *src++)</span><br><span class="line">        ;</span><br><span class="line">    <span class="keyword">return</span> address;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="strcmp"><a href="#strcmp" class="headerlink" title="strcmp"></a>strcmp</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">strcmp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *s1,<span class="type">const</span> <span class="type">char</span> *s2)</span></span><br><span class="line">&#123;</span><br><span class="line">    assert((s1!=<span class="literal">NULL</span>) &amp;&amp; (s2!=<span class="literal">NULL</span>));</span><br><span class="line">    <span class="keyword">while</span>(*s1 == *s2)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(*s1 == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">         </span><br><span class="line">        ++s1;</span><br><span class="line">        ++s2;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> *s1 - *s2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>若s1==s2，返回零；</li>
-<li>若s1&gt;s2，返回正数；</li>
-<li>若s1&lt;s2，返回负数。</li>
-</ul>
-<p>两个字符串自左向右逐个字符相比（按ASCII值大小相比较），直到出现不同的字符或遇\0为止。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/iniparser/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1612,6 +1521,87 @@
   
   
 
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/uml/uml_sequence/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/uml/uml_sequence/" class="post-title-link" itemprop="url">UML Sequence diagram</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-26 15:57:54" itemprop="dateModified" datetime="2022-06-26T15:57:54+08:00">2022-06-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/UML/" itemprop="url" rel="index"><span itemprop="name">UML</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>uml</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/06/07/code/uml/uml_sequence/">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
   </div>
 
   
@@ -1681,7 +1671,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">216</span>
+          <span class="site-state-item-count">215</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

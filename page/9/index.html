@@ -176,135 +176,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/21/net/tcpip/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/21/net/tcpip/" class="post-title-link" itemprop="url">TCP/IP 网络模型</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-21 18:40:36" itemprop="dateCreated datePublished" datetime="2022-06-21T18:40:36+08:00">2022-06-21</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-25 20:19:18" itemprop="dateModified" datetime="2022-06-25T20:19:18+08:00">2022-06-25</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="TCP-IP-模型"><a href="#TCP-IP-模型" class="headerlink" title="TCP/IP 模型"></a>TCP/IP 模型</h2><table>
-<thead>
-<tr>
-<th>分层</th>
-<th>作用</th>
-<th>协议</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>应用层</td>
-<td>负责给应用程序提供统一的接口</td>
-<td>FTP、DNS、Telnet、SMTP、HTTP、WWW、NFS</td>
-</tr>
-<tr>
-<td>表示层</td>
-<td>负责把数据转换成能识别的格式，对数据进行翻译、加密和压缩</td>
-<td>JPEG、MPEG、ASII</td>
-</tr>
-<tr>
-<td>会话层</td>
-<td>建立、管理和终止会话</td>
-<td>NFS、SQL、NETBIOS、RPC</td>
-</tr>
-<tr>
-<td>传输层</td>
-<td>负责端到端的可靠报文传递和流量控制</td>
-<td>TCP、UDP、SPX</td>
-</tr>
-<tr>
-<td>网络层</td>
-<td>负责数据的路由、转发、分片，实现两个端系统之间的数据透明传送</td>
-<td>IP、ICMP、ARP、RARP、OSPF、IPX、RIP、IGRP（路由器）</td>
-</tr>
-<tr>
-<td>数据链路层</td>
-<td>负责数据的封帧、流量控制、差错检测和重发，及 MAC 寻址</td>
-<td>PPP、FR、HDLC、VLAN、MAC（网桥，交换机）</td>
-</tr>
-<tr>
-<td>物理层</td>
-<td>负责把数据包转换成电信号，在物理介质中传输数据帧</td>
-<td>RJ45、CLOCK、IEEE802.3（中继器，集线器）</td>
-</tr>
-</tbody></table>
-<p><img src="/images/net/tcpip/OSI.png" alt="img"></p>
-<p>OSI 模型只是概念理论上的分层，并没有提供具体的实现方案，实际应用中采用的是更为简化的 TCP/IP 模型。</p>
-<p><img src="/images/net/tcpip/tcp-ip-arch.webp" alt="img"></p>
-<p><img src="/images/net/tcpip/tcp_ip_pack.bmp" alt="tcp_ip_pack"></p>
-<h2 id="ADSL"><a href="#ADSL" class="headerlink" title="ADSL"></a>ADSL</h2><p>ADSL(Asymmetric Digital Subscriber Line)不对称数字用户线，是一种利用架设在电线杆上的金属电话线来进行高速通信的技术，它的上行方向(用户到互联网)和下行方向(互联网到用户)的通信速率是不对称的。</p>
-<p>用户端路由器发出的网络包通过ADSL Modem调制解调器和电话线到达电话局，然后到达 ADSL 的网络运营商(即 ISP，互联网服务提供商)。</p>
-<p>互联网接入路由器会在网络包前面加上 MAC 头部、PPPoE 头部、PPP 头部，然后发送给 ADSL Modem。ADSL Modem 将包拆分成信元，并调制成电信号发送给分离器。分离器负责将电话和 ADSL 的信号进行分离。</p>
-<p><img src="/images/net/modem.png" alt="eth_if"></p>
-<p>ADSL采用的调制方式是振幅调制(ASK)和相位调制(PSK)相结合的正交振幅调制(QAM)方式。ADSL 使用间隔为 4.3125 kHz 的上百个不同频率的波进行合成，每个波都采用正交振幅调制。</p>
-<p><img src="/images/net/modem2.png" alt="eth_if"></p>
-<h2 id="ppp"><a href="#ppp" class="headerlink" title="ppp"></a>ppp</h2><p>PPP (Point-to-Point Protocol)点到点协议。用户向运营商的接入点拨打电话，,电话接通后，输入用户名和密码进行登录操作。用户名和密码通过 RADIUS 协议从 RAS 发送到认证服务器，认证服务器校验这些信息是否正确。当确认无误后,认证服务器会返回 IP 地址等配置信息，为计算机分配一个公有地址。</p>
-<p>PPPoE 是将 PPP 消息装入以太网包进行传输的方式。PPP 协议中没有定义以太网中的报头和 FCS 等元素，也没有定义信号的格式，因此无法直接将 PPP 消息转换成信号来发送。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/21/net/ip/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1276,6 +1147,75 @@
   
   
 
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/gdb/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/tool/gdb/" class="post-title-link" itemprop="url">usage for gdb</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-06-07 16:05:54 / 修改时间：19:48:55" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:54+08:00">2022-06-07</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/gdb/" itemprop="url" rel="index"><span itemprop="name">gdb</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>set val a=10  //更改程序变量的值</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/chen1415886044/article/details/105094688">https://blog.csdn.net/chen1415886044/article/details/105094688</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wuyuegb2312/archive/2013/03/29/2987025.html">https://www.cnblogs.com/wuyuegb2312/archive/2013/03/29/2987025.html</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/chenshengkai/p/14218678.html">https://www.cnblogs.com/chenshengkai/p/14218678.html</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
   </div>
 
   
@@ -1345,7 +1285,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">216</span>
+          <span class="site-state-item-count">215</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
