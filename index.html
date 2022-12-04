@@ -176,6 +176,86 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/12/04/algo/SlideWindow/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/12/04/algo/SlideWindow/" class="post-title-link" itemprop="url">滑动窗口</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-12-04 22:30:17 / 修改时间：23:21:50" itemprop="dateCreated datePublished" datetime="2022-12-04T22:30:17+08:00">2022-12-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>滑动窗口就是维护一个窗口(队列/数组)，通过双指针同向移动不断滑动，然后更新答案。</p>
+<p>1、数组或字符串、连续， 需要输出或比较的结果在原数据结构中是连续排列的（字符串中的连续不重复子串，数组中的连续元素最大和）<br>2、双指针，每次窗口滑动时，只需观察窗口两端元素的变化，窗口内元素的整体性比较强，窗口滑动可以只通过操作头尾两个位置的变化实现，但对比结果时往往要用到窗口中所有元素（检查窗口中是否含有重复字符，对比窗口中元素的和）</p>
+<p>变长滑动窗口</p>
+<p>//构建窗口window容器保存窗口内元素，可以采用数组、hashset、hashmap等<br>window window;<br>//保存最优结果、最大或最小等<br>result = defaltvalue;<br>//构造窗口的左右边界指针<br>int left = 0, right = 0;<br>while(right &lt; s.size()) {<br>    window.add(s[right]);<br>    //确定合适的位置，执行右指针移动，不一定就放在这<br>    right++;<br>    // 如果符合要求，说明窗口构造完成，移动 left 缩小窗口<br>    while (window 符合要求) {<br>        // 如果这个窗口的条件更优，则更新result<br>        result = maxOrMin(result, window);<br>        //移出左指针元素<br>        window.remove(s[left]);<br>        left++;<br>    }<br>}<br>return result;</p>
+<p>固定长度滑动窗口：</p>
+<p>// 固定窗口大小为 k<br>string s;<br>// 在 s 中寻找窗口大小为 k 时的所包含最大元音字母个数<br>int right = 0;<br>while(right &lt; s.size()) {<br>    window.add(s[right]);<br>    right++;<br>    // 如果符合要求，说明窗口构造完成，<br>    if (right&gt;=k) {<br>        // 这是已经是一个窗口了，根据条件做一些事情<br>        // … 可以计算窗口最大值等<br>        // 最后不要忘记把 right -k 位置元素从窗口里面移除<br>    }<br>}<br>return result;</p>
+<h2 id="长度最小的子数组"><a href="#长度最小的子数组" class="headerlink" title="长度最小的子数组"></a>长度最小的子数组</h2><p>给定一个含有 n 个正整数的数组和一个正整数 s ，找出该数组中满足其和≥ s的长度最小的连续子数组。如果不存在符合条件的连续子数组，返回 0。</p>
+<p>输入: s = 7, nums = [2,3,1,2,4,3]<br>输出: 2<br>解释: 子数组 [4,3] 是该条件下的长度最小的连续子数组。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt; nums = &#123;<span class="number">2</span>,<span class="number">3</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">4</span>,<span class="number">3</span>&#125;;</span><br><span class="line"><span class="type">int</span> target;</span><br><span class="line">cin &gt;&gt; target;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> res = INT16_MAX;</span><br><span class="line"><span class="type">int</span> sum = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> left = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> right = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (right &lt; nums.<span class="built_in">size</span>()) &#123;</span><br><span class="line">    sum += nums[right];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (sum &gt;= target) &#123;</span><br><span class="line">        res = <span class="built_in">MIN</span>(res, right - left + <span class="number">1</span>);</span><br><span class="line">        sum -= nums[left];</span><br><span class="line">        left++;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;---- &quot;</span> &lt;&lt; left &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; right &lt;&lt; <span class="string">&quot; res = &quot;</span> &lt;&lt; res &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; left &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; right &lt;&lt; <span class="string">&quot;   sum = &quot;</span> &lt;&lt; sum &lt;&lt; endl;</span><br><span class="line">    right++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">cout &lt;&lt; (res == INT16_MAX ? <span class="number">0</span> : res) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<h2 id="最小覆盖子串"><a href="#最小覆盖子串" class="headerlink" title="最小覆盖子串"></a>最小覆盖子串</h2><p>给定一个字符串 s 、一个字符串 t ，返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 “” 。</p>
+<p>输入：s = “ADOBECODEBANC”, t = “ABC”<br>输出：”BANC”</p>
+<p><img src="/images/code/algo/slide-window.gif" alt="img"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/11/19/net/mac/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -314,7 +394,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-11-26 11:48:32" itemprop="dateModified" datetime="2022-11-26T11:48:32+08:00">2022-11-26</time>
+                <time title="修改时间：2022-11-26 17:45:16" itemprop="dateModified" datetime="2022-11-26T17:45:16+08:00">2022-11-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -339,7 +419,7 @@
       
           <ol>
 <li>存在「重叠子问题」，子问题相互独立。</li>
-<li>具备「最优子结构」，能通过子问题的最值得到原问题的最值。</li>
+<li>具备「最优子结构」，可通过子问题的最值得到原问题的最值。</li>
 <li>列出「状态转移方程」：明确「状态」 -&gt; 定义 dp 数组的含义 -&gt; 明确「选择」-&gt; 明确 base case。</li>
 </ol>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> 状态<span class="number">1</span> in 状态<span class="number">1</span>的所有取值：</span><br><span class="line">    <span class="keyword">for</span> 状态<span class="number">2</span> in 状态<span class="number">2</span>的所有取值：</span><br><span class="line">        <span class="keyword">for</span> ...</span><br><span class="line">            dp[状态<span class="number">1</span>][状态<span class="number">2</span>][...] = 择优(选择<span class="number">1</span>，选择<span class="number">2.</span>..)</span><br></pre></td></tr></table></figure>
@@ -1329,185 +1409,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/cpu/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/25/cpu/cpu/" class="post-title-link" itemprop="url">处理器设计</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-25 11:13:36" itemprop="dateCreated datePublished" datetime="2022-09-25T11:13:36+08:00">2022-09-25</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-11-26 10:21:23" itemprop="dateModified" datetime="2022-11-26T10:21:23+08:00">2022-11-26</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="ISA"><a href="#ISA" class="headerlink" title="ISA"></a>ISA</h2><p>ISA（Instruction Set Architecture）指令集架构定义了一个处理器支持的指令和指令的字节级编码，包括很多个部分：</p>
-<ul>
-<li>指令集</li>
-<li>指令集编码</li>
-<li>基本数据类型</li>
-<li>一组编程规范</li>
-<li>寄存器</li>
-<li>寻址模式</li>
-<li>存储体系</li>
-<li>异常事件处理</li>
-<li>中断</li>
-<li>外部I/O</li>
-</ul>
-<p><strong>CISC</strong>（Complex Instruction Set Computer，复杂指令集计算机）的每个指令可执行若干低阶操作，诸如从内存读取、储存、和计算操作，全部集于单一指令之中。CISC特点：</p>
-<ul>
-<li><p>指令系统庞大，指令功能复杂，指令格式、寻址方式多；</p>
-</li>
-<li><p>绝大多数指令需多个机器周期完成；- 各种指令都可访问存储器；</p>
-</li>
-<li><p>采用微程序控制；</p>
-</li>
-<li><p>有专用寄存器，少量；</p>
-</li>
-<li><p>难以用优化编译技术生成高效的目标代码程序；</p>
-</li>
-</ul>
-<p>在CISC指令集的各种指令中，大约有20%的指令会被反复使用，占整个程序代码的80%。而余下的80%的指令却不经常使用，在程序设计中只占20%。</p>
-<p><strong>RISC</strong>（Reduced Instruction Set Computer，精简指令集计算机）对指令数目和寻址方式都做了精简，使其实现更容易，指令并行执行程度更好，编译器的效率更高。它能够以更快的速度执行操作。RISC设计的根本原则量对流水线的优化。RISC特点：</p>
-<ul>
-<li>统一指令编码（例如，所有指令中的op-code永远位于同样的位元位置、等长指令），可快速解译；</li>
-<li>泛用的暂存器，所有暂存器可用于所有内容，以及编译器设计的单纯化（不过暂存器中区分了整数和浮点数）；</li>
-<li>单纯的寻址模式（复杂寻址模式以简单计算指令序列取代）。</li>
-<li>硬件中支援少数资料型别（例如，一些CISC电脑中存有处理字节字串的指令。这在RISC电脑中不太可能出现）。</li>
-<li>所有计算都要在寄存器中完成。而寄存器和内存的通信则由单独的指令完成。</li>
-<li>有非常多的通用寄存器，并采用了重叠寄存器窗口和寄存器堆等技术使寄存器资源得到充分的利用。</li>
-</ul>
-<p><strong>CISC和RISC的区别</strong></p>
-<ul>
-<li>指令系统：RISC设计者把主要精力放在那些经常使用的指令上，尽量使它们具有简单高效的特色。对不常用的功能，常通过组合指令来完成。因此，在RISC机器上实现特殊功能时，效率可能较低。但可以利用流水技术和超标量技术加以改进和弥补。而CISC计算机的指令系统比较丰富，有专用指令来完成特定的功能。因此，处理特殊任务效率较高。</li>
-<li>存储器操作：RISC对存储器操作有限制，使控制简单化；而CISC机器的存储器操作指令多，操作直接。</li>
-<li>程序：RISC汇编语言程序一般需要较大的内存空间，实现特殊功能时程序复杂，不易设计；而CISC汇编语言程序编程相对简单，科学计算及复杂操作的程序社设计相对容易，效率较高。</li>
-<li>中断：RISC机器在一条指令执行的适当地方可以响应中断；而CISC机器是在一条指令执行结束后响应中断。</li>
-<li>CPU：RISC CPU包含有较少的单元电路，因而面积小、功耗低；而CISCCPU包含有丰富的电路单元，因而功能强、面积大、功耗大。</li>
-<li>设计周期：RISC微处理器结构简单，布局紧凑，设计周期短，且易于采用最新技术；CISC微处理器结构复杂，设计周期长。</li>
-<li>用户使用：RISC微处理器结构简单，指令规整，性能容易把握，易学易用；CISC微处理器结构复杂，功能强大，实现特殊功能容易。</li>
-<li>应用范围：由于RISC指令系统的确定与特定的应用领域有关，故RISC机器更适合于专用机；而CISC机器则更适合于通用机。</li>
-</ul>
-<h2 id="流水线"><a href="#流水线" class="headerlink" title="流水线"></a>流水线</h2><p>MIPS处理器在设计时，将处理器的执行过程划分为5个阶段：IF取指、ID译码、EX执行、MEM内存数据读或写、WB数据写回到通用寄存器中。</p>
-<p><img src="/images/cpu/%E6%B5%81%E6%B0%B4%E7%BA%BF.jpg" alt="img"></p>
-<p>流水线在实际执行过程中会遇到一些因素导致流水线停顿，这些就被称为流水线冒险。</p>
-<p><strong>结构冒险</strong></p>
-<p>流水线中取指阶段和读写存储器阶段都需要访问存储器，处理器中，程序和数据存储器没有分开，IF和MEM操作同时访问存储器导致其中一个操作要等待。哈弗架构不存在这个问题。</p>
-<p><strong>数据冒险</strong></p>
-<p>由于从指令取指到数据更新至存储器/寄存器之间具有时钟延迟，当出现某些指令的组合时，可能会导致后面的指令使用了错误的数据。</p>
-<p>解决方法一是加入几个cycle的等待，但这影响了执行效率。另一种更好的解决办法是使用直通（Forwarding）技术。当硬件检测到当前指令的源操作数正好在EX/MEM流水线寄存器中时，就直接将EX/MEM寄存器的值传递给ALU的输入，而不是从寄存器堆中读数据。</p>
-<p><strong>控制冒险</strong></p>
-<p>由于使用流水线操作，在当前指令正在执行时，后面的很多条指令已经完成了取指和译码等步骤。然而，程序中有很多跳转语句，如果程序的实际执行路径是要跳转到其它的地址去执行，那么流水线中已经做的这些取指和译码工作就白做了，这就是流水线的控制冒险。</p>
-<p>此时处理器需要排空流水线，跳转到新的地址处重新进入流水线。x86处理器使用硬件冲刷流水线来保证发生跳转时，流水线能正确执行。在TI的DSP中，硬件不处理这些冒险，而是通过软件的方式，在跳转语句后增加5个NOP操作来保证流水线正确，编译器也可以将指令乱序，用有效指令代替NOP指令。</p>
-<h2 id="分支预测"><a href="#分支预测" class="headerlink" title="分支预测"></a>分支预测</h2><p>流水线的控制冒险将可能引起流水线排空，这对程序性能的损害是巨大的，流水线越深，损害越大。现代的很多处理器采用了分支预测技术来避免跳转带来的损失。</p>
-<p>采用分支预测，处理器猜测进入哪个分支，并且基于预测的结果来取指、译码。如果猜测正确，就能节省时间，若果猜测错误，则刷新流水线，在新的地址上取指、译码。因此，分支预测需要有足够的准确性。</p>
-<p>介绍两种简单的分支预测算法：</p>
-<ul>
-<li><p>1位预测：如果该跳转指令上一次发生跳转，就预测这一次也会跳转，如果上一次没有跳转，就预测这一次也没有跳转。</p>
-</li>
-<li><p>2位预测：用2bit计数器保存跳转信息，如果跳转执行就加1，跳转未执行就减1,。当计数器值为0和1时，就预测该分支不执行；当计数器值为2和3时，就预测这个分支执行。</p>
-</li>
-</ul>
-<p>分支预测会消耗大量的资源，很多低功耗处理器没有分支预测，取而代之的是使用条件执行来减少跳转指令，如TI的DSP和ARM的cortex系列内核等。</p>
-<h2 id="乱序执行"><a href="#乱序执行" class="headerlink" title="乱序执行"></a>乱序执行</h2><p>指令在执行时常常因为一些限制而等待，后面的指令都要等待。如果处理器足够智能，就可以先执行后面不依赖该数据的指令，这就是处理器的乱序执行（out -of-order execution）。</p>
-<p>乱序执行最大的障碍就是指令间的相关性。指令间相关大致有三种情况：</p>
-<ul>
-<li>寄存器相关，即前后指令使用了相同的寄存器。</li>
-<li>控制相关，跳转指令之后执行哪些指令需要依赖于跳转的结果。</li>
-<li>数据相关，即后面指令需要的数据依赖于前面指令的计算结果。</li>
-</ul>
-<p>对于寄存器相关，处理器通过<strong>寄存器重命名</strong>技术解决这一问题。相同的ISA寄存器可以映射到不同的物理寄存器，经过映射后，新的指令就可以使用不同的物理寄存器，指令间的相关性依赖也就消除了。</p>
-<p>对于控制相关，处理器通过分支预测来决定哪些指令将会得到执行。</p>
-<p>对于数据相关，这往往是由程序算法特性以及程序的设计共同决定的，它和处理器无关，和程序员以及编译器有关。在很多时候，编程人员可以通过调整代码设计将数据间的相关性降至最小。如下面这段代码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x = a + b;</span><br><span class="line">y = x + c;</span><br><span class="line">z = y + d;</span><br></pre></td></tr></table></figure>
-
-<p>可以改写成：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x = a + b;</span><br><span class="line">y = c + d;</span><br><span class="line">z = x + y;</span><br></pre></td></tr></table></figure>
-
-<p>乱序执行比顺序执行要耗费更多的处理器资源，通常只有高端处理器才会使用。</p>
-<h2 id="并行设计"><a href="#并行设计" class="headerlink" title="并行设计"></a>并行设计</h2><p><strong>指令并行</strong></p>
-<p>多发射是指将多条指令同时发射到不同的译码器或者后续处理流水线中。</p>
-<p>超标量是指一个时钟周期内能发射多条指令的流水线架构，内部有多个执行单元，</p>
-<p><strong>数据并行</strong></p>
-<p>SIMD（Single Instruction Multiple Data，单指令多数据）指令通过一条语句处理多个数据。在多媒体应用中，同一操作会重复处理多个数据，SIMD指令就特别适合处理这一类数据。</p>
-<p><strong>线程并行</strong></p>
-<p>线程并行的方式有：单核内多线程、多核、多处理器。</p>
-<p>流水线是一种在垂直方向上对指令处理进行重叠来提升性能的技术，相对地，在水平方向上将指令进行重叠的技术称为<strong>超标量</strong>（superscalar），每个核内放置冗余单元如ALU，同一时钟内可以执行多条指令。</p>
-<p>超线程是Intel公司提出的一种提高CPU性能的技术，利用特殊的硬件指令，把两个逻辑内核模拟成两个物理芯片，让单个处理器都能使用线程级并行计算，进而兼容多线程操作系统和应用软件，减少CPU的闲置时间，提高CPU的运行效率。</p>
-<h2 id="核间通信"><a href="#核间通信" class="headerlink" title="核间通信"></a>核间通信</h2><p>多核处理器的多个核之间会共用处理器的外设与接口，如内存控制器、PCI-E接口等，通常也会共享一段Cache。核与核之间有时需要交换信息，因此核间连接/通信方式的选取也很关键。常见的几种多核组织结构：</p>
-<ul>
-<li><p>Bus结构比较简单，缺点是每两个内核通信都要占用总线，导致其它核不能通信，通信效率低。</p>
-</li>
-<li><p>Switch结构通信效率最高。但如果核太多，这种连接方式需耗费大量的互联资源，通常4个核左右的处理器采用这种方式。</p>
-</li>
-<li><p>Ring结构介于Bus和Switch结构之间。1和3通信需要经过2，越近的两个核通信效率越高，通信连线并不复杂，实现成本也低。通常8个核左右采用这种方式，Intel的很多处理器采用这种结构。</p>
-</li>
-<li><p>Mesh结构适用于核数非常多的情况，类似于二维的Ring结构。</p>
-</li>
-</ul>
-<p><img src="/images/cpu/%E5%A4%9A%E6%A0%B8%E7%BB%84%E7%BB%87%E7%BB%93%E6%9E%84.jpg" alt="img"></p>
-<p>因为核间通信会影响内核的运算效率，1个核可以做5件事情，并不代表4个核可以做20件事情，核越多时，数据交换延时越长。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1577,7 +1478,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">215</span>
+          <span class="site-state-item-count">216</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

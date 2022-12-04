@@ -176,6 +176,92 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/Bridge/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/design-patterns/Bridge/" class="post-title-link" itemprop="url">桥接模式</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="桥接模式"><a href="#桥接模式" class="headerlink" title="桥接模式"></a>桥接模式</h2><p>桥接模式(Bridge Pattern)：将<strong>抽象和实现分离</strong>，让它们可以独立变化。一个类存在多个独立变化的维度，桥接模式通过将继承改为组合的方式，让这多维度可以独立进行扩展。比如电脑通过usb连接鼠标，接口是固定的，电脑和鼠标品牌可以随意购买。</p>
+<p><img src="/images/code/design-pattern/Bridge.png" alt="Bridge"></p>
+<ul>
+<li><p>Abstraction（抽象类） ： 用于定义抽象类的接口，它一般是抽象类，定义了一个Implementor（实现类接口）类型的对象，与其之间具有关联关系，从而分离抽象接口与实现部分。</p>
+</li>
+<li><p>RefinedAbstraction（扩充抽象类）： 扩充由Abstraction定义的接口，通常情况下它是具体类，实现Abstraction的抽象业务方法，并可以调用在Implementor中定义的业务方法。</p>
+</li>
+<li><p>Implementor（实现类接口）: 定义实现类的接口，Implementor接口声明了一些基本操作，而具体实现交给其子类。通过关联关系，在Abstraction中不仅拥有自己的方法，还可以调用Implementor中定义的方法。</p>
+</li>
+<li><p>ConcreteImplementor：具体实现Implementor接口。</p>
+</li>
+</ul>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 实现类接口</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Implementor</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">OperationImp</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteImplementorA</span> : <span class="keyword">public</span> Implementor</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">OperationImp</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;ConcreteImplementor A&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteImplementorB</span> : <span class="keyword">public</span> Implementor</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">OperationImp</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;ConcreteImplementor B&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Abstraction</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Abstraction</span>(Implementor *imp) : <span class="built_in">imp_</span>(imp) &#123;&#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Operation</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        imp_-&gt;<span class="built_in">OperationImp</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Implementor *imp_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ConcreteImplementorA impa;</span><br><span class="line">    ConcreteImplementorB impb;</span><br><span class="line">    Abstraction abs1 = <span class="built_in">Abstraction</span>(&amp;impa);</span><br><span class="line">    abs1.<span class="built_in">Operation</span>();</span><br><span class="line"></span><br><span class="line">    Abstraction abs2 = <span class="built_in">Abstraction</span>(&amp;impb);</span><br><span class="line">    abs2.<span class="built_in">Operation</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/Adapter/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -945,189 +1031,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/find/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/algo/find/" class="post-title-link" itemprop="url">查找算法</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <table>
-<thead>
-<tr>
-<th>查找算法</th>
-<th>平均时间复杂度</th>
-<th>空间复杂度</th>
-<th>查找条件</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>顺序查找</td>
-<td>O(n)</td>
-<td>O(1)</td>
-<td>无序或有序</td>
-</tr>
-<tr>
-<td>二分查找</td>
-<td>O(log<sub>2</sub>n)</td>
-<td>O(1)</td>
-<td>有序</td>
-</tr>
-<tr>
-<td>插值查找</td>
-<td>O(log<sub>2</sub>(log<sub>2</sub>n))</td>
-<td>O(1)</td>
-<td>有序</td>
-</tr>
-<tr>
-<td>斐波那契查找</td>
-<td>O(log<sub>2</sub>n)</td>
-<td>O(1)</td>
-<td>有序</td>
-</tr>
-<tr>
-<td>哈希查找</td>
-<td>O(1)</td>
-<td>O(n)</td>
-<td>无序或有序</td>
-</tr>
-<tr>
-<td>二叉查找树</td>
-<td>O(log<sub>2</sub>n)</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>红黑树</td>
-<td>O(log<sub>2</sub>n)</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>2-3树</td>
-<td>O(log<sub>2</sub>n - log<sub>3</sub>n)</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>B树/B+树</td>
-<td>O(log<sub>2</sub>n)</td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="图搜索算法"><a href="#图搜索算法" class="headerlink" title="图搜索算法"></a>图搜索算法</h3><table>
-<thead>
-<tr>
-<th>图搜索算法</th>
-<th>数据结构</th>
-<th>遍历时间复杂度</th>
-<th>空间复杂度</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>BFS广度优先搜索</td>
-<td>邻接矩阵<br/>邻接链表</td>
-<td>O(|v|<sup>2</sup>)<br/>O(|v|+|E|)</td>
-<td>O(|v|<sup>2</sup>)<br/>O(|v|+|E|)</td>
-</tr>
-<tr>
-<td>DFS深度优先搜索</td>
-<td>邻接矩阵<br/>邻接链表</td>
-<td>O(|v|<sup>2</sup>)<br/>O(|v|+|E|)</td>
-<td>O(|v|<sup>2</sup>)<br/>O(|v|+|E|)</td>
-</tr>
-</tbody></table>
-<h3 id="其他算法"><a href="#其他算法" class="headerlink" title="其他算法"></a>其他算法</h3><table>
-<thead>
-<tr>
-<th>算法</th>
-<th>思想</th>
-<th>应用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>[分治法</td>
-<td>把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并</td>
-<td>循环赛日程安排问题、排序算法（快速排序、归并排序）</td>
-</tr>
-<tr>
-<td>动态规划</td>
-<td>通过把原问题分解为相对简单的子问题的方式求解复杂问题的方法，适用于有重叠子问题和最优子结构性质的问题</td>
-<td>背包问题、斐波那契数列</td>
-</tr>
-<tr>
-<td>贪心法</td>
-<td>一种在每一步选择中都采取在当前状态下最好或最优（即最有利）的选择，从而希望导致结果是最好或最优的算法</td>
-<td>旅行推销员问题（最短路径问题）、最小生成树、哈夫曼编码</td>
-</tr>
-</tbody></table>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1197,7 +1100,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">215</span>
+          <span class="site-state-item-count">216</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
