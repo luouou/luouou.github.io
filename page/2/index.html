@@ -176,6 +176,193 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/arm-arch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/25/cpu/arm-arch/" class="post-title-link" itemprop="url">arm体系架构</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-25 11:23:54 / 修改时间：15:11:00" itemprop="dateCreated datePublished" datetime="2022-09-25T11:23:54+08:00">2022-09-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="ARM指令集架构命名"><a href="#ARM指令集架构命名" class="headerlink" title="ARM指令集架构命名"></a>ARM指令集架构命名</h2><blockquote>
+<p>| ARMv | n | variants | x（variants） |</p>
+</blockquote>
+<ul>
+<li>ARMv – 固定字符，即ARM Version</li>
+<li>n – 指令集版本号。迄今为之，ARM架构版本发布了8个系列，所以n=[1:8]。</li>
+<li>variants – 变种</li>
+<li>x（variants） – 排除x后指定的变种</li>
+</ul>
+<p>常见的variants有以下字母可选：</p>
+<ul>
+<li>T – Thumb指令集</li>
+<li>M – 长乘法指令</li>
+<li>E – 增强型DSP指令</li>
+<li>J – Java加速器Jazelle</li>
+<li>SIMD – ARM媒体功能扩展</li>
+<li>D – Debug，提供调试支持</li>
+<li>I – 芯片上带有内置的ICE，从而支持程序内的断点和数据空间的观察点设置。</li>
+</ul>
+<p>比如：ARMv5TxM表示ARM指令集版本为5，支持T变种，不支持M变种。</p>
+<h2 id="ARM体系变种"><a href="#ARM体系变种" class="headerlink" title="ARM体系变种"></a>ARM体系变种</h2><p><strong>T变种</strong></p>
+<p>thumb指令集是ARM指令集的一个子集重新编码而成的。它使ARM更加高效地进行运作。</p>
+<p>ARM的指令长度为32位，而Thumb指令长度只有16位，对于一些冗余空余位的操作来讲的话，在使用16位的基础上，明显比使用32位更加高效。但是thumb自身也有一定的局限性：</p>
+<ul>
+<li><p>完成相同的操作时，Thumb指令通常情况下需要比ARM更多的指令。</p>
+</li>
+<li><p>Thumb指令集是不包含异常处理时的一些指令的</p>
+</li>
+</ul>
+<p>因此ARM是不能舍弃ARM的32位指令的，它与16位的Thumb指令配合才能更加有效率地执行。</p>
+<p><strong>M变种</strong></p>
+<p>增加了两条长乘法的ARM指令：</p>
+<ul>
+<li><p>长乘法操作：32位整数乘以32位整数，生成64位整数</p>
+</li>
+<li><p>长乘加操作：32位整数乘以32位整数，然后加上加上32位整数，生成64位整数</p>
+</li>
+</ul>
+<p>它其实做版本3中正式引入，版本2的时候仅是有了这个思想的，然后在版本4以后，M变种就变成了系统中的标准部分。我们也不再说M变种了，因为我们在开发ARM过程中直接是使用相应的指令的。</p>
+<p><strong>E变种</strong></p>
+<p>增强型DSP指令，针对于ARM的应用范围越来越广阔，为了满足DSP算法，就需要增强这个算法的处理性能。</p>
+<ul>
+<li><p>增加了新的16位数据乘法与乘加操作指令</p>
+</li>
+<li><p>实现饱和的带符号数的加减法操作指令</p>
+</li>
+<li><p>进行双字数据操作的指令，包含LDRD、STDR、MCRR\MRRC</p>
+</li>
+<li><p>cache预取指令PLD</p>
+</li>
+</ul>
+<p>E变种是在版本5T中开始使用的。值得注意的是：早期的E变种未有包含LDRD、STRD、MCRR\MRRC、PLD。</p>
+<p><strong>J变种</strong></p>
+<p>ARM能跑android和java不得不归功于这个变种——java加数器jazelle，与一般的java虚拟机相比，它将java代码运行速度提高了整整8倍，而功耗竟降低了80%。</p>
+<p><strong>SIMD变种</strong></p>
+<p>媒体功能扩展，它将音频\视频处理性能提高了4倍。</p>
+<ul>
+<li>音频\视频处理性能提高了4倍</li>
+<li>提供小数算术运算</li>
+<li>可同时进行两个16位操作数或者4个8位操作数的运算</li>
+<li>用户可以定义饱和运算模式</li>
+<li>两套16位操作数的乘加/乘减运算</li>
+<li>32位乘以32位的小数MAC</li>
+</ul>
+<h2 id="ARM处理器系列命名"><a href="#ARM处理器系列命名" class="headerlink" title="ARM处理器系列命名"></a>ARM处理器系列命名</h2><p>在 ARMv3 ~ ARMv6 时期规则：</p>
+<blockquote>
+<p>ARM{x}{y}{z}{T}{D}{M}{I}{E}{J}{F}{-S}</p>
+</blockquote>
+<ul>
+<li>x – 处理器系列</li>
+<li>y – 存储管理/保护单元</li>
+<li>z – cache</li>
+<li>T – 支持Thumb指令集</li>
+<li>D – 支持片上调试</li>
+<li>M – 支持快速乘法器</li>
+<li>I – 支持Embedded ICE，支持嵌入式跟踪调试</li>
+<li>E – 支持增强型DSP指令</li>
+<li>J – 支持Jazelle</li>
+<li>F – 具备向量浮点单元VFP</li>
+<li>-S – 可综合版本</li>
+</ul>
+<p>比如：ARM926 是 ARM9系列的，2个存储管理/保护单元，6个Cache</p>
+<p>在 ARMv7 后期，统一用 <strong>Cortex</strong> 作为主名，分为了3个款式：A、R、M &amp; SC：</p>
+<ul>
+<li>A 系列，应用级处理器，手机。</li>
+<li>R 系列，实时处理器，执行一个指令段的耗时是固定时钟周期数。</li>
+<li>M 系列，微处理器单片机。</li>
+<li>SC（SecurCore）系列，主打安全，面向支付、政府、SIM 卡。</li>
+</ul>
+<h2 id="ARM处理器工作模式"><a href="#ARM处理器工作模式" class="headerlink" title="ARM处理器工作模式"></a>ARM处理器工作模式</h2><ul>
+<li><p>用户模式（usr，User Mode）：ARM处理器正常的程序执行状态。</p>
+</li>
+<li><p>快速中断模式（fiq，Fast Interrupt Request Mode）：用于高速数据传输或通道处理。当触发快速中断时进入此模式。</p>
+</li>
+<li><p>外部中断模式（irq，Interrupt Request Mode）：用于通用的中断处理。当触发外部中断时进入此模式。</p>
+</li>
+<li><p>管理模式（svc，Supervisor Mode）：操作系统使用的保护模式。在系统复位或执行软件中断指令SWI时进入。</p>
+</li>
+<li><p>数据访问中止模式（abt，Abort Mode）：当数据或指令预取中止时进入该模式，可用于虚拟存储及存储保护。</p>
+</li>
+<li><p>系统模式（sys，System Mode）：运行具有特权的操作系统任务。</p>
+</li>
+<li><p>未定义指令中止模式（und，Undefined Mode）：当未定义的指令执行时进入该模式，可用于支持硬件协处理器的软件仿真。</p>
+</li>
+</ul>
+<p>除了用户模式之外，其余六种模式都是特权模式。除了用户模式和系统模式之外，其余五种模式都是异常模式。</p>
+<p>在特权模式下程序可以访问所有的系统资源。非特权模式和特权模式之间的区别在于有些操作只能在特权模式下才被允许，例如直接改变模式和中断使能等。而且为了保证数据安全，一般MMU会对地址空间进行划分，只有特权模式才能访问所有的地址空间。而用户模式如果需要访问硬件，必须切换到特权模式下，才允许访问硬件。</p>
+<p><strong>工作模式的切换</strong></p>
+<ul>
+<li><p>执行软中断（SWI）或复位命令（Reset）指令。如果在用户模式下执行SWI指令，CPU就进入管理（Supervisor）模式。当然，在其他模式下执行SWI，也会进入该模式，不过一般操作系统不会这么做，因为除了用户模式属于非特权模式，其他模式都属于特权模式。执行SWI指令一般是为了访问系统资源，而在特权模式下可以访问所有的系统资源。SWI指令一般用来为操作系统提供API接口。</p>
+</li>
+<li><p>外部中断。如果发生了外部中断，CPU就会进入IRQ或FIQ模式。</p>
+</li>
+<li><p>CPU执行过程中产生异常。最典型的异常是由于MMU保护所引起的内存访问异常，此时CPU会切换到Abort模式。如果是无效指令，则会进入Undefined模式。</p>
+</li>
+<li><p>有一种模式是CPU无法自动进入的，这种模式就是System模式，要进入System模式必须由程序员编写指令来实现。要进入System模式只需改变CPSR的模式位为System模式对应的模式位即可。进入System模式一般是为了利用System模式和用户模式下的寄存器相同的特点，因此一般情况下，操作系统在通过SWI进入Supervisor模式后，做一些操作后，就进入System模式。</p>
+</li>
+<li><p>在任何特权模式下，都可以通过修改CPSR的MODE域来进入其他模式。不过需要注意的是由于修改的CPSR是该模式下的影子CPSR，即SPSR，因此并不是实际的CPSR，所以一般的做法是修改影子CPSR，然后执行一个MOVS指令来恢复执行某个断点并切换到新模式。</p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/cpu/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1392,125 +1579,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/tool/vim/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/04/tool/vim/" class="post-title-link" itemprop="url">vim插件与配置</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-09-04 20:23:47 / 修改时间：22:26:42" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/tool/" itemprop="url" rel="index"><span itemprop="name">tool</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br></pre></td><td class="code"><pre><span class="line">&quot; 设置当文件被改动时自动载入</span><br><span class="line">set autoread</span><br><span class="line"></span><br><span class="line">&quot;代码补全</span><br><span class="line">set completeopt=preview,menu</span><br><span class="line"></span><br><span class="line">&quot;允许插件  </span><br><span class="line">filetype plugin on</span><br><span class="line"></span><br><span class="line">&quot;共享剪贴板  </span><br><span class="line">set clipboard+=unnamed</span><br><span class="line"></span><br><span class="line">&quot;从不备份  </span><br><span class="line">set nobackup</span><br><span class="line"></span><br><span class="line">&quot;自动保存</span><br><span class="line">set autowrite</span><br><span class="line">set ruler                   &quot; 打开状态栏标尺</span><br><span class="line">set cursorline              &quot; 突出显示当前行</span><br><span class="line"></span><br><span class="line">&quot; 高亮光标所在的行列</span><br><span class="line">highlight CursorLine   cterm=NONE ctermbg=black ctermfg=NONE guibg=NONE guifg=NONE</span><br><span class="line">highlight CursorColumn cterm=NONE ctermbg=black ctermfg=NONE guibg=NONE guifg=NONE</span><br><span class="line"></span><br><span class="line">&quot; CursorLine 和 CursorColumn 分别表示当前所在的行列，cterm 表示为原生vim设置样式，设置为NONE表示可以自定义设置。ctermbg 设置终端vim的背景色；ctermfg 设置终端vim的前景色。guibg 和 guifg 分别是设置gvim的背景色和前景色</span><br><span class="line"></span><br><span class="line">set magic                   &quot; 设置魔术</span><br><span class="line">set guioptions-=T           &quot; 隐藏工具栏</span><br><span class="line">set guioptions-=m           &quot; 隐藏菜单栏</span><br><span class="line"></span><br><span class="line">&quot; 设置在状态行显示的信息</span><br><span class="line">&quot;set foldcolumn=0</span><br><span class="line">&quot;set foldmethod=indent</span><br><span class="line">&quot;set foldlevel=3</span><br><span class="line">&quot;set foldenable              &quot; 开始折叠</span><br><span class="line"></span><br><span class="line">&quot; 不要使用vi的键盘模式，而是vim自己的</span><br><span class="line">set nocompatible</span><br><span class="line"></span><br><span class="line">&quot; 语法高亮</span><br><span class="line">set syntax=on</span><br><span class="line"></span><br><span class="line">&quot; 配色方案</span><br><span class="line">&quot;&quot;colorscheme darkblue</span><br><span class="line"></span><br><span class="line">&quot; 去掉输入错误的提示声音</span><br><span class="line">set noeb</span><br><span class="line"></span><br><span class="line">&quot; 在处理未保存或只读文件的时候，弹出确认</span><br><span class="line">set confirm</span><br><span class="line"></span><br><span class="line">&quot; 自动缩进</span><br><span class="line">set autoindent</span><br><span class="line">set cindent</span><br><span class="line"></span><br><span class="line">&quot; Tab键的宽度</span><br><span class="line">set tabstop=2</span><br><span class="line"></span><br><span class="line">&quot; 统一缩进为4</span><br><span class="line">set softtabstop=2</span><br><span class="line">set shiftwidth=2</span><br><span class="line"></span><br><span class="line">&quot; 不要用空格代替制表符</span><br><span class="line">set noexpandtab</span><br><span class="line"></span><br><span class="line">&quot; 在行和段开始处使用制表符</span><br><span class="line">set smarttab</span><br><span class="line"></span><br><span class="line">&quot; 显示行号</span><br><span class="line">set number</span><br><span class="line"></span><br><span class="line">&quot; 历史记录数</span><br><span class="line">set history=1000</span><br><span class="line"></span><br><span class="line">&quot;禁止生成临时文件</span><br><span class="line">set nobackup</span><br><span class="line">set noswapfile</span><br><span class="line"></span><br><span class="line">&quot;搜索逐字符高亮</span><br><span class="line">set hlsearch</span><br><span class="line">set incsearch</span><br><span class="line"></span><br><span class="line">&quot;行内替换</span><br><span class="line">set gdefault</span><br><span class="line"></span><br><span class="line">&quot;编码设置</span><br><span class="line">set enc=utf-8</span><br><span class="line">set fencs=utf-8,GB18030,ucs-bom,default,latin1</span><br><span class="line"></span><br><span class="line">&quot;语言设置</span><br><span class="line">set langmenu=zh_CN.UTF-8</span><br><span class="line">set helplang=cn</span><br><span class="line"></span><br><span class="line">&quot; 总是显示状态行</span><br><span class="line">set laststatus=2</span><br><span class="line"></span><br><span class="line">&quot; 命令行（在状态行下）的高度，默认为1，这里是2</span><br><span class="line">set cmdheight=2</span><br><span class="line"></span><br><span class="line">&quot; 侦测文件类型</span><br><span class="line">filetype on</span><br><span class="line"></span><br><span class="line">&quot; 载入文件类型插件</span><br><span class="line">filetype plugin on</span><br><span class="line"></span><br><span class="line">&quot; 为特定文件类型载入相关缩进文件</span><br><span class="line">filetype indent on</span><br><span class="line"></span><br><span class="line">&quot; 保存全局变量</span><br><span class="line">set viminfo+=!</span><br><span class="line"></span><br><span class="line">&quot; 带有如下符号的单词不要被换行分割</span><br><span class="line">set iskeyword+=_,$,@,%,#,-</span><br><span class="line"></span><br><span class="line">&quot; 字符间插入的像素行数目</span><br><span class="line">set linespace=0</span><br><span class="line"></span><br><span class="line">&quot; 增强模式中的命令行自动完成操作</span><br><span class="line">set wildmenu</span><br><span class="line"></span><br><span class="line">&quot; 使回格键（backspace）正常处理indent, eol, start等</span><br><span class="line">set backspace=2</span><br><span class="line"></span><br><span class="line">&quot; 允许backspace和光标键跨越行边界</span><br><span class="line">set whichwrap+=&lt;,&gt;,h,l</span><br><span class="line"></span><br><span class="line">&quot; 可以在buffer的任何地方使用鼠标（类似office中在工作区双击鼠标定位）</span><br><span class="line">set mouse=a</span><br><span class="line">set selection=exclusive</span><br><span class="line">set selectmode=mouse,key</span><br><span class="line"></span><br><span class="line">&quot; 通过使用: commands命令，告诉我们文件的哪一行被改变过</span><br><span class="line">set report=0</span><br><span class="line"></span><br><span class="line">&quot; 在被分割的窗口间显示空白，便于阅读</span><br><span class="line">set fillchars=vert:\ ,stl:\ ,stlnc:\</span><br><span class="line"></span><br><span class="line">&quot; 高亮显示匹配的括号</span><br><span class="line">set showmatch</span><br><span class="line"></span><br><span class="line">&quot; 匹配括号高亮的时间（单位是十分之一秒）</span><br><span class="line">set matchtime=1</span><br><span class="line"></span><br><span class="line">&quot; 光标移动到buffer的顶部和底部时保持3行距离</span><br><span class="line">set scrolloff=3</span><br><span class="line"></span><br><span class="line">&quot; 为C程序提供自动缩进</span><br><span class="line">set smartindent</span><br><span class="line"></span><br><span class="line">&quot; 高亮显示普通txt文件（需要txt.vim脚本）</span><br><span class="line">au BufRead,BufNewFile *  setfiletype txt</span><br><span class="line"></span><br><span class="line">&quot;自动补全</span><br><span class="line">:inoremap ( ()<span class="tag">&lt;<span class="name">ESC</span>&gt;</span>i</span><br><span class="line">:inoremap &#123; &#123;&#125;<span class="tag">&lt;<span class="name">ESC</span>&gt;</span>i</span><br><span class="line">:inoremap [ []<span class="tag">&lt;<span class="name">ESC</span>&gt;</span>i</span><br><span class="line">:inoremap &quot; &quot;&quot;<span class="tag">&lt;<span class="name">ESC</span>&gt;</span>i</span><br><span class="line">:inoremap &#x27; &#x27;&#x27;<span class="tag">&lt;<span class="name">ESC</span>&gt;</span>i</span><br><span class="line"></span><br><span class="line">&quot; 按tab键依次选择</span><br><span class="line">set wildmenu</span><br><span class="line"></span><br><span class="line">&quot;配置规则</span><br><span class="line">set wildmode=longest,list,full</span><br><span class="line"></span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; cscope  设置</span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">:cs add cscope.out</span><br><span class="line"></span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; Tag List  设置</span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">nmap <span class="tag">&lt;<span class="name">F5</span>&gt;</span> :TlistToggle<span class="tag">&lt;<span class="name">CR</span>&gt;</span></span><br><span class="line"></span><br><span class="line">let Tlist_Ctags_Cmd=&quot;/usr/bin/ctags&quot;  &quot;ctags程序位置</span><br><span class="line">let Tlist_Inc_Winwidth=0        &quot;window width change off</span><br><span class="line">let Tlist_Auto_Open=0           &quot;vim 开始时window open=off</span><br><span class="line">let Tlist_Use_Left_Window=1     &quot;显示在左侧</span><br><span class="line">let Tlist_Show_One_File=1       &quot;不同时显示多个文件的tag，只显示当前文件的    </span><br><span class="line">let Tlist_Exit_OnlyWindow=1     &quot;如果taglist窗口是最后一个窗口，则退出vim   </span><br><span class="line">set ut=100</span><br><span class="line"></span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; NERDTree  设置</span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">nmap <span class="tag">&lt;<span class="name">F8</span>&gt;</span> :NERDTreeToggle<span class="tag">&lt;<span class="name">CR</span>&gt;</span></span><br><span class="line">let NERDTreeWinPos=&quot;right&quot;</span><br><span class="line"></span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; SrcExpl  设置</span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; // The switch of the Source Explorer </span><br><span class="line">nmap <span class="tag">&lt;<span class="name">F7</span>&gt;</span> :SrcExplToggle<span class="tag">&lt;<span class="name">CR</span>&gt;</span> </span><br><span class="line"></span><br><span class="line">&quot; // Set the height of Source Explorer window </span><br><span class="line">let g:SrcExpl_winHeight = 8 </span><br><span class="line"></span><br><span class="line">&quot; // Set 100 ms for refreshing the Source Explorer </span><br><span class="line">let g:SrcExpl_refreshTime = 100 </span><br><span class="line"></span><br><span class="line">&quot; // Set &quot;Enter&quot; key to jump into the exact definition context </span><br><span class="line">let g:SrcExpl_jumpKey = &quot;<span class="tag">&lt;<span class="name">ENTER</span>&gt;</span>&quot; </span><br><span class="line"></span><br><span class="line">&quot; // Set &quot;Space&quot; key for back from the definition context </span><br><span class="line">let g:SrcExpl_gobackKey = &quot;<span class="tag">&lt;<span class="name">SPACE</span>&gt;</span>&quot; </span><br><span class="line"></span><br><span class="line">&quot; // In order to avoid conflicts, the Source Explorer should know what plugins except</span><br><span class="line">&quot; // itself are using buffers. And you need add their buffer names into below list</span><br><span class="line">&quot; // according to the command &quot;:buffers!&quot;</span><br><span class="line">let g:SrcExpl_pluginList = [</span><br><span class="line">        \ &quot;__Tag_List__&quot;,</span><br><span class="line">        \ &quot;_NERD_tree_&quot;,</span><br><span class="line">        \ &quot;Source_Explorer&quot;</span><br><span class="line">    \ ]</span><br><span class="line"></span><br><span class="line">&quot; // The color schemes used by Source Explorer. There are five color schemes</span><br><span class="line">&quot; // supported for now - Red, Cyan, Green, Yellow and Magenta. Source Explorer</span><br><span class="line">&quot; // will pick up one of them randomly when initialization.</span><br><span class="line">let g:SrcExpl_colorSchemeList = [</span><br><span class="line">        \ &quot;Red&quot;,</span><br><span class="line">        \ &quot;Cyan&quot;,</span><br><span class="line">        \ &quot;Green&quot;,</span><br><span class="line">        \ &quot;Yellow&quot;,</span><br><span class="line">        \ &quot;Magenta&quot;</span><br><span class="line">    \ ]</span><br><span class="line"></span><br><span class="line">&quot; // Enable/Disable the local definition searching, and note that this is not </span><br><span class="line">&quot; // guaranteed to work, the Source Explorer doesn&#x27;t check the syntax for now. </span><br><span class="line">&quot; // It only searches for a match with the keyword according to command &#x27;gd&#x27; </span><br><span class="line">let g:SrcExpl_searchLocalDef = 1 </span><br><span class="line"></span><br><span class="line">&quot; // Workaround for Vim bug @https://goo.gl/TLPK4K as any plugins using autocmd for</span><br><span class="line">&quot; // BufReadPre might have conflicts with Source Explorer. e.g. YCM, Syntastic etc.</span><br><span class="line">let g:SrcExpl_nestedAutoCmd = 1</span><br><span class="line"></span><br><span class="line">&quot; // Do not let the Source Explorer update the tags file when opening </span><br><span class="line">let g:SrcExpl_isUpdateTags = 0 </span><br><span class="line"></span><br><span class="line">&quot; // Use &#x27;Exuberant Ctags&#x27; with &#x27;--sort=foldcase -R .&#x27; or &#x27;-L cscope.files&#x27; to </span><br><span class="line">&quot; // create/update the tags file </span><br><span class="line">let g:SrcExpl_updateTagsCmd = &quot;ctags --sort=foldcase -R .&quot; </span><br><span class="line"></span><br><span class="line">&quot; // Set &quot;<span class="tag">&lt;<span class="name">F12</span>&gt;</span>&quot; key for updating the tags file artificially </span><br><span class="line">let g:SrcExpl_updateTagsKey = &quot;<span class="tag">&lt;<span class="name">F12</span>&gt;</span>&quot; </span><br><span class="line"></span><br><span class="line">&quot; // Set &quot;<span class="tag">&lt;<span class="name">F3</span>&gt;</span>&quot; key for displaying the previous definition in the jump list </span><br><span class="line">let g:SrcExpl_prevDefKey = &quot;<span class="tag">&lt;<span class="name">F3</span>&gt;</span>&quot; </span><br><span class="line"></span><br><span class="line">&quot; // Set &quot;<span class="tag">&lt;<span class="name">F4</span>&gt;</span>&quot; key for displaying the next definition in the jump list </span><br><span class="line">let g:SrcExpl_nextDefKey = &quot;<span class="tag">&lt;<span class="name">F4</span>&gt;</span>&quot; </span><br><span class="line"></span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; Trinity  设置</span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">nmap <span class="tag">&lt;<span class="name">F6</span>&gt;</span>  :TrinityToggleAll<span class="tag">&lt;<span class="name">CR</span>&gt;</span> </span><br><span class="line"></span><br><span class="line">vmap <span class="tag">&lt;<span class="name">c-c</span>&gt;</span> &quot;+y</span><br></pre></td></tr></table></figure>
-
-<h2 id="插件"><a href="#插件" class="headerlink" title="插件"></a>插件</h2><h3 id="ctags"><a href="#ctags" class="headerlink" title="ctags"></a>ctags</h3><p>ctags 默认并不会提取所有标识符的tag标签，以下命令可以生成更加详细的tag文件</p>
-<blockquote>
-<p>ctags -R –c-kinds=+c+d+e+f+g+m+n+s+t+u+v –fields=+liaS –extra=+q –langmap=c:+.h.s.S –exclude=build/*</p>
-</blockquote>
-<p>可以在Vim尾行模式或Vim配置文件 .~/.vimrc 中通过以下命令显式地指定tag文件路径：<code>:set tags+=tags文件路径</code></p>
-<p><code>--list-kinds=c++</code> 可列出C++支持生成的标签类型的全量列表：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">c     类classes)</span><br><span class="line">d     宏定义(macro definitions)</span><br><span class="line">e     枚举变量(enumerators)</span><br><span class="line">f     函数定义(function definitions)</span><br><span class="line">g     枚举类型(enumeration names)</span><br><span class="line">l     局部变量(local variables)，默认不提取</span><br><span class="line">m     类、结构体、联合体(class, struct, and union members)</span><br><span class="line">n     命名空间(namespaces)</span><br><span class="line">p     函数原型(function prototypes)，默认不提取</span><br><span class="line">s     结构体类型(structure names)</span><br><span class="line">t     类型定义(typedefs)</span><br><span class="line">u     联合体类型(union names)</span><br><span class="line">v     变量定义(variable definitions)</span><br><span class="line">x     外部变量(external and forward variable declarations)，默认不提取</span><br></pre></td></tr></table></figure>
-
-<p>局部对象、函数声明、外部变量等类型默认不会生成标签，所以在上面的ctags命令中显式加上了这些类型，用于生成所有类型的标签。</p>
-<p><code>--list-maps</code> 查看默认情况下支持那些语言，每一种支持的语言支持的文件扩展名是什么。</p>
-<p><code>--list-kinds=c++</code> 查看c++语言可以识别哪些语法元素。</p>
-<p><code>--langmap=c++:+.hpp</code> 认定某种扩展名的文件为某种语法语言文件</p>
-<p><code>fields=+iaS</code> 表明ctags要求描述的信息</p>
-<ul>
-<li>i 表示如果有继承，要标明父类；</li>
-<li>a 表示如果是类的成员，要标明其访问权限</li>
-<li>S 表示如果是函数，则生成的tag文件要标识函数的原型</li>
-<li>K 表示要显示语法元素类型的全称；</li>
-<li>z 表示在显示语法元素的类型时，使用格式kind:type。</li>
-</ul>
-<p><code>extra=+q</code> 表示强制要求ctags对同一个语法元素 再 记一行(如果某个语法元素是类的一个成员，ctags默认会给其记录一行)，这样可以保证在Vim中多个同名函数可以通过路径不同来区分。</p>
-<p><code>--exclude=</code> 路径不能加./。</p>
-<p><code>Ctrl + ]</code> 转跳到光标所在函数定义处；<code>Ctrl + t</code>跳回；</p>
-<h3 id="cscope"><a href="#cscope" class="headerlink" title="cscope"></a>cscope</h3><blockquote>
-<p>cscope -Rbqk</p>
-</blockquote>
-<ul>
-<li>R : 对目录和子目录下所有文件都递归创建索引</li>
-<li>b : 生成数据库后不进入查询界面</li>
-<li>q : 建立cscope.in.out和cscope.po.out，可加快搜索速度</li>
-<li>k : 不在预定义的系统路径中搜索(如：/usr/include)</li>
-<li>i: 指定保存文件列表的文件名（cscope.files），可以使用”–“，表示由标准输入获得文件列表。</li>
-<li>I dir: 在-I选项指出的目录中查找头文件</li>
-<li>u: 扫描所有文件，重新生成交叉索引文件</li>
-<li>C: 搜索时忽略大小写</li>
-<li>P path: 在以相对路径表示的文件前加上的path，这样不用切换到数据库文件所在的目录也可以使用。</li>
-</ul>
-<p>在代码所在根目录下，用vim打开代码，导入索引文件：<code>:cs add cscope.out</code>就可以使用以下命令了：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">:cs find s &#123;name&#125; : 查找c语言符号，即查找函数名、宏、枚举值等出现的地方</span><br><span class="line">:cs find g &#123;name&#125; : 查找函数、宏、枚举等定义的位置，类似ctags所提供的功能</span><br><span class="line">:cs find c &#123;name&#125; : 找出使用name的地方</span><br><span class="line">:cs find t &#123;name&#125; : 找出name的字串</span><br><span class="line">:cs find e &#123;name&#125; : 查找egrep模式，相当于egrep功能，但查找速度快多了</span><br><span class="line">:cs find f &#123;name&#125; : 查找并打开文件，类似vim的find功能</span><br><span class="line">:cs find i &#123;name&#125; : 查找include此文件的文件</span><br><span class="line">:cs find d &#123;name&#125; : 查找调用本函数的函数</span><br></pre></td></tr></table></figure>
-
-<p>Cscope缺省只解析C文件(.c和.h)、lex文件(.l)和yacc文件(.y)，虽然它也可以支持C++以及Java，但它在扫描目录时会跳过C++及Java后缀的文件。如果你希望cscope解析C++或Java文件，需要把这些文件的名字和路径保存在一个名为cscope.files的文件。当cscope发现在当前目录中存在cscope.files时，就会为cscope.files中列出的所有文件生成索引数据库。通常我们使用 find 来生成cscope.files文件。</p>
-<h3 id="taglist"><a href="#taglist" class="headerlink" title="taglist"></a>taglist</h3><p><a target="_blank" rel="noopener" href="https://www.vim.org/scripts/script.php?script_id=273">https://www.vim.org/scripts/script.php?script_id=273</a></p>
-<p>在Vim命令行下运行”:Tlist”就可以打开Taglist窗口，再次运行”:Tlist”则关闭。左右窗口切换Ctrl+ww在taglist窗口中，还可以使用下面的快捷键：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;CR&gt;          跳到光标下tag所定义的位置，用鼠标双击此tag功能也一样</span><br><span class="line">o             在一个新打开的窗口中显示光标下tag</span><br><span class="line">&lt;Space&gt;       显示光标下tag的原型定义</span><br><span class="line">u             更新taglist窗口中的tag</span><br><span class="line">s             更改排序方式，在按名字排序和按出现顺序排序间切换</span><br><span class="line">x             taglist窗口放大和缩小，方便查看较长的tag</span><br><span class="line">+             打开一个折叠，同zo</span><br><span class="line">-             将tag折叠起来，同zc</span><br><span class="line">*             打开所有的折叠，同zR</span><br><span class="line">=             将所有tag折叠起来，同zM</span><br><span class="line">[[            跳到前一个文件</span><br><span class="line">]]            跳到后一个文件</span><br><span class="line">q             关闭taglist窗口</span><br><span class="line">&lt;F1&gt;          显示帮助</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&quot; Tag List  设置</span><br><span class="line">nmap <span class="tag">&lt;<span class="name">F5</span>&gt;</span> :TlistToggle<span class="tag">&lt;<span class="name">CR</span>&gt;</span></span><br><span class="line"></span><br><span class="line">let Tlist_Ctags_Cmd=&quot;/home/luoyou/home/usr/bin/ctags&quot;  &quot;ctags程序位置</span><br><span class="line">let Tlist_Inc_Winwidth=0     &quot;window width change off</span><br><span class="line">let Tlist_Auto_Open=0        &quot;vim 开始时window open=off</span><br><span class="line">let Tlist_Use_Left_Window=1  &quot;显示在左侧</span><br><span class="line">let Tlist_Show_One_File=1    &quot;不同时显示多个文件的tag，只显示当前文件的    </span><br><span class="line">let Tlist_Exit_OnlyWindow=1  &quot;如果taglist窗口是最后一个窗口，则退出vim   </span><br><span class="line">let Tlist_File_Fold_Auto_Close=1             &quot; 自动折叠</span><br><span class="line">set ut=100</span><br></pre></td></tr></table></figure>
-
-<h3 id="Trinity"><a href="#Trinity" class="headerlink" title="Trinity"></a>Trinity</h3><p><a target="_blank" rel="noopener" href="https://github.com/wenlongche/Trinity">https://github.com/wenlongche/Trinity</a></p>
-<h3 id="NERD-tree"><a href="#NERD-tree" class="headerlink" title="NERD tree"></a>NERD tree</h3><p>要用Trinity插件包里的NERD_tree.vim</p>
-<h3 id="SrcExpl"><a href="#SrcExpl" class="headerlink" title="SrcExpl"></a>SrcExpl</h3><p><a target="_blank" rel="noopener" href="https://www.vim.org/scripts/script.php?script_id=2179">https://www.vim.org/scripts/script.php?script_id=2179</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1580,7 +1648,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">216</span>
+          <span class="site-state-item-count">217</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

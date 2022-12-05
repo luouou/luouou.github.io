@@ -494,14 +494,15 @@
   <entry>
     <title>动态规划</title>
     <url>/2022/10/30/algo/dynamic/</url>
-    <content><![CDATA[<ol>
-<li>存在「重叠子问题」，子问题相互独立。</li>
-<li>具备「最优子结构」，可通过子问题的最值得到原问题的最值。</li>
-<li>列出「状态转移方程」：明确「状态」 -&gt; 定义 dp 数组的含义 -&gt; 明确「选择」-&gt; 明确 base case。</li>
+    <content><![CDATA[<p>动态规划的核心思想就是穷举求最值，如果暴力穷举的话效率会极其低下，需要「备忘录」或者「DP table」来优化穷举过程，避免不必要的计算。其中带备忘录的递归解法叫做「自顶向下」，动态规划叫做「自底向上」。</p>
+<p>动态规划问题的特征：</p>
+<ol>
+<li>存在重复子问题，子问题相互独立。</li>
+<li>具备最优子结构，可通过子问题的最优解得到原问题的最优解。</li>
+<li>无后效性：某阶段状态一旦确定，就不受之后阶段的决策影响。</li>
 </ol>
 <figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> 状态<span class="number">1</span> in 状态<span class="number">1</span>的所有取值：</span><br><span class="line">    <span class="keyword">for</span> 状态<span class="number">2</span> in 状态<span class="number">2</span>的所有取值：</span><br><span class="line">        <span class="keyword">for</span> ...</span><br><span class="line">            dp[状态<span class="number">1</span>][状态<span class="number">2</span>][...] = 择优(选择<span class="number">1</span>，选择<span class="number">2.</span>..)</span><br></pre></td></tr></table></figure>
 
-<p>动态规划的核心思想就是穷举求最值，如果暴力穷举的话效率会极其低下，需要「备忘录」或者「DP table」来优化穷举过程，避免不必要的计算。其中带备忘录的递归解法叫做「自顶向下」，动态规划叫做「自底向上」。</p>
 <h2 id="菲波那切数列"><a href="#菲波那切数列" class="headerlink" title="菲波那切数列"></a>菲波那切数列</h2><p>斐波那契数列又称黄金分割数列、因数学家列昂纳多·斐波那契以兔子繁殖为例子而引入，又称为兔子数列。在数学上，斐波纳契数列以如下被以递归的方法定义：F(0)=0, F(1)=1, F(n)=F(n-1)+F(n-2)（n&gt;=2，n∈N*）。</p>
 <p>暴力递归</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">fibonacci</span><span class="params">(<span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (n &lt; <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> fibonacci(n - <span class="number">1</span>) + fibonacci(n - <span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -26162,12 +26163,23 @@ tcpdump ip multicast
   <entry>
     <title>滑动窗口</title>
     <url>/2022/12/04/algo/SlideWindow/</url>
-    <content><![CDATA[<p>滑动窗口就是维护一个窗口(队列/数组)，通过双指针同向移动不断滑动，然后更新答案。</p>
-<p>1、数组或字符串、连续， 需要输出或比较的结果在原数据结构中是连续排列的（字符串中的连续不重复子串，数组中的连续元素最大和）<br>2、双指针，每次窗口滑动时，只需观察窗口两端元素的变化，窗口内元素的整体性比较强，窗口滑动可以只通过操作头尾两个位置的变化实现，但对比结果时往往要用到窗口中所有元素（检查窗口中是否含有重复字符，对比窗口中元素的和）</p>
-<p>变长滑动窗口</p>
-<p>//构建窗口window容器保存窗口内元素，可以采用数组、hashset、hashmap等<br>window window;<br>//保存最优结果、最大或最小等<br>result = defaltvalue;<br>//构造窗口的左右边界指针<br>int left = 0, right = 0;<br>while(right &lt; s.size()) {<br>    window.add(s[right]);<br>    //确定合适的位置，执行右指针移动，不一定就放在这<br>    right++;<br>    // 如果符合要求，说明窗口构造完成，移动 left 缩小窗口<br>    while (window 符合要求) {<br>        // 如果这个窗口的条件更优，则更新result<br>        result = maxOrMin(result, window);<br>        //移出左指针元素<br>        window.remove(s[left]);<br>        left++;<br>    }<br>}<br>return result;</p>
-<p>固定长度滑动窗口：</p>
-<p>// 固定窗口大小为 k<br>string s;<br>// 在 s 中寻找窗口大小为 k 时的所包含最大元音字母个数<br>int right = 0;<br>while(right &lt; s.size()) {<br>    window.add(s[right]);<br>    right++;<br>    // 如果符合要求，说明窗口构造完成，<br>    if (right&gt;=k) {<br>        // 这是已经是一个窗口了，根据条件做一些事情<br>        // … 可以计算窗口最大值等<br>        // 最后不要忘记把 right -k 位置元素从窗口里面移除<br>    }<br>}<br>return result;</p>
+    <content><![CDATA[<p>滑动窗口就是维护一个窗口(队列/数组)，通过双指针同向移动不断滑动，然后更新答案，主要用来处理连续问题。</p>
+<p><strong>固定窗口大小</strong></p>
+<ol>
+<li>left 初始化为 0，初始化 right，使得 right - left + 1 等于窗口大小。</li>
+<li>同时移动 left 和 right，判断窗口内的连续元素是否满足限定条件。</li>
+<li>如果满足，再判断是否需要更新最优解，如果不满足，则继续。</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 固定窗口大小为 k</span></span><br><span class="line"><span class="comment">// 在 s 中寻找窗口大小为 k 时的所包含最大元音字母个数</span></span><br><span class="line">string s;</span><br><span class="line">window window;</span><br><span class="line"><span class="type">int</span> right = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">while</span>(right &lt; s.<span class="built_in">size</span>()) &#123;</span><br><span class="line">    window.<span class="built_in">add</span>(s[right]);</span><br><span class="line">    right++;</span><br><span class="line">    <span class="comment">// 如果符合要求，说明窗口构造完成，</span></span><br><span class="line">    <span class="keyword">if</span> (right&gt;=k) &#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment">// 把 right -k 位置元素从窗口里面移除</span></span><br><span class="line">        window.<span class="built_in">remove</span>(s[right -k]);</span><br><span class="line">        left++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> result;</span><br></pre></td></tr></table></figure>
+
+<p><strong>可变窗口大小</strong></p>
+<ol>
+<li>left 和 right 都初始化为 0。</li>
+<li>right 指针剃每向右移动一步，就判断窗口内的连续元素是否满足限定条件。</li>
+<li>如果满足，再判断是否需要更新最优解，通过移动 left 指针收缩窗口。 如果不满足，则继续。</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="comment">//构建窗口window容器保存窗口内元素，可以采用数组、hashset、hashmap等</span></span><br><span class="line">window window;</span><br><span class="line"><span class="comment">//保存最优结果、最大或最小等</span></span><br><span class="line"><span class="type">int</span> result = defaltValue;</span><br><span class="line"><span class="comment">//构造窗口的左右边界指针</span></span><br><span class="line"><span class="type">int</span> left = <span class="number">0</span>, right = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">while</span>(right &lt; s.<span class="built_in">size</span>()) &#123;</span><br><span class="line">    <span class="comment">// 增大窗口</span></span><br><span class="line">    window.<span class="built_in">add</span>(s[right]);</span><br><span class="line">    <span class="comment">// 如果符合要求，说明窗口构造完成，移动 left 缩小窗口</span></span><br><span class="line">    <span class="keyword">while</span> (window 符合要求) &#123;</span><br><span class="line">        <span class="comment">// 如果这个窗口的条件更优，则更新result</span></span><br><span class="line">        result = <span class="built_in">maxOrMin</span>(result, window);</span><br><span class="line">        <span class="comment">//移出左指针元素</span></span><br><span class="line">        window.<span class="built_in">remove</span>(s[left]);</span><br><span class="line">        left++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    right++;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> result;</span><br></pre></td></tr></table></figure>
+
 <h2 id="长度最小的子数组"><a href="#长度最小的子数组" class="headerlink" title="长度最小的子数组"></a>长度最小的子数组</h2><p>给定一个含有 n 个正整数的数组和一个正整数 s ，找出该数组中满足其和≥ s的长度最小的连续子数组。如果不存在符合条件的连续子数组，返回 0。</p>
 <p>输入: s = 7, nums = [2,3,1,2,4,3]<br>输出: 2<br>解释: 子数组 [4,3] 是该条件下的长度最小的连续子数组。</p>
 <figure class="highlight c++"><table><tr><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt; nums = &#123;<span class="number">2</span>,<span class="number">3</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">4</span>,<span class="number">3</span>&#125;;</span><br><span class="line"><span class="type">int</span> target;</span><br><span class="line">cin &gt;&gt; target;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> res = INT16_MAX;</span><br><span class="line"><span class="type">int</span> sum = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> left = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> right = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (right &lt; nums.<span class="built_in">size</span>()) &#123;</span><br><span class="line">    sum += nums[right];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (sum &gt;= target) &#123;</span><br><span class="line">        res = <span class="built_in">MIN</span>(res, right - left + <span class="number">1</span>);</span><br><span class="line">        sum -= nums[left];</span><br><span class="line">        left++;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;---- &quot;</span> &lt;&lt; left &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; right &lt;&lt; <span class="string">&quot; res = &quot;</span> &lt;&lt; res &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; left &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; right &lt;&lt; <span class="string">&quot;   sum = &quot;</span> &lt;&lt; sum &lt;&lt; endl;</span><br><span class="line">    right++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">cout &lt;&lt; (res == INT16_MAX ? <span class="number">0</span> : res) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
@@ -26175,6 +26187,72 @@ tcpdump ip multicast
 <h2 id="最小覆盖子串"><a href="#最小覆盖子串" class="headerlink" title="最小覆盖子串"></a>最小覆盖子串</h2><p>给定一个字符串 s 、一个字符串 t ，返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 “” 。</p>
 <p>输入：s = “ADOBECODEBANC”, t = “ABC”<br>输出：”BANC”</p>
 <p><img src="/images/code/algo/slide-window.gif" alt="img"></p>
+<p>string minWindow(string s, string t) {<br>    unordered_map&lt;char, int&gt; need, window;<br>    for (char c : t) need[c]++;</p>
+<pre><code>int left = 0, right = 0;
+int valid = 0;
+// 记录最小覆盖子串的起始索引及长度
+int start = 0, len = INT_MAX;
+while (right &lt; s.size()) &#123;
+    // c 是将移入窗口的字符
+    char c = s[right];
+    // 右移窗口
+    right++;
+    // 进行窗口内数据的一系列更新
+    if (need.count(c)) &#123;
+        window[c]++;
+        if (window[c] == need[c])
+            valid++;
+    &#125;
+
+    // 判断左侧窗口是否要收缩
+    while (valid == need.size()) &#123;
+        // 在这里更新最小覆盖子串
+        if (right - left &lt; len) &#123;
+            start = left;
+            len = right - left;
+        &#125;
+        // d 是将移出窗口的字符
+        char d = s[left];
+        // 左移窗口
+        left++;
+        // 进行窗口内数据的一系列更新
+        if (need.count(d)) &#123;
+            if (window[d] == need[d])
+                valid--;
+            window[d]--;
+        &#125;                    
+    &#125;
+&#125;
+// 返回最小覆盖子串
+return len == INT_MAX ? &quot;&quot; : s.substr(start, len);
+</code></pre>
+<p>}</p>
+]]></content>
+      <categories>
+        <category>algorithm</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>贪心算法</title>
+    <url>/2022/12/05/algo/Greedy/</url>
+    <content><![CDATA[<p>贪心算法是指在对问题求解时，总是做出局部最优的选择，通过每一步贪心选择，最终可得到问题的一个整体最优解。</p>
+<p>贪心算法和动态规划对比：</p>
+<ul>
+<li>贪心算法的每一次操作都对结果产生直接影响，而动态规划则不是。</li>
+<li>贪心算法对每个子问题的解决方案都做出选择，不能回退；动态规划则会根据以前的选择结果对当前进行选择，有回退功能。</li>
+<li>动态规划主要运用于二维或三维问题，而贪心一般是一维问题。</li>
+</ul>
+<h2 id="区间调度问题"><a href="#区间调度问题" class="headerlink" title="区间调度问题"></a>区间调度问题</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="跳跃游戏II"><a href="#跳跃游戏II" class="headerlink" title="跳跃游戏II"></a>跳跃游戏II</h2><p>给定一个非负整数数组，你最初位于数组的第一个位置。数组中的每个元素代表你在该位置可以跳跃的最大长度。你的目标是使用最少的跳跃次数到达数组的最后一个位置。</p>
+<p>输入: [2,3,1,1,4]<br>输出: 2<br>解释: 跳到最后一个位置的最小跳跃数是 2。从下标为 0 跳到下标为 1 的位置，跳 1 步，然后跳 3 步到达数组的最后一个位置。</p>
+<ol>
+<li><p>从后往前选择，先找到一个可以一步跳到结尾的位置n，如果有多个，就选择距离结尾最远的那个n-1。然后找到可以跳到n-1处的最远的地方n-2。依次类推，最终找到开头位置。</p>
+</li>
+<li><p>从前往后选择，在当前位置可以跳的步数范围内，选择下一跳可以跳到的最远的那个步数，来决定当前跳多少步。</p>
+</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
         <category>algorithm</category>

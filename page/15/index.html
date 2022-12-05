@@ -176,6 +176,107 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/opensource/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/opensource/" class="post-title-link" itemprop="url">开源库编译</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:52:15" itemprop="dateModified" datetime="2022-06-08T17:52:15+08:00">2022-06-08</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="lrzsz"><a href="#lrzsz" class="headerlink" title="lrzsz"></a>lrzsz</h2><p>Lrzsz是一款在linux里可代替ftp上传和下载的程序，提供 XMODEM，YMODEM ZMODEM文件传输协议的unix通信包 。只要输入一行简单的命令，就可以上传下载文件，无需打开 ftp 或者其他服务器文件管理软件。下载地址：<a target="_blank" rel="noopener" href="https://ohse.de/uwe/software/lrzsz.html">https://ohse.de/uwe/software/lrzsz.html</a></p>
+<ol>
+<li>修改<code>arm-linux.cache</code>，（可省略）</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ac_cv_prog_CC=$&#123;ac_cv_prog_CC=&#x27;arm-linux-gcc&#x27;&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>若没有cache file，则直接编译，CC参数放在configure前面。</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CC=/opt/arm-anykav200-crosstool/usr/bin/arm-anykav200-linux-uclibcgnueabi-gcc ./configure --prefix=/home/luoyou/home/arm/`</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<p>打开SecureCRT软件 -&gt; Options -&gt; session options -&gt; X/Y/Zmodem 下可以设置上传和下载的目录</p>
+<h2 id="libnl"><a href="#libnl" class="headerlink" title="libnl"></a>libnl</h2><p>下载地址：<a target="_blank" rel="noopener" href="http://www.infradead.org/~tgr/libnl/">http://www.infradead.org/~tgr/libnl/</a></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./configure --prefix=/home/luo_u/usr/hisi/libnl-3.4.0/ --host=arm-himix100-linux</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<h2 id="openssl"><a href="#openssl" class="headerlink" title="openssl"></a>openssl</h2><p>下载地址：<a target="_blank" rel="noopener" href="https://www.openssl.org/source/">https://www.openssl.org/source/</a></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./config no-asm shared no-async --prefix=/home/luo_u/usr/hisi/openssl-1.1.1 --cross-compile-prefix=arm-himix100-linux-</span><br></pre></td></tr></table></figure>
+
+<p>将生成的Makefile中将-m64选项全部删除掉，因为平台是在32位的系统上使用，如果是64位跳过这一步骤。</p>
+<blockquote>
+<p>sed -i “s/-m64//g” Makefile</p>
+</blockquote>
+<h2 id="expat"><a href="#expat" class="headerlink" title="expat"></a>expat</h2><p>下载地址：<a target="_blank" rel="noopener" href="https://libexpat.github.io/">https://libexpat.github.io/</a></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./configure --prefix=/home/luo_u/usr/hisi/expat-2.2.9 --host=arm-himix100-linux\</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<h2 id="dbus"><a href="#dbus" class="headerlink" title="dbus"></a>dbus</h2><p>下载地址：<a target="_blank" rel="noopener" href="https://dbus.freedesktop.org/releases/dbus/">https://dbus.freedesktop.org/releases/dbus/</a></p>
+<p>依赖expat库。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./configure --prefix=/home/luo_u/usr/anyka/dbus-1.12.10/ --host=arm-anykav200-linux CFLAGS=-I/home/luo_u/usr/anyka/expat-2.2.9/include LDFLAGS=-L/home/luo_u/usr/anyka/expat-2.2.9/lib CC=arm-anykav200-linux-uclibcgnueabi-gcc</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<h2 id="UPX"><a href="#UPX" class="headerlink" title="UPX"></a>UPX</h2><p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/upx/upx.git">https://github.com/upx/upx.git</a></p>
+<h2 id="liblzo"><a href="#liblzo" class="headerlink" title="liblzo"></a>liblzo</h2><p>下载地址：<a target="_blank" rel="noopener" href="http://www.linuxfromscratch.org/blfs/view/svn/general/lzo.html">http://www.linuxfromscratch.org/blfs/view/svn/general/lzo.html</a></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./configure -prefix=/home/luoyou/home/usr/x86_64/lzo-2.10 --enable-shared --disable-static</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<h2 id="libevent"><a href="#libevent" class="headerlink" title="libevent"></a>libevent</h2><p><a target="_blank" rel="noopener" href="https://libevent.org/">https://libevent.org/</a></p>
+<h2 id="libncurses"><a href="#libncurses" class="headerlink" title="libncurses"></a>libncurses</h2><p><a target="_blank" rel="noopener" href="http://ftp.gnu.org/pub/gnu/ncurses/">http://ftp.gnu.org/pub/gnu/ncurses/</a></p>
+<p>libncurses库用来在显示器上显示文本界面。典型例子就是Linux内核的make menuconfig配置界面。libform库用于 在ncurses中使用表格。libmenu库用于在ncurses中使用菜单。libpanel库用于在ncurses中使用面板。</p>
+<h2 id="libmodbus"><a href="#libmodbus" class="headerlink" title="libmodbus"></a>libmodbus</h2><p><a target="_blank" rel="noopener" href="https://www.libmodbus.org/">https://www.libmodbus.org/</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/linux/lib/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1185,94 +1286,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/Visitor/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/code/design-patterns/Visitor/" class="post-title-link" itemprop="url">访问者模式</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="访问者模式"><a href="#访问者模式" class="headerlink" title="访问者模式"></a>访问者模式</h2><p>访问者模式(Visitor Pattern): 访问者模式包含访问者和被访问元素两个主要组成部分，不同的访问者可以对访问元素进行不同的访问操作。比如，对于旅游景点来说，游客只负责游玩，清洁工只负责打扫卫生。</p>
-<p><img src="/images/code/design-pattern/Visitor.jpeg" alt="Visitor"></p>
-<ul>
-<li><p>Visitor（抽象访问者）： 为对象结构中每一个具体元素类ConcreteElement声明一个访问操作，通过名称或参数类型这个方法知道需要访问的具体元素的类型，具体访问者实现这些操作方法，定义对这些元素的访问操作（重载）。</p>
-</li>
-<li><p>ConcreteVisitor（具体访问者）： 实现了抽象访问者声明的操作，每一个操作用于访问对象结构中一种类型的元素。</p>
-</li>
-<li><p>Element（抽象元素）： 一般是抽象类或者接口，它定义一个accept()方法，该方法通常以一个抽象访问者作为参数。</p>
-</li>
-<li><p>ConcreteElement（具体元素）： 针对具体被访问的元素，实现accept()方法。</p>
-</li>
-<li><p>ObjectStructure（对象结构）： 元素的集合，提供了遍历对象结构中所有元素的方法。对象结构存储了不同类型的元素对象，以供不同的访问者访问。</p>
-</li>
-</ul>
-<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Element</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Visitor</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Visit</span><span class="params">(Element *e)</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Element</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Accept</span><span class="params">(Visitor *visitor)</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteElement</span> : <span class="keyword">public</span> Element</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Accept</span><span class="params">(Visitor *visitor)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        visitor-&gt;<span class="built_in">Visit</span>(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteVisitor</span> : <span class="keyword">public</span> Visitor</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Visit</span><span class="params">(Element *e)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;visit element&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ObjectStructure</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    ~<span class="built_in">ObjectStructure</span>() &#123;</span><br><span class="line">        elemVec_.<span class="built_in">clear</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">AddElement</span><span class="params">(Element *e)</span> </span>&#123;</span><br><span class="line">        elemVec_.<span class="built_in">push_back</span>(e);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Visit</span><span class="params">(Visitor *visitor)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span> &amp;e : elemVec_) &#123;</span><br><span class="line">            e-&gt;<span class="built_in">Accept</span>(visitor);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; </span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    vector&lt;Element *&gt; elemVec_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ConcreteVisitor visitor;</span><br><span class="line">    ConcreteElement elem;</span><br><span class="line"></span><br><span class="line">    visitor.<span class="built_in">Visit</span>(&amp;elem);</span><br><span class="line"></span><br><span class="line">    ObjectStructure obj;</span><br><span class="line">    obj.<span class="built_in">AddElement</span>(&amp;elem);</span><br><span class="line">    obj.<span class="built_in">Visit</span>(&amp;visitor);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1342,7 +1355,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">216</span>
+          <span class="site-state-item-count">217</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

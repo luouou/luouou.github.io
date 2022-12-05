@@ -176,6 +176,112 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/list/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/kernel/list/" class="post-title-link" itemprop="url">linux kernel list</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Linux内核中使用了大量的链表结构来组织数据，代码实现在include/linux/list.h中。</p>
+<h2 id="list-head"><a href="#list-head" class="headerlink" title="list_head"></a>list_head</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> *<span class="title">next</span>, *<span class="title">prev</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>list_head本身没有任何数据内容，只有两个方向指针prev和next，而自定义的数据结点结构体只要包含list_head指针，就可以使用 list提供的所有接口函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">list_node</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_node</span> *<span class="title">next</span>;</span></span><br><span class="line">    <span class="type">int</span>    data;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*声明一个链表头，它的next、prev指针都初始化为指向自己*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_HEAD_INIT(name) &#123; &amp;(name), &amp;(name) &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_HEAD(name) struct list_head name = LIST_HEAD_INIT(name)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*初始化已经定义过的链表*/</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">INIT_LIST_HEAD</span><span class="params">(<span class="keyword">struct</span> list_head *<span class="built_in">list</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">list</span>-&gt;next = <span class="built_in">list</span>;</span><br><span class="line">    <span class="built_in">list</span>-&gt;prev = <span class="built_in">list</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="list-add"><a href="#list-add" class="headerlink" title="list_add"></a>list_add</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> __list_add(<span class="keyword">struct</span> list_head *new_entry,</span><br><span class="line">       <span class="keyword">struct</span> list_head *prev,</span><br><span class="line">       <span class="keyword">struct</span> list_head *next)</span><br><span class="line">&#123;</span><br><span class="line">    next-&gt;prev = new_entry;</span><br><span class="line">    new_entry-&gt;next = next;</span><br><span class="line">    new_entry-&gt;prev = prev;</span><br><span class="line">    prev-&gt;next = new_entry;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">list_add</span><span class="params">(<span class="keyword">struct</span> list_head *new_entry, <span class="keyword">struct</span> list_head *head)</span></span><br><span class="line">&#123;</span><br><span class="line">    __list_add(new_entry, head, head-&gt;next);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">list_add_tail</span><span class="params">(<span class="keyword">struct</span> list_head *new_entry, <span class="keyword">struct</span> list_head *head)</span></span><br><span class="line">&#123;</span><br><span class="line">    __list_add(new_entry, head-&gt;prev, head);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="list-del"><a href="#list-del" class="headerlink" title="list_del"></a>list_del</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> __list_del(<span class="keyword">struct</span> list_head * prev, <span class="keyword">struct</span> list_head * next)</span><br><span class="line">&#123;</span><br><span class="line">    next-&gt;prev = prev;</span><br><span class="line">    prev-&gt;next = next;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_POISON1  ((void *) 0x00100100)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_POISON2  ((void *) 0x00200200)</span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">list_del</span><span class="params">(<span class="keyword">struct</span> list_head *entry)</span></span><br><span class="line">&#123;</span><br><span class="line">    __list_del(entry-&gt;prev, entry-&gt;next);</span><br><span class="line">    entry-&gt;next = (<span class="keyword">struct</span> list_head *)LIST_POISON1;</span><br><span class="line">    entry-&gt;prev = (<span class="keyword">struct</span> list_head *)LIST_POISON2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="list-replace"><a href="#list-replace" class="headerlink" title="list_replace"></a>list_replace</h2><p>新节点替换老节点</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">list_replace</span><span class="params">(<span class="keyword">struct</span> list_head *old,</span></span><br><span class="line"><span class="params">                <span class="keyword">struct</span> list_head *new_entry)</span></span><br><span class="line">&#123;</span><br><span class="line">    new_entry-&gt;next = old-&gt;next;</span><br><span class="line">    new_entry-&gt;next-&gt;prev = new_entry;</span><br><span class="line">    new_entry-&gt;prev = old-&gt;prev;</span><br><span class="line">    new_entry-&gt;prev-&gt;next = new_entry;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="list-move"><a href="#list-move" class="headerlink" title="list_move"></a>list_move</h2><p>移动节点到另一个链表</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">list_move</span><span class="params">(<span class="keyword">struct</span> list_head *<span class="built_in">list</span>, <span class="keyword">struct</span> list_head *head)</span></span><br><span class="line">&#123;</span><br><span class="line">    __list_del_entry(<span class="built_in">list</span>);</span><br><span class="line">    list_add(<span class="built_in">list</span>, head);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">list_move_tail</span><span class="params">(<span class="keyword">struct</span> list_head *<span class="built_in">list</span>,</span></span><br><span class="line"><span class="params">                  <span class="keyword">struct</span> list_head *head)</span></span><br><span class="line">&#123;</span><br><span class="line">    __list_del_entry(<span class="built_in">list</span>);</span><br><span class="line">    list_add_tail(<span class="built_in">list</span>, head);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="list-empty"><a href="#list-empty" class="headerlink" title="list_empty"></a>list_empty</h2><p>判断这个链表的头指针 head的next是否指向它自己，如果是，则说明为空。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> <span class="title function_">list_empty</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> list_head *head)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> head-&gt;next == head;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="list-entry"><a href="#list-entry" class="headerlink" title="list_entry"></a>list_entry</h2><p>获取链表中某个节点的地址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> list_entry(ptr, type, member) \</span></span><br><span class="line"><span class="meta">    container_of(ptr, type, member)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> offset_of(TYPE, MEMBER) ((size_t) &amp;((TYPE *)0)-&gt;MEMBER)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> container_of(ptr, type, member) (&#123;\</span></span><br><span class="line"><span class="meta">    const __typeof__( ((type *)0)-&gt;member ) *__mptr = (ptr); \</span></span><br><span class="line"><span class="meta">    (type *)( (char *)__mptr - offset_of(type,member) ); &#125;)</span></span><br></pre></td></tr></table></figure>
+
+<p>获取链表中第一个节点的地址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> list_first_entry(ptr, type, member) \</span></span><br><span class="line"><span class="meta">    list_entry((ptr)-&gt;next, type, member)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> list_last_entry(ptr, type, member) \</span></span><br><span class="line"><span class="meta">    list_entry((ptr)-&gt;prev, type, member)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="list-for-each"><a href="#list-for-each" class="headerlink" title="list_for_each"></a>list_for_each</h2><p>遍历整个链表，pos只是一个临时的变量。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> list_for_each(pos, head) \</span></span><br><span class="line"><span class="meta">    for (pos = (head)-&gt;next; pos != (head); pos = pos-&gt;next)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> list_for_each_prev(pos, head) \</span></span><br><span class="line"><span class="meta">    for (pos = (head)-&gt;prev; pos != (head); pos = pos-&gt;prev)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="list-for-each-safe"><a href="#list-for-each-safe" class="headerlink" title="list_for_each_safe"></a>list_for_each_safe</h2><p>遍历链表，如果在遍历的过程中涉及到节点的删除操作，则需要使用这个函数，这个函数中有个中间节点 n 作为临时存储区，更加安全。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> list_for_each_safe(pos, n, head) \</span></span><br><span class="line"><span class="meta">    for (pos = (head)-&gt;next, n = pos-&gt;next; pos != (head); \</span></span><br><span class="line"><span class="meta">        pos = n, n = pos-&gt;next)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> list_for_each_prev_safe(pos, n, head) \</span></span><br><span class="line"><span class="meta">    for (pos = (head)-&gt;prev, n = pos-&gt;prev; \</span></span><br><span class="line"><span class="meta">         pos != (head); \</span></span><br><span class="line"><span class="meta">         pos = n, n = pos-&gt;prev)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="list-for-each-entry"><a href="#list-for-each-entry" class="headerlink" title="list_for_each_entry"></a>list_for_each_entry</h2><p>节点结构遍历</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> list_for_each_entry(pos, head, member) \</span></span><br><span class="line"><span class="meta">    for (pos = list_first_entry(head, __typeof__(*pos), member); \</span></span><br><span class="line"><span class="meta">         &amp;pos-&gt;member != (head);                    \</span></span><br><span class="line"><span class="meta">         pos = list_next_entry(pos, member))</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> list_for_each_entry_reverse(pos, head, member) \</span></span><br><span class="line"><span class="meta">    for (pos = list_last_entry(head, __typeof__(*pos), member); \</span></span><br><span class="line"><span class="meta">         &amp;pos-&gt;member != (head); \</span></span><br><span class="line"><span class="meta">         pos = list_prev_entry(pos, member))</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> list_for_each_entry_safe(pos, n, head, member) \</span></span><br><span class="line"><span class="meta">    for (pos = list_first_entry(head, __typeof__(*pos), member), \</span></span><br><span class="line"><span class="meta">            n = list_next_entry(pos, member); \</span></span><br><span class="line"><span class="meta">         &amp;pos-&gt;member != (head); \</span></span><br><span class="line"><span class="meta">         pos = n, n = list_next_entry(n, member))</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/string/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1485,133 +1591,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/time/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/c/time/" class="post-title-link" itemprop="url">linux time function</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="时间"><a href="#时间" class="headerlink" title="时间"></a>时间</h2><p><strong>GMT</strong>格林威治时间(Greenwich Mean Time)。根据地球的自转和公转来计算时间，就是太阳横穿格林威治子午线（本初子午线）时的时间，也是0时区的标准时间，是老的时间计量标准。格林威治子午线是穿过英国伦敦格林威治天文台子午仪中心的一条经线，作为零度参考线。</p>
-<p>UT根据原子钟计算出来的时间。</p>
-<p><strong>UTC</strong>协调世界时(Coordinated Universal Time)。因为地球自转越来越慢，每年都会比前一年多出零点几秒，为了让基于原子钟的世界时和基于天文学的格林威治时间相差不至于太大，每隔几年协调世界时组织都会给世界时+1秒，并将所得到的时间称为UTC，这就是现在使用的世界标准时间。协调世界时不与任何地区位置相关，<strong>本地时间</strong>是 UTC+TimeZone，GMT = UTC+0。</p>
-<p>北京时间(CST)所属时区: UTC/GMT +8。</p>
-<p>Unix<strong>时间戳</strong>是从1970-01-01 00:00:00 +0000至今的秒数，不考虑闰秒。</p>
-<p>世界时区的划分以本初子午线（穿过英国伦敦格林威治天文台子午仪中心的一条经线）为标准，向东12个时区，向西12个时区，子午线所在区为0时区，经度每向东或者向西间隔15°，就划分一个时区，共有24个时区，相邻时区的时间相差一个小时。</p>
-<p>夏令时DST(Daylight Saving Time)，它是为节约能源而人为规定地方时间的制度。一般在天亮早的夏季人为将时间提前一小时。在施行夏令时的国家，一年里面有一天只有23小时（夏令时开始那一天），有一天有25小时（夏令时结束那一天），其他时间每天都是24小时。</p>
-<h2 id="获取时间"><a href="#获取时间" class="headerlink" title="获取时间"></a>获取时间</h2><h3 id="time"><a href="#time" class="headerlink" title="time()"></a>time()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">int</span> <span class="type">time_t</span></span><br><span class="line"></span><br><span class="line"><span class="type">time_t</span> <span class="title function_">time</span><span class="params">(<span class="type">time_t</span> *tloc)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>返回从UTC至今所经过的秒数，如果tloc非空，会将返回值也存到该指针。</p>
-<h3 id="ftime"><a href="#ftime" class="headerlink" title="ftime()"></a>ftime()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/timeb.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timeb</span> &#123;</span></span><br><span class="line">    <span class="type">time_t</span>         time;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> millitm;   <span class="comment">// ms</span></span><br><span class="line">    <span class="type">short</span>          timezonel; <span class="comment">// 为目前时区和Greenwich相差的时间，单位为分钟，东区为负</span></span><br><span class="line">    <span class="type">short</span>          dstflag;   <span class="comment">// 非0代表启用夏时制</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">ftime</span><span class="params">(<span class="keyword">struct</span> timeb *tp)</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="gettimeofday"><a href="#gettimeofday" class="headerlink" title="gettimeofday()"></a>gettimeofday()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> &#123;</span></span><br><span class="line">    <span class="type">time_t</span>      tv_sec;     <span class="comment">/* seconds */</span></span><br><span class="line">    <span class="type">suseconds_t</span> tv_usec;    <span class="comment">/* microseconds */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timezone</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> tz_minuteswest;     <span class="comment">/* minutes west of Greenwich */</span></span><br><span class="line">    <span class="type">int</span> tz_dsttime;         <span class="comment">/* type of DST correction */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*tz_dsttime 所代表的状态如下:*/</span> </span><br><span class="line">   DST_NONE     <span class="comment">/* not on DST */</span></span><br><span class="line">   DST_USA      <span class="comment">/* USA style DST */</span></span><br><span class="line">   DST_AUST     <span class="comment">/* Australian style DST */</span></span><br><span class="line">   DST_WET      <span class="comment">/* Western European DST */</span></span><br><span class="line">   DST_MET      <span class="comment">/* Middle European DST */</span></span><br><span class="line">   DST_EET      <span class="comment">/* Eastern European DST */</span></span><br><span class="line">   DST_CAN      <span class="comment">/* Canada */</span></span><br><span class="line">   DST_GB       <span class="comment">/* Great Britain and Eire */</span></span><br><span class="line">   DST_RUM      <span class="comment">/* Romania */</span></span><br><span class="line">   DST_TUR      <span class="comment">/* Turkey */</span></span><br><span class="line">   DST_AUSTALT  <span class="comment">/* Australian style with shift in 1986 */</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">gettimeofday</span><span class="params">(<span class="keyword">struct</span> timeval *tv, <span class="keyword">struct</span> timezone *tz)</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="clock-gettime"><a href="#clock-gettime" class="headerlink" title="clock_gettime()"></a>clock_gettime()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> &#123;</span></span><br><span class="line">    <span class="type">time_t</span>   tv_sec;        <span class="comment">/* seconds */</span></span><br><span class="line">    <span class="type">long</span>     tv_nsec;       <span class="comment">/* nanoseconds */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">clock_gettime</span><span class="params">(<span class="type">clockid_t</span> clk_id, <span class="keyword">struct</span> timespec *tp)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">clock_getres</span><span class="params">(<span class="type">clockid_t</span> clk_id, <span class="keyword">struct</span> timespec *res)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>clk_id 用于指定计时时钟的类型:</p>
-<ul>
-<li><p><code>CLOCK_REALTIME</code>/<code>CLOCK_REALTIME_COARSE</code> 系统实时时间，即从UTC开始计时的秒数，随系统实时时间改变而改变，包括通过系统函数手动调整系统时间，例如 settime()、settimeofday()，或者通过 adjtime()、adjtimex() 或者 NTP 调整时间。</p>
-</li>
-<li><p><code>CLOCK_MONOTONIC</code>/<code>CLOCK_MONOTONIC_COARSE</code> 从系统启动开始计时，不受系统时间被用户改变的影响，但会受像 adjtime() 或者 NTP 之类渐进调整的影响。</p>
-</li>
-<li><p><code>CLOCK_MONOTONIC_RAW</code> 与上述的 CLOCK_MONOTONIC 相同，只是不会受 adjtime() 以及 NTP 的影响。</p>
-</li>
-<li><p><code>CLOCK_PROCESS_CPUTIME_ID</code> 本进程到当前代码系统 CPU 花费的时间。</p>
-</li>
-<li><p><code>CLOCK_THREAD_CPUTIME_ID</code> 本线程到当前代码系统 CPU 花费的时间。</p>
-</li>
-</ul>
-<h3 id="clock"><a href="#clock" class="headerlink" title="clock()"></a>clock()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回程序执行使用的时钟时间*/</span></span><br><span class="line"><span class="type">clock_t</span> <span class="title function_">clock</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
-
-<h2 id="时间转换"><a href="#时间转换" class="headerlink" title="时间转换"></a>时间转换</h2><h3 id="ctime-asctime"><a href="#ctime-asctime" class="headerlink" title="ctime asctime"></a>ctime asctime</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 转换为本地时间，使用标准格式 */</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">ctime</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep)</span>;</span><br><span class="line"><span class="type">char</span> *<span class="title function_">ctime_r</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep, <span class="type">char</span> *buf)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 将时间格式转为字符串，不修改时区，使用标准格式 */</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">asctime</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> tm *tm)</span>;</span><br><span class="line"><span class="type">char</span> *<span class="title function_">asctime_r</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> tm *tm, <span class="type">char</span> *buf)</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="mktime"><a href="#mktime" class="headerlink" title="mktime()"></a>mktime()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tm</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> tm_sec;         <span class="comment">/* seconds [0, 59] */</span></span><br><span class="line">    <span class="type">int</span> tm_min;         <span class="comment">/* minutes [0, 59] */</span></span><br><span class="line">    <span class="type">int</span> tm_hour;        <span class="comment">/* hours [0, 23] */</span></span><br><span class="line">    <span class="type">int</span> tm_mday;        <span class="comment">/* day of the month [1, 31] */</span></span><br><span class="line">    <span class="type">int</span> tm_mon;         <span class="comment">/* month [0, 11] */</span></span><br><span class="line">    <span class="type">int</span> tm_year;        <span class="comment">/* year now.year - 1900 */</span></span><br><span class="line">    <span class="type">int</span> tm_wday;        <span class="comment">/* day of the week, [0, 6] 0-&gt;sunday */</span></span><br><span class="line">    <span class="type">int</span> tm_yday;        <span class="comment">/* day in the year [0, 365] */</span></span><br><span class="line">    <span class="type">int</span> tm_isdst;       <span class="comment">/* daylight saving time */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">time_t</span> <span class="title function_">mktime</span><span class="params">(<span class="keyword">struct</span> tm *tm)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>tm_isdst是夏令时：</p>
-<ul>
-<li>0 完全不考虑夏令时的问题，直接将日历时间转换为秒数；</li>
-<li>1 考虑夏令时。</li>
-<li>-1 自动根据时区信息进行判断。</li>
-</ul>
-<p>注意在使用前，需要将 struct tm 结构体清空，否则不需要设置的字段 (如 tm_isdst ) 会有脏数据。</p>
-<p>实际上程序比较怕时间回退，那么关于夏令时比较坑的是，夏令时的停止，此时时钟会向后回拨一次，也就是说，同一个小时的时间点出现了两次。</p>
-<p>例如 CET (欧洲中部时间) 在 2016-10-30 02:59:59 下一秒会跳转到 2016-10-30 02:00:00 ，也就是说 02:00:00 到 02:59:59 这一个小时的时间窗出现了两次。</p>
-<p>那么，此时，如果要获取到中间的时间窗，在使用 mktime() 时就需要手动配置其中的 tm_isdst 字段。</p>
-<p>mktime() 会忽略 tm_wday 以及 tm_yday 字段，会使用 tm_isdst 判断是否采用夏令时，同时会根据其它字段来修改 tm_wday tm_yday 字段，同时其它字段如果超过了范围则会修正。</p>
-<h3 id="gmtime-localtime"><a href="#gmtime-localtime" class="headerlink" title="gmtime() localtime()"></a>gmtime() localtime()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 将时间戳转换为GMT时区的标准时间 */</span></span><br><span class="line"><span class="keyword">struct</span> tm *<span class="title function_">gmtime</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep)</span>;</span><br><span class="line"><span class="keyword">struct</span> tm *<span class="title function_">gmtime_r</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep, <span class="keyword">struct</span> tm *result)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 将时间戳转换为本地时区的时间格式 */</span></span><br><span class="line"><span class="keyword">struct</span> tm *<span class="title function_">localtime</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep)</span>;</span><br><span class="line"><span class="keyword">struct</span> tm *<span class="title function_">localtime_r</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep, <span class="keyword">struct</span> tm *result)</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="strftime-strptime"><a href="#strftime-strptime" class="headerlink" title="strftime() strptime()"></a>strftime() strptime()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 将时间按格式化字符串转换为字符串 */</span></span><br><span class="line"><span class="type">size_t</span> <span class="title function_">strftime</span><span class="params">(<span class="type">char</span> *s, <span class="type">size_t</span> max, <span class="type">const</span> <span class="type">char</span> *format, <span class="type">const</span> <span class="keyword">struct</span> tm *tm)</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _XOPEN_SOURCE</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">char</span> *<span class="title function_">strptime</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *s, <span class="type">const</span> <span class="type">char</span> *format, <span class="keyword">struct</span> tm *tm)</span>;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">%a 星期几的简写</span><br><span class="line">%A 星期几的全称</span><br><span class="line">%b 月份的简写</span><br><span class="line">%B 月份的全称</span><br><span class="line">%c 标准的日期的时间串</span><br><span class="line">%C 年份的前两位数字</span><br><span class="line">%d 十进制表示的每月的第几天</span><br><span class="line">%D 月/天/年</span><br><span class="line">%e 在两字符域中，十进制表示的每月的第几天</span><br><span class="line">%F 年-月-日</span><br><span class="line">%g 年份的后两位数字，使用基于周的年</span><br><span class="line">%G 年份，使用基于周的年</span><br><span class="line">%h 简写的月份名</span><br><span class="line">%H 24小时制的小时</span><br><span class="line">%I 12小时制的小时</span><br><span class="line">%j 十进制表示的每年的第几天</span><br><span class="line">%m 十进制表示的月份</span><br><span class="line">%M 十时制表示的分钟数</span><br><span class="line">%n 新行符</span><br><span class="line">%p 本地的AM或PM的等价显示</span><br><span class="line">%r 12小时的时间</span><br><span class="line">%R 显示小时和分钟：hh:mm</span><br><span class="line">%S 十进制的秒数</span><br><span class="line">%t 水平制表符</span><br><span class="line">%T 显示时分秒：hh:mm:ss</span><br><span class="line">%u 每周的第几天，星期一为第一天 （值从1到7，星期一为1）</span><br><span class="line">%U 第年的第几周，把星期日作为第一天（值从0到53）</span><br><span class="line">%V 每年的第几周，使用基于周的年</span><br><span class="line">%w 十进制表示的星期几（值从0到6，星期天为0）</span><br><span class="line">%W 每年的第几周，把星期一做为第一天（值从0到53）</span><br><span class="line">%x 标准的日期串</span><br><span class="line">%X 标准的时间串</span><br><span class="line">%y 不带世纪的十进制年份（值从0到99）</span><br><span class="line">%Y 带世纪部分的十制年份</span><br><span class="line">%z，%Z 时区名称，如果不能得到时区名称则返回空字符。</span><br><span class="line">%% 百分号</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/cpp/time_function.bmp" alt="时间转换函数"></p>
-<h2 id="设置时间"><a href="#设置时间" class="headerlink" title="设置时间"></a>设置时间</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*返回 time1 和 time2 之间相差的秒数 (time1-time2)*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">difftime</span><span class="params">(<span class="type">time_t</span> time1, <span class="type">time_t</span> time2)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">clock_settime</span><span class="params">(<span class="type">clockid_t</span> clk_id, <span class="type">const</span> <span class="keyword">struct</span> timespec *tp)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">settimeofday</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> timeval *tv, <span class="type">const</span> <span class="keyword">struct</span> timezone *tz)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*设置系统的时间，不过需要超级用户的权限*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">stime</span><span class="params">(<span class="type">time_t</span> *t)</span></span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1681,7 +1660,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">216</span>
+          <span class="site-state-item-count">217</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
