@@ -176,6 +176,158 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/12/11/algo/divided/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/12/11/algo/divided/" class="post-title-link" itemprop="url">分治算法</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-12-11 19:04:14 / 修改时间：20:59:02" itemprop="dateCreated datePublished" datetime="2022-12-11T19:04:14+08:00">2022-12-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>分治算法的基本思想是将一个规模为N的问题，分解为K个规模较小的子问题，这些子问题相互独立且原问题性质相同。分而治之，逐个击破，递归解决子问题，然后合并得到原问题的解。</p>
+<h2 id="二分法搜索"><a href="#二分法搜索" class="headerlink" title="二分法搜索"></a>二分法搜索</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">binary</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> data)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> min = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> max = arr.length - <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> mid;</span><br><span class="line">    <span class="keyword">while</span> (min &lt;= max) &#123;</span><br><span class="line">        mid = (min + max) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span> (arr[mid] &gt; data) &#123;</span><br><span class="line">            max = mid - <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[mid] &lt; data) &#123;</span><br><span class="line">            min = mid + <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> mid;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种取中位数的方式，当 min 和 max 很大的时候，会出现溢出的情况，从而导致数组访问出错。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mid = (min + max) / <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<p>改进的办法是将加法变成减法。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 防止溢出</span></span><br><span class="line">mid =  min + (max - min) / <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="寻找假币"><a href="#寻找假币" class="headerlink" title="寻找假币"></a>寻找假币</h2><p>有N个硬币，其中有一个质量较轻的假币，如何通过一个天平将假币挑出。</p>
+<p>将硬币分成2份去称，轻的寻一半包含假币，再将轻的那一份又分为2份，直到最后剩下两枚，轻的那一枚即为假币。考虑到硬币个数为奇数的情况，照样分为两半，剩下一个多余的，如果两半相等，多余那个就是假币，否则处理那两半。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">FakeCoin</span><span class="params">(<span class="type">const</span> vector&lt;<span class="type">int</span>&gt; &amp;coins, <span class="type">int</span> start, <span class="type">int</span> end)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> num = end - start + <span class="number">1</span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;num = &quot;</span> &lt;&lt; num &lt;&lt; <span class="string">&quot; [&quot;</span> &lt;&lt; start &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; end &lt;&lt; <span class="string">&quot;]&quot;</span> &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">if</span> (num &lt;= <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> coins[start] &lt; coins[end] ? start : end;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> mid = num / <span class="number">2</span> + start;</span><br><span class="line">    <span class="type">int</span> left = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> right = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (num % <span class="number">2</span> == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = start; i &lt; mid; ++i) &#123;</span><br><span class="line">            left += coins[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = mid; i &lt;= end; ++i) &#123;</span><br><span class="line">            right += coins[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;(&quot;</span> &lt;&lt; left &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; right &lt;&lt; <span class="string">&quot;) --&gt; &quot;</span> &lt;&lt; mid &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (left &gt; right) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">FakeCoin</span>(coins, mid, end);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">FakeCoin</span>(coins, start, mid - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = start; i &lt; mid; ++i) &#123;</span><br><span class="line">            left += coins[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = mid + <span class="number">1</span>; i &lt;= end; ++i) &#123;</span><br><span class="line">            right += coins[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;(&quot;</span> &lt;&lt; left &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; right &lt;&lt; <span class="string">&quot;) --&gt; &quot;</span> &lt;&lt; mid &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (left &gt; right) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">FakeCoin</span>(coins, mid + <span class="number">1</span>, end);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (left &lt; right) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">FakeCoin</span>(coins, start, mid - <span class="number">1</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> mid;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; coins = &#123;<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>&#125;;</span><br><span class="line">    <span class="comment">// vector&lt;int&gt; coins = &#123;1, 1, 1, 1, 0, 1, 1, 1, 1&#125;;</span></span><br><span class="line">    <span class="comment">// vector&lt;int&gt; coins = &#123;1, 1, 1, 1, 1, 1, 1, 1, 0&#125;;</span></span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; <span class="built_in">FakeCoin</span>(coins, <span class="number">0</span>, coins.<span class="built_in">size</span>() - <span class="number">1</span>) &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/12/11/algo/backtrack/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/12/11/algo/backtrack/" class="post-title-link" itemprop="url">回溯算法</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-12-11 18:28:30 / 修改时间：19:03:45" itemprop="dateCreated datePublished" datetime="2022-12-11T18:28:30+08:00">2022-12-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>回溯算法是从一条路往前走，能进则进，走不通就退回，换一条路再试，实际 上就是一个决策树的遍历过程。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">backtrack</span><span class="params">(参数)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (终止条件) &#123;</span><br><span class="line">        存放结果;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> 选择 in 选择列表 &#123;</span><br><span class="line">        做选择</span><br><span class="line">        backtrack(路径, 选择列表); <span class="comment">// 路径就是已经做出的选择</span></span><br><span class="line">        回溯撤销选择</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="组合问题"><a href="#组合问题" class="headerlink" title="组合问题"></a>组合问题</h2><p>给定2个整数n和k，返回范围[1,n]中所有可能的k的个数从小到大顺序的组合<br>输入：n = 4, k = 2<br>输出：[[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]]</p>
+<p><img src="/images/code/algo/backtrack.png" alt="img"></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line">vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; res;</span><br><span class="line"><span class="type">int</span> target;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">backtrack</span><span class="params">(<span class="type">const</span> vector&lt;<span class="type">int</span>&gt; &amp;nums, vector&lt;<span class="type">int</span>&gt; &amp;tmp, <span class="type">int</span> start)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it : tmp) &#123;</span><br><span class="line">        cout &lt;&lt; it &lt;&lt; <span class="string">&quot; -&gt; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (tmp.<span class="built_in">size</span>() == target) &#123;</span><br><span class="line">        res.<span class="built_in">push_back</span>(tmp);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = start; i &lt; nums.<span class="built_in">size</span>(); ++i) &#123;</span><br><span class="line">        tmp.<span class="built_in">push_back</span>(nums[i]);</span><br><span class="line">        <span class="built_in">backtrack</span>(nums, tmp, i+<span class="number">1</span>);</span><br><span class="line">        tmp.<span class="built_in">pop_back</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; nums = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>&#125;;</span><br><span class="line">    target = <span class="number">2</span>;</span><br><span class="line">    <span class="comment">// target = 3;</span></span><br><span class="line"></span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; tmp;</span><br><span class="line">    <span class="built_in">backtrack</span>(nums, tmp, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> vec : res) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span> it : vec) &#123;</span><br><span class="line">            cout &lt;&lt; it &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        cout &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/12/05/algo/Greedy/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -199,10 +351,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-12-05 22:14:25 / 修改时间：22:46:06" itemprop="dateCreated datePublished" datetime="2022-12-05T22:14:25+08:00">2022-12-05</time>
+              <time title="创建时间：2022-12-05 22:14:25" itemprop="dateCreated datePublished" datetime="2022-12-05T22:14:25+08:00">2022-12-05</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-11 18:25:29" itemprop="dateModified" datetime="2022-12-11T18:25:29+08:00">2022-12-11</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -231,7 +389,13 @@
 <li>贪心算法对每个子问题的解决方案都做出选择，不能回退；动态规划则会根据以前的选择结果对当前进行选择，有回退功能。</li>
 <li>动态规划主要运用于二维或三维问题，而贪心一般是一维问题。</li>
 </ul>
-<h2 id="区间调度问题"><a href="#区间调度问题" class="headerlink" title="区间调度问题"></a>区间调度问题</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="区间调度问题"><a href="#区间调度问题" class="headerlink" title="区间调度问题"></a>区间调度问题</h2><p>给定多个形如[start, end]的闭区间，请计算出最多有多少个互不相交的区间。</p>
+<ol>
+<li>从排序后的区间中选出end最小的区间x</li>
+<li>把所有与x区间相交的区间删除</li>
+<li>重复步骤1和2，直到最后一个区间。</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;algorithm&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">interval</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> start;</span><br><span class="line">        <span class="type">int</span> end;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// vector&lt;struct interval&gt; vec = &#123;&#123;1, 3&#125;, &#123;4, 6&#125;, &#123;2, 4&#125;&#125;;</span></span><br><span class="line">    vector&lt;<span class="keyword">struct</span> interval&gt; vec = &#123;&#123;<span class="number">1</span>, <span class="number">3</span>&#125;, &#123;<span class="number">4</span>, <span class="number">5</span>&#125;, &#123;<span class="number">7</span>, <span class="number">8</span>&#125;&#125;;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it : vec) &#123;</span><br><span class="line">        cout &lt;&lt; it.start &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; it.end &lt;&lt; it.end;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">sort</span>(vec.<span class="built_in">begin</span>(), vec.<span class="built_in">end</span>(), [] (<span class="keyword">struct</span> interval a, <span class="keyword">struct</span> interval b) &#123; <span class="keyword">return</span> a.end &lt; b.end; &#125;);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it : vec) &#123;</span><br><span class="line">        cout &lt;&lt; it.start &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; it.end;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> cnt = <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> end = vec[<span class="number">0</span>].end;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; vec.<span class="built_in">size</span>(); ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; vec[i].start &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; vec[i].end &lt;&lt; <span class="string">&quot; ==&gt; &quot;</span> &lt;&lt; end &lt;&lt; endl;</span><br><span class="line">        <span class="keyword">if</span> (vec[i].start &gt; end) &#123;</span><br><span class="line">            cnt++;</span><br><span class="line">            end = vec[i].end;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; cnt &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="跳跃游戏II"><a href="#跳跃游戏II" class="headerlink" title="跳跃游戏II"></a>跳跃游戏II</h2><p>给定一个非负整数数组，你最初位于数组的第一个位置。数组中的每个元素代表你在该位置可以跳跃的最大长度。你的目标是使用最少的跳跃次数到达数组的最后一个位置。</p>
 <p>输入: [2,3,1,1,4]<br>输出: 2<br>解释: 跳到最后一个位置的最小跳跃数是 2。从下标为 0 跳到下标为 1 的位置，跳 1 步，然后跳 3 步到达数组的最后一个位置。</p>
@@ -241,7 +405,7 @@
 <li><p>从前往后选择，在当前位置可以跳的步数范围内，选择下一跳可以跳到的最远的那个步数，来决定当前跳多少步。</p>
 </li>
 </ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> step = <span class="number">0</span>;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; nums = &#123;<span class="number">2</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">4</span>&#125;;</span><br><span class="line">    <span class="comment">// vector&lt;int&gt; nums = &#123;2, 3, 1, 1, 4&#125;;</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> cur = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (cur &lt; nums.<span class="built_in">size</span>() - <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="type">int</span> max = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> distance = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= nums[cur]; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (nums[cur+i] &gt;= max) &#123;</span><br><span class="line">                max = nums[cur+i];</span><br><span class="line">                distance = i;</span><br><span class="line">            &#125;</span><br><span class="line">            cout &lt;&lt; cur &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; i &lt;&lt; <span class="string">&quot; --&gt; &quot;</span> &lt;&lt; nums[cur+i] &lt;&lt; endl;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        cur += distance;</span><br><span class="line">        step++;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;index = &quot;</span> &lt;&lt; cur &lt;&lt; <span class="string">&quot;, step = &quot;</span> &lt;&lt; step &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; step &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -292,7 +456,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-05 22:38:37" itemprop="dateModified" datetime="2022-12-05T22:38:37+08:00">2022-12-05</time>
+                <time title="修改时间：2022-12-07 22:57:06" itemprop="dateModified" datetime="2022-12-07T22:57:06+08:00">2022-12-07</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -339,47 +503,7 @@
 <h2 id="最小覆盖子串"><a href="#最小覆盖子串" class="headerlink" title="最小覆盖子串"></a>最小覆盖子串</h2><p>给定一个字符串 s 、一个字符串 t ，返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 “” 。</p>
 <p>输入：s = “ADOBECODEBANC”, t = “ABC”<br>输出：”BANC”</p>
 <p><img src="/images/code/algo/slide-window.gif" alt="img"></p>
-<p>string minWindow(string s, string t) {<br>    unordered_map&lt;char, int&gt; need, window;<br>    for (char c : t) need[c]++;</p>
-<pre><code>int left = 0, right = 0;
-int valid = 0;
-// 记录最小覆盖子串的起始索引及长度
-int start = 0, len = INT_MAX;
-while (right &lt; s.size()) &#123;
-    // c 是将移入窗口的字符
-    char c = s[right];
-    // 右移窗口
-    right++;
-    // 进行窗口内数据的一系列更新
-    if (need.count(c)) &#123;
-        window[c]++;
-        if (window[c] == need[c])
-            valid++;
-    &#125;
-
-    // 判断左侧窗口是否要收缩
-    while (valid == need.size()) &#123;
-        // 在这里更新最小覆盖子串
-        if (right - left &lt; len) &#123;
-            start = left;
-            len = right - left;
-        &#125;
-        // d 是将移出窗口的字符
-        char d = s[left];
-        // 左移窗口
-        left++;
-        // 进行窗口内数据的一系列更新
-        if (need.count(d)) &#123;
-            if (window[d] == need[d])
-                valid--;
-            window[d]--;
-        &#125;                    
-    &#125;
-&#125;
-// 返回最小覆盖子串
-return len == INT_MAX ? &quot;&quot; : s.substr(start, len);
-</code></pre>
-<p>}</p>
-
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">Check</span><span class="params">(unordered_map&lt;<span class="type">char</span>, <span class="type">int</span>&gt; &amp;window, <span class="type">const</span> unordered_map&lt;<span class="type">char</span>, <span class="type">int</span>&gt; &amp;target)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it : target) &#123;</span><br><span class="line">        <span class="comment">// cout &lt;&lt; &quot;        &quot; &lt;&lt; it.first &lt;&lt; &quot; : &quot; &lt;&lt; window[it.first] &lt;&lt; &quot;, &quot; &lt;&lt; it.second &lt;&lt; endl;</span></span><br><span class="line">        <span class="keyword">if</span> (window[it.first] &lt; it.second) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    string s = <span class="string">&quot;ADOBECODEBANC&quot;</span>;</span><br><span class="line">    string t = <span class="string">&quot;ABC&quot;</span>;</span><br><span class="line">    unordered_map&lt;<span class="type">char</span>, <span class="type">int</span>&gt; window;</span><br><span class="line">    unordered_map&lt;<span class="type">char</span>, <span class="type">int</span>&gt; target;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">char</span> c : t) &#123;</span><br><span class="line">        target[c]++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> right = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> left = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> start;</span><br><span class="line">    <span class="type">int</span> len = UINT16_MAX;</span><br><span class="line">    <span class="keyword">while</span> (right &lt; s.<span class="built_in">length</span>()) &#123;</span><br><span class="line">        window[s[right]]++;</span><br><span class="line">        <span class="comment">// cout &lt;&lt; &quot;    &quot; &lt;&lt; left &lt;&lt; &quot;, &quot; &lt;&lt; right &lt;&lt; &quot; &quot; &lt;&lt; s[right] &lt;&lt; endl;</span></span><br><span class="line">        <span class="keyword">while</span> (<span class="built_in">Check</span>(window, target)) &#123;</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;    &quot;</span> &lt;&lt; left &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; right &lt;&lt; endl;</span><br><span class="line">            <span class="keyword">if</span> (right - left + <span class="number">1</span> &lt; len) &#123;</span><br><span class="line">                start = left;</span><br><span class="line">                len = right - left + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            window[s[left]]--;</span><br><span class="line">            left++;</span><br><span class="line">        &#125;</span><br><span class="line">        right++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; s &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; t &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; s.<span class="built_in">substr</span>(start, len) &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -1057,314 +1181,6 @@ return len == INT_MAX ? &quot;&quot; : s.substr(start, len);
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/armv8_reg/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/25/cpu/armv8_reg/" class="post-title-link" itemprop="url">ARMv8 寄存器</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-25 15:11:47" itemprop="dateCreated datePublished" datetime="2022-09-25T15:11:47+08:00">2022-09-25</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-10-30 12:50:26" itemprop="dateModified" datetime="2022-10-30T12:50:26+08:00">2022-10-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="执行状态"><a href="#执行状态" class="headerlink" title="执行状态"></a>执行状态</h2><p>在 ARMv8 架构定义了两种执行状态：AArch64 以及 AArch32。这两种执行状态分别用于描述执行使用 64 位宽的通用寄存器或者使用 32 位宽的通用寄存器。系统运行在 64 位状态下的时候名字叫 Xn，运行在 32 位的时候就叫 Wn。</p>
-<p>32位W寄存器使用对应64位X寄存器的低32位，即W0对应X0的低32位，W1对应X1的低32位，以此类推。读取W寄存器时，将会舍弃高32位的数据。写入W寄存器时，会将高32位清0，例如将0xFFFFFFFF写入W0后，X0中的值位0x00000000FFFFFFFF。</p>
-<p><img src="/images/cpu/arm/reg.png" alt="img"></p>
-<h2 id="通用寄存器"><a href="#通用寄存器" class="headerlink" title="通用寄存器"></a>通用寄存器</h2><p><img src="/images/cpu/arm/reg2.png" alt="img"><br><img src="/images/cpu/arm/armv8_register.png" alt="img"></p>
-<p>AArch64执行状态拥有 31 个通用寄存器，可以在任何时间和所有异常级别访问。</p>
-<ul>
-<li><p>X0-X7：参数/结果寄存器，被调用子程序返回前无需恢复。</p>
-</li>
-<li><p>X8：间接结果未知寄存器，用于保存子程序返回地址，尽量不使用</p>
-</li>
-<li><p>X9-X15：临时寄存器，使用需要保存现场，返回时需要恢复现场。</p>
-</li>
-<li><p>X16 X17：程序内调用临时寄存器，使用需要保存现场，返回时需要恢复现场。</p>
-</li>
-<li><p>X18：平台寄存器，保留用于平台 ABI，尽量不使用</p>
-</li>
-<li><p>X19-X28：被保存的寄存器，这些寄存器保存在被调用者帧中。使用需要保存现场，返回时需要恢复现场。</p>
-</li>
-<li><p>X29：帧指针寄存器（FP），保存函数栈基地址。</p>
-</li>
-<li><p>X30：链接寄存器（LR）</p>
-</li>
-<li><p>X31：堆栈指针寄存器 SP 或零寄存器 ZXR</p>
-</li>
-</ul>
-<h2 id="特殊寄存器"><a href="#特殊寄存器" class="headerlink" title="特殊寄存器"></a>特殊寄存器</h2><p><strong>Zero register(WZR, XZR)</strong></p>
-<p>当访问zero寄存器，所有的写入都被丢弃，所有的读取都返回0，AArch32执行状态使用WZR指令访问zero寄存器，AArch64执行状态使用XZR访问zero寄存器。</p>
-<p><img src="/images/cpu/arm/armv8%E7%89%B9%E6%AE%8A%E5%AF%84%E5%AD%98%E5%99%A8.png" alt="img"></p>
-<p><strong>Program Counter(PC)</strong></p>
-<p>程序计数寄存器，是一个各个异常级别通用的一个寄存器。PC寄存器不能作为命名寄存器访问，而是通过确定的指令隐含的访问，如相对PC的加载和产生地址。PC寄存器不能明确的作为数据处理指令或加载指令的目的寄存器。</p>
-<p><strong>Stack Pointer(SP)</strong></p>
-<p>栈顶指针寄存器，用来描述各个栈顶的指针寄存器。每个异常级别都拥有一个SP寄存器：SP_EL0, SP_EL1, SP_EL2, SP_EL3. 通过此寄存器就可以确定当前在那个EL。AArch32执行状态使用WSP访问当前栈指针寄存器，AArch64执行状态使用SP访问当前栈指针寄存器。</p>
-<p><strong>Saved Program Status Register(SPSR)</strong></p>
-<p>当异常发生时，处理器的状态将会被保存到相应异常级别的SPSR寄存器中。异常发生后，在处理异常之前，处理器会自动的将PSTATE寄存器的内容保存到SPSR中，异常返回时，会将SPSR保存的处理器状态恢复到PSTATE中。ARMv8定义的SPSR寄存器兼容ARMv7中的SPSR寄存器，只使用低32位。</p>
-<p><img src="/images/cpu/arm/SPSR.png" alt="img"></p>
-<p>各个位域定义如下：</p>
-<ul>
-<li>N 符号位（N flag）</li>
-<li>Z 0标志（Z flag）</li>
-<li>C 操作进位（C flag）</li>
-<li>V 溢出标志（V flag）</li>
-<li>SS 用于软件调试。异常发生的时候，通过设置MDSCR_EL1.SS为1启动单步调试机制</li>
-<li>IL 不合法的执行状态（非法异常），保存自PSTATE.IL</li>
-<li>D 处理器状态调试掩码。指示是否屏蔽来自观察点、断点和软件步骤调试事件的调试异常</li>
-<li>A 软件错误掩码位</li>
-<li>I IRQ掩码位</li>
-<li>F FIQ掩码位</li>
-<li>M[4] 发生异常时处理器的执行状态，0表示AArch64</li>
-<li>M[3:0] M[3:2]发生异常的级别；M[1]保留；M[0]根据此选择栈指针寄存器，0表示t，1表示h。可以通过异常级别的栈指针后缀表明所选的栈指针。</li>
-</ul>
-<p><strong>Exception Link Register (ELR)</strong></p>
-<p>异常链接寄存器，保存着异常返回地址。</p>
-<p>比如当一个异常发生时，处理器必须去处理异常。处理异常时候就需要使用SPSR寄存器保存异常处理前的处理器状态，就是所谓的硬件上保存现场。当处理器处理完异常后，就需要从异常返回，则就需要从ELR寄存器中返回，然后再使用SPSR寄存器恢复现场即可。</p>
-<h2 id="Processor-state-PSTATE"><a href="#Processor-state-PSTATE" class="headerlink" title="Processor state(PSTATE)"></a>Processor state(PSTATE)</h2><p>在AArch64执行状态中，处理器的状态使用PSTATE描述，但PSTATE不是寄存器，而是处理器状态各个位域的总称。</p>
-<p>在AArch64执行状态中，使用ERET命令从异常中返回，即将SPSR_ELn寄存器中保存的发生异常时的处理器状态恢复到PSTATE中。SPSR_ELn中保存了发生异常时ALU的标志、执行状态、异常级别及处理器branches。处理器从异常返回后的执行地址保存在ELR_ELn中。</p>
-<h2 id="系统寄存器"><a href="#系统寄存器" class="headerlink" title="系统寄存器"></a>系统寄存器</h2><table>
-<thead>
-<tr>
-<th>名称</th>
-<th>寄存器</th>
-<th>描述</th>
-<th>允许的异常级别</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>ACTLR_ELn</td>
-<td>辅助控制寄存器</td>
-<td>控制处理器详细的特性</td>
-<td>1，2，3</td>
-</tr>
-<tr>
-<td>CCSIDR_ELn</td>
-<td>当前Cache Size ID寄存器</td>
-<td>当前架构所选择cache的信息</td>
-<td>1</td>
-</tr>
-<tr>
-<td>CLIDR_ELn</td>
-<td>Cache Level ID寄存器</td>
-<td>每个级别的cache类型及实现</td>
-<td>1，2，3</td>
-</tr>
-<tr>
-<td>CNTFRQ_ELn</td>
-<td>计时器频率寄存器</td>
-<td>反应了系统定时器的频率</td>
-<td>0</td>
-</tr>
-<tr>
-<td>CNTPCT_ELn</td>
-<td>计时器物理计数寄存器</td>
-<td>保存了当前64位计数值</td>
-<td>0</td>
-</tr>
-<tr>
-<td>CNTKCTL_ELn</td>
-<td>内核计时器控制寄存器</td>
-<td>控制从虚拟计数器生成事件流</td>
-<td>1</td>
-</tr>
-<tr>
-<td>CPACR_ELn</td>
-<td>协处理器访问控制寄存器</td>
-<td>控制访问Trace、 floating-point及NEON</td>
-<td>1</td>
-</tr>
-<tr>
-<td>CSSELR_ELn</td>
-<td>Cache Size选择寄存器</td>
-<td>定义了要求的cache级别、cache类型及指令cache或数据cache</td>
-<td>1</td>
-</tr>
-<tr>
-<td>CNTP_CTL_ELn</td>
-<td>物理计时器控制寄存器</td>
-<td>EL1物理计时器的控制寄存器</td>
-<td>0</td>
-</tr>
-<tr>
-<td>ELR_ELn</td>
-<td>Exception Link Register</td>
-<td>保存异常返回地址</td>
-<td>1，2，3</td>
-</tr>
-<tr>
-<td>ESR_ELn</td>
-<td>Exception Syndrome Register</td>
-<td>保存了发生异常的原因</td>
-<td>1，2，3</td>
-</tr>
-<tr>
-<td>FAR_ELn</td>
-<td>Fault Address Register</td>
-<td>保存了virtual faulting address</td>
-<td>1，2，3</td>
-</tr>
-<tr>
-<td>SCTLR_ELn</td>
-<td>系统控制寄存器</td>
-<td>控制架构特性，如MMU、caches及对齐检查</td>
-<td>0，1，2，3</td>
-</tr>
-<tr>
-<td>SPSR_ELn</td>
-<td>Saved Program Status Registe</td>
-<td>发生异常时，保存处理器的状态</td>
-<td>abt，fiq，irq， und，1，2，3</td>
-</tr>
-</tbody></table>
-<h2 id="NEON和浮点寄存器"><a href="#NEON和浮点寄存器" class="headerlink" title="NEON和浮点寄存器"></a>NEON和浮点寄存器</h2><p>armV8有32个128bit的浮点寄存器 V0-V31， 这些寄存器用来处理标量浮点运算时保存浮点操作数，或NEON 操作时保存标量和向量操作数。</p>
-<p><img src="/images/cpu/arm/armv8_simd_reg.png" alt="img"></p>
-<h2 id="兼容ARMv7"><a href="#兼容ARMv7" class="headerlink" title="兼容ARMv7"></a>兼容ARMv7</h2><p><img src="/images/cpu/arm/armv8_reg_map.png" alt="img"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/armv7_reg/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/25/cpu/armv7_reg/" class="post-title-link" itemprop="url">ARMv7 寄存器</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-09-25 14:54:02 / 修改时间：15:28:13" itemprop="dateCreated datePublished" datetime="2022-09-25T14:54:02+08:00">2022-09-25</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="ARMv7寄存器"><a href="#ARMv7寄存器" class="headerlink" title="ARMv7寄存器"></a>ARMv7寄存器</h2><p>ARM处理器共有37个寄存器。其中包括：31个通用寄存器（包括PC在内）和6个状态寄存器。</p>
-<p><img src="/images/cpu/arm/reg.jpg" alt="img"></p>
-<h3 id="通用寄存器"><a href="#通用寄存器" class="headerlink" title="通用寄存器"></a>通用寄存器</h3><p>通用寄存器包括R0-R15，均为32位寄存器，可以分为3类：</p>
-<p><strong>未分组寄存器(R0-R7)</strong></p>
-<p>在所有运行模式下，未分组寄存器都指向同一个物理寄存器。在中断或异常处理进行异常模式转换时，由于不同的处理器运行模式均使用相同的物理寄存器，所以可能造成寄存器中数据的破坏。</p>
-<p><strong>分组寄存器(R8-R14)</strong></p>
-<p>对于分组寄存器，他们每次所访问的物理寄存器都与当前的处理器运行模式相关。</p>
-<p>R13常用作存放堆栈指针，用户也可以使用其他寄存器存放堆栈指针，但在Thumb指令集下，某些指令强制要求使用R13存放堆栈指针。</p>
-<p>R14称为链接寄存器（LR，Link Register），当执行子程序时，R14可得到R15（PC）的备份，执行完子程序后，又将R14的值复制回PC，即使用R14保存返回地址。</p>
-<p><strong>程序计数器PC（R15）</strong></p>
-<p>寄存器R15用作程序计数器（PC），在ARM状态下，位[1:0]为0，位[31:2]用于保存PC；在Thumb状态下,位[0]为0，位[31:1]用于保存PC。</p>
-<p>由于ARM体系结构采用了多级流水线技术，对于ARM指令集而言，PC总是指向当前指令的下两条指令的地址，即PC的值为当前指令的地址值加8个字节。</p>
-<h3 id="状态寄存器"><a href="#状态寄存器" class="headerlink" title="状态寄存器"></a>状态寄存器</h3><ul>
-<li>CPSR（Current Program Status Register）当前程序状态寄存器1个。</li>
-<li>SPSR（Saved Progarm Status Register）备份程序状态寄存器6个，用于异常发生时保存CPSR的值，异常退出时恢复CPSR。</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1434,7 +1250,7 @@ return len == INT_MAX ? &quot;&quot; : s.substr(start, len);
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">217</span>
+          <span class="site-state-item-count">218</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

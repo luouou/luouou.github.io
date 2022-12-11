@@ -176,6 +176,312 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/kernel/dts/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/04/kernel/dts/" class="post-title-link" itemprop="url">device tree</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>设备树可以描述的信息包括CPU的数量和类别、内存基地址和大小、总线和桥、外设连接、中断控制器和中断使用情况、GPIO控制器和GPIO使用情况、Clock控制器和Clock使用情况。另外，设备树对于可热插拔的热备不进行具体描述，它只描述用于控制该热插拔设备的控制器。对于同一SOC的不同主板，只需更换设备树文件.dtb即可实现不同主板的无差异支持，而无需更换内核文件。</p>
+<p>设备树中的设备树节点在文件系统中有与之对应的文件，位于/proc/device-tree目录。在这里子节点是一个文件夹，属性是一个文件。设备节点属性的设置方法可参考内核文档Documentation/devicetree。</p>
+<p><a target="_blank" rel="noopener" href="https://www.devicetree.org/">https://www.devicetree.org/</a></p>
+<p>设备树包含DTC（device tree compiler），DTS（device tree source和DTB（device tree blob）。</p>
+<h2 id="DTS"><a href="#DTS" class="headerlink" title="DTS"></a>DTS</h2><p>dts文件是一种ASCII文本对Device Tree的描述，放置在内核的/arch/arm/boot/dts目录。一般而言，一个dts文件对应一个ARM的板子。</p>
+<p>由于一个SOC可能有多个不同的电路板，而每个电路板拥有一个dts文件。这些dts势必会存在许多共同部分，为了减少代码的冗余，设备树将这些共同部分提炼保存在dtsi文件中，供不同的dts共同使用，使用时需要包含dtsi文件。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;exynos4.dtsi&quot;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>device tree的基本单元是node。这些node被组织成树状结构，除了root node，每个node都只有一个parent。一个dts文件中只能有一个root node。</p>
+<p>每一个“{}”都是一个设备树节点，“{}”中包含的内容是节点属性，属性的定义采用property ＝ value的形式，value有三种情况：</p>
+<ul>
+<li>字符串或字符串数组，用双引号表示。</li>
+<li>u32整数，用尖括号表示。</li>
+<li>二进制数，用方括号表示。</li>
+</ul>
+<p>设备树中的每个节点都按照以下节点基本格式：</p>
+<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[label:] node-name[<span class="keyword">@unit</span>-address] &#123; </span><br><span class="line">   [properties definitions] </span><br><span class="line">   [child nodes] </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>label定义一个标签，是可选的，在标签名前加“&amp;”符号就可引用该节点。</p>
+</li>
+<li><p>node-name 用于标识节点的名称，root node的节点名必须是“/”。</p>
+</li>
+<li><p><code>@unit-address</code> ，其中“@”符号是分割符，“unit-address”是单元地址， 它的值要和节点<code>reg</code>属性的第一个地址一致。如果节点没有<code>reg</code>属性，可以直接省略， 不过这时要求同级别的设备树下节点名唯一。同级别的子节点的节点名可以相同，但是要求地址不同，node-name@unit-address 的整体要求同级唯一。</p>
+</li>
+</ul>
+<p>子节点前面加一个“&amp;”符号， 这表示该节点在向已经存在的子节点追加数据。</p>
+<h3 id="节点"><a href="#节点" class="headerlink" title="节点"></a>节点</h3><h4 id="chosen"><a href="#chosen" class="headerlink" title="chosen"></a>chosen</h4><p>chosen 节点主要用来描述由系统firmware指定的runtime parameter。如果存在chosen node，其parent node必须是根节点。可以用作uboot向linux内核传递配置参数，如：<code>bootargs</code> ,<code>console</code>。</p>
+<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/ &#123;</span><br><span class="line">    chosen &#123;</span><br><span class="line">        bootargs = <span class="string">&quot;root=/dev/mmcblk0p2 rw rootfstype=ext4 rootdelay=1 rootwait&quot;</span>;</span><br><span class="line">        stdout-path = <span class="string">&quot;serial2:115200n8&quot;</span>;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;;  </span><br></pre></td></tr></table></figure>
+
+<h4 id="aliases"><a href="#aliases" class="headerlink" title="aliases"></a>aliases</h4><p>aliases 节点定义了一个别名。</p>
+<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">aliases &#123;</span><br><span class="line">    spi0 = &amp;spi_0;</span><br><span class="line">    i2c0 = &amp;i2c_0;</span><br><span class="line">    serial0 = &amp;serial_0;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="memory"><a href="#memory" class="headerlink" title="memory"></a>memory</h4><p>memory node是所有设备树文件的必备节点，它定义了系统物理内存的layout。对于memory node，其<code>device_type</code>属性必须等于<code>memory</code>。<code>reg</code>属性定义了memory的起始地址和长度。</p>
+<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">memory@<span class="number">40000000</span> &#123;</span><br><span class="line">    device_type = <span class="string">&quot;memory&quot;</span>;</span><br><span class="line">    reg = &lt;<span class="number">0</span>x40000000 <span class="number">0</span>x40000000&gt;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="interrupt-controller"><a href="#interrupt-controller" class="headerlink" title="interrupt-controller"></a>interrupt-controller</h4><figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gic: interrupt-controller@<span class="number">10490000</span> &#123;</span><br><span class="line">    #interrupt-cells = &lt;<span class="number">3</span>&gt;;</span><br><span class="line">    interrupt-controller;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wakup_eint: wakeup-interrupt-controller &#123;</span><br><span class="line">    interrupt-parent = &lt;&amp;gic&gt;;</span><br><span class="line">    interrupts = &lt;GIC_SPI <span class="number">32</span> IRQ_TYPE_LEVEL_HIGH&gt;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>interrupt-controller</code> 是一个空属性，用来声明这个node是一个中断控制器。</li>
+<li><code>#interrupt-cells</code>标识这个控制器需要几个单位做中断描述符，描述子节点中<code>interrupts</code>属性使用了父节点中<code>interrupts</code>属性的具体的哪个值。如果父节点的属性値是3，则子节点<code>interrupts</code>属性中的3个值分别代表&lt;中断域 中断 触发方式&gt;；如果父节点的属性値是2，则是&lt;中断 触发方式&gt;。</li>
+<li><code>interrupt-parent</code>标识此设备节点属于哪一个中断控制器，如果没有设置这个属性，会自动依附父节点的。</li>
+<li><code>interrupts</code>标识一个中断。而具体每个cell的含义，由驱动的实现决定，也会在Device Tree的binding文档中说明。</li>
+</ul>
+<h4 id="gpio-controller"><a href="#gpio-controller" class="headerlink" title="gpio-controller"></a>gpio-controller</h4><figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gpa0: gpa0 &#123;</span><br><span class="line">    gpio-controller;</span><br><span class="line">    #gpio-cells = &lt;<span class="number">2</span>&gt;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>gpio-controller</code>是一个空属性，用来说明该节点描述的是一个gpio控制器。</li>
+<li><code>#gpio-cells</code>用来描述gpio使用节点的属性一个cell的内容，即 `属性 = &lt;&amp;引用gpio节点别名  gpio号  有效电平&gt;</li>
+</ul>
+<h3 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h3><h4 id="compatible"><a href="#compatible" class="headerlink" title="compatible"></a>compatible</h4><figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">leds &#123;</span><br><span class="line">    compatible = <span class="string">&quot;gpio-leds&quot;</span>;</span><br><span class="line"></span><br><span class="line">    led2 &#123;</span><br><span class="line">        label = <span class="string">&quot;red:system&quot;</span>;</span><br><span class="line">        gpios = &lt;&amp;gpl2 <span class="number">0</span> GPIO_ACTIVE_HIGH&gt;;</span><br><span class="line">        <span class="keyword">default</span>-state = <span class="string">&quot;on&quot;</span>;</span><br><span class="line">        linux,<span class="keyword">default</span>-trigger = <span class="string">&quot;heartbeat&quot;</span>;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    led3 &#123;</span><br><span class="line">        label = <span class="string">&quot;red:user&quot;</span>;</span><br><span class="line">        gpios = &lt;&amp;gpk1 <span class="number">1</span> GPIO_ACTIVE_HIGH&gt;;</span><br><span class="line">        <span class="keyword">default</span>-state = <span class="string">&quot;on&quot;</span>;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>compatible属性值由一个或多个字符串组成，有多个字符串时使用“,”分隔开。</p>
+<p>设备树中的每个设备节点都有一个compatible属性，compatible属性用于驱动和设备的绑定。platform总线根据设备节点”compatible”属性和驱动程序中的of_match_table指针所指向的of_device_id结构里的compatible字段匹配的，只有dts里的compatible字段的名字和驱动程序中of_device_id里的compatible字段的名字一样，驱动程序才能进入probe函数。</p>
+<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">struct</span> of_device_id of_gpio_leds_match[] = &#123;</span><br><span class="line">    &#123; .compatible = <span class="string">&quot;gpio-leds&quot;</span>, &#125;,</span><br><span class="line">    &#123;&#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">struct</span> platform_driver gpio_led_driver = &#123;</span><br><span class="line">    .probe      = gpio_led_probe,</span><br><span class="line">    .shutdown   = gpio_led_shutdown,</span><br><span class="line">    .driver     = &#123;</span><br><span class="line">        .name   = <span class="string">&quot;leds-gpio&quot;</span>,</span><br><span class="line">        .of_match_table = of_gpio_leds_match,</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="model"><a href="#model" class="headerlink" title="model"></a>model</h4><p>model属性用于指定设备的制造商和型号，格式自定义。</p>
+<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">model = <span class="string">&quot;TOPEET iTop 4412 Elite board based on Exynos4412&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="status"><a href="#status" class="headerlink" title="status"></a>status</h4><p>status属性用于指示设备的操作状态，可以禁止设备或者启用设备，默认情况下不设置status属性设备是使能的。</p>
+<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">status = <span class="string">&quot;disabled&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="ranges"><a href="#ranges" class="headerlink" title="ranges"></a>ranges</h4><p>ranges属性为地址转换表，表明了子节点地址空间和父地址空间的映射方法，常见格式是<code>ranges = &lt;子地址, 父地址, 转换长度&gt;</code>。 如果父地址空间和子地址空间相同则无需转换，只写<code>renges,</code>内容为空，或直接省略renges属性。</p>
+<p>比如对于#address-cells和#size-cells都为1的话，以ranges=&lt;0x0 0x10 0x20&gt;为例，表示将子地址的从0x0<del>(0x0 + 0x20)的地址空间映射到父地址的0x10</del>(0x10 + 0x20)。</p>
+<h4 id="name"><a href="#name" class="headerlink" title="name"></a>name</h4><p>name属性在旧的设备树中用于确定节点名， 现在已经弃用。</p>
+<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">name = <span class="string">&quot;name&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="device-type"><a href="#device-type" class="headerlink" title="device_type"></a>device_type</h4><p>对于device node，device_type属性定义了该node的设备类型，如<code>cpu</code>、<code>serial</code>等。对于memory node，其device_type属性必须等于<code>memory</code>。</p>
+<h4 id="reg"><a href="#reg" class="headerlink" title="reg"></a>reg</h4><p>reg用于描述地址的offset和length。该属性的值被解析成任意长度的（address，length）组合，其中address和size的値是在其parent node中的<code>#address-cells</code>和<code>#size-cells</code>属性定义的。</p>
+<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg = &lt;<span class="number">0</span>x03830000 <span class="number">0</span>x100&gt;;</span><br></pre></td></tr></table></figure>
+
+<p>如果一个device node中包含了有寻址需求的sub node，那么就必须要定义<code>#address-cells</code>和<code>#size-cells</code>这两个属性。“#”是number的意思，这两个属性是用来描述sub node中的reg属性的地址域特性的，也就是说需要用多少个u32的cell来描述该地址域。</p>
+<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/ &#123;</span><br><span class="line">    #address-cells = &lt;<span class="number">1</span>&gt;;</span><br><span class="line">    #size-cells = &lt;<span class="number">1</span>&gt;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="获取节点信息"><a href="#获取节点信息" class="headerlink" title="获取节点信息"></a>获取节点信息</h2><p>内核提供了一组函数用于获取设备节点属性的函数，这些函数以of_开头，称为OF操作函数。</p>
+<h3 id="device-node"><a href="#device-node" class="headerlink" title="device_node"></a>device_node</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">device_node</span> &#123;</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *name;  <span class="comment">/* 节点中属性为name的值 */</span></span><br><span class="line">    phandle phandle;  <span class="comment">/* 节点中属性为device_type的值 */</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *full_name;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">fwnode_handle</span> <span class="title">fwnode</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span>  <span class="title">property</span> *<span class="title">properties</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span>  <span class="title">property</span> *<span class="title">deadprops</span>;</span>    <span class="comment">/* removed properties */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span>  <span class="title">device_node</span> *<span class="title">parent</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span>  <span class="title">device_node</span> *<span class="title">child</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span>  <span class="title">device_node</span> *<span class="title">sibling</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_OF_KOBJ)</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span>  <span class="title">kobject</span> <span class="title">kobj</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> _flags;</span><br><span class="line">    <span class="type">void</span>    *data;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_SPARC)</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> unique_id;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">of_irq_controller</span> *<span class="title">irq_trans</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="查找节点"><a href="#查找节点" class="headerlink" title="查找节点"></a>查找节点</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 根据节点路径寻找 */</span></span><br><span class="line"><span class="keyword">struct</span> device_node *<span class="title function_">of_find_node_by_path</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 根据节点名字寻找，from指定从哪个节点开始查找，它本身并不在查找行列中，只查找它后面的节点，如果设置为NULL表示从根节点开始查找。 */</span></span><br><span class="line"><span class="keyword">struct</span> device_node *<span class="title function_">of_find_node_by_name</span><span class="params">(<span class="keyword">struct</span> device_node *from,</span></span><br><span class="line"><span class="params">    <span class="type">const</span> <span class="type">char</span> *name)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 根据节点类型寻找 */</span></span><br><span class="line"><span class="keyword">struct</span> device_node *<span class="title function_">of_find_node_by_type</span><span class="params">(<span class="keyword">struct</span> device_node *from,</span></span><br><span class="line"><span class="params">    <span class="type">const</span> <span class="type">char</span> *type)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 根据节点类型和compatible属性寻找 */</span></span><br><span class="line"><span class="keyword">struct</span> device_node *<span class="title function_">of_find_compatible_node</span><span class="params">(<span class="keyword">struct</span> device_node *from,</span></span><br><span class="line"><span class="params">                        <span class="type">const</span> <span class="type">char</span> *type, <span class="type">const</span> <span class="type">char</span> *compat)</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 寻找父节点 */</span></span><br><span class="line"><span class="keyword">struct</span> device_node *<span class="title function_">of_get_parent</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> device_node *node)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 寻找子节点，寻找的是prev节点之后的节点。这是一个迭代寻找过程，例如寻找第二个子节点，这里就要填第一个子节点。参数为NULL 表示寻找第一个子节点。 */</span></span><br><span class="line"><span class="keyword">struct</span> device_node *<span class="title function_">of_get_next_child</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> device_node *node,</span></span><br><span class="line"><span class="params">                         <span class="keyword">struct</span> device_node *prev)</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="property"><a href="#property" class="headerlink" title="property"></a>property</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">property</span> &#123;</span></span><br><span class="line">    <span class="type">char</span>    *name;  属性名</span><br><span class="line">    <span class="type">int</span> length;  属性长度</span><br><span class="line">    <span class="type">void</span>    *value;  属性值</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">property</span> *<span class="title">next</span>;</span>  下一个属性</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_OF_DYNAMIC) || defined(CONFIG_SPARC)</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> _flags;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_OF_PROMTREE)</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> unique_id;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_OF_KOBJ)</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">bin_attribute</span> <span class="title">attr</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="提取属性值"><a href="#提取属性值" class="headerlink" title="提取属性值"></a>提取属性值</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/of.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 获取节点属性 */</span></span><br><span class="line"><span class="keyword">struct</span> property *<span class="title function_">of_find_property</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> device_node *np,</span></span><br><span class="line"><span class="params">                     <span class="type">const</span> <span class="type">char</span> *name, <span class="type">int</span> *lenp)</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">of_property_read_u32</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> device_node *np,</span></span><br><span class="line"><span class="params">                       <span class="type">const</span> <span class="type">char</span> *propname, u32 *out_value)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">of_property_read_u8</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> device_node *np, </span></span><br><span class="line"><span class="params">                        <span class="type">const</span> <span class="type">char</span> *propname, u8 *out_value)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">of_property_read_u16</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> device_node *np, </span></span><br><span class="line"><span class="params">                         <span class="type">const</span> <span class="type">char</span> *propname, u16 *out_value)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 检查节点中某个属性是否存在 */</span></span><br><span class="line"><span class="type">bool</span> <span class="title function_">of_property_read_bool</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> device_node *np,</span></span><br><span class="line"><span class="params">                     <span class="type">const</span> <span class="type">char</span> *propname)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">of_property_read_string</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> device_node *np, </span></span><br><span class="line"><span class="params">                 <span class="type">const</span> <span class="type">char</span> *propname, <span class="type">const</span> <span class="type">char</span> **out_string)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">of_property_read_u32_array</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> device_node *np,</span></span><br><span class="line"><span class="params">                         <span class="type">const</span> <span class="type">char</span> *propname,</span></span><br><span class="line"><span class="params">                         u32 *out_values, <span class="type">size_t</span> sz)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="gpio的获取"><a href="#gpio的获取" class="headerlink" title="gpio的获取"></a>gpio的获取</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/of_gpio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 根据gpio属性的名字获取 */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">of_get_named_gpio</span><span class="params">(<span class="keyword">struct</span> device_node *np,</span></span><br><span class="line"><span class="params">                             <span class="type">const</span> <span class="type">char</span> *propname, <span class="type">int</span> index)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">of_get_gpio</span><span class="params">(<span class="keyword">struct</span> device_node *np, <span class="type">int</span> index)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="地址的获取"><a href="#地址的获取" class="headerlink" title="地址的获取"></a>地址的获取</h3><p>在设备树的设备节点中大多会包含一些内存相关的属性，比如常用的reg属性。通常情况下，得到寄存器地址之后我们还要通过ioremap函数将物理地址转化为虚拟地址。现在内核提供了of函数，自动完成物理地址到虚拟地址的转换。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">resource</span> &#123;</span></span><br><span class="line">    <span class="type">resource_size_t</span> start;</span><br><span class="line">    <span class="type">resource_size_t</span> end;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *name;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> desc;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">resource</span> *<span class="title">parent</span>, *<span class="title">sibling</span>, *<span class="title">child</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">of_address_to_resource</span><span class="params">(<span class="keyword">struct</span> device_node *dev, <span class="type">int</span> index,</span></span><br><span class="line"><span class="params">               <span class="keyword">struct</span> resource *r)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="中断的获取"><a href="#中断的获取" class="headerlink" title="中断的获取"></a>中断的获取</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/of_irq.h&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="DTC"><a href="#DTC" class="headerlink" title="DTC"></a>DTC</h2><p>DTC（Device Tree Compiler）为编译工具，它可以将.dts文件编译成.dtb文件。DTC的源码位于内核的scripts/dtc目录，内核选中CONFIG_OF，编译内核的时候，主机可执行程序DTC就会被编译出来。 即scripts/dtc/Makefile中。</p>
+<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hostprogs-y := dtc</span><br><span class="line"></span><br><span class="line">always := $(hostprogs-y) </span><br></pre></td></tr></table></figure>
+
+<p>在内核的arch/arm/boot/dts/Makefile中，若选中某种SOC，则与其对应相关的所有dtb文件都将编译出来。<code>make dtbs</code>可单独编译dtb。</p>
+<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ifeq ($(CONFIG_OF),y)</span><br><span class="line"></span><br><span class="line">dtb-$(CONFIG_ARCH_EXYNOS4) += \</span><br><span class="line">    exynos4412-origen.dtb \</span><br><span class="line">    exynos4412-smdk4412.dtb \</span><br><span class="line">    exynos4412-tiny4412.dtb \</span><br><span class="line"></span><br><span class="line">endif</span><br></pre></td></tr></table></figure>
+
+<p>DTC在编译时，会对node进行合并操作，最终生成的dtb只有一个root node。</p>
+<h2 id="DTB"><a href="#DTB" class="headerlink" title="DTB"></a>DTB</h2><p>dtb文件由头（Header）、结构块（device-tree structure）、字符串块（string block）三部分组成。</p>
+<p><img src="/images/kernel/device-tree/dtb_struct.png" alt="dtb文件结构"></p>
+<h3 id="fdt-header"><a href="#fdt-header" class="headerlink" title="fdt_header"></a>fdt_header</h3><p>设备树文件头信息，存储在dtb文件的开头部分，使用fdt_header结构体描述。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> FDT_MAGIC   0xd00dfeed  <span class="comment">/* 4: version, 4: total size */</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">fdt_header</span> &#123;</span></span><br><span class="line">        <span class="type">fdt32_t</span> magic;                   <span class="comment">/* magic word FDT_MAGIC */</span></span><br><span class="line">        <span class="type">fdt32_t</span> totalsize;               <span class="comment">/* total size of DT block */</span></span><br><span class="line">        <span class="type">fdt32_t</span> off_dt_struct;           <span class="comment">/* offset to structure */</span></span><br><span class="line">        <span class="type">fdt32_t</span> off_dt_strings;          <span class="comment">/* offset to strings */</span></span><br><span class="line">        <span class="type">fdt32_t</span> off_mem_rsvmap;          <span class="comment">/* offset to memory reserve map */</span></span><br><span class="line">        <span class="type">fdt32_t</span> version;                 <span class="comment">/* format version */</span></span><br><span class="line">        <span class="type">fdt32_t</span> last_comp_version;       <span class="comment">/* last compatible version */</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">/* version 2 fields below */</span></span><br><span class="line">        <span class="type">fdt32_t</span> boot_cpuid_phys;         <span class="comment">/* Which physical CPU id we&#x27;re</span></span><br><span class="line"><span class="comment">                                            booting on */</span></span><br><span class="line">        <span class="comment">/* version 3 fields below */</span></span><br><span class="line">        <span class="type">fdt32_t</span> size_dt_strings;         <span class="comment">/* size of the strings block */</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">/* version 17 fields below */</span></span><br><span class="line">        <span class="type">fdt32_t</span> size_dt_struct;          <span class="comment">/* size of the structure block */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>所有成员都是32位整型，并以大端模式存储；从头部可获知memory reservation block、structure block和strings block部分的起始地址和大小。</p>
+<p>使用<code>fdtdump</code>工具对dtb文件进行分析，通过查看fdtdump输出信息以及dtb二进制文件信息。</p>
+<p><img src="/images/kernel/device-tree/dtb_dump.png" alt="fdt_header和文件结构之间的关系"></p>
+<p>dtb文件结构分为header、fill_area、dt_struct及dt_string四个区域。header为头信息，其中fill_area为填充区域，填充数字0，dt_struct存储节点数值及名称相关信息，dt_string存储属性名。</p>
+<h3 id="memory-reservation-block"><a href="#memory-reservation-block" class="headerlink" title="memory reservation block"></a>memory reservation block</h3><p>预留内存区域，用于存放并保护一些重要的数据，与特定平台的实现相关。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">fdt_reserve_entry</span> &#123;</span></span><br><span class="line">        <span class="type">fdt64_t</span> address;</span><br><span class="line">        <span class="type">fdt64_t</span> size;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="structure-block"><a href="#structure-block" class="headerlink" title="structure block"></a>structure block</h3><p>structure block区域描述了设备树本身的结构和内容。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">fdt_node_header</span>  &#123;</span></span><br><span class="line">    <span class="type">fdt32_t</span>  tag; </span><br><span class="line">    <span class="comment">/* node名称，以&#x27;\0&#x27;结尾的字符串形式，32-bits对齐，不够用0x0补齐 */</span></span><br><span class="line">    <span class="type">char</span>  name[<span class="number">0</span>];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>fdt_node_header结构体描述节点信息，tag是标识node的起始结束等信息的标志位，name指向node名称的首地址。tag的取值如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> FDT_BEGIN_NODE   0x1    <span class="comment">/*  标识一个node的开始 */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FDT_END_NODE  0x2    <span class="comment">/*  标识一个node的结束 */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FDT_PROP   0x3    <span class="comment">/* 标识node节点下面的属性起始符 */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FDT_NOP    0x4    <span class="comment">/* 所有的设备树解析程序都会忽略该令牌，一般用于覆盖树中的属性或者节点，以将其从树中删除 */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FDT_END    0x9  <span class="comment">/* 标识structure block区域的结 */</span>束</span></span><br></pre></td></tr></table></figure>
+
+<p>对于每个node节点的tag标识符一般为FDT_BEGIN_NODE，对于每个node节点下面的属性的tag标识符一般是FDT_PROP。</p>
+<h3 id="strings-block"><a href="#strings-block" class="headerlink" title="strings block"></a>strings block</h3><p>strings block包含了设备树中所有属性的名称。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span>  <span class="title">fdt_property</span>  &#123;</span></span><br><span class="line">    <span class="type">fdt32_t</span>  tag;</span><br><span class="line">    <span class="comment">/* 表示property value的长度 */</span></span><br><span class="line">    <span class="type">fdt32_t</span>  len;</span><br><span class="line">    <span class="comment">/* property的名称在string block的偏移 */</span></span><br><span class="line">    <span class="type">fdt32_t</span>  nameoff;</span><br><span class="line">    <span class="comment">/* property值，以&#x27;\0&#x27;结尾的字符串形式，32-bits对齐，用0x0补齐 */</span></span><br><span class="line">    <span class="type">char</span>  data[<span class="number">0</span>];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>属性用fdt_property结构体描述，tag标识是属性，取值为FDT_PROP；len为属性值的长度（包括‘\0’，单位字节）；nameoff为属性名称存储位置相对于off_dt_strings的偏移地址。</p>
+<p>由于设备树node节点的名称和property value值的长度是不固定的，所以fdt_node_header和fdt_property结构体都使用零长数组的方式进行实现动态长度。</p>
+<p><img src="/images/kernel/device-tree/dtb_block.png" alt="dt_struct结构图"></p>
+<h3 id="kernel解析设备树"><a href="#kernel解析设备树" class="headerlink" title="kernel解析设备树"></a>kernel解析设备树</h3><p>bootloader在引导内核时，会预先读取dtb文件到内存，然后将地址通过bootm或bootz命令传给内核，<code>bootm [kernel_addr] [initrd_address] [dtb_address]</code>。</p>
+<p>kernel会根据Device Tree的结构解析出能够使用的 property结构体。并根据Device Tree中的属性解析出数据来填充 property结构体，并将同一个node节点下面的所有属性通过property.next指针进行链接，形成一个单链表。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">property</span>  &#123;</span></span><br><span class="line">    <span class="type">char</span>  *name;                          <span class="comment">/* property full name */</span></span><br><span class="line">    <span class="type">int</span>  length;                          <span class="comment">/* property  value length */</span></span><br><span class="line">    <span class="type">void</span>  *value;                         <span class="comment">/* property  value */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span>  <span class="title">property</span> *<span class="title">next</span>;</span>   <span class="comment">/* next property  under the same node */</span></span><br><span class="line">    <span class="type">unsigned</span>  <span class="type">long</span> _flags;</span><br><span class="line">    <span class="type">unsigned</span>  <span class="type">int</span> unique_id;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span>  <span class="title">bin_attribute</span> <span class="title">attr</span>;</span>        <span class="comment">/*属性文件，与sysfs文件系统挂接 */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>kernel启动的入口函数为stext，其中会将bootloader传来的dtb地址（物理地址，保存在x21寄存器中）赋值给__fdt_pointer变量。此后执行的start_kernell()函数对dtb文件进行物理地址映射，并进行数据解析。</p>
+<p>start_kernel()函数，在early_init_dt_scan_nodes()中会做以下三件事：</p>
+<ol>
+<li><p>扫描/chosen或者/chose@0节点下面的bootargs属性值到boot_command_line，此外，还处理initrd相关的property，并保存在initrd_start和initrd_end这两个全局变量中；</p>
+</li>
+<li><p>扫描根节点下面，获取{size,address}-cells信息，并保存在dt_root_size_cells和dt_root_addr_cells全局变量中；</p>
+</li>
+<li><p>扫描具有device_type = “memory”属性的/memory或者/memory@0节点下面的reg属性值，并把相关信息保存在meminfo中，全局变量meminfo保存了系统内存相关的信息。</p>
+</li>
+</ol>
+<p>Device Tree中的每一个node节点经过kernel处理都会生成一个device_node的结构体，device_node最终会被挂接到具体的device结构体。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">device_node</span>  &#123;</span></span><br><span class="line">    <span class="type">const</span>  <span class="type">char</span> *name;              <span class="comment">/* node的名称，取最后一次“/”和“@”之间子串 */</span></span><br><span class="line">    <span class="type">const</span>  <span class="type">char</span> *type;              <span class="comment">/* device_type的属性名称，没有为&lt;NULL&gt; */</span></span><br><span class="line">    phandle  phandle;               <span class="comment">/* phandle属性值 */</span></span><br><span class="line">    <span class="type">const</span>  <span class="type">char</span> *full_name;   <span class="comment">/*指向该结构体结束的位置，存放node的路径全名，例如：/chosen */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span>  <span class="title">fwnode_handle</span> <span class="title">fwnode</span>;</span></span><br><span class="line"> </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">property</span> *<span class="title">properties</span>;</span>  <span class="comment">/*指向该节点下的第一个属性，其他属性与该属性链表相接 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">property</span> *<span class="title">deadprops</span>;</span>   <span class="comment">/* removed properties */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_node</span> *<span class="title">parent</span>;</span>   <span class="comment">/*父节点 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_node</span> *<span class="title">child</span>;</span>    <span class="comment">/*子节点 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_node</span> *<span class="title">sibling</span>;</span>  <span class="comment">/*姊妹节点，与自己同等级的node */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">kobject</span> <span class="title">kobj</span>;</span>          <span class="comment">/* sysfs文件系统目录体现 */</span></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span>  <span class="type">long</span> _flags;        <span class="comment">/*当前node状态标志位 */</span></span><br><span class="line">    <span class="type">void</span>   *data;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> OF_DYNAMIC        1 <span class="comment">/* node and properties were  allocated via kmalloc */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> OF_DETACHED       2  <span class="comment">/* node has been detached from the device tree*/</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> OF_POPULATED      3  <span class="comment">/* device already created for the node */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> OF_POPULATED_BUS  4 <span class="comment">/* of_platform_populate recursed to children of this node */</span></span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/141623370">https://zhuanlan.zhihu.com/p/141623370</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.zhihu.com/column/c_1221056483527483392">https://www.zhihu.com/column/c_1221056483527483392</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.wowotech.net/device_model/dt-code-analysis.html">http://www.wowotech.net/device_model/dt-code-analysis.html</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/kernel/i2c_device/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/04/kernel/i2c_device/" class="post-title-link" itemprop="url">i2c 设备驱动</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>I2C设备层由i2c设备和对应的设备驱动组成，分别用i2c_client和i2c_driver表示。</p>
+<h2 id="i2c-driver"><a href="#i2c-driver" class="headerlink" title="i2c_driver"></a>i2c_driver</h2><p>i2c_driver 对应一套驱动方法，实现设备与总线的挂接。i2c_driver与i2c_client的关系是一对多，一个i2c_driver上可以支持多个同等类型的i2c_client。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">i2c_driver</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> <span class="class"><span class="keyword">class</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Notifies the driver that a new bus has appeared or is about to be</span></span><br><span class="line"><span class="comment">     * removed. You should avoid using this if you can, it will probably</span></span><br><span class="line"><span class="comment">     * be removed in a near future.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">int</span> (*attach_adapter)(<span class="keyword">struct</span> i2c_adapter *);</span><br><span class="line">    <span class="type">int</span> (*detach_adapter)(<span class="keyword">struct</span> i2c_adapter *);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Standard driver model interfaces */</span></span><br><span class="line">    <span class="type">int</span> (*probe)(<span class="keyword">struct</span> i2c_client *, <span class="type">const</span> <span class="keyword">struct</span> i2c_device_id *);</span><br><span class="line">    <span class="type">int</span> (*remove)(<span class="keyword">struct</span> i2c_client *);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* driver model interfaces that don&#x27;t relate to enumeration  */</span></span><br><span class="line">    <span class="type">void</span> (*shutdown)(<span class="keyword">struct</span> i2c_client *);</span><br><span class="line">    <span class="type">int</span> (*suspend)(<span class="keyword">struct</span> i2c_client *, <span class="type">pm_message_t</span> mesg);</span><br><span class="line">    <span class="type">int</span> (*resume)(<span class="keyword">struct</span> i2c_client *);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Alert callback, for example for the SMBus alert protocol.</span></span><br><span class="line"><span class="comment">     * The format and meaning of the data value depends on the protocol.</span></span><br><span class="line"><span class="comment">     * For the SMBus alert protocol, there is a single bit of data passed</span></span><br><span class="line"><span class="comment">     * as the alert response&#x27;s low bit (&quot;event flag&quot;).</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">void</span> (*alert)(<span class="keyword">struct</span> i2c_client *, <span class="type">unsigned</span> <span class="type">int</span> data);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* a ioctl like command that can be used to perform specific functions</span></span><br><span class="line"><span class="comment">     * with the device.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">int</span> (*command)(<span class="keyword">struct</span> i2c_client *client, <span class="type">unsigned</span> <span class="type">int</span> cmd, <span class="type">void</span> *arg);</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_driver</span> <span class="title">driver</span>;</span></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">i2c_device_id</span> *<span class="title">id_table</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Device detection callback for automatic device creation */</span></span><br><span class="line">    <span class="type">int</span> (*detect)(<span class="keyword">struct</span> i2c_client *, <span class="keyword">struct</span> i2c_board_info *);</span><br><span class="line">    <span class="type">const</span> <span class="type">unsigned</span> <span class="type">short</span> *address_list;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">clients</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> to_i2c_driver(d) container_of(d, struct i2c_driver, driver)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="注册i2c设备驱动"><a href="#注册i2c设备驱动" class="headerlink" title="注册i2c设备驱动"></a>注册i2c设备驱动</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">eeprom_detect</span><span class="params">(<span class="keyword">struct</span> i2c_client *client, <span class="keyword">struct</span> i2c_board_info *info)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">i2c_adapter</span> *<span class="title">adapter</span> =</span> client-&gt;adapter;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* EDID EEPROMs are often 24C00 EEPROMs, which answer to all</span></span><br><span class="line"><span class="comment">       addresses 0x50-0x57, but we only care about 0x50. So decline</span></span><br><span class="line"><span class="comment">       attaching to addresses &gt;= 0x51 on DDC buses */</span></span><br><span class="line">    <span class="keyword">if</span> (!(adapter-&gt;class &amp; I2C_CLASS_SPD) &amp;&amp; client-&gt;addr &gt;= <span class="number">0x51</span>)</span><br><span class="line">        <span class="keyword">return</span> -ENODEV;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* There are four ways we can read the EEPROM data:</span></span><br><span class="line"><span class="comment">       (1) I2C block reads (faster, but unsupported by most adapters)</span></span><br><span class="line"><span class="comment">       (2) Word reads (128% overhead)</span></span><br><span class="line"><span class="comment">       (3) Consecutive byte reads (88% overhead, unsafe)</span></span><br><span class="line"><span class="comment">       (4) Regular byte data reads (265% overhead)</span></span><br><span class="line"><span class="comment">       The third and fourth methods are not implemented by this driver</span></span><br><span class="line"><span class="comment">       because all known adapters support one of the first two. */</span></span><br><span class="line">    <span class="keyword">if</span> (!i2c_check_functionality(adapter, I2C_FUNC_SMBUS_READ_WORD_DATA)</span><br><span class="line">     &amp;&amp; !i2c_check_functionality(adapter, I2C_FUNC_SMBUS_READ_I2C_BLOCK))</span><br><span class="line">        <span class="keyword">return</span> -ENODEV;</span><br><span class="line"></span><br><span class="line">    strlcpy(info-&gt;type, <span class="string">&quot;eeprom&quot;</span>, I2C_NAME_SIZE);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">eeprom_probe</span><span class="params">(<span class="keyword">struct</span> i2c_client *client,</span></span><br><span class="line"><span class="params">            <span class="type">const</span> <span class="keyword">struct</span> i2c_device_id *id)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">i2c_adapter</span> *<span class="title">adapter</span> =</span> client-&gt;adapter;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">eeprom_data</span> *<span class="title">data</span>;</span></span><br><span class="line">    <span class="type">int</span> err;</span><br><span class="line"></span><br><span class="line">    data = kzalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> eeprom_data), GFP_KERNEL);</span><br><span class="line">    <span class="built_in">memset</span>(data-&gt;data, <span class="number">0xff</span>, EEPROM_SIZE);</span><br><span class="line">    i2c_set_clientdata(client, data);</span><br><span class="line">    mutex_init(&amp;data-&gt;update_lock);</span><br><span class="line">    data-&gt;nature = UNKNOWN;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Detect the Vaio nature of EEPROMs.</span></span><br><span class="line"><span class="comment">       We use the &quot;PCG-&quot; or &quot;VGN-&quot; prefix as the signature. */</span></span><br><span class="line">    <span class="keyword">if</span> (client-&gt;addr == <span class="number">0x57</span> &amp;&amp; i2c_check_functionality(adapter, I2C_FUNC_SMBUS_READ_BYTE_DATA)) &#123;</span><br><span class="line">        <span class="type">char</span> name[<span class="number">4</span>];</span><br><span class="line">        name[<span class="number">0</span>] = i2c_smbus_read_byte_data(client, <span class="number">0x80</span>);</span><br><span class="line">        name[<span class="number">1</span>] = i2c_smbus_read_byte_data(client, <span class="number">0x81</span>);</span><br><span class="line">        name[<span class="number">2</span>] = i2c_smbus_read_byte_data(client, <span class="number">0x82</span>);</span><br><span class="line">        name[<span class="number">3</span>] = i2c_smbus_read_byte_data(client, <span class="number">0x83</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!<span class="built_in">memcmp</span>(name, <span class="string">&quot;PCG-&quot;</span>, <span class="number">4</span>) || !<span class="built_in">memcmp</span>(name, <span class="string">&quot;VGN-&quot;</span>, <span class="number">4</span>)) &#123;</span><br><span class="line">            dev_info(&amp;client-&gt;dev, <span class="string">&quot;Vaio EEPROM detected, enabling privacy protection\n&quot;</span>);</span><br><span class="line">            data-&gt;nature = VAIO;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* create the sysfs eeprom file */</span></span><br><span class="line">    err = sysfs_create_bin_file(&amp;client-&gt;dev.kobj, &amp;eeprom_attr);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">i2c_device_id</span> <span class="title">eeprom_id</span>[] =</span> &#123;</span><br><span class="line">    &#123; <span class="string">&quot;eeprom&quot;</span>, <span class="number">0</span> &#125;,</span><br><span class="line">    &#123; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">i2c_driver</span> <span class="title">eeprom_driver</span> =</span> &#123;</span><br><span class="line">    .driver = &#123;</span><br><span class="line">        .name   = <span class="string">&quot;eeprom&quot;</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    .probe      = eeprom_probe,</span><br><span class="line">    .remove     = eeprom_remove,</span><br><span class="line">    .id_table   = eeprom_id,</span><br><span class="line">    .class      = I2C_CLASS_DDC | I2C_CLASS_SPD,</span><br><span class="line">    .detect     = eeprom_detect,</span><br><span class="line">    .address_list   = normal_i2c,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">eeprom_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> i2c_add_driver(&amp;eeprom_driver);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>实例一个 i2c_driver，然后通过 i2c_add_driver() 函数注册i2c设备驱动。id_table数组元素中的名称指明了支持的I2C设备。</p>
+<h3 id="i2c-add-driver"><a href="#i2c-add-driver" class="headerlink" title="i2c_add_driver()"></a>i2c_add_driver()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> <span class="title function_">i2c_add_driver</span><span class="params">(<span class="keyword">struct</span> i2c_driver *driver)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> i2c_register_driver(THIS_MODULE, driver);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">i2c_register_driver</span><span class="params">(<span class="keyword">struct</span> module *owner, <span class="keyword">struct</span> i2c_driver *driver)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> res;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Can&#x27;t register until after driver model init */</span></span><br><span class="line">    <span class="keyword">if</span> (unlikely(WARN_ON(!i2c_bus_type.p)))</span><br><span class="line">        <span class="keyword">return</span> -EAGAIN;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* add the driver to the list of i2c drivers in the driver core */</span></span><br><span class="line">    driver-&gt;driver.owner = owner;</span><br><span class="line">    driver-&gt;driver.bus = &amp;i2c_bus_type;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* When registration returns, the driver core</span></span><br><span class="line"><span class="comment">     * will have called probe() for all matching-but-unbound devices.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    res = driver_register(&amp;driver-&gt;driver);</span><br><span class="line"></span><br><span class="line">    INIT_LIST_HEAD(&amp;driver-&gt;clients);</span><br><span class="line">    <span class="comment">/* Walk the adapters that are already present */</span></span><br><span class="line">    mutex_lock(&amp;core_lock);</span><br><span class="line">    bus_for_each_dev(&amp;i2c_bus_type, <span class="literal">NULL</span>, driver, __process_new_driver);</span><br><span class="line">    mutex_unlock(&amp;core_lock);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __process_new_driver(<span class="keyword">struct</span> device *dev, <span class="type">void</span> *data)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (dev-&gt;type != &amp;i2c_adapter_type)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> i2c_do_add_adapter(data, to_i2c_adapter(dev));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">i2c_do_add_adapter</span><span class="params">(<span class="keyword">struct</span> i2c_driver *driver, <span class="keyword">struct</span> i2c_adapter *adap)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/* Detect supported devices on that bus, and instantiate them */</span></span><br><span class="line">    i2c_detect(adap, driver);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Let legacy drivers scan this bus for matching devices */</span></span><br><span class="line">    <span class="keyword">if</span> (driver-&gt;attach_adapter) &#123;</span><br><span class="line">        <span class="comment">/* We ignore the return code; if it fails, too bad */</span></span><br><span class="line">        driver-&gt;attach_adapter(adap);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>指定总线类型为 i2c_bus_type。遍历总线的设备，调用__process_new_driver()函数，拿到设备对应的适配器，调用驱动的detect()函数，探测其设备地址，若设备名匹配，则将这个设备注册到内核。</p>
+<h2 id="i2c-client"><a href="#i2c-client" class="headerlink" title="i2c_client"></a>i2c_client</h2><p>i2c_client 对应真实的i2c物理设备，描述了i2c设备的硬件信息，设备挂接在i2c适配器上，通过i2c适配器与CPU交换数据。所有的i2c设备都在/sys/bus/i2c/目录中显示，以适配器地址和芯片地址的形式列出。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">i2c_client</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> flags;       <span class="comment">/* div., see below      */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> addr;        <span class="comment">/* chip address - <span class="doctag">NOTE:</span> 7bit    */</span></span><br><span class="line">                    <span class="comment">/* addresses are stored in the  */</span></span><br><span class="line">                    <span class="comment">/* _LOWER_ 7 bits       */</span></span><br><span class="line">    <span class="type">char</span> name[I2C_NAME_SIZE];</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">i2c_adapter</span> *<span class="title">adapter</span>;</span>    <span class="comment">/* the adapter we sit on    */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device</span> <span class="title">dev</span>;</span>      <span class="comment">/* the device structure     */</span></span><br><span class="line">    <span class="type">int</span> init_irq;           <span class="comment">/* irq set at initialization    */</span></span><br><span class="line">    <span class="type">int</span> irq;            <span class="comment">/* irq issued by device     */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">detected</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="注册i2c设备"><a href="#注册i2c设备" class="headerlink" title="注册i2c设备"></a>注册i2c设备</h3><p><strong>在板文件注册</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">i2c_board_info</span> &#123;</span></span><br><span class="line">    <span class="type">char</span>        type[I2C_NAME_SIZE];</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span>  flags;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span>  addr;</span><br><span class="line">    <span class="type">void</span>        *platform_data;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dev_archdata</span> *<span class="title">archdata</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_OF</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_node</span> *<span class="title">of_node</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">    <span class="type">int</span>     irq;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>i2c_client 信息通常在BSP板文件中通过 i2c_board_info 结构体来填充。注册I2C设备时，先获取相应总线号上的适配器，然后通过 i2c_new_device() 函数生成一个i2c_client。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">i2c_board_info</span>  <span class="title">my_i2c_dev_info</span> =</span> &#123;</span><br><span class="line">    I2C_BOARD_INFO(<span class="string">&quot;my_i2c_dev&quot;</span>, <span class="number">0x20</span>),  <span class="comment">//名字，设备地址</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">adapter = i2c_get_adapter(bus);</span><br><span class="line"></span><br><span class="line">client = i2c_new_device(adapter, my_i2c_dev_info);</span><br></pre></td></tr></table></figure>
+
+<p>也可以通过 i2c_register_board_info() 函数来注册。</p>
+<p><strong>在用户空间注册</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">注册设备</span></span><br><span class="line">echo my_i2c_dev 0x55 &gt; sys/devices/platform/s3c2440-i2c.0/i2c-0/new_device</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">注销设备</span></span><br><span class="line">echo 0x55 &gt; sys/devices/platform/s3c2440-i2c.0/i2c-0/delete_device</span><br></pre></td></tr></table></figure>
+
+<h3 id="i2c-register-board-info"><a href="#i2c-register-board-info" class="headerlink" title="i2c_register_board_info()"></a>i2c_register_board_info()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">LIST_HEAD(__i2c_board_list);</span><br><span class="line">EXPORT_SYMBOL_GPL(__i2c_board_list);</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> __init <span class="title function_">i2c_register_board_info</span><span class="params">(<span class="type">int</span> busnum, </span></span><br><span class="line"><span class="params">    <span class="keyword">struct</span> i2c_board_info <span class="type">const</span> *info, <span class="type">unsigned</span> len)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> status;</span><br><span class="line"></span><br><span class="line">    down_write(&amp;__i2c_board_lock);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* dynamic bus numbers will be assigned after the last static one */</span></span><br><span class="line">    <span class="keyword">if</span> (busnum &gt;= __i2c_first_dynamic_bus_num)</span><br><span class="line">        __i2c_first_dynamic_bus_num = busnum + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (status = <span class="number">0</span>; len; len--, info++) &#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">i2c_devinfo</span>  *<span class="title">devinfo</span> =</span> kzalloc(<span class="keyword">sizeof</span>(*devinfo), GFP_KERNEL);</span><br><span class="line"></span><br><span class="line">        devinfo-&gt;busnum = busnum;</span><br><span class="line">        devinfo-&gt;board_info = *info;</span><br><span class="line">        list_add_tail(&amp;devinfo-&gt;<span class="built_in">list</span>, &amp;__i2c_board_list);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    up_write(&amp;__i2c_board_lock);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> status;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">i2c_scan_static_board_info</span><span class="params">(<span class="keyword">struct</span> i2c_adapter *adapter)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">i2c_devinfo</span>  *<span class="title">devinfo</span>;</span></span><br><span class="line"></span><br><span class="line">    down_read(&amp;__i2c_board_lock);</span><br><span class="line">    list_for_each_entry(devinfo, &amp;__i2c_board_list, <span class="built_in">list</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (devinfo-&gt;busnum == adapter-&gt;nr</span><br><span class="line">                &amp;&amp; !i2c_new_device(adapter, &amp;devinfo-&gt;board_info))</span><br><span class="line">            dev_err(&amp;adapter-&gt;dev,</span><br><span class="line">                <span class="string">&quot;Can&#x27;t create device at 0x%02x\n&quot;</span>, devinfo-&gt;board_info.addr);</span><br><span class="line">    &#125;</span><br><span class="line">    up_read(&amp;__i2c_board_lock);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">i2c_register_adapter</span><span class="params">(<span class="keyword">struct</span> i2c_adapter *adap)</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">/* create pre-declared device nodes */</span></span><br><span class="line">    <span class="keyword">if</span> (adap-&gt;nr &lt; __i2c_first_dynamic_bus_num)</span><br><span class="line">        i2c_scan_static_board_info(adap);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过板文件静态注册的i2c设备，会先添加加到一个设备链表中，内核在注册i2c适配器时，会遍历这个设备链表，把总线号匹配的设备注册到内核，所以通过板文件注册设备要在注册适配器之前。</p>
+<h3 id="i2c-new-device"><a href="#i2c-new-device" class="headerlink" title="i2c_new_device()"></a>i2c_new_device()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> i2c_client *<span class="title function_">i2c_new_device</span><span class="params">(<span class="keyword">struct</span> i2c_adapter *adap, <span class="keyword">struct</span> i2c_board_info <span class="type">const</span> *info)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">i2c_client</span>   *<span class="title">client</span>;</span></span><br><span class="line">    <span class="type">int</span>         status;</span><br><span class="line"></span><br><span class="line">    client = kzalloc(<span class="keyword">sizeof</span> *client, GFP_KERNEL);</span><br><span class="line">    client-&gt;adapter = adap;</span><br><span class="line">    client-&gt;dev.platform_data = info-&gt;platform_data;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (info-&gt;archdata)</span><br><span class="line">        client-&gt;dev.archdata = *info-&gt;archdata;</span><br><span class="line"></span><br><span class="line">    client-&gt;flags = info-&gt;flags;</span><br><span class="line">    client-&gt;addr = info-&gt;addr;</span><br><span class="line">    client-&gt;irq = info-&gt;irq;</span><br><span class="line">    strlcpy(client-&gt;name, info-&gt;type, <span class="keyword">sizeof</span>(client-&gt;name));</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Check for address validity */</span></span><br><span class="line">    status = i2c_check_client_addr_validity(client);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Check for address business */</span></span><br><span class="line">    status = i2c_check_addr_busy(adap, client-&gt;addr);</span><br><span class="line"></span><br><span class="line">    client-&gt;dev.parent = &amp;client-&gt;adapter-&gt;dev;</span><br><span class="line">    client-&gt;dev.bus = &amp;i2c_bus_type;</span><br><span class="line">    client-&gt;dev.type = &amp;i2c_client_type;</span><br><span class="line"></span><br><span class="line">    dev_set_name(&amp;client-&gt;dev, <span class="string">&quot;%d-%04x&quot;</span>, i2c_adapter_id(adap),</span><br><span class="line">             client-&gt;addr);</span><br><span class="line">    status = device_register(&amp;client-&gt;dev);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> client;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/kernel/i2c_adapter/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1044,301 +1350,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/fs/buildroot/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/04/fs/buildroot/" class="post-title-link" itemprop="url">buildroot</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/rootfs/" itemprop="url" rel="index"><span itemprop="name">rootfs</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>下载地址：　<a target="_blank" rel="noopener" href="https://buildroot.org/">https://buildroot.org/</a></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">├── arch: 存放CPU架构相关的配置脚本</span><br><span class="line">├── board</span><br><span class="line">├── boot</span><br><span class="line">├── CHANGES</span><br><span class="line">├── Config.in</span><br><span class="line">├── Config.in.legacy</span><br><span class="line">├── configs: 放置开发板的一些配置参数. </span><br><span class="line">├── COPYING</span><br><span class="line">├── DEVELOPERS</span><br><span class="line">├── dl: 存放下载的源代码及应用软件的压缩包. </span><br><span class="line">├── docs: 存放相关的参考文档. </span><br><span class="line">├── fs: 放各种文件系统的源代码. </span><br><span class="line">├── linux: 存放着Linux kernel的自动构建脚本. </span><br><span class="line">├── Makefile</span><br><span class="line">├── Makefile.legacy</span><br><span class="line">├── output: 是编译出来的输出文件夹. </span><br><span class="line">│   ├── build: 存放解压后的各种软件包编译完成后的现场.</span><br><span class="line">│   ├── host: 存放着制作好的编译工具链，如gcc、arm-linux-gcc等工具.</span><br><span class="line">│   ├── images: 存放着编译好的uboot.bin, zImage, rootfs等镜像文件，可烧写到板子里, 让linux系统跑起来.</span><br><span class="line">│   ├── staging</span><br><span class="line">│   └── target: 存放Linux系统基本的目录结构，以及编译好的应用库和bin可执行文件</span><br><span class="line">├── package：下面放着应用软件的配置文件，每个应用软件的配置文件有Config.in和soft_name.mk。</span><br><span class="line">├── README</span><br><span class="line">├── support</span><br><span class="line">├── system</span><br><span class="line">└── toolchain</span><br></pre></td></tr></table></figure>
-
-<p> Buildroot提供了构建流程的框架。开发者按照格式写脚本，提供必要的构建细节，配置整个系统，最后自动构建出你的系统。</p>
-<p> package/pkg-generic.mk中通过调用同目录下的pkg-download.mk、pkg-utils.mk文件，已经帮你自动实现了下载、解压、依赖包下载编译等一系列流程。你只要需要按照格式写Makefile脚app_pkg.mk，填充下载地址，链接依赖库的名字等一些特有的构建细节即可。</p>
-<p><img src="/images/rootfs/build.png" alt="构建流程框架"></p>
-<p>Buildroot代码仓库默认只包含一个编译框架，真正构建rootfs需要的各种代码包是根据配置选项，在编译的时候才开始下载的。</p>
-<p>通过<code>make help</code>可以看到buildroot下make的使用细节，包括对package、uclibc、busybox、linux以及文档生成等配置。</p>
-<p>执行命令<code>make list-defconfigs</code>查看buildroot中支持的开发板</p>
-<p>设置 toolchain 的版本和内核头文件的内核的版本</p>
-<p>System configuration-&gt;Run a getty(login prompt) after boot选项中配置 TTY Port 为 ttyAMA0。否则文件系统挂载后无法进入控制台。</p>
-<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p><strong>Target options</strong>：目标板的配置</p>
-<ul>
-<li><p>Target Architecture：目标架构，这里选择 ARM(little endian)，ARM小端模式</p>
-</li>
-<li><p>Target Binary Format：二进制格式，为 ELF</p>
-</li>
-<li><p>Target Architecture Variant：架构变体为 arm920t，内核类型</p>
-</li>
-<li><p>Target ABI：应用程序二进制接口，为EABI</p>
-</li>
-<li><p>Floating point strategy：浮点数的策略，选择为 Soft float</p>
-</li>
-<li><p>ARM instruction set：arm 汇编指令集，选择  ARM</p>
-</li>
-<li><p><strong>Build　options</strong></p>
-</li>
-</ul>
-<p>主要是一些编译时用到的选项，比如dl的路径，下载代码包使用的路径，同时运行多个编译的上限，是否使能编译器缓冲区等。</p>
-<p><strong>Toolchain</strong>：工具链选项</p>
-<ul>
-<li>Toolchain type：Buildroot提供两种方式使用toolchain<ul>
-<li>external toolthain：非Buildroot提供的交叉编译器</li>
-<li>Buildroot toolchain：Buildroot本身编译生成的Buildroot toolchain</li>
-</ul>
-</li>
-<li>custom toolchain vendor name：填上S3C2440</li>
-<li>C library：C库选择，选择 glibc</li>
-<li>Kernel Headers：内核头文件，Linux 4.9.x kernel headers</li>
-<li>glibc version：glibc版本选择，2.24</li>
-<li>Binutils Version：binutils版本：2.27</li>
-<li>Additional binutils options：附加的 binutils 选择，不填即可</li>
-<li>GCC compiler Version：GCC版本选择，gcc 6.x</li>
-<li>Additional gcc options：附件的GCC选项</li>
-<li>Enable C++ support：使能C++支持，选上</li>
-<li>Enable Fortran support：使能Fortran语言支持，不选</li>
-<li>Enable compiler link-time-optimization support：是否支持LTO，不选</li>
-<li>Enable compiler OpenMP support：是否支持OpenMP，OpenMP用于共享内存并行系统的多处理器程序设计，<br>不适合需要复杂的线程间同步和互斥的场合，OpenMp的另一个缺点是不能在非共享内存系统如计算机集群上使用。不选择</li>
-<li>Enable graphite support ：是否支持graphite。Graphite是应用WEB应用的一套开源的编程接口。不选择。</li>
-<li>Build cross gdb for the host：主机上运行gdb进行调试，不选</li>
-<li>Copy gconv libraries：拷贝 gconv库，gconv库用于在不同字符集之间进行转换。默认不选</li>
-<li>Enable MMU support：使能 MMU，S3C2440支持MMU，选上</li>
-<li>Target Optimizations：不选</li>
-<li>Target linker options：不选</li>
-<li>Register toolchain within Eclipse Buildroot plug-in：eclipse插件支持，不选</li>
-</ul>
-<p><strong>System configuration</strong>：系统配置</p>
-<ul>
-<li>Root FS skeleton：</li>
-<li>System hostname：填写JZ2440</li>
-<li>System banner</li>
-<li>Passwords encoding</li>
-<li>Init system：系统初始化，选择 BusyBox</li>
-<li>/dev management：设备文件管理，选择Dynamic using devtmpfs + mdev，即使用mdev动态加载设备节点的方式</li>
-<li>Path to the permission tables：设备节点的配置表设置，一定要选择system/device_table_dev.txt，否则后面在dev目录下将不会生成各种设备节点。当然我们也可以手动的配置该文件，添加必要的节点或删除不需要的节点。</li>
-<li>support extended attributes in device tables</li>
-<li>Use symlinks to /usr for /bin, /sbin and /lib</li>
-<li>Enable root login with password</li>
-<li>Root password：进入linux控制台终端后的密码，为空则登录时不需要密码，默认登录用户名为root。</li>
-<li>/bin/sh (busybox’ default shell)</li>
-<li>Run a getty (login prompt) after boot：保持默认，默认为选中。<ul>
-<li>TTY port：控制台打印串口</li>
-<li>Baudrate ：波特率，配置为 115200</li>
-<li>TERM environment variable：默认即可</li>
-<li>other options to pass to getty：默认即可</li>
-</ul>
-</li>
-<li>remount root filesystem read-write during boot</li>
-<li>Network interface to configure through DHCP</li>
-<li>Purge unwanted locales</li>
-<li>Locales to keep</li>
-<li>Generate locale data</li>
-<li>Install timezone info</li>
-<li>Path to the users tables</li>
-<li>Root filesystem overlay directories：</li>
-<li>Custom scripts to run before creating filesystem images</li>
-<li>Custom scripts to run inside the fakeroot environment</li>
-<li>Custom scripts to run after creating filesystem images</li>
-</ul>
-<p><strong>Kernel</strong>：内核配置</p>
-<ul>
-<li><p>Kernel version：内核版本，选择用户自定义Custom version</p>
-</li>
-<li><p>Kernel version：填上自己所需要的版本，4.14.12</p>
-</li>
-<li><p>Custom kernel patches：自定义的内核补丁</p>
-</li>
-<li><p>Kernel configuration：内核配置，选择 Using an in-tree defconfig file</p>
-</li>
-<li><p>Defconfig name：填写为 mini2440</p>
-</li>
-<li><p>Additional configuration fragment files：暂且不填写</p>
-</li>
-<li><p>Kernel binary format：内核二进制文件格式，zImage</p>
-</li>
-<li><p>Kernel compression format：内核压缩格式，选择gzip</p>
-</li>
-<li><p>Build a Device Tree Blob：设备树？暂且不填写</p>
-</li>
-<li><p>Install kernel image to /boot in target：暂且不填</p>
-</li>
-<li><p>Linux Kernel Extensions：内核扩展，默认不选择</p>
-</li>
-<li><p>Linux Kernel Tools：内核工具，默认不选择</p>
-</li>
-<li><p><strong>Target packages</strong></p>
-</li>
-<li><p>Filesystem images：文件系统选择，选择 yaffs2 root filesystem</p>
-</li>
-<li><p><strong>Bootloaders</strong></p>
-</li>
-<li><p>Build system：u-boot系统选择为Kconfig</p>
-<ul>
-<li>legacy：若是选择2015.04之前的u-boot 选择此项</li>
-<li>Kconfig：2015.04之后的 u-boot 选择此项，勾选此项　　</li>
-</ul>
-</li>
-<li><p>U-boot Version：U-boot版本，默认为 2017.01，选择为Custom version</p>
-</li>
-<li><p>U-Boot version：填写为2017.11</p>
-</li>
-<li><p>Custom U-boot patches：U-boot补丁，不添加</p>
-</li>
-<li><p>U-Boot configuration：U-boot配置，暂时还没有U-BOOT，所以选择为：Using an in-tree board defconfig file</p>
-</li>
-<li><p>Board defconfig：板子的配置，选择与架构一样的板子的默认文件，mini2440。后期再修改</p>
-</li>
-<li><p>U-boot needs dtc：是否需要设备树，默认，后期调试</p>
-</li>
-<li><p>U-boot needs OpenSSL：是否需要 OpenSSL，默认，后期调试修改</p>
-</li>
-<li><p>U-boot binary format：二进制文件，选择 .bin文件</p>
-</li>
-<li><p>produce a .ift signed image：默认</p>
-</li>
-<li><p>Install U-boot SPL binary image：默认</p>
-</li>
-<li><p>Environment image：默认</p>
-</li>
-<li><p><strong>Host utilities</strong></p>
-</li>
-<li><p><strong>Legacy config options</strong></p>
-</li>
-</ul>
-<h2 id="编译性能"><a href="#编译性能" class="headerlink" title="编译性能"></a>编译性能</h2><p>buildroot还提供了一些命令，用于分析buildroot编译过程中耗时、依赖关系、文件系统尺寸等。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Documentation:</span><br><span class="line">  manual               　 * build manual in all formats</span><br><span class="line">  manual-html          　 * build manual in HTML</span><br><span class="line">  manual-split-html      * build manual in split HTML</span><br><span class="line">  manual-pdf             * build manual in PDF</span><br><span class="line">  manual-text            * build manual in text</span><br><span class="line">  manual-epub            * build manual in ePub</span><br><span class="line">  graph-build            * generate graphs of the build times</span><br><span class="line">  graph-depends          * generate graph of the dependency tree</span><br><span class="line">  graph-size             * generate stats of the filesystem size</span><br><span class="line">  list-defconfigs        * list all defconfigs (pre-configured minimal systems)</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/kernel/watchdog/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/04/kernel/watchdog/" class="post-title-link" itemprop="url">watchdog device</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <ul>
-<li>watchdog_dev.c</li>
-<li>watchdog_core.c</li>
-<li>wdt.c</li>
-</ul>
-<p>内核配置<code>CONFIG_WATCHDOG_NOWAYOUT</code>选项表示看门狗一旦开启就无法被停止，可设置nowayout模块参数。</p>
-<p>如果驱动支持”Magic Close”，除非在关闭看门狗前，魔幻字符’V’发送到/dev/watchdog，否则不能停止看门狗。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1408,7 +1419,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">217</span>
+          <span class="site-state-item-count">218</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

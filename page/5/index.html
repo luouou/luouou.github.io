@@ -176,6 +176,301 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/fs/buildroot/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/04/fs/buildroot/" class="post-title-link" itemprop="url">buildroot</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/rootfs/" itemprop="url" rel="index"><span itemprop="name">rootfs</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>下载地址：　<a target="_blank" rel="noopener" href="https://buildroot.org/">https://buildroot.org/</a></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">├── arch: 存放CPU架构相关的配置脚本</span><br><span class="line">├── board</span><br><span class="line">├── boot</span><br><span class="line">├── CHANGES</span><br><span class="line">├── Config.in</span><br><span class="line">├── Config.in.legacy</span><br><span class="line">├── configs: 放置开发板的一些配置参数. </span><br><span class="line">├── COPYING</span><br><span class="line">├── DEVELOPERS</span><br><span class="line">├── dl: 存放下载的源代码及应用软件的压缩包. </span><br><span class="line">├── docs: 存放相关的参考文档. </span><br><span class="line">├── fs: 放各种文件系统的源代码. </span><br><span class="line">├── linux: 存放着Linux kernel的自动构建脚本. </span><br><span class="line">├── Makefile</span><br><span class="line">├── Makefile.legacy</span><br><span class="line">├── output: 是编译出来的输出文件夹. </span><br><span class="line">│   ├── build: 存放解压后的各种软件包编译完成后的现场.</span><br><span class="line">│   ├── host: 存放着制作好的编译工具链，如gcc、arm-linux-gcc等工具.</span><br><span class="line">│   ├── images: 存放着编译好的uboot.bin, zImage, rootfs等镜像文件，可烧写到板子里, 让linux系统跑起来.</span><br><span class="line">│   ├── staging</span><br><span class="line">│   └── target: 存放Linux系统基本的目录结构，以及编译好的应用库和bin可执行文件</span><br><span class="line">├── package：下面放着应用软件的配置文件，每个应用软件的配置文件有Config.in和soft_name.mk。</span><br><span class="line">├── README</span><br><span class="line">├── support</span><br><span class="line">├── system</span><br><span class="line">└── toolchain</span><br></pre></td></tr></table></figure>
+
+<p> Buildroot提供了构建流程的框架。开发者按照格式写脚本，提供必要的构建细节，配置整个系统，最后自动构建出你的系统。</p>
+<p> package/pkg-generic.mk中通过调用同目录下的pkg-download.mk、pkg-utils.mk文件，已经帮你自动实现了下载、解压、依赖包下载编译等一系列流程。你只要需要按照格式写Makefile脚app_pkg.mk，填充下载地址，链接依赖库的名字等一些特有的构建细节即可。</p>
+<p><img src="/images/rootfs/build.png" alt="构建流程框架"></p>
+<p>Buildroot代码仓库默认只包含一个编译框架，真正构建rootfs需要的各种代码包是根据配置选项，在编译的时候才开始下载的。</p>
+<p>通过<code>make help</code>可以看到buildroot下make的使用细节，包括对package、uclibc、busybox、linux以及文档生成等配置。</p>
+<p>执行命令<code>make list-defconfigs</code>查看buildroot中支持的开发板</p>
+<p>设置 toolchain 的版本和内核头文件的内核的版本</p>
+<p>System configuration-&gt;Run a getty(login prompt) after boot选项中配置 TTY Port 为 ttyAMA0。否则文件系统挂载后无法进入控制台。</p>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p><strong>Target options</strong>：目标板的配置</p>
+<ul>
+<li><p>Target Architecture：目标架构，这里选择 ARM(little endian)，ARM小端模式</p>
+</li>
+<li><p>Target Binary Format：二进制格式，为 ELF</p>
+</li>
+<li><p>Target Architecture Variant：架构变体为 arm920t，内核类型</p>
+</li>
+<li><p>Target ABI：应用程序二进制接口，为EABI</p>
+</li>
+<li><p>Floating point strategy：浮点数的策略，选择为 Soft float</p>
+</li>
+<li><p>ARM instruction set：arm 汇编指令集，选择  ARM</p>
+</li>
+<li><p><strong>Build　options</strong></p>
+</li>
+</ul>
+<p>主要是一些编译时用到的选项，比如dl的路径，下载代码包使用的路径，同时运行多个编译的上限，是否使能编译器缓冲区等。</p>
+<p><strong>Toolchain</strong>：工具链选项</p>
+<ul>
+<li>Toolchain type：Buildroot提供两种方式使用toolchain<ul>
+<li>external toolthain：非Buildroot提供的交叉编译器</li>
+<li>Buildroot toolchain：Buildroot本身编译生成的Buildroot toolchain</li>
+</ul>
+</li>
+<li>custom toolchain vendor name：填上S3C2440</li>
+<li>C library：C库选择，选择 glibc</li>
+<li>Kernel Headers：内核头文件，Linux 4.9.x kernel headers</li>
+<li>glibc version：glibc版本选择，2.24</li>
+<li>Binutils Version：binutils版本：2.27</li>
+<li>Additional binutils options：附加的 binutils 选择，不填即可</li>
+<li>GCC compiler Version：GCC版本选择，gcc 6.x</li>
+<li>Additional gcc options：附件的GCC选项</li>
+<li>Enable C++ support：使能C++支持，选上</li>
+<li>Enable Fortran support：使能Fortran语言支持，不选</li>
+<li>Enable compiler link-time-optimization support：是否支持LTO，不选</li>
+<li>Enable compiler OpenMP support：是否支持OpenMP，OpenMP用于共享内存并行系统的多处理器程序设计，<br>不适合需要复杂的线程间同步和互斥的场合，OpenMp的另一个缺点是不能在非共享内存系统如计算机集群上使用。不选择</li>
+<li>Enable graphite support ：是否支持graphite。Graphite是应用WEB应用的一套开源的编程接口。不选择。</li>
+<li>Build cross gdb for the host：主机上运行gdb进行调试，不选</li>
+<li>Copy gconv libraries：拷贝 gconv库，gconv库用于在不同字符集之间进行转换。默认不选</li>
+<li>Enable MMU support：使能 MMU，S3C2440支持MMU，选上</li>
+<li>Target Optimizations：不选</li>
+<li>Target linker options：不选</li>
+<li>Register toolchain within Eclipse Buildroot plug-in：eclipse插件支持，不选</li>
+</ul>
+<p><strong>System configuration</strong>：系统配置</p>
+<ul>
+<li>Root FS skeleton：</li>
+<li>System hostname：填写JZ2440</li>
+<li>System banner</li>
+<li>Passwords encoding</li>
+<li>Init system：系统初始化，选择 BusyBox</li>
+<li>/dev management：设备文件管理，选择Dynamic using devtmpfs + mdev，即使用mdev动态加载设备节点的方式</li>
+<li>Path to the permission tables：设备节点的配置表设置，一定要选择system/device_table_dev.txt，否则后面在dev目录下将不会生成各种设备节点。当然我们也可以手动的配置该文件，添加必要的节点或删除不需要的节点。</li>
+<li>support extended attributes in device tables</li>
+<li>Use symlinks to /usr for /bin, /sbin and /lib</li>
+<li>Enable root login with password</li>
+<li>Root password：进入linux控制台终端后的密码，为空则登录时不需要密码，默认登录用户名为root。</li>
+<li>/bin/sh (busybox’ default shell)</li>
+<li>Run a getty (login prompt) after boot：保持默认，默认为选中。<ul>
+<li>TTY port：控制台打印串口</li>
+<li>Baudrate ：波特率，配置为 115200</li>
+<li>TERM environment variable：默认即可</li>
+<li>other options to pass to getty：默认即可</li>
+</ul>
+</li>
+<li>remount root filesystem read-write during boot</li>
+<li>Network interface to configure through DHCP</li>
+<li>Purge unwanted locales</li>
+<li>Locales to keep</li>
+<li>Generate locale data</li>
+<li>Install timezone info</li>
+<li>Path to the users tables</li>
+<li>Root filesystem overlay directories：</li>
+<li>Custom scripts to run before creating filesystem images</li>
+<li>Custom scripts to run inside the fakeroot environment</li>
+<li>Custom scripts to run after creating filesystem images</li>
+</ul>
+<p><strong>Kernel</strong>：内核配置</p>
+<ul>
+<li><p>Kernel version：内核版本，选择用户自定义Custom version</p>
+</li>
+<li><p>Kernel version：填上自己所需要的版本，4.14.12</p>
+</li>
+<li><p>Custom kernel patches：自定义的内核补丁</p>
+</li>
+<li><p>Kernel configuration：内核配置，选择 Using an in-tree defconfig file</p>
+</li>
+<li><p>Defconfig name：填写为 mini2440</p>
+</li>
+<li><p>Additional configuration fragment files：暂且不填写</p>
+</li>
+<li><p>Kernel binary format：内核二进制文件格式，zImage</p>
+</li>
+<li><p>Kernel compression format：内核压缩格式，选择gzip</p>
+</li>
+<li><p>Build a Device Tree Blob：设备树？暂且不填写</p>
+</li>
+<li><p>Install kernel image to /boot in target：暂且不填</p>
+</li>
+<li><p>Linux Kernel Extensions：内核扩展，默认不选择</p>
+</li>
+<li><p>Linux Kernel Tools：内核工具，默认不选择</p>
+</li>
+<li><p><strong>Target packages</strong></p>
+</li>
+<li><p>Filesystem images：文件系统选择，选择 yaffs2 root filesystem</p>
+</li>
+<li><p><strong>Bootloaders</strong></p>
+</li>
+<li><p>Build system：u-boot系统选择为Kconfig</p>
+<ul>
+<li>legacy：若是选择2015.04之前的u-boot 选择此项</li>
+<li>Kconfig：2015.04之后的 u-boot 选择此项，勾选此项　　</li>
+</ul>
+</li>
+<li><p>U-boot Version：U-boot版本，默认为 2017.01，选择为Custom version</p>
+</li>
+<li><p>U-Boot version：填写为2017.11</p>
+</li>
+<li><p>Custom U-boot patches：U-boot补丁，不添加</p>
+</li>
+<li><p>U-Boot configuration：U-boot配置，暂时还没有U-BOOT，所以选择为：Using an in-tree board defconfig file</p>
+</li>
+<li><p>Board defconfig：板子的配置，选择与架构一样的板子的默认文件，mini2440。后期再修改</p>
+</li>
+<li><p>U-boot needs dtc：是否需要设备树，默认，后期调试</p>
+</li>
+<li><p>U-boot needs OpenSSL：是否需要 OpenSSL，默认，后期调试修改</p>
+</li>
+<li><p>U-boot binary format：二进制文件，选择 .bin文件</p>
+</li>
+<li><p>produce a .ift signed image：默认</p>
+</li>
+<li><p>Install U-boot SPL binary image：默认</p>
+</li>
+<li><p>Environment image：默认</p>
+</li>
+<li><p><strong>Host utilities</strong></p>
+</li>
+<li><p><strong>Legacy config options</strong></p>
+</li>
+</ul>
+<h2 id="编译性能"><a href="#编译性能" class="headerlink" title="编译性能"></a>编译性能</h2><p>buildroot还提供了一些命令，用于分析buildroot编译过程中耗时、依赖关系、文件系统尺寸等。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Documentation:</span><br><span class="line">  manual               　 * build manual in all formats</span><br><span class="line">  manual-html          　 * build manual in HTML</span><br><span class="line">  manual-split-html      * build manual in split HTML</span><br><span class="line">  manual-pdf             * build manual in PDF</span><br><span class="line">  manual-text            * build manual in text</span><br><span class="line">  manual-epub            * build manual in ePub</span><br><span class="line">  graph-build            * generate graphs of the build times</span><br><span class="line">  graph-depends          * generate graph of the dependency tree</span><br><span class="line">  graph-size             * generate stats of the filesystem size</span><br><span class="line">  list-defconfigs        * list all defconfigs (pre-configured minimal systems)</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/kernel/watchdog/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/04/kernel/watchdog/" class="post-title-link" itemprop="url">watchdog device</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <ul>
+<li>watchdog_dev.c</li>
+<li>watchdog_core.c</li>
+<li>wdt.c</li>
+</ul>
+<p>内核配置<code>CONFIG_WATCHDOG_NOWAYOUT</code>选项表示看门狗一旦开启就无法被停止，可设置nowayout模块参数。</p>
+<p>如果驱动支持”Magic Close”，除非在关闭看门狗前，魔幻字符’V’发送到/dev/watchdog，否则不能停止看门狗。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/fs/busybox/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1030,286 +1325,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/27/tool/sublime/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/08/27/tool/sublime/" class="post-title-link" itemprop="url">Sublime Text插件与配置</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-08-27 17:09:51" itemprop="dateCreated datePublished" datetime="2022-08-27T17:09:51+08:00">2022-08-27</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/tool/" itemprop="url" rel="index"><span itemprop="name">tool</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;auto_complete&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;auto_complete_commit_on_tab&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;auto_complete_with_fields&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;color_scheme&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Packages/Color Scheme - Default/Mariana.sublime-color-scheme&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;theme&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Default.sublime-theme&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_face&quot;</span><span class="punctuation">:</span> <span class="string">&quot;JetBrains Mono&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_face1&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Consolas&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_face2&quot;</span><span class="punctuation">:</span> <span class="string">&quot;DejaVu Sans Mono&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;default_encoding&quot;</span><span class="punctuation">:</span> <span class="string">&quot;UTF-8&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;default_line_ending&quot;</span><span class="punctuation">:</span> <span class="string">&quot;unix&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_size&quot;</span><span class="punctuation">:</span> <span class="number">18</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;tab_size&quot;</span><span class="punctuation">:</span> <span class="number">4</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;translate_tabs_to_spaces&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;highlight_line&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;update_check&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;vintage_ctrl_keys&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;vintage_start_in_command_mode&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;word_wrap&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;rulers&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="number">100</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;ignored_packages&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;Package Control&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;ignored_packages_bak&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;Vintage&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;file_exclude_patterns&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;*.pyc&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.pyo&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.exe&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.dll&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.obj&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.o&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.a&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.lib&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.so&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.dylib&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.ncb&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.sdf&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.suo&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.pdb&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.idb&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.DS_Store&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.class&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.psd&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.db&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.sublime-workspace&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.ko.*&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.mod.*&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.o.*&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;a.out&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.order&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.ko&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.symvers&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*_test&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;folder_exclude_patterns&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;.svn&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.git&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.hg&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;CVS&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.tags&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.tmp*&quot;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="快捷键"><a href="#快捷键" class="headerlink" title="快捷键"></a>快捷键</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;navigate_to_definition&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;keys&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;alt+t&quot;</span><span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line"></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;jump_prev&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;keys&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;alt+b&quot;</span><span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line"></span><br><span class="line">    <span class="punctuation">&#123;</span> </span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;alignment&quot;</span><span class="punctuation">,</span> </span><br><span class="line">        <span class="attr">&quot;keys&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;ctrl+shift+a&quot;</span><span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
-
-<p>配置鼠标操作，点击Preferences-&gt;Browse Packages进入Packages目录，然后打开User目录，查看User目录里面有没有Default (Windows).sublime-mousemap文件，如果没有则创建一个。</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;button&quot;</span><span class="punctuation">:</span> <span class="string">&quot;button1&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;count&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;press_command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;drag_select&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;modifiers&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;alt&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;navigate_to_definition&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;button&quot;</span><span class="punctuation">:</span> <span class="string">&quot;button2&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;count&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;modifiers&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;alt&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;jump_prev&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="package-control"><a href="#package-control" class="headerlink" title="package control"></a>package control</h2><h3 id="CMake"><a href="#CMake" class="headerlink" title="CMake"></a>CMake</h3><h3 id="All-Autocomplete"><a href="#All-Autocomplete" class="headerlink" title="All Autocomplete"></a>All Autocomplete</h3><h3 id="Emmet"><a href="#Emmet" class="headerlink" title="Emmet"></a>Emmet</h3><h3 id="Color-Highlight"><a href="#Color-Highlight" class="headerlink" title="Color Highlight"></a>Color Highlight</h3><h3 id="Higlighter"><a href="#Higlighter" class="headerlink" title="Higlighter"></a>Higlighter</h3><h3 id="WordHighlight"><a href="#WordHighlight" class="headerlink" title="WordHighlight"></a>WordHighlight</h3><h3 id="Block-Cursor-Everywhere"><a href="#Block-Cursor-Everywhere" class="headerlink" title="Block Cursor Everywhere"></a>Block Cursor Everywhere</h3><h3 id="BracketHighlighter"><a href="#BracketHighlighter" class="headerlink" title="BracketHighlighter"></a>BracketHighlighter</h3><h3 id="Side-Bar"><a href="#Side-Bar" class="headerlink" title="Side Bar"></a>Side Bar</h3><h3 id="DocBlockr"><a href="#DocBlockr" class="headerlink" title="DocBlockr"></a>DocBlockr</h3><h3 id="CTags"><a href="#CTags" class="headerlink" title="CTags"></a>CTags</h3><ol>
-<li>安装ctags，设置环境变量。</li>
-<li>在Preferences菜单中打开Package settings-&gt;ctags-&gt;settings-user和settings-default<br>把default中的配置全部复制到user中，然后改一下command配置项，为ctags的可执行文件路径</li>
-<li>工程目录执行<code>ctags -R -f .tags</code></li>
-<li>设置键盘快捷键</li>
-</ol>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;navigate_to_definition&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;keys&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;alt+t&quot;</span><span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;jump_prev&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;keys&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;alt+b&quot;</span><span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
-
-<p>5.设置鼠标快捷键</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;button&quot;</span><span class="punctuation">:</span> <span class="string">&quot;button1&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;count&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;press_command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;drag_select&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;modifiers&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;ctrl&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;navigate_to_definition&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;button&quot;</span><span class="punctuation">:</span> <span class="string">&quot;button2&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;count&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;modifiers&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;ctrl&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;jump_prev&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="File-Header"><a href="#File-Header" class="headerlink" title="File Header"></a>File Header</h3><p>1.设置默认信息键值对，Preferences -&gt; Pacakge Settings -&gt; File Header -&gt; Setting User</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;Default&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;_author&quot;</span><span class="punctuation">:</span> <span class="string">&quot;luo_u&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;_email&quot;</span><span class="punctuation">:</span> <span class="string">&quot;luo_u@qq.com&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;_desc&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<p>2.更改模板文件，进入SublimeText 插件安装目录，Preferences -&gt; Browse Packages-&gt;File Header -&gt; template -&gt; header，有大量的.tmpl 文件。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * @Description:    </span></span><br><span class="line"><span class="comment"> * @Author: &#123;&#123;author&#125;&#125;</span></span><br><span class="line"><span class="comment"> * @Date: &#123;&#123;create_time&#125;&#125;</span></span><br><span class="line"><span class="comment"> * @LastEditor: &#123;&#123;last_modified_by&#125;&#125;</span></span><br><span class="line"><span class="comment"> * @LastEditTime: &#123;&#123;last_modified_time&#125;&#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="Terminal"><a href="#Terminal" class="headerlink" title="Terminal"></a>Terminal</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;terminal&quot;</span><span class="punctuation">:</span> <span class="string">&quot;D:\\Git\\git-bash.exe&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;parameters&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;env&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="Alignment"><a href="#Alignment" class="headerlink" title="Alignment"></a>Alignment</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;keys&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;ctrl+shift+a&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span> <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;alignment&quot;</span> <span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="Snippets"><a href="#Snippets" class="headerlink" title="Snippets"></a>Snippets</h2><p>打开Tools-&gt;New snippet创建代码段</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">snippet</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">content</span>&gt;</span>&lt;![CDATA[</span><br><span class="line">/******************************************************************</span><br><span class="line">  * @file    $TM_FILENAME</span><br><span class="line">  * @brief   $1</span><br><span class="line">  * @author  $&#123;2:luo_u&#125;</span><br><span class="line">  * @date    $3</span><br><span class="line">******************************************************************/</span><br><span class="line">]]&gt;<span class="tag">&lt;/<span class="name">content</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Set a tabTrigger to define how to trigger the snippet --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">tabTrigger</span>&gt;</span>hand<span class="tag">&lt;/<span class="name">tabTrigger</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Set a scope to limit where the snippet will trigger --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">scope</span>&gt;</span>source.c<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Optional: Description to show in the menu --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">description</span>&gt;</span>c file hand<span class="tag">&lt;/<span class="name">description</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">snippet</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>content</code>其中必须包含<code>&lt;![CDATA[…]]&gt;</code>,否则无法工作, [..]中写你自己的代码片段</li>
-<li><code>tabTrigger</code>用来引发代码片段的字符或者字符串</li>
-<li><code>scope</code>表示你的代码片段会在那种语言环境下激活</li>
-<li><code>description</code> 展示代码片段的描述，默认使用代码片段的文件名作为描述</li>
-</ul>
-<h3 id="Snippet环境变量"><a href="#Snippet环境变量" class="headerlink" title="Snippet环境变量"></a>Snippet环境变量</h3><table>
-<thead>
-<tr>
-<th><strong>环境变量名</strong></th>
-<th><strong>描述</strong></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>$PARAM1 .. $PARAMn</td>
-<td>Arguments passed to the <code>insert_snippet</code> command.</td>
-</tr>
-<tr>
-<td>$SELECTION</td>
-<td>The text that was selected when the snippet was triggered.</td>
-</tr>
-<tr>
-<td>$TM_CURRENT_LINE</td>
-<td>Content of the cursor’s line when the snippet was triggered.</td>
-</tr>
-<tr>
-<td>$TM_CURRENT_WORD</td>
-<td>Word under the cursor when the snippet was triggered.</td>
-</tr>
-<tr>
-<td>$TM_DIRECTORY</td>
-<td>Directory name of the file being edited. (since 3154)</td>
-</tr>
-<tr>
-<td>$TM_FILENAME</td>
-<td>用户文件名</td>
-</tr>
-<tr>
-<td>$TM_FILEPATH</td>
-<td>用户的用户名</td>
-</tr>
-<tr>
-<td>$TM_FULLNAME</td>
-<td>用户的用户名</td>
-</tr>
-<tr>
-<td>$TM_LINE_INDEX</td>
-<td>插入多少列, 默认为0</td>
-</tr>
-<tr>
-<td>$TM_LINE_NUMBER</td>
-<td>一个snippet插入多少行</td>
-</tr>
-<tr>
-<td>$TM_SELECTED_TEXT</td>
-<td>An alias for $SELECTION.</td>
-</tr>
-<tr>
-<td>$TM_SCOPE</td>
-<td>The scope of the beginning of each selected region. (since 3154)</td>
-</tr>
-<tr>
-<td>$TM_SOFT_TABS</td>
-<td>如果设置translate_tabs_to_spaces : true 则为Yes</td>
-</tr>
-<tr>
-<td>$TM_TAB_SIZE</td>
-<td>每个Tab包含几个空格</td>
-</tr>
-</tbody></table>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/27/tool/vscode/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/08/27/tool/vscode/" class="post-title-link" itemprop="url">vscode插件与配置</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-08-27 17:09:51" itemprop="dateCreated datePublished" datetime="2022-08-27T17:09:51+08:00">2022-08-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-11-26 10:42:31" itemprop="dateModified" datetime="2022-11-26T10:42:31+08:00">2022-11-26</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/tool/" itemprop="url" rel="index"><span itemprop="name">tool</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>官网：<a target="_blank" rel="noopener" href="https://code.visualstudio.com/">https://code.visualstudio.com/</a><br>使用指南：<a target="_blank" rel="noopener" href="https://code.visualstudio.com/docs">https://code.visualstudio.com/docs</a></p>
-<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;files.exclude&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;**/.tags*&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/cmake_install.cmake&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/CMakeCache.txt&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/CMakeFiles&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.srctrlprj&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.srctrldb&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.srctrlbm&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.exe&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.exe.*&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.o&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.cmd&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.ko&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.a&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.so&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.mod.c&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.symvers&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*.order&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/.gitignore&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/.jekyll-cache&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/_site/&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/obj/&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/libs/&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/*_test&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/.tmp_*/&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;files.autoSave&quot;</span><span class="punctuation">:</span> <span class="string">&quot;onWindowChange&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;workbench.colorTheme&quot;</span><span class="punctuation">:</span> <span class="string">&quot;One Dark Vivid&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;terminal.integrated.fontSize&quot;</span><span class="punctuation">:</span> <span class="number">14</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;todo-tree.tree.showScanModeButton&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;terminal.integrated.rightClickCopyPaste&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.fontFamily&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&#x27;JetBrains Mono&#x27;, Consolas, &#x27;Courier New&#x27;, monospace&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.fontLigatures&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.fontSize&quot;</span><span class="punctuation">:</span> <span class="number">20</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.detectIndentation&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.multiCursorModifier&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ctrlCmd&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.occurrencesHighlight&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.selectionHighlight&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.tokenColorCustomizations&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;textMateRules&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">            <span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;One Dark italic&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;scope&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">                    <span class="string">&quot;comment&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;entity.other.attribute-name&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;keyword&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;markup.underline.link&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.modifier&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.type&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;string.url&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;variable.language.super&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;variable.language.this&quot;</span></span><br><span class="line">                <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;settings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">                    <span class="attr">&quot;fontStyle&quot;</span><span class="punctuation">:</span> <span class="string">&quot;italic&quot;</span></span><br><span class="line">                <span class="punctuation">&#125;</span></span><br><span class="line">            <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;One Dark italic reset&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;scope&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">                    <span class="string">&quot;keyword.operator&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;keyword.other.type&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.modifier.import&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.modifier.package&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.type.built-in&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.type.function.arrow&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.type.generic&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.type.java&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="string">&quot;storage.type.primitive&quot;</span></span><br><span class="line">                <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;settings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">                    <span class="attr">&quot;fontStyle&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span></span><br><span class="line">                <span class="punctuation">&#125;</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;fileheader.configObj&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;createFileTime&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;autoAdd&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;annotationStr&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;head&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/*&quot;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;middle&quot;</span><span class="punctuation">:</span> <span class="string">&quot; * @&quot;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;end&quot;</span><span class="punctuation">:</span> <span class="string">&quot; */&quot;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;use&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;headInsertLine&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;php&quot;</span><span class="punctuation">:</span> <span class="number">2</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;fileheader.cursorMode&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;brief&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;param&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;return&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;fileheader.customMade&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;Description&quot;</span><span class="punctuation">:</span><span class="string">&quot;&quot;</span> <span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;Author&quot;</span><span class="punctuation">:</span><span class="string">&quot;luo_u&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;Date&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Do not edit&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;LastEditTime&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Do not edit&quot;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;highlightwords.colors&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#b3d9ff&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="string">&quot;cyan&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#e6ffb3&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="string">&quot;pink&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#b3b3ff&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="string">&quot;lightgreen&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#ffd9b3&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="string">&quot;magenta&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#ffb3ff&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="string">&quot;cornflowerblue&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#b3ffb3&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="string">&quot;orange&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#ffff80&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="string">&quot;green&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span> <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#d1e0e0&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="string">&quot;red&quot;</span> <span class="punctuation">&#125;</span>                                        </span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;highlightwords.box&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;light&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;dark&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;[cpp]&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;editor.defaultFormatter&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ms-vscode.cpptools&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;C_Cpp.clang_format_style&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&#123; BasedOnStyle: LLVM, UseTab: Never, IndentWidth: 4, TabWidth: 4, AccessModifierOffset: -4, AlignConsecutiveAssignments: AcrossEmptyLines, AlignConsecutiveBitFields: Consecutive, AlignConsecutiveDeclarations: AcrossEmptyLines, AlignTrailingComments: true, PointerAlignment: Right, SpaceAroundPointerQualifiers: Before&#125;&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;bracket-pair-colorizer-2.depreciation-notice&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;git.enabled&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;git.autorefresh&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;search.followSymlinks&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="插件"><a href="#插件" class="headerlink" title="插件"></a>插件</h2><ul>
-<li>C/C++</li>
-<li>CMake</li>
-<li>Bracket Pair Colorizer</li>
-<li>Color Highlight</li>
-<li>highlight-words</li>
-<li>hightlight-selections-vscode</li>
-<li>koroFileHeader</li>
-<li>Filter Line</li>
-<li>Foam</li>
-<li>Image preview</li>
-<li>Filter Line</li>
-<li>Markdown All in One</li>
-<li>markdownlint</li>
-<li>Markdown Image</li>
-<li>Markdown Preview Enhanced</li>
-<li>vscode-icons</li>
-<li>Simple Vim</li>
-<li>Sublime Text Keymap and Settings Importer</li>
-<li>One Dark Theme</li>
-</ul>
-<h2 id="Filter-Line"><a href="#Filter-Line" class="headerlink" title="Filter Line"></a>Filter Line</h2><ol>
-<li>打开log文件。</li>
-<li>运行 <code>command+shift+p</code> ，输入 filter line，选择 Filter Line By Config File。</li>
-<li>回车就生成了新的文件.log.filterline.log ，这就是过滤、翻译好的日志。</li>
-</ol>
-<p>配置文件格式：</p>
-<ul>
-<li>type general，指通用类型。</li>
-<li>prefix 匹配前缀的正则表达式。这里就是为了匹配每一行的时间、线程等信息。</li>
-<li>rules 过滤、翻译（替换）的规则。</li>
-<li>src 匹配的正则。dest是要替换成什么的字符串。</li>
-<li>tag 匹配到时，输出中增加的前缀。某些特殊行，例如闪退，可以明显的加个emoji图标。</li>
-<li>flag 全局的标记。例如app进入后台，则在所有行都加个标记，会前台时取消这个标记。</li>
-<li>until 匹配到某行时，后面紧跟的几行连续输出原始内容，直到某一行匹配正则表达式。</li>
-</ul>
-<p>更多信息可以参考 <a target="_blank" rel="noopener" href="https://github.com/everettjf/vscode-filter-line">https://github.com/everettjf/vscode-filter-line</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1379,7 +1394,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">217</span>
+          <span class="site-state-item-count">218</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

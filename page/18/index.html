@@ -176,6 +176,171 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/Singleton/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/design-patterns/Singleton/" class="post-title-link" itemprop="url">单例模式</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h2><p>单例模式（Singleton Pattern）确保在一个系统中只允许一个类的一个实例，定义一个getInstance()获取实例的静态方法来返回其所属类的一个相同实例，此方法必须是获取单例对象的唯一方式。</p>
+<p><img src="/images/code/design-pattern/Singleton.jpg" alt="单例"></p>
+<ul>
+<li>单例的构造析构函数必须对外隐藏，不能为public属性。</li>
+<li>禁用拷贝构造和赋値运算符。</li>
+<li>在多线程下要避免多次创建单例对象。</li>
+</ul>
+<h2 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">static</span> std::mutex mutex_;</span><br><span class="line">    <span class="built_in">Singleton</span>(<span class="type">const</span> Singleton &amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    Singleton &amp;<span class="keyword">operator</span>= (<span class="type">const</span> Singleton &amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="built_in">Singleton</span>() = <span class="keyword">default</span>;</span><br><span class="line">    ~<span class="built_in">Singleton</span>() = <span class="keyword">default</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton <span class="title">GetInstance</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="function">std::lock_guard&lt;std::mutex&gt; <span class="title">lock</span><span class="params">(mutex_)</span></span>;</span><br><span class="line">        <span class="type">static</span> Singleton ins &#123;&#125;;</span><br><span class="line">        <span class="keyword">return</span> ins;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><p>单例类提供了对唯一实例的受控访问，在系统内存中只存在一个对象，所以可以节约系统资源。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/c-object/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/design-patterns/c-object/" class="post-title-link" itemprop="url">c语言实现面向对象</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>面向对象语言有三个最重要的特点，即继承、封装、多态，其中类可以用结构体实现。</p>
+<h2 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h2><p>把基类结构体作为派生类结构体的第一个成员，这样就可以对基类进行访问与强转。 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">parent</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">int</span> data_parent;</span><br><span class="line"> </span><br><span class="line">&#125;Parent;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">Child</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">parent</span> <span class="title">parent</span>;</span></span><br><span class="line">    <span class="type">int</span> data_child;</span><br><span class="line"> </span><br><span class="line">&#125;Child;</span><br></pre></td></tr></table></figure>
+
+<h2 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h2><p>封装的意义在于函数和数据是绑在一起的，其中将该对象结构体指针作为函数的参数，相当于类的this指针，这样就可以遍历类中的所有函数和成员。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">Data</span>;</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">typedef</span>  <span class="title function_">void</span> <span class="params">(*func)</span><span class="params">(<span class="keyword">struct</span> _Data* pData)</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">Data</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">int</span> value;</span><br><span class="line">    func pfunc;</span><br><span class="line">&#125;Data;</span><br></pre></td></tr></table></figure>
+
+<h2 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h2><p>多态就是实现同一接口处理不同的事情，可以用函数指针来实现，通过给函数指针赋于不同的値。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">Play</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">void</span>* pData;</span><br><span class="line">    <span class="type">void</span> (*start_play)(<span class="keyword">struct</span> _Play* pPlay);</span><br><span class="line">&#125;Play;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/uml/uml_class/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -732,89 +897,6 @@
 <p><img src="/images/code/algo/graph/AdjacencyMatrix.png" alt="邻接矩阵"></p>
 <h3 id="邻接表"><a href="#邻接表" class="headerlink" title="邻接表"></a>邻接表</h3><p>邻接表的每个顶点对应一条链表，链表中存储的是与这个顶点相连接的其他顶点。</p>
 <p><img src="/images/code/algo/graph/AdjacencyList.png" alt="邻接表"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/binary/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/algo/binary/" class="post-title-link" itemprop="url">二分法搜索</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-10-04 16:21:53" itemprop="dateModified" datetime="2022-10-04T16:21:53+08:00">2022-10-04</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="type">static</span> <span class="type">int</span> <span class="title">binary</span><span class="params">(<span class="type">int</span>[] arr, <span class="type">int</span> data)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> min = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> max = arr.length - <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> mid;</span><br><span class="line">    <span class="keyword">while</span> (min &lt;= max) &#123;</span><br><span class="line">        mid = (min + max) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span> (arr[mid] &gt; data) &#123;</span><br><span class="line">            max = mid - <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (arr[mid] &lt; data) &#123;</span><br><span class="line">            min = mid + <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> mid;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这种取中位数的方式，当 min 和 max 很大的时候，会出现溢出的情况，从而导致数组访问出错。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mid = (min + max) / <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
-
-<p>改进的办法是将加法变成减法。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 防止溢出</span></span><br><span class="line">mid =  min + (max - min) / <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
-
-<p>更高效的办法是使用位运算。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 无符号位运算符的优先级较低，先括起来</span></span><br><span class="line">mid =  min + ((max - min) &gt;&gt;&gt; <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -1504,317 +1586,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/kernel_arch/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/kernel/kernel_arch/" class="post-title-link" itemprop="url">Linux Kernel Architecture</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-10-06 16:10:49" itemprop="dateModified" datetime="2022-10-06T16:10:49+08:00">2022-10-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Linux的内核是一种宏内核，主要有以下特征：</p>
-<ul>
-<li>支持动态加载内核模块</li>
-<li>支持对称多处理（SMP）</li>
-<li>支持抢占，允许内核运行的任务有优先执行的能力</li>
-<li>不区分线程和进程</li>
-</ul>
-<h2 id="linux系统结构"><a href="#linux系统结构" class="headerlink" title="linux系统结构"></a>linux系统结构</h2><img src="/images/kernel/kernel/linux_arch.jpeg" alt="Unix/Linux系统分层结构" style="zoom: 33%;" />
-
-<p><img src="/images/kernel/kernel/linux-arch.webp" alt="Linux系统层次结构"></p>
-<p>最上面是用户空间，这是用户应用程序执行的地方。用户空间之下是内核空间，GNU C Library （glibc）也位于这里，它提供了连接内核的系统调用接口，还提供了在用户空间应用程序和内核之间进行转换的机制。</p>
-<p>Linux 内核可以进一步划分成三层，最上面是系统调用接口，之下是内核代码，是与处理器体系结构无关的通用代码，最下面是依赖于特定处理器体系结构的代码，称为 BSP（Board Support Package）。</p>
-<h2 id="内核架构"><a href="#内核架构" class="headerlink" title="内核架构"></a>内核架构</h2><p><img src="/images/kernel/kernel/kernel_struct.webp" alt="linux内核架构"></p>
-<p>Linux内核的主要组件有：系统调用接口、进程调度、内存管理、虚拟文件系统、网络协议栈、进程间通信、设备驱动程序和硬件架构的相关代码。</p>
-<p>LXR (Linux Cross Reference)是一个内核的源代码浏览工具，<a target="_blank" rel="noopener" href="http://lxr.linux.no/%E3%80%82">http://lxr.linux.no/。</a></p>
-<p><img src="/images/kernel/kernel/linux_kernel_map.svg" alt="Linux kernel map"></p>
-<p><a target="_blank" rel="noopener" href="https://makelinux.github.io/kernel/map/">https://makelinux.github.io/kernel/map/</a></p>
-<h3 id="目录详解"><a href="#目录详解" class="headerlink" title="目录详解"></a>目录详解</h3><table>
-<thead>
-<tr>
-<th align="left">目录 / 文件名</th>
-<th align="left">源码功能简介</th>
-</tr>
-</thead>
-</table>
-<table>
-<thead>
-<tr>
-<th><strong>目录</strong></th>
-<th><strong>说明</strong></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>arch</td>
-<td>特定体系结构的代码</td>
-</tr>
-<tr>
-<td>block</td>
-<td>块设备I/O层</td>
-</tr>
-<tr>
-<td>crypo</td>
-<td>加密API</td>
-</tr>
-<tr>
-<td>certs</td>
-<td>与证书相关。</td>
-</tr>
-<tr>
-<td>Documentation</td>
-<td>内核源码文档</td>
-</tr>
-<tr>
-<td>drivers</td>
-<td>设备驱动程序</td>
-</tr>
-<tr>
-<td>firmware</td>
-<td>使用某些驱动程序而需要的设备固件</td>
-</tr>
-<tr>
-<td>fs</td>
-<td>VFS和各种文件系统</td>
-</tr>
-<tr>
-<td>include</td>
-<td>内核头文件</td>
-</tr>
-<tr>
-<td>init</td>
-<td>内核引导和初始化</td>
-</tr>
-<tr>
-<td>ipc</td>
-<td>进程间通信代码</td>
-</tr>
-<tr>
-<td>kernel</td>
-<td>核心子系统，如调度程序</td>
-</tr>
-<tr>
-<td>lib</td>
-<td>同样内核函数</td>
-</tr>
-<tr>
-<td>mm</td>
-<td>内存管理子系统和VM</td>
-</tr>
-<tr>
-<td>net</td>
-<td>网络子系统</td>
-</tr>
-<tr>
-<td>samples</td>
-<td>示例，示范代码</td>
-</tr>
-<tr>
-<td>scripts</td>
-<td>编译内核所用的脚本</td>
-</tr>
-<tr>
-<td>security</td>
-<td>Linux 安全模块</td>
-</tr>
-<tr>
-<td>sound</td>
-<td>语音子系统</td>
-</tr>
-<tr>
-<td>usr</td>
-<td>早期用户空间代码（所谓的initramfs）</td>
-</tr>
-<tr>
-<td>tools</td>
-<td>在Linux开发中有用的工具</td>
-</tr>
-<tr>
-<td>virt</td>
-<td>虚拟化基础结构</td>
-</tr>
-<tr>
-<td>COPYING</td>
-<td>许可和授权信息。</td>
-</tr>
-<tr>
-<td>CREDITS</td>
-<td>贡献者列表。</td>
-</tr>
-</tbody></table>
-<h2 id="drivers目录"><a href="#drivers目录" class="headerlink" title="drivers目录"></a>drivers目录</h2><p><strong>accessibility</strong>  这些驱动提供支持一些辅助设备。在Linux 3.9.4中，这个文件夹中只有一个驱动就是盲文设备驱动。</p>
-<p><strong>acpi</strong>  高级配置和电源接口（ACPI : Advanced Configuration and Power Interface）驱动用来管理电源使用。</p>
-<p><strong>amba</strong>  高级微控制器总线架构（AMBA : Advanced Microcontroller Bus Architecture）是与片上系统（SoC）的管理和互连的协议。SoC是一块包含许多或所有必要的计算机组件的芯片。这里的AMBA驱动让内核能够运行在这上面。</p>
-<p><strong>ata</strong>  该目录包含PATA和SATA设备的驱动程序。串行ATA（SATA）是一种连接主机总线适配器到像硬盘那样的存储器的计算机总线接口。并行ATA（PATA）用于连接存储设备，如硬盘驱动器，软盘驱动器，光盘驱动器的标准。PATA就是我们所说的IDE。</p>
-<p><strong>atm</strong>  异步通信模式(ATM : Asynchronous Transfer Mode)是一种通信标准。这里有各种接到PCI桥的驱动(他们连接到PCI总线)和以太网控制器(控制以太网通信的集成电路芯片)。</p>
-<p><strong>auxdisplay</strong>  这个文件夹提供了三个驱动。LCD 帧缓存（framebuffer）驱动、LCD控制器驱动和一个LCD驱动。这些驱动用于管理液晶显示器 —— 液晶显示器会在按压时显示波纹。注意:按压会损害屏幕,所以请不要用力戳LCD显示屏。</p>
-<p><strong>base</strong>  这是个重要的目录包含了固件、系统总线、虚拟化能力等基本的驱动。</p>
-<p><strong>bcma</strong>  这些驱动用于使用基于AMBA协议的总线。AMBA是由博通公司开发。</p>
-<p><strong>block</strong>  这些驱动提供对块设备的支持，像软驱、SCSI磁带、TCP网络块设备等等。</p>
-<p><strong>bluetooth</strong>  蓝牙是一种安全的无线个人区域网络标准(PANs)。蓝牙驱动就在这个文件夹，它允许系统使用各种蓝牙设备。例如，一个蓝牙鼠标不用电缆，并且计算机有一个电子狗(小型USB接收器)。Linux系统必须能够知道进入电子狗的信号，否则蓝牙设备无法工作。</p>
-<p><strong>bus</strong>  这个目录包含了三个驱动。一个转换ocp接口协议到scp协议。一个是设备间的互联驱动，第三个是用于处理互联中的错误处理。</p>
-<p><strong>cdrom</strong>  这个目录包含两个驱动。一个是cd-rom，包括DVD和CD的读写。第二个是gd-rom(只读GB光盘)，GD光盘是1.2GB容量的光盘，这像一个更大的CD或者更小的DVD。GD通常用于世嘉游戏机中。</p>
-<p><strong>char</strong>  字符设备驱动就在这里。字符设备每次传输数据传输一个字符。这个文件夹里的驱动包括打印机、PS3闪存驱动、东芝SMM驱动和随机数发生器驱动等。</p>
-<p><strong>clk</strong>  这些驱动用于系统时钟。</p>
-<p><strong>clocksource</strong>  这些驱动用于作为定时器的时钟。</p>
-<p><strong>connector</strong>  这些驱动使内核知道当进程fork并使用proc连接器更改UID(用户ID)、GID(组ID)和SID(会话ID)。内核需要知道什么时候进程fork(CPU中运行多个任务)并执行。否则,内核可能会低效管理资源。</p>
-<p><strong>cpufreq</strong>  这些驱动改变CPU的电源能耗。</p>
-<p><strong>cpuidle</strong>  这些驱动用来管理空闲的CPU。一些系统使用多个CPU，其中一个驱动可以让这些CPU负载相当。</p>
-<p><strong>crypto</strong>  这些驱动提供加密功能。</p>
-<p><strong>dca</strong>  直接缓存访问（DCA ： Direct Cache Access）驱动允许内核访问CPU缓存。CPU缓存就像CPU内置的RAM。CPU缓存的速度比RAM更快。然而,CPU缓存的容量比RAM小得多。CPU在这个缓存系统上存储了最重要的和执行的代码。</p>
-<p><strong>devfreq</strong>  这个驱动程序提供了一个通用的动态电压和频率调整(DVFS ： Generic Dynamic Voltage and Frequency Scaling)框架，可以根据需要改变CPU频率来节约能源。这就是所谓的CPU节能。</p>
-<p><strong>dio</strong>  数字输入/输出（DIO ：Digital Input/Output）总线驱动允许内核可以使用DIO总线。</p>
-<p><strong>dma</strong>  直接内存访问(DMA)驱动允许设备无需CPU直接访问内存。这减少了CPU的负载。</p>
-<p><strong>edac</strong>  错误检测和校正（ Error Detection And Correction）驱动帮助减少和纠正错误。</p>
-<p><strong>eisa</strong>  扩展工业标准结构总线（Extended Industry Standard Architecture）驱动提供内核对EISA总线的支持。</p>
-<p><strong>extcon</strong>  外部连接器（EXTernal CONnectors）驱动用于检测设备插入时的变化。例如，extcon会检测用户是否插入了USB驱动器。</p>
-<p><strong>firewire</strong>  这些驱动用于控制苹果制造的类似于USB的火线设备。</p>
-<p><strong>firmware</strong>  这些驱动用于和像BIOS(计算机的基本输入输出系统固件)这样的设备的固件通信。BIOS用于启动操作系统和控制硬件与设备的固件。一些BIOS允许用户超频CPU。超频是使CPU运行在一个更快的速度。CPU速度以MHz(百万赫兹)或GHz衡量。一个3.7 GHz的CPU的的速度明显快于一个700Mhz的处理器。</p>
-<p><strong>gpio</strong>  通用输入/输出(GPIO ：General Purpose Input/Output)是可由用户控制行为的芯片的管脚。这里的驱动就是控制GPIO。</p>
-<p><strong>gpu</strong>  这些驱动控制VGA、GPU和直接渲染管理(DRM ：Direct Rendering Manager )。VGA是640*480的模拟计算机显示器或是简化的分辨率标准。GPU是图形处理器。DRM是一个Unix渲染系统。</p>
-<p><strong>hid</strong>  这驱动用于对USB人机界面设备的支持。</p>
-<p><strong>hsi</strong>  这个驱动用于内核访问像Nokia N900这样的蜂窝式调制解调器。</p>
-<p><strong>hv</strong>  这个驱动用于提供Linux中的键值对(KVP ：Key Value Pair)功能。</p>
-<p><strong>hwmon</strong>  硬件监控驱动用于内核读取硬件传感器上的信息。比如，CPU上有个温度传感器。那么内核就可以追踪温度的变化并相应地调节风扇的速度。</p>
-<p><strong>hwspinlock</strong>  硬件转锁驱动允许系统同时使用两个或者更多的处理器，或使用一个处理器上的两个或更多的核心。</p>
-<p><strong>i2c</strong>  I2C驱动可以使计算机用I2C协议处理主板上的低速外设。系统管理总线(SMBus ：System Management Bus)驱动管理SMBus,这是一种用于轻量级通信的two-wire总线。</p>
-<p><strong>ide</strong>  这些驱动用来处理像CDROM和硬盘这些PATA/IDE设备。</p>
-<p><strong>idle</strong>  这个驱动用来管理Intel处理器的空闲功能。</p>
-<p><strong>iio</strong>  工业I/O核心驱动程序用来处理数模转换器或模数转换器。</p>
-<p><strong>infiniband</strong>  Infiniband是在企业数据中心和一些超级计算机中使用的一种高性能的端口。这个目录中的驱动用来支持Infiniband硬件。</p>
-<p><strong>input</strong>  这里包含了很多驱动，这些驱动都用于输入处理，包括游戏杆、鼠标、键盘、游戏端口（旧式的游戏杆接口）、遥控器、触控、耳麦按钮和许多其他的驱动。如今的操纵杆使用USB端口，但是在上世纪80、90年代，操纵杆是插在游戏端口的。</p>
-<p><strong>iommu</strong>  输入/输出内存管理单元(IOMMU ：Input/Output Memory Management Unit)驱动用来管理内存管理单元中的IOMMU。IOMMU连接DMA IO总线到内存上。IOMMU是设备在没有CPU帮助下直接访问内存的桥梁。这有助于减少处理器的负载。</p>
-<p><strong>ipack</strong>  Ipack代表的是IndustryPack。 这个驱动是一个虚拟总线,允许在载体和夹板之间操作。</p>
-<p><strong>irqchip</strong>  这些驱动程序允许硬件的中断请求(IRQ)发送到处理器，暂时挂起一个正在运行的程序而去运行一个特殊的程序（称为一个中断处理程序）。</p>
-<p><strong>isdn</strong>  这些驱动用于支持综合业务数字网(ISDN)，这是用于同步数字传输语音、视频、数据和其他网络服务使用传统电话网络的电路的通信标准。</p>
-<p><strong>leds</strong>  用于LED的驱动。</p>
-<p><strong>lguest</strong>  lguest用于管理客户机系统的中断。中断是CPU被重要任务打断的硬件或软件信号。CPU接着给硬件或软件一些处理资源。</p>
-<p><strong>macintosh</strong>  苹果设备的驱动在这个文件夹里。</p>
-<p><strong>mailbox</strong>  这个文件夹(pl320-pci)中的驱动用于管理邮箱系统的连接。</p>
-<p><strong>md</strong>  多设备驱动用于支持磁盘阵列，一种多块硬盘间共享或复制数据的系统。</p>
-<p><strong>media</strong>  媒体驱动提供了对收音机、调谐器、视频捕捉卡、DVB标准的数字电视等等的支持。驱动还提供了对不同通过USB或火线端口插入的多媒体设备的支持。</p>
-<p><strong>memory</strong>  支持内存的重要驱动。</p>
-<p><strong>memstick</strong>  这个驱动用于支持Sony记忆棒。</p>
-<p><strong>message</strong>  这些驱动用于运行LSI Fusion MPT(一种消息传递技术)固件的LSI PCI芯片/适配器。LSI大规模集成，这代表每片芯片上集成了几万晶体管、</p>
-<p><strong>mfd</strong>  多用途设备(MFD)驱动提供了对可以提供诸如电子邮件、传真、复印机、扫描仪、打印机功能的多用途设备的支持。这里的驱动还给MFD设备提供了一个通用多媒体通信端口(MCP)层。</p>
-<p><strong>misc</strong>  这个目录包含了不适合在其他目录的各种驱动。就像光线传感器驱动。</p>
-<p><strong>mmc</strong>  MMC卡驱动用于处理用于MMC标准的闪存卡。</p>
-<p><strong>mtd</strong>  内存技术设备(MTD ：Memory technology devices)驱动程序用于Linux和闪存的交互，这就就像一层闪存转换层。其他块设备和字符设备的驱动程序不会以闪存设备的操作方式来做映射。尽管USB记忆卡和SD卡是闪存设备，但它们不使用这个驱动，因为他们隐藏在系统的块设备接口后。这个驱动用于新型闪存设备的通用闪存驱动器驱动。</p>
-<p><strong>net</strong>  网络驱动提供像AppleTalk、TCP和其他的网络协议。这些驱动也提供对调制解调器、USB 2.0的网络设备、和射频设备的支持。</p>
-<p><strong>nfc</strong>  这个驱动是德州仪器的共享传输层之间的接口和NCI核心。</p>
-<p><strong>ntb</strong>  不透明的桥接驱动提供了在PCIe系统的不透明桥接。PCIe是一种高速扩展总线标准。</p>
-<p><strong>nubus</strong>  NuBus是一种32位并行计算总线。用于支持苹果设备。</p>
-<p><strong>of</strong>  此驱动程序提供设备树中创建、访问和解释程序的OF助手。</p>
-<p><strong>oprofile</strong>  这个驱动用于从驱动到用户空间进程(运行在用户态下的应用)评测整个系统。这帮助开发人员找到性能问题—-性能分析机制-是用于 Linux 的若干种评测和性能监控工具中的一种</p>
-<p><strong>parisc</strong>  这些驱动用于HP生产的PA-RISC架构设备。PA-RISC是一种特殊指令集的处理器。</p>
-<p><strong>parport</strong>  并口驱动提供了Linux下的并口支持。</p>
-<p><strong>pci</strong>  这些驱动提供了PCI总线服务。</p>
-<p><strong>pcmcia</strong>  这些是笔记本的pc卡驱动</p>
-<p><strong>pinctrl</strong>  这些驱动用来处理引脚控制设备。引脚控制器可以禁用或启用I/O设备。</p>
-<p><strong>platform</strong> 这个文件夹包含了不同的计算机平台的驱动像Acer、Dell、Toshiba、IBM、Intel、Chrombooks等等。</p>
-<p><strong>pnp</strong>  即插即用驱动允许用户在插入一个像USB的设备后可以立即使用而不必手动配置设备。</p>
-<p><strong>power</strong>  电源驱动使内核可以测量电池电量，检测充电器和进行电源管理。</p>
-<p><strong>pps</strong>  Pulse-Per-Second驱动用来控制电流脉冲速率。这用于计时。</p>
-<p><strong>ps3</strong>  这是Sony的游戏控制台驱动- PlayStation3。</p>
-<p><strong>ptp</strong>  图片传输协议(PTP)驱动支持一种从数码相机中传输图片的协议。</p>
-<p><strong>pwm</strong>  脉宽调制(PWM)驱动用于控制设备的电流脉冲。主要用于控制像CPU风扇。</p>
-<p><strong>rapidio</strong>  RapidIO驱动用于管理RapidIO架构，它是一种高性能分组交换，用于电路板上交互芯片的交互技术，也用于互相使用底板的电路板。</p>
-<p><strong>regulator</strong>  校准驱动用于校准电流、温度、或其他可能系统存在的校准硬件。—-用于控制系统中某些设备的电压电流供应</p>
-<p><strong>remoteproc</strong>  这些驱动用来管理远程处理器。</p>
-<p><strong>rpmsg</strong>  这个驱动用来控制支持大量驱动的远程处理器通讯总线(rpmsg)。这些总线提供消息传递设施,促进客户端驱动程序编写自己的连接协议消息。—-该基础架构允许主处理器上的 Linux 操作系统管理远程处理器上远程软件环境的生命周期和通信-用于在 AMP 环境中的操作系统之间实现 IPC 的 rpmsg 组件和 API</p>
-<p><strong>rtc</strong>  实时时钟(RTC)驱动使内核可以读取时钟。</p>
-<p><strong>s390</strong>  用于31/32位的大型机架构的驱动。</p>
-<p><strong>sbus</strong>  用于管理基于SPARC的总线驱动。</p>
-<p><strong>scsi</strong>  允许内核使用SCSI标准外围设备。例如,Linux将在与SCSI硬件传输数据时使用SCSI驱动。</p>
-<p><strong>sfi</strong> 简单固件接口(SFI)驱动允许固件发送信息表给操作系统。这些表的数据称为SFI表。</p>
-<p><strong>sh</strong>  该驱动用于支持SuperHway总线。</p>
-<p><strong>sn</strong>  该驱动用于支持IOC3串口。</p>
-<p><strong>spi</strong>  这些驱动处理串行设备接口总线(SPI)，它是一个在在全双工下运行的同步串行数据链路标准,。全双工是指两个设备可以同一时间同时发送和接收信息。双工指的是双向通信。设备在主/从模式下通信(取决于设备配置)。</p>
-<p><strong>ssb</strong>  ssb(Sonics Silicon Backplane)驱动提供对在不同芯片和嵌入式设备上使用的迷你总线的支持。</p>
-<p><strong>staging</strong>  该目录含有许多子目录。这里所有的驱动还需要在加入主内核前经过更多的开发工作。</p>
-<p><strong>target</strong>  SCSI设备驱动</p>
-<p><strong>tc</strong>  这些驱动用于TURBOchannel，TURBOchannel是数字设备公司开发的32位开放总线。这主要用于DEC工作站。</p>
-<p><strong>thermal</strong>  thermal驱动使CPU保持较低温度。—Linux温控框架</p>
-<p><strong>tty</strong>  tty驱动用于管理物理终端连接。</p>
-<p><strong>uio</strong>  该驱动允许用户编译运行在用户空间而不是内核空间的驱动。这使用户驱动不会导致内核崩溃。—–运行在用户空间的IO技术</p>
-<p><strong>usb</strong>  USB设备允许内核使用USB端口。闪存驱动和记忆卡已经包含了固件和控制器,所以这些驱动程序允许内核使用USB接口和与USB设备。</p>
-<p><strong>uwb</strong>  Ultra-WideBand驱动用来管理短距离，高带宽通信的超低功耗的射频设备</p>
-<p><strong>vfio</strong>  允许设备访问用户空间的VFIO驱动。用户态驱动框架。</p>
-<p><strong>vhost</strong>  这是用于宿主内核中的virtio服务器驱动。用于虚拟化中。</p>
-<p><strong>video</strong>  这是用来管理显卡和监视器的视频驱动。</p>
-<p><strong>virt</strong>  这些驱动用来虚拟化。</p>
-<p><strong>virtio</strong>  这个驱动用来在虚拟PCI设备上使用virtio设备。用于虚拟化中。</p>
-<p><strong>vlynq</strong>  这个驱动控制着由德州仪器开发的专有接口。这些都是宽带产品，像WLAN和调制解调器，VOIP处理器，音频和数字媒体信号处理芯片。</p>
-<p><strong>vme</strong>  WMEbus最初是为摩托罗拉68000系列处理器开发的总线标准</p>
-<p><strong>w1</strong>  这些驱动用来控制one-wire总线。</p>
-<p><strong>watchdog</strong>  该驱动管理看门狗定时器，这是一个可以用来检测和恢复异常的定时器。</p>
-<p><strong>xen</strong>  该驱动是Xen管理程序系统。这是个允许用户运行多个操作系统在一台计算机的软件或硬件。这意味着xen的代码将允许用户在同一时间的一台计算机上运行两个或更多的Linux系统。用户也可以在Linux上运行Windows、Solaris、FreeBSD、或其他操作系统。</p>
-<p><strong>zorro</strong>  该驱动提供Zorro Amiga总线支持。</p>
-<p>Documentation/CodingStyle 文件描 述 了 Linux 内 核 对 编 码 风 格 的 要 求，内 核 下 的scripts/checkpatch.pl 脚本可以检查代码风格。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1884,7 +1655,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">217</span>
+          <span class="site-state-item-count">218</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

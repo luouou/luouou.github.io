@@ -176,6 +176,314 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/armv8_reg/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/25/cpu/armv8_reg/" class="post-title-link" itemprop="url">ARMv8 寄存器</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-25 15:11:47" itemprop="dateCreated datePublished" datetime="2022-09-25T15:11:47+08:00">2022-09-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-10-30 12:50:26" itemprop="dateModified" datetime="2022-10-30T12:50:26+08:00">2022-10-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="执行状态"><a href="#执行状态" class="headerlink" title="执行状态"></a>执行状态</h2><p>在 ARMv8 架构定义了两种执行状态：AArch64 以及 AArch32。这两种执行状态分别用于描述执行使用 64 位宽的通用寄存器或者使用 32 位宽的通用寄存器。系统运行在 64 位状态下的时候名字叫 Xn，运行在 32 位的时候就叫 Wn。</p>
+<p>32位W寄存器使用对应64位X寄存器的低32位，即W0对应X0的低32位，W1对应X1的低32位，以此类推。读取W寄存器时，将会舍弃高32位的数据。写入W寄存器时，会将高32位清0，例如将0xFFFFFFFF写入W0后，X0中的值位0x00000000FFFFFFFF。</p>
+<p><img src="/images/cpu/arm/reg.png" alt="img"></p>
+<h2 id="通用寄存器"><a href="#通用寄存器" class="headerlink" title="通用寄存器"></a>通用寄存器</h2><p><img src="/images/cpu/arm/reg2.png" alt="img"><br><img src="/images/cpu/arm/armv8_register.png" alt="img"></p>
+<p>AArch64执行状态拥有 31 个通用寄存器，可以在任何时间和所有异常级别访问。</p>
+<ul>
+<li><p>X0-X7：参数/结果寄存器，被调用子程序返回前无需恢复。</p>
+</li>
+<li><p>X8：间接结果未知寄存器，用于保存子程序返回地址，尽量不使用</p>
+</li>
+<li><p>X9-X15：临时寄存器，使用需要保存现场，返回时需要恢复现场。</p>
+</li>
+<li><p>X16 X17：程序内调用临时寄存器，使用需要保存现场，返回时需要恢复现场。</p>
+</li>
+<li><p>X18：平台寄存器，保留用于平台 ABI，尽量不使用</p>
+</li>
+<li><p>X19-X28：被保存的寄存器，这些寄存器保存在被调用者帧中。使用需要保存现场，返回时需要恢复现场。</p>
+</li>
+<li><p>X29：帧指针寄存器（FP），保存函数栈基地址。</p>
+</li>
+<li><p>X30：链接寄存器（LR）</p>
+</li>
+<li><p>X31：堆栈指针寄存器 SP 或零寄存器 ZXR</p>
+</li>
+</ul>
+<h2 id="特殊寄存器"><a href="#特殊寄存器" class="headerlink" title="特殊寄存器"></a>特殊寄存器</h2><p><strong>Zero register(WZR, XZR)</strong></p>
+<p>当访问zero寄存器，所有的写入都被丢弃，所有的读取都返回0，AArch32执行状态使用WZR指令访问zero寄存器，AArch64执行状态使用XZR访问zero寄存器。</p>
+<p><img src="/images/cpu/arm/armv8%E7%89%B9%E6%AE%8A%E5%AF%84%E5%AD%98%E5%99%A8.png" alt="img"></p>
+<p><strong>Program Counter(PC)</strong></p>
+<p>程序计数寄存器，是一个各个异常级别通用的一个寄存器。PC寄存器不能作为命名寄存器访问，而是通过确定的指令隐含的访问，如相对PC的加载和产生地址。PC寄存器不能明确的作为数据处理指令或加载指令的目的寄存器。</p>
+<p><strong>Stack Pointer(SP)</strong></p>
+<p>栈顶指针寄存器，用来描述各个栈顶的指针寄存器。每个异常级别都拥有一个SP寄存器：SP_EL0, SP_EL1, SP_EL2, SP_EL3. 通过此寄存器就可以确定当前在那个EL。AArch32执行状态使用WSP访问当前栈指针寄存器，AArch64执行状态使用SP访问当前栈指针寄存器。</p>
+<p><strong>Saved Program Status Register(SPSR)</strong></p>
+<p>当异常发生时，处理器的状态将会被保存到相应异常级别的SPSR寄存器中。异常发生后，在处理异常之前，处理器会自动的将PSTATE寄存器的内容保存到SPSR中，异常返回时，会将SPSR保存的处理器状态恢复到PSTATE中。ARMv8定义的SPSR寄存器兼容ARMv7中的SPSR寄存器，只使用低32位。</p>
+<p><img src="/images/cpu/arm/SPSR.png" alt="img"></p>
+<p>各个位域定义如下：</p>
+<ul>
+<li>N 符号位（N flag）</li>
+<li>Z 0标志（Z flag）</li>
+<li>C 操作进位（C flag）</li>
+<li>V 溢出标志（V flag）</li>
+<li>SS 用于软件调试。异常发生的时候，通过设置MDSCR_EL1.SS为1启动单步调试机制</li>
+<li>IL 不合法的执行状态（非法异常），保存自PSTATE.IL</li>
+<li>D 处理器状态调试掩码。指示是否屏蔽来自观察点、断点和软件步骤调试事件的调试异常</li>
+<li>A 软件错误掩码位</li>
+<li>I IRQ掩码位</li>
+<li>F FIQ掩码位</li>
+<li>M[4] 发生异常时处理器的执行状态，0表示AArch64</li>
+<li>M[3:0] M[3:2]发生异常的级别；M[1]保留；M[0]根据此选择栈指针寄存器，0表示t，1表示h。可以通过异常级别的栈指针后缀表明所选的栈指针。</li>
+</ul>
+<p><strong>Exception Link Register (ELR)</strong></p>
+<p>异常链接寄存器，保存着异常返回地址。</p>
+<p>比如当一个异常发生时，处理器必须去处理异常。处理异常时候就需要使用SPSR寄存器保存异常处理前的处理器状态，就是所谓的硬件上保存现场。当处理器处理完异常后，就需要从异常返回，则就需要从ELR寄存器中返回，然后再使用SPSR寄存器恢复现场即可。</p>
+<h2 id="Processor-state-PSTATE"><a href="#Processor-state-PSTATE" class="headerlink" title="Processor state(PSTATE)"></a>Processor state(PSTATE)</h2><p>在AArch64执行状态中，处理器的状态使用PSTATE描述，但PSTATE不是寄存器，而是处理器状态各个位域的总称。</p>
+<p>在AArch64执行状态中，使用ERET命令从异常中返回，即将SPSR_ELn寄存器中保存的发生异常时的处理器状态恢复到PSTATE中。SPSR_ELn中保存了发生异常时ALU的标志、执行状态、异常级别及处理器branches。处理器从异常返回后的执行地址保存在ELR_ELn中。</p>
+<h2 id="系统寄存器"><a href="#系统寄存器" class="headerlink" title="系统寄存器"></a>系统寄存器</h2><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>寄存器</th>
+<th>描述</th>
+<th>允许的异常级别</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ACTLR_ELn</td>
+<td>辅助控制寄存器</td>
+<td>控制处理器详细的特性</td>
+<td>1，2，3</td>
+</tr>
+<tr>
+<td>CCSIDR_ELn</td>
+<td>当前Cache Size ID寄存器</td>
+<td>当前架构所选择cache的信息</td>
+<td>1</td>
+</tr>
+<tr>
+<td>CLIDR_ELn</td>
+<td>Cache Level ID寄存器</td>
+<td>每个级别的cache类型及实现</td>
+<td>1，2，3</td>
+</tr>
+<tr>
+<td>CNTFRQ_ELn</td>
+<td>计时器频率寄存器</td>
+<td>反应了系统定时器的频率</td>
+<td>0</td>
+</tr>
+<tr>
+<td>CNTPCT_ELn</td>
+<td>计时器物理计数寄存器</td>
+<td>保存了当前64位计数值</td>
+<td>0</td>
+</tr>
+<tr>
+<td>CNTKCTL_ELn</td>
+<td>内核计时器控制寄存器</td>
+<td>控制从虚拟计数器生成事件流</td>
+<td>1</td>
+</tr>
+<tr>
+<td>CPACR_ELn</td>
+<td>协处理器访问控制寄存器</td>
+<td>控制访问Trace、 floating-point及NEON</td>
+<td>1</td>
+</tr>
+<tr>
+<td>CSSELR_ELn</td>
+<td>Cache Size选择寄存器</td>
+<td>定义了要求的cache级别、cache类型及指令cache或数据cache</td>
+<td>1</td>
+</tr>
+<tr>
+<td>CNTP_CTL_ELn</td>
+<td>物理计时器控制寄存器</td>
+<td>EL1物理计时器的控制寄存器</td>
+<td>0</td>
+</tr>
+<tr>
+<td>ELR_ELn</td>
+<td>Exception Link Register</td>
+<td>保存异常返回地址</td>
+<td>1，2，3</td>
+</tr>
+<tr>
+<td>ESR_ELn</td>
+<td>Exception Syndrome Register</td>
+<td>保存了发生异常的原因</td>
+<td>1，2，3</td>
+</tr>
+<tr>
+<td>FAR_ELn</td>
+<td>Fault Address Register</td>
+<td>保存了virtual faulting address</td>
+<td>1，2，3</td>
+</tr>
+<tr>
+<td>SCTLR_ELn</td>
+<td>系统控制寄存器</td>
+<td>控制架构特性，如MMU、caches及对齐检查</td>
+<td>0，1，2，3</td>
+</tr>
+<tr>
+<td>SPSR_ELn</td>
+<td>Saved Program Status Registe</td>
+<td>发生异常时，保存处理器的状态</td>
+<td>abt，fiq，irq， und，1，2，3</td>
+</tr>
+</tbody></table>
+<h2 id="NEON和浮点寄存器"><a href="#NEON和浮点寄存器" class="headerlink" title="NEON和浮点寄存器"></a>NEON和浮点寄存器</h2><p>armV8有32个128bit的浮点寄存器 V0-V31， 这些寄存器用来处理标量浮点运算时保存浮点操作数，或NEON 操作时保存标量和向量操作数。</p>
+<p><img src="/images/cpu/arm/armv8_simd_reg.png" alt="img"></p>
+<h2 id="兼容ARMv7"><a href="#兼容ARMv7" class="headerlink" title="兼容ARMv7"></a>兼容ARMv7</h2><p><img src="/images/cpu/arm/armv8_reg_map.png" alt="img"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/armv7_reg/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/25/cpu/armv7_reg/" class="post-title-link" itemprop="url">ARMv7 寄存器</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-25 14:54:02 / 修改时间：15:28:13" itemprop="dateCreated datePublished" datetime="2022-09-25T14:54:02+08:00">2022-09-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="ARMv7寄存器"><a href="#ARMv7寄存器" class="headerlink" title="ARMv7寄存器"></a>ARMv7寄存器</h2><p>ARM处理器共有37个寄存器。其中包括：31个通用寄存器（包括PC在内）和6个状态寄存器。</p>
+<p><img src="/images/cpu/arm/reg.jpg" alt="img"></p>
+<h3 id="通用寄存器"><a href="#通用寄存器" class="headerlink" title="通用寄存器"></a>通用寄存器</h3><p>通用寄存器包括R0-R15，均为32位寄存器，可以分为3类：</p>
+<p><strong>未分组寄存器(R0-R7)</strong></p>
+<p>在所有运行模式下，未分组寄存器都指向同一个物理寄存器。在中断或异常处理进行异常模式转换时，由于不同的处理器运行模式均使用相同的物理寄存器，所以可能造成寄存器中数据的破坏。</p>
+<p><strong>分组寄存器(R8-R14)</strong></p>
+<p>对于分组寄存器，他们每次所访问的物理寄存器都与当前的处理器运行模式相关。</p>
+<p>R13常用作存放堆栈指针，用户也可以使用其他寄存器存放堆栈指针，但在Thumb指令集下，某些指令强制要求使用R13存放堆栈指针。</p>
+<p>R14称为链接寄存器（LR，Link Register），当执行子程序时，R14可得到R15（PC）的备份，执行完子程序后，又将R14的值复制回PC，即使用R14保存返回地址。</p>
+<p><strong>程序计数器PC（R15）</strong></p>
+<p>寄存器R15用作程序计数器（PC），在ARM状态下，位[1:0]为0，位[31:2]用于保存PC；在Thumb状态下,位[0]为0，位[31:1]用于保存PC。</p>
+<p>由于ARM体系结构采用了多级流水线技术，对于ARM指令集而言，PC总是指向当前指令的下两条指令的地址，即PC的值为当前指令的地址值加8个字节。</p>
+<h3 id="状态寄存器"><a href="#状态寄存器" class="headerlink" title="状态寄存器"></a>状态寄存器</h3><ul>
+<li>CPSR（Current Program Status Register）当前程序状态寄存器1个。</li>
+<li>SPSR（Saved Progarm Status Register）备份程序状态寄存器6个，用于异常发生时保存CPSR的值，异常退出时恢复CPSR。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/arm-arch/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1250,335 +1558,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/24/tool/gcc_options/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/24/tool/gcc_options/" class="post-title-link" itemprop="url">gcc compile and link options</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-24 19:07:35" itemprop="dateCreated datePublished" datetime="2022-09-24T19:07:35+08:00">2022-09-24</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-09-25 11:00:48" itemprop="dateModified" datetime="2022-09-25T11:00:48+08:00">2022-09-25</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/gcc/" itemprop="url" rel="index"><span itemprop="name">gcc</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="编译选项"><a href="#编译选项" class="headerlink" title="编译选项"></a>编译选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">--help</span><br><span class="line">--target-help</span><br><span class="line">显示 gcc 帮助说明。‘target-help’是显示目标机器特定的命令行选项。</span><br><span class="line"></span><br><span class="line">--version</span><br><span class="line">显示 gcc 版本号和版权信息。</span><br><span class="line"></span><br><span class="line">-wall</span><br><span class="line">显示警告信息；</span><br><span class="line"></span><br><span class="line">-o outfile</span><br><span class="line">输出到指定的文件。</span><br><span class="line"></span><br><span class="line">-x language</span><br><span class="line">指明使用的编程语言，包括：c c++ assembler none 。 ‘none’意味着恢复默认行为，即根据文件的扩展名猜测源文件的语言。</span><br><span class="line"></span><br><span class="line">-v</span><br><span class="line">打印较多信息，显示编译器调用的程序。</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">-#</span><span class="language-bash"><span class="comment">##</span></span></span><br><span class="line">与 -v 类似，但选项被引号括住，并且不执行命令。</span><br><span class="line"></span><br><span class="line">-E</span><br><span class="line">仅作预处理，不进行编译、汇编和链接。</span><br><span class="line"></span><br><span class="line">-S</span><br><span class="line">仅编译到汇编语言，不进行汇编和链接。</span><br><span class="line"></span><br><span class="line">-c</span><br><span class="line">仅编译、汇编到目标代码，不进行链接。</span><br><span class="line"></span><br><span class="line">-C</span><br><span class="line">告诉预处理器不要丢弃注释，配合-E选项使用。</span><br><span class="line"></span><br><span class="line">-P</span><br><span class="line">告诉预处理器不要产生#line命令，配合-E选项使用。</span><br><span class="line"></span><br><span class="line">-pipe</span><br><span class="line">使用管道代替临时文件。</span><br><span class="line"></span><br><span class="line">-combine</span><br><span class="line">将多个源文件一次性传递给汇编器。</span><br><span class="line"></span><br><span class="line">-fsanitize=address</span><br><span class="line">gcc从4.8版本起，集成了Address Sanitizer工具，可以用来检查内存访问的错误，编译时指定`-fsanitize=address -g`，可以检测内存泄漏、堆栈和全局内存越界访问、free后继续使用、局部内存被外层使用和Initialization order bugs问题。</span><br></pre></td></tr></table></figure>
-
-<h2 id="链接选项"><a href="#链接选项" class="headerlink" title="链接选项"></a>链接选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">-l library</span><br><span class="line">-llibrary</span><br><span class="line">进行链接时搜索名为library的库。</span><br><span class="line"></span><br><span class="line">-Ldir</span><br><span class="line">把dir 加入到搜索库文件的路径列表中。</span><br><span class="line"></span><br><span class="line">-Idir</span><br><span class="line">把dir 加入到搜索头文件的路径列表中。</span><br><span class="line"></span><br><span class="line">-Dname</span><br><span class="line">预定义一个名为name 的宏，值为1。</span><br><span class="line"></span><br><span class="line">-Dname=definition</span><br><span class="line">预定义名为name ，值为definition 的宏。</span><br><span class="line"></span><br><span class="line">-ggdb</span><br><span class="line">-ggdblevel</span><br><span class="line">为调试器 gdb 生成调试信息。level 可以为1，2，3，默认值为2。</span><br><span class="line"></span><br><span class="line">-g</span><br><span class="line">-glevel</span><br><span class="line">生成操作系统本地格式的调试信息，level 取值同上。</span><br><span class="line"></span><br><span class="line">-s</span><br><span class="line">去除可执行文件中的符号表和重定位信息。用于减小可执行文件的大小。</span><br><span class="line"></span><br><span class="line">-static</span><br><span class="line">禁止使用动态库</span><br><span class="line"></span><br><span class="line">-share</span><br><span class="line">尽量使用动态库</span><br><span class="line"></span><br><span class="line">-nostdlib</span><br><span class="line">不连接系统标准启动文件和标准库文件，只把指定的文件传递给连接器。</span><br><span class="line"></span><br><span class="line">-rdynamic</span><br><span class="line">指示连接器把所有符号都添加到动态符号表（.dynsym）里，以便那些使用符号表的函数使用，如dlopen() 或 backtrace()。</span><br></pre></td></tr></table></figure>
-
-<h2 id="优化项"><a href="#优化项" class="headerlink" title="优化项"></a>优化项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-O0 禁止编译器进行优化。默认为此项。</span><br><span class="line">-O1 尝试优化编译时间和可执行文件大小。</span><br><span class="line"></span><br><span class="line">-O2 更多的优化，会尝试几乎全部的优化功能，但不会进行“空间换时间”的优化方法。</span><br><span class="line"></span><br><span class="line">-O3 在 -O2 的基础上再打开一些优化选项：-finline-functions， -funswitch-loops 和 -fgcse-after-reload。</span><br><span class="line"></span><br><span class="line">-Os 对生成文件大小进行优化。它会打开 -O2 开的全部选项，除了会那些增加文件大小的。</span><br></pre></td></tr></table></figure>
-
-<h2 id="指定标准"><a href="#指定标准" class="headerlink" title="指定标准"></a>指定标准</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">-ansi 支持符合ANSI标准的C程序。这样就会关闭GNU C中某些不兼容ANSI C的特性。</span><br><span class="line"></span><br><span class="line">-std=c89 指明使用标准 ISO C90 作为标准来编译程序。</span><br><span class="line"></span><br><span class="line">-std=c99 指明使用标准 ISO C99 作为标准来编译程序。</span><br><span class="line"></span><br><span class="line">-std=c++98 指明使用标准 C++98 作为标准来编译程序。</span><br><span class="line"></span><br><span class="line">-std=gnu9x 使用 ISO C99 再加上 GNU 的一些扩展。</span><br><span class="line"></span><br><span class="line">-fno-asm 不把asm, inline或typeof当作关键字，因此这些词可以用做标识符。用 __asm__， __inline__和__typeof__能够替代它们。 `-ansi&#x27; 隐含声明了`-fno-asm&#x27;。</span><br><span class="line"></span><br><span class="line">-fgnu89-inline 告诉编译器在 C99 模式下看到 inline 函数时使用传统的 GNU 句法。</span><br></pre></td></tr></table></figure>
-
-<h2 id="C选项"><a href="#C选项" class="headerlink" title="C选项"></a>C选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">-pedantic</span><br><span class="line">以ANSI/ISO C标准列出的所有警告</span><br><span class="line"></span><br><span class="line">-fsigned-char</span><br><span class="line">把char定义为有符号类型，如同signed char。</span><br><span class="line"></span><br><span class="line">-funsigned-char</span><br><span class="line">把char定义为无符号类型，如同unsigned char。</span><br><span class="line"></span><br><span class="line">-traditional</span><br><span class="line">尝试支持传统C编译器的某些方面。详见GNU C手册。</span><br><span class="line"></span><br><span class="line">-fno-builtin</span><br><span class="line">-fno-builtin-function</span><br><span class="line">不接受没有 __builtin_ 前缀的函数作为内建函数。</span><br><span class="line"></span><br><span class="line">-trigraphs</span><br><span class="line">支持ANSI C的三联符（ trigraphs）。-ansi选项隐含声明了此选项。</span><br><span class="line"></span><br><span class="line">-fsigned-bitfields</span><br><span class="line">-funsigned-bitfields</span><br><span class="line">如果没有明确声明signed或unsigned修饰符，这些选项用来定义有符号位域或无符号位域。缺省情况下，位域是有符号的，因为它们继承的基本整数类型，如int，是有符号数。</span><br><span class="line"></span><br><span class="line">-fno-strict-aliasing</span><br><span class="line">启用严格别名规则，“-fno-strict-aliasing”表示禁用严格别名规则，当gcc的编译优化参数为“-O2”、“-O3”和“-Os”时，默认会打开“-fstrict-aliasing”。</span><br></pre></td></tr></table></figure>
-
-<h2 id="C-选项"><a href="#C-选项" class="headerlink" title="C++选项"></a>C++选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-fsyntax-only</span><br><span class="line">检查代码中的语法错误，但除此之外不要做任何事情。</span><br><span class="line"></span><br><span class="line">-ffor-scope</span><br><span class="line">从头开始执行程序，也允许进行重定向。</span><br><span class="line"></span><br><span class="line">-fno-rtti</span><br><span class="line">关闭对 dynamic_cast 和 typeid 的支持。如果你不需要这些功能，关闭它会节省一些空间。</span><br></pre></td></tr></table></figure>
-
-<h2 id="机器选项"><a href="#机器选项" class="headerlink" title="机器选项"></a>机器选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">-mtune=cpu-type</span><br><span class="line">为指定类型的 CPU 生成代码。cpu-type 可以是：i386，i486，i586，pentium，i686，pentium4 等等。</span><br><span class="line"></span><br><span class="line">-msse</span><br><span class="line">-msse2</span><br><span class="line">-mmmx</span><br><span class="line">-mno-sse</span><br><span class="line">-mno-sse2</span><br><span class="line">-mno-mmx</span><br><span class="line">使用或者不使用MMX，SSE，SSE2指令。</span><br><span class="line"></span><br><span class="line">-m32</span><br><span class="line">-m64</span><br><span class="line">生成32位/64位机器上的代码。</span><br><span class="line"></span><br><span class="line">-mpush-args</span><br><span class="line">-mno-push-args</span><br><span class="line">（不）使用 push 指令来进行存储参数。默认是使用。</span><br><span class="line"></span><br><span class="line">-mregparm=num</span><br><span class="line">当传递整数参数时，控制所使用寄存器的个数。</span><br></pre></td></tr></table></figure>
-
-<h2 id="依赖文件"><a href="#依赖文件" class="headerlink" title="依赖文件"></a>依赖文件</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">-M</span><br><span class="line">生成文件的依赖关系，依赖项是源文件中引用的所有头文件，同时也把一些标准库的头文件包含了进来。</span><br><span class="line"></span><br><span class="line">-MM</span><br><span class="line">生成文件的依赖关系，和 -M 类似，但不包含标准库的头文件。</span><br><span class="line"></span><br><span class="line">-MG</span><br><span class="line">要求把缺失的头文件按存在对待，并且假定他们和源文件在同一目录下，必须和`-M`选项一起用。</span><br><span class="line"></span><br><span class="line">-MF [file]</span><br><span class="line">当使用了-M或-MM选项时，则把依赖关系写入名为file的文件中。若同时也使用了-MD或-MMD,-MF将覆写输出的依赖文件的名称 。</span><br><span class="line"></span><br><span class="line">-MD</span><br><span class="line">等同于 -M -MF file，但是默认关闭了 -E 选项。其输出的文件名是基于 -o 选项，若给定了 -o 选项，则输出的文件名是 -o 指定的文件名，并添加 .d 后缀，若没有给定，则输入的文件名作为输出的文件名，并添加 .d 后缀，同时继续指定的编译工作。</span><br><span class="line"></span><br><span class="line">-MMD</span><br><span class="line">类似于-MD”，但是输出的依赖文件中，不包含标准头文件。</span><br><span class="line"></span><br><span class="line">-MP</span><br><span class="line">生成的依赖文件里面，依赖规则中的所有 .h 依赖项都会在该文件中生成一个伪目标，其不依赖任何其他依赖项。该伪规则将避免删除了对应的头文件而没有更新Makefile去匹配新的依赖关系而导致 make 出错的情况出现。</span><br><span class="line"></span><br><span class="line">-MT Target</span><br><span class="line">在生成的依赖文件中，指定依赖规则中的目标。</span><br></pre></td></tr></table></figure>
-
-<h2 id="其他项"><a href="#其他项" class="headerlink" title="其他项"></a>其他项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-finline-functions</span><br><span class="line">把所有简单的函数内联进调用者。编译器会探索式地决定哪些函数足够简单，值得做这种内联。</span><br><span class="line"></span><br><span class="line">-fstrict-aliasing</span><br><span class="line">施加最强的别名规则（aliasing rules）。</span><br><span class="line"></span><br><span class="line">-fPIC</span><br><span class="line">告诉编译器产生与位置无关代码，在产生的代码中，没有绝对地址，全部使用相对地址，故而代码可以被加载器加载到内存的任意位置，都可以正确的执行。这正是共享库所要求的，共享库被加载时，在内存的位置不是固定的。如果不加-fPIC，则加载.so文件的代码段时，代码段引用的数据对象需要重定位， 重定位会修改代码段的内容，这就造成每个使用这个.so文件代码段的进程在内核里都会生成这个.so文件代码段的拷贝。</span><br></pre></td></tr></table></figure>
-
-<hr>
-<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/347611674">https://zhuanlan.zhihu.com/p/347611674</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/net/ntp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/04/net/ntp/" class="post-title-link" itemprop="url">ntp</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>NTP是计算机系统中的时钟同步协议，是基于用户数据报协议（UDP），端口号是123。</p>
-<p>对于同步过程，NTP依赖于协调世界时（UTC），该时间是从分层系统中的各个客户端和服务器获得的。时钟同步的工作过程：</p>
-<ol>
-<li>客户端发送一个NTP报文给服务器，该报文带有它离开客户端时的时间戳T1。</li>
-<li>当NTP报文到达服务器时，服务器加上自己的时间戳T2。</li>
-<li>当NTP报文离开服务器时，服务器再加上自己的时间戳T3。</li>
-<li>当客户端接收到该响应报文时，客户端的本地时间为T4。</li>
-</ol>
-<p><img src="/images/net/ntp.png"></p>
-<p>如此客户端相对服务器的时间差为((T2-T1) + (T3-T4)) / 2，然后根据时间差来设定自己的时钟，使之与服务器的时钟同步。</p>
-<h2 id="报文格式"><a href="#报文格式" class="headerlink" title="报文格式"></a>报文格式</h2><p><strong>数据报文格式</strong></p>
-<p><img src="/images/net/ntp_package.png"></p>
-<table>
-<thead>
-<tr>
-<th>字段名</th>
-<th>长度(bit)</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Leap Indicator</td>
-<td>2</td>
-<td>闰秒提示：<br/>0: 无leap秒调整<br/>1: 一天的最后一分钟为61秒<br/>2: 一天的最后一分钟为59秒<br/>3:表示告警状态，时钟未被同步。</td>
-</tr>
-<tr>
-<td>Version Number</td>
-<td>3</td>
-<td>NTP的版本号，目前值为3。</td>
-</tr>
-<tr>
-<td>Mode</td>
-<td>3</td>
-<td>NTP的工作模式。不同值表示的含义如下：<br/>0：reserved，保留。<br/>1：symmetric active，主动对等体模式。<br/>2：symmetric passive，被动对等体模式。<br/>3：client，客户模式。<br/>4：server，服务器模式。<br/>5：broadcast，广播模式。<br/>6：reserved for NTP control messages，NTP控制报文。<br/>7：reserved for private use，内部使用预留。</td>
-</tr>
-<tr>
-<td>Stratum</td>
-<td>8</td>
-<td>时钟的层数，定义了时钟的准确度。层数为1的时钟准确度最高，从1到15依次递减。<br/>0：未指定或无效<br/>1：主服务器<br/>2 – 15：辅助服务器<br/>16：未同步<br/>17 –255：保留</td>
-</tr>
-<tr>
-<td>Poll</td>
-<td>8</td>
-<td>轮询时间（8位有符号整数），即两个连续NTP报文之间最小间隔时间(s)。</td>
-</tr>
-<tr>
-<td>Precision</td>
-<td>8</td>
-<td>本地时钟精度（8位有符号整数）</td>
-</tr>
-<tr>
-<td>Root Delay</td>
-<td>32</td>
-<td>到主参考时钟的总往返延迟时间。</td>
-</tr>
-<tr>
-<td>Root Dispersion</td>
-<td>32</td>
-<td>本地时钟相对于主参考时钟的最大误差。</td>
-</tr>
-<tr>
-<td>Reference Identifier</td>
-<td>32</td>
-<td>标识特定参考时钟。</td>
-</tr>
-<tr>
-<td>Reference Timestamp</td>
-<td>64</td>
-<td>参考时间戳，本地时钟最后一次被设定或更新的时间。如果值为0表示本地时钟从未被同步过。</td>
-</tr>
-<tr>
-<td>Originate Timestamp</td>
-<td>64</td>
-<td>原始时间戳，NTP报文离开源端时的本地时间。</td>
-</tr>
-<tr>
-<td>Receive Timestamp</td>
-<td>64</td>
-<td>接受时间戳，NTP报文到达目的端的本地时间。</td>
-</tr>
-<tr>
-<td>Transmit Timestamp</td>
-<td>64</td>
-<td>传送时间戳目的端应答报文离开服务器端的本地时间。</td>
-</tr>
-<tr>
-<td>Authenticator</td>
-<td>96</td>
-<td>（可选）验证信息。</td>
-</tr>
-</tbody></table>
-<p><strong>控制报文格式</strong></p>
-<p><img src="/images/net/ntp_packet.png"></p>
-<table>
-<thead>
-<tr>
-<th>字段名</th>
-<th>长度(bit)</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>0</td>
-<td>2</td>
-<td>保留位。NTP本身不做处理。</td>
-</tr>
-<tr>
-<td>VN（Version Number）</td>
-<td>3</td>
-<td>NTP的版本号，目前值为3。</td>
-</tr>
-<tr>
-<td>6</td>
-<td>3</td>
-<td>表明是控制报文。</td>
-</tr>
-<tr>
-<td>REM</td>
-<td>3</td>
-<td>R：0表示命令，1表示响应。 E：0表示发送正常响应，1表示发送错误响应。 M：0表示最后一个分片，1表示其他。</td>
-</tr>
-<tr>
-<td>Op</td>
-<td>5</td>
-<td>操作码，表明命令的类型。</td>
-</tr>
-<tr>
-<td>Sequence</td>
-<td>16</td>
-<td>发送或接受到报文的顺序号。</td>
-</tr>
-<tr>
-<td>Status</td>
-<td>16</td>
-<td>表明当前系统的状态。</td>
-</tr>
-<tr>
-<td>Association ID</td>
-<td>16</td>
-<td>连接标示。</td>
-</tr>
-<tr>
-<td>Offset</td>
-<td>16</td>
-<td>偏移量。</td>
-</tr>
-<tr>
-<td>Count</td>
-<td>16</td>
-<td>数据域的长度。</td>
-</tr>
-<tr>
-<td>Data</td>
-<td>最大468</td>
-<td>包括发送报文或接受报文中的数据信息。</td>
-</tr>
-<tr>
-<td>Padding</td>
-<td>16</td>
-<td>填充字段。</td>
-</tr>
-<tr>
-<td>Authenticator</td>
-<td>96</td>
-<td>（可选）验证信息。</td>
-</tr>
-</tbody></table>
-<hr>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/hankgo/p/15586190.html">https://www.cnblogs.com/hankgo/p/15586190.html</a></p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiaotian_muzi/article/details/90718222">https://blog.csdn.net/xiaotian_muzi/article/details/90718222</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1648,7 +1627,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">217</span>
+          <span class="site-state-item-count">218</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
