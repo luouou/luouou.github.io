@@ -176,6 +176,105 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/cmd/route/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/26/cmd/route/" class="post-title-link" itemprop="url">route</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-06-26 15:56:04 / 修改时间：15:59:10" itemprop="dateCreated datePublished" datetime="2022-06-26T15:56:04+08:00">2022-06-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cmd/" itemprop="url" rel="index"><span itemprop="name">cmd</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>route - show / manipulate the IP routing table，显示并设置静态路由表</p>
+<p>可以在<code>/etc/rc.local</code>中添加route命令来保证该路由设置永久有效。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">route [-CFvnee]</span><br><span class="line"></span><br><span class="line">route  [-v] [-A family] add [-net|-host] target [netmask Nm] [gw Gw] [metric N] [mss M] [window W] [irtt I] [reject] [mod] [dyn] [rein‐state] [[dev] If]</span><br><span class="line"></span><br><span class="line">route  [-v] [-A family] del [-net|-host] target [gw Gw] [netmask Nm] [metric N] [[dev] If]</span><br><span class="line"></span><br><span class="line">route  [-V] [--version] [-h] [--help]</span><br></pre></td></tr></table></figure>
+
+<h2 id="选项"><a href="#选项" class="headerlink" title="选项"></a>选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-A：设置地址类型；</span><br><span class="line">-C：打印将Linux核心的路由缓存；</span><br><span class="line">-v：详细信息模式；</span><br><span class="line">-n：不执行DNS反向查找，直接显示数字形式的IP地址；</span><br><span class="line">-e：netstat格式显示路由表；</span><br><span class="line">-net：到一个网络的路由表；</span><br><span class="line">-host：到一个主机的路由表。</span><br></pre></td></tr></table></figure>
+
+<h2 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">add：增加指定的路由记录；</span><br><span class="line">del：删除指定的路由记录；</span><br><span class="line">target：目的网络或目的主机；</span><br><span class="line">gw：设置默认网关；</span><br><span class="line">mss：设置TCP的最大区块长度（MSS），单位MB；</span><br><span class="line">window：指定通过路由表的TCP连接的TCP窗口大小；</span><br><span class="line">dev：路由记录所表示的网络接口。</span><br></pre></td></tr></table></figure>
+
+<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><p> <strong>显示当前路由</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">route -n</span><br></pre></td></tr></table></figure>
+
+<p>其中Flags为路由标志，标记当前网络节点的状态，Flags标志说明：</p>
+<ul>
+<li>U Up表示此路由当前为启动状态。</li>
+<li>H Host，表示此网关为一主机。</li>
+<li>G Gateway，表示此网关为一路由器。</li>
+<li>R Reinstate Route，使用动态路由重新初始化的路由。</li>
+<li>D Dynamically,此路由是动态性地写入。</li>
+<li>M Modified，此路由是由路由守护程序或导向器动态修改。</li>
+<li>! 表示此路由当前为关闭状态。</li>
+</ul>
+<p><strong>添加/设置网关</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">route add -net 192.168.1.0 netmask 255.255.255.0 dev eth0</span><br><span class="line">route del -net 192.168.1.0 netmask 255.255.255.0 dev eth0</span><br></pre></td></tr></table></figure>
+
+<p><strong>屏蔽一条路由</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">route add -net 224.0.0.0 netmask 240.0.0.0 reject  #增加一条屏蔽的路由，目的地址为224.x.x.x将被拒绝。</span><br></pre></td></tr></table></figure>
+
+<p><strong>删除路由记录</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">route del -net 224.0.0.0 netmask 240.0.0.0</span><br><span class="line">route del -net 224.0.0.0 netmask 240.0.0.0 reject</span><br></pre></td></tr></table></figure>
+
+<p><strong>删除/添加默认网关</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">route add default gw 192.168.1.2 eth0</span><br><span class="line">route del default gw 192.168.1.2 eth0</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/cmd/patch/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -937,77 +1036,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/cmd/cp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/26/cmd/cp/" class="post-title-link" itemprop="url">cp</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-06-26 15:56:04 / 修改时间：15:59:10" itemprop="dateCreated datePublished" datetime="2022-06-26T15:56:04+08:00">2022-06-26</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cmd/" itemprop="url" rel="index"><span itemprop="name">cmd</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>cp - copy files and directories</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp [OPTION]... SOURCE... DIRECTORY</span><br></pre></td></tr></table></figure>
-
-<h2 id="选项"><a href="#选项" class="headerlink" title="选项"></a>选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">-a：此参数的效果和同时指定&quot;-dpR&quot;参数相同；</span><br><span class="line">-d：当复制符号连接时，把目标文件或目录也建立为符号连接，并指向与源文件或目录连接的原始文件或目录；</span><br><span class="line">-f：强行复制文件或目录，不论目标文件或目录是否已存在；</span><br><span class="line">-i：覆盖既有文件之前先询问用户；</span><br><span class="line">-l：对源文件建立硬连接，而非复制文件；</span><br><span class="line">-p：保留源文件或目录的属性；</span><br><span class="line">-R/r：递归处理，将指定目录下的所有文件与子目录一并处理；</span><br><span class="line">-s：对源文件建立符号连接，而非复制文件；</span><br><span class="line">-u：使用这项参数后只会在源文件的更改时间较目标文件更新时或是名称相互对应的目标文件并不存在时，才复制文件；</span><br><span class="line">-S：在备份文件时，用指定的后缀“SUFFIX”代替文件的默认后缀；</span><br><span class="line">-b：覆盖已存在的文件目标前将目标文件备份；</span><br><span class="line">-v：详细显示命令执行的操作。</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1077,7 +1105,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">218</span>
+          <span class="site-state-item-count">219</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

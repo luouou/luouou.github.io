@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="二叉搜索树（Binary Search Tree， BST）支持动态数据集合的快速插入、删除、查找操作，是一棵空树或者有如下性质的二叉树：  若任意节点的左子树不空，其左子树中的每个节点的值都小于这个节点的值； 若任意节点的右子树不空，其右子树每个节点的值都大于这个节点的值； 任意节点的左、右子树也分别为二叉查找树； 没有键值相等的节点。  不管操作是插入、删除还是查找，其时间复杂度其实都跟树的高">
+<meta property="og:type" content="article">
+<meta property="og:title" content="二叉搜索树">
+<meta property="og:url" content="http://example.com/2022/12/17/algo/tree-search/index.html">
+<meta property="og:site_name" content="nullptr">
+<meta property="og:description" content="二叉搜索树（Binary Search Tree， BST）支持动态数据集合的快速插入、删除、查找操作，是一棵空树或者有如下性质的二叉树：  若任意节点的左子树不空，其左子树中的每个节点的值都小于这个节点的值； 若任意节点的右子树不空，其右子树每个节点的值都大于这个节点的值； 任意节点的左、右子树也分别为二叉查找树； 没有键值相等的节点。  不管操作是插入、删除还是查找，其时间复杂度其实都跟树的高">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/code/algo/tree/findtree.png">
+<meta property="og:image" content="http://example.com/images/code/algo/tree/findtree-add.png">
+<meta property="og:image" content="http://example.com/images/code/algo/tree/findtree-del.png">
+<meta property="og:image" content="http://example.com/images/code/algo/tree/rbtree.png">
+<meta property="og:image" content="http://example.com/images/code/algo/tree/rbtree2.png">
+<meta property="article:published_time" content="2022-12-17T03:15:01.718Z">
+<meta property="article:modified_time" content="2022-12-17T03:16:26.709Z">
+<meta property="article:author" content="ubun2">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/code/algo/tree/findtree.png">
+
+<link rel="canonical" href="http://example.com/2022/12/17/algo/tree-search/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>二叉搜索树 | nullptr</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nullptr</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">吾生也有涯 而知也无涯</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/12/17/algo/tree-search/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          二叉搜索树
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-12-17 11:15:01 / 修改时间：11:16:26" itemprop="dateCreated datePublished" datetime="2022-12-17T11:15:01+08:00">2022-12-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>二叉搜索树（Binary Search Tree， BST）支持动态数据集合的快速插入、删除、查找操作，是一棵空树或者有如下性质的二叉树：</p>
+<ul>
+<li>若任意节点的左子树不空，其左子树中的每个节点的值都小于这个节点的值；</li>
+<li>若任意节点的右子树不空，其右子树每个节点的值都大于这个节点的值；</li>
+<li>任意节点的左、右子树也分别为二叉查找树；</li>
+<li>没有键值相等的节点。</li>
+</ul>
+<p>不管操作是插入、删除还是查找，其时间复杂度其实都跟树的高度成正比，也就是 O(height)。</p>
+<p><strong>查找操作</strong></p>
+<p>先取根节点，如果它等于要查找的数据就返回。如果要查找的数据比根节点的值小，那就在左子树中递归查找；如果要查找的数据比根节点的值大，那就在右子树中递归查找。</p>
+<p><img src="/images/code/algo/tree/findtree.png" alt="二叉搜索树"></p>
+<p><strong>插入操作</strong></p>
+<p>二叉查找树的插入过程需要从根节点开始，依次比较要插入的数据和节点的大小关系：</p>
+<ol>
+<li><p>如果要插入的数据比节点的数据大，并且节点的右子树为空，就将新数据直接插到右子节点的位置；如果不为空，就再递归遍历右子树，查找插入位置。</p>
+</li>
+<li><p>如果要插入的数据比节点数值小，并且节点的左子树为空，就将新数据插入到左子节点的位置；如果不为空，就再递归遍历左子树，查找插入位置。</p>
+</li>
+</ol>
+<p><img src="/images/code/algo/tree/findtree-add.png" alt="img"></p>
+<p><strong>删除操作</strong></p>
+<p>针对要删除节点的子节点个数的不同需要分2种情况来处理:</p>
+<ol>
+<li><p>如果要删除的节点只有一个子节点或没有子节点，只需要要将要删除节点的父节点的指针指向要删除节点的子节点。比如下图中删除节点 55、 13。</p>
+</li>
+<li><p>如果要删除的节点有两个子节点。需要找到这个节点的右子树中的最小节点，把它替换到要删除的节点上。然后再按照上面方法删除掉这个最小节点。比如下图中的删除节点 18。（用左子树的最大节点进行替换也可以）。</p>
+</li>
+</ol>
+<p><img src="/images/code/algo/tree/findtree-del.png" alt="img"></p>
+<h2 id="平衡二叉树"><a href="#平衡二叉树" class="headerlink" title="平衡二叉树"></a>平衡二叉树</h2><p>为了解决普通二叉查找树在频繁的插入、删除等动态更新的情况下，出现时间复杂度退化的问题。平衡二叉查找树就是让整棵树左右看起来比较平衡，不要出现左子树很高、右子树很矮的情况。这样就能让整棵树的高度相对来说低一些，相应的插入、删除、查找等操作的效率高一些。</p>
+<p>任何节点的左右子树高度相差不超过 1，完全二叉树、满二叉树都是平衡二叉树，非完全二叉树有可能是平衡二叉树。</p>
+<h2 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h2><p>红黑树是一颗特殊的二叉查找树，除了二叉查找树的要求外，它还具有以下特性：</p>
+<ul>
+<li>每个节点是黑色或者红色。</li>
+<li>根节点是黑色。</li>
+<li>每个叶子节点(NIL，空节点)是黑色。</li>
+<li>从根节点到叶子节点，不会出现两个连续的红色节点。如果一个节点是红色的，则它的子节点必是黑色。</li>
+<li>从任何节点到叶子节点，这条路径上有相同数目的黑色节点。</li>
+</ul>
+<p><strong>旋转</strong></p>
+<p>左旋就是当新加入节点之后，树的高度及颜色不再满足红黑树定义规则后；将不满足的节点进行左旋转，使得它取代之前它的父节点，同时它的父节点变为它的左子节点，最后调整颜色的过程。</p>
+<p><img src="/images/code/algo/tree/rbtree.png" alt="img"></p>
+<p>对x左旋，意味着降低x节点的高度，将x变成一个左节点，提升x节点右节点y的高度。</p>
+<ol>
+<li>x的右子树指向y的左子树</li>
+<li>本来指向x结点的父指针，改成指向y</li>
+<li>y的左子树指向x结点</li>
+</ol>
+<p><img src="/images/code/algo/tree/rbtree2.png" alt="img"></p>
+<p>右旋就是以某节点为中心进行向右的旋转，取代并成为之前自己的父节点，然后把之前的父节点变为自己的右子节点，最后调整颜色的过程。</p>
+<ol>
+<li>x的左子树指向y的右子树</li>
+<li>本来指向x结点的父指针，改成指向y</li>
+<li>y的右子树指向x结点</li>
+</ol>
+<hr>
+<h2 id="霍夫曼树"><a href="#霍夫曼树" class="headerlink" title="霍夫曼树"></a>霍夫曼树</h2><p>带权路径最短的二叉树称为哈夫曼树或最优二叉树。<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wuqinglong/p/9709048.html">https://www.cnblogs.com/wuqinglong/p/9709048.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/12/11/algo/divided/" rel="prev" title="分治算法">
+      <i class="fa fa-chevron-left"></i> 分治算法
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91"><span class="nav-number">1.</span> <span class="nav-text">平衡二叉树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%A2%E9%BB%91%E6%A0%91"><span class="nav-number">2.</span> <span class="nav-text">红黑树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9C%8D%E5%A4%AB%E6%9B%BC%E6%A0%91"><span class="nav-number">3.</span> <span class="nav-text">霍夫曼树</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ubun2</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">219</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ubun2</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

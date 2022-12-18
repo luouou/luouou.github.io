@@ -176,6 +176,89 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/armv8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/25/cpu/armv8/" class="post-title-link" itemprop="url">ARMv8 架构</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-25 15:35:42 / 修改时间：16:52:22" itemprop="dateCreated datePublished" datetime="2022-09-25T15:35:42+08:00">2022-09-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="特权等级"><a href="#特权等级" class="headerlink" title="特权等级"></a>特权等级</h2><p>ARMv8中，引入了Secure World和Non-Secure World（Normal World）两种安全状态，四种异常级别。</p>
+<ul>
+<li><p>EL0是无特权模式，就是用户空间，运行应用程序，在Secure world就是Trust Application。</p>
+</li>
+<li><p>EL1是一个特权模式，能够执行一些特权指令，用于运行操作系统，在Secure World则就是Trusted OS，比如OP-TEE，豌豆荚的TEE等。</p>
+</li>
+<li><p>EL2提供了对虚拟化的支持，只在Noraml world使用。</p>
+</li>
+<li><p>EL3具有最高管理权限，负责安全监测和Secure World和Normal World之间的切换。当noraml world想要访问Secure world需要通过安全监视器调用SMC指令进入监视模式然后切换。</p>
+</li>
+</ul>
+<p>安全状态主要是影响资源的访问，比如memory，系统寄存器等。</p>
+<p>对于memory，有时候需要做数据隔离，用于保护数据的安全性。因此就可以将memory分成两个区域，secure区域和non-secure区域。对于secure的memory区域，只允许secure状态去访问，而对于non-secure的memory区域，允许secure状态和non-secure状态都可访问。这样可以保护数据的安全。</p>
+<p>对于系统寄存器，有些系统寄存器限制了最低EL的访问，这样可以有效的保护系统。不让低EL运行的程序，误操作这些系统寄存器而使整个系统崩溃掉。</p>
+<p>对于EL1和EL0，可以是non-secure状态，也可以是secure状态。对于EL2，只能是non-secure状态。对于EL3，只能是secure状态。</p>
+<p>secure和non-secure状态的切换，只能通过EL3进行切换，也就是如果想从non-secure的EL0切换到secure的EL0，首先要先从non-secure的EL0，通过异常切换到EL3，然后再通过异常，返回到secure的EL0。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/armv8_reg/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1366,198 +1449,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/24/algo/tree/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/24/algo/tree/" class="post-title-link" itemprop="url">二叉树</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-24 19:07:35" itemprop="dateCreated datePublished" datetime="2022-09-24T19:07:35+08:00">2022-09-24</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-10-04 16:17:22" itemprop="dateModified" datetime="2022-10-04T16:17:22+08:00">2022-10-04</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="树的定义"><a href="#树的定义" class="headerlink" title="树的定义"></a>树的定义</h2><p>树是 n (n &gt;= 0)个节点的有限集合，当n = 0 时称为空树，在任意一棵非空树中都应满足：</p>
-<ol>
-<li>有且仅有一个根节点。</li>
-<li>当 n &gt; 1 时，其余节点可分为 m ( m &gt; 0)个互不相交的有限集合T1,T2,T3, …. Tm ，其中每一个集合本身又是一棵树。</li>
-</ol>
-<ul>
-<li>父节点：若一个节点含有子节点，则这个节点称为其子节点的父节点</li>
-<li>子节点：一个节点含有的子树的根节点称为该节点的子节点</li>
-<li>节点深度：根节点到这个节点所经历的边的个数</li>
-<li>节点高度：节点到叶子节点的最长路径(边数)</li>
-<li>节点的层次：从根节点开始，根节点为第一层，根的子节点为第二层，以此类推</li>
-<li>树的深度：一棵树中节点的最大深度就是树的深度，也称为高度</li>
-<li>兄弟节点：拥有共同父节点的节点</li>
-<li>度：节点的子树数目</li>
-<li>叶子节点：度为零的节点</li>
-<li>祖先：对任意节点x，从根节点到节点x的所有节点都是x的祖先（节点x也是自己的祖先）</li>
-<li>后代：对任意节点x，从节点x到叶子节点的所有节点都是x的后代（节点x也是自己的后代）</li>
-<li>森林：m颗互不相交的树构成的集合就是森林</li>
-</ul>
-<p>“高度”是从下往上度量，从最底层开始计数计数的起点是0。“深度”是从上往下度量，从根结点开始度量计数起点也是0。“层数”跟深度的计算类似，不过计数起点是1。</p>
-<p><img src="/images/code/algo/tree/struct.png" alt="树定义"></p>
-<h2 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h2><p>二叉树是树的一种，特点是每个节点最多有两个子节点，分别是左子节点和右子节点，有的只有左子节点，有的只有右子节点。</p>
-<ul>
-<li>每个节点最多有两个子节点，度小于2。</li>
-<li>二叉树的第i层上至多有2^i-1^个节点(i&gt;=1)。</li>
-<li>深度为k的二叉树至多有2^k^-1个节点(k&gt;=1)。</li>
-<li>对任何一棵二叉树，如果其终端节点数为n<del>0</del>，度为2的节点数为n<del>2</del>，则n<del>0</del> = n<del>2</del> + 1。</li>
-<li>具有n个节点的完全二叉树的深度为|log2^n^|+1 (|x|表示不大于x的最大整数)。</li>
-</ul>
-<h3 id="树的存储结构"><a href="#树的存储结构" class="headerlink" title="树的存储结构"></a>树的存储结构</h3><p><strong>链式存储法</strong>：每个节点有三个字段，其中一个存储数据，另外两个是指向左右子节点的指针。从根节点开始可以通过左右子节点的指针，把整棵树都串起来。</p>
-<p><img src="/images/code/algo/tree/list.png" alt="链式存储"></p>
-<p><strong>数组顺序存储法</strong>：把根节点存储在下标 i = 1 的位置，那左子节点存储在下标 2 * i = 2 的位置，右子节点存储在 2 * i + 1 = 3 的位置，以此类推。</p>
-<p><img src="/images/code/algo/tree/array.png" alt="顺序存储"></p>
-<p>如果节点 X 存储在数组中下标为 i 的位置，左子节点的下标为 2 * i ，右子节点的下标为 2 * i + 1。反过来，下标为 i/2 的位置存储就是它的父节点。通过这种方式，只要知道根节点存储的位置（一般情况下，为了方便计算子节点，根节点会存储在下标为 1 的位置），就可以通过下标计算，把整棵树都串起来。</p>
-<p>这种方式比较适合完全二叉树，仅浪费了一个下标为 0 的存储位置，如果是非完全二叉树，则会比较浪费存储空间。</p>
-<p><img src="/images/code/algo/tree/array2.png" alt="顺序存储"></p>
-<h3 id="二叉树的遍历"><a href="#二叉树的遍历" class="headerlink" title="二叉树的遍历"></a>二叉树的遍历</h3><p>二叉树遍历过程中每个节点最多会被访问两次，所以遍历操作的时间复杂度跟节点的个数 n 成正比，二叉树遍历的时间复杂度是 O(n)。</p>
-<p><img src="/images/code/algo/tree/foreach.png" alt="二叉树的遍历"></p>
-<ul>
-<li><p>前序遍历规则是若树为空，则空操作返回，否则先访问根节点，然后依次访问的左子树和右子树。</p>
-</li>
-<li><p>中序遍历规则是若树为空，则空操作返回，否则从根节点开始，先遍历根节点的左子树，然后访问根节点，最后访问右子树。</p>
-</li>
-<li><p>后序遍历规则是若树为空，则空操作返回，否则从左到右先叶子后节点的方式遍历访问左右子树，最后访问根节点。</p>
-</li>
-<li><p>层序遍历规则是若树为空，则空操作返回，否则从树的第一层，也就是根节点开始访问，从上而下逐层遍历，在同一层中，按从左到右的顺序对节点逐个访问。</p>
-</li>
-</ul>
-<p><img src="/images/code/algo/tree/foreach2.png" alt="层序遍历"></p>
-<p>按照广度优先的遍历算法的思路实现层序遍历：引入一个队列，根节点先入队列，然后开始从队列头部取元素，每取一个元素则先打印当前元素，然后依次将左右子节点加入队列，若左子节点或右子节点为空则跳过此步。</p>
-<h3 id="满二叉树"><a href="#满二叉树" class="headerlink" title="满二叉树"></a>满二叉树</h3><p>叶子节点全都在同一层，并且除了叶子节点之外，每个节点都有左右两个子节点的二叉树。</p>
-<p><img src="/images/code/algo/tree/fulltree.png" alt="满二叉树"></p>
-<h3 id="完全二叉树"><a href="#完全二叉树" class="headerlink" title="完全二叉树"></a>完全二叉树</h3><p>子节点都在最底下两层，最后一层的叶子节点都靠左排列，并且除了最后一层，其他层的节点个数都要达到最大（构成满二叉树）。</p>
-<p><img src="/images/code/algo/tree/alltree.png" alt="完全二叉树"></p>
-<ol>
-<li>叶子节点只能出现在最下两层。</li>
-<li>最下层的叶子一定集中在左部连续位置。</li>
-<li>倒数二层，若有叶子节点，一定都在右部连续位置。</li>
-<li>如果节点度数为1,则该节点只有左子树，即不存在只有右子树的情况。</li>
-<li>同样节点数的二叉树，完全二叉树的深度最小。</li>
-</ol>
-<h3 id="二叉搜索树"><a href="#二叉搜索树" class="headerlink" title="二叉搜索树"></a>二叉搜索树</h3><p>二叉搜索树（Binary Search Tree， BST）支持动态数据集合的快速插入、删除、查找操作，是一棵空树或者有如下性质的二叉树：</p>
-<ul>
-<li>若任意节点的左子树不空，其左子树中的每个节点的值都小于这个节点的值；</li>
-<li>若任意节点的右子树不空，其右子树每个节点的值都大于这个节点的值；</li>
-<li>任意节点的左、右子树也分别为二叉查找树；</li>
-<li>没有键值相等的节点。</li>
-</ul>
-<p>不管操作是插入、删除还是查找，其时间复杂度其实都跟树的高度成正比，也就是 O(height)。</p>
-<p><strong>查找操作</strong></p>
-<p>先取根节点，如果它等于要查找的数据就返回。如果要查找的数据比根节点的值小，那就在左子树中递归查找；如果要查找的数据比根节点的值大，那就在右子树中递归查找。</p>
-<p><img src="/images/code/algo/tree/findtree.png" alt="二叉搜索树"></p>
-<p><strong>插入操作</strong></p>
-<p>二叉查找树的插入过程需要从根节点开始，依次比较要插入的数据和节点的大小关系：</p>
-<ol>
-<li><p>如果要插入的数据比节点的数据大，并且节点的右子树为空，就将新数据直接插到右子节点的位置；如果不为空，就再递归遍历右子树，查找插入位置。</p>
-</li>
-<li><p>如果要插入的数据比节点数值小，并且节点的左子树为空，就将新数据插入到左子节点的位置；如果不为空，就再递归遍历左子树，查找插入位置。</p>
-</li>
-</ol>
-<p><img src="/images/code/algo/tree/findtree-add.png" alt="img"></p>
-<p><strong>删除操作</strong></p>
-<p>针对要删除节点的子节点个数的不同需要分2种情况来处理:</p>
-<ol>
-<li><p>如果要删除的节点只有一个子节点或没有子节点，只需要要将要删除节点的父节点的指针指向要删除节点的子节点。比如下图中删除节点 55、 13。</p>
-</li>
-<li><p>如果要删除的节点有两个子节点。需要找到这个节点的右子树中的最小节点，把它替换到要删除的节点上。然后再按照上面方法删除掉这个最小节点。比如下图中的删除节点 18。（用左子树的最大节点进行替换也可以）。</p>
-</li>
-</ol>
-<p><img src="/images/code/algo/tree/findtree-del.png" alt="img"></p>
-<h3 id="平衡二叉树"><a href="#平衡二叉树" class="headerlink" title="平衡二叉树"></a>平衡二叉树</h3><p>为了解决普通二叉查找树在频繁的插入、删除等动态更新的情况下，出现时间复杂度退化的问题。平衡二叉查找树就是让整棵树左右看起来比较平衡，不要出现左子树很高、右子树很矮的情况。这样就能让整棵树的高度相对来说低一些，相应的插入、删除、查找等操作的效率高一些。</p>
-<p>任何节点的左右子树高度相差不超过 1，完全二叉树、满二叉树都是平衡二叉树，非完全二叉树有可能是平衡二叉树。</p>
-<h3 id="霍夫曼树"><a href="#霍夫曼树" class="headerlink" title="霍夫曼树"></a>霍夫曼树</h3><p>带权路径最短的二叉树称为哈夫曼树或最优二叉树。</p>
-<h3 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h3><p>红黑树是一颗特殊的二叉查找树，除了二叉查找树的要求外，它还具有以下特性：</p>
-<ul>
-<li>每个节点是黑色或者红色。</li>
-<li>根节点是黑色。</li>
-<li>每个叶子节点(NIL，空节点)是黑色。</li>
-<li>从根节点到叶子节点，不会出现两个连续的红色节点。如果一个节点是红色的，则它的子节点必是黑色。</li>
-<li>从任何节点到叶子节点，这条路径上有相同数目的黑色节点。</li>
-</ul>
-<p><strong>旋转</strong></p>
-<p>左旋就是当新加入节点之后，树的高度及颜色不再满足红黑树定义规则后；将不满足的节点进行左旋转，使得它取代之前它的父节点，同时它的父节点变为它的左子节点，最后调整颜色的过程。</p>
-<p><img src="/images/code/algo/tree/rbtree.png" alt="img"></p>
-<p>对x左旋，意味着降低x节点的高度，将x变成一个左节点，提升x节点右节点y的高度。</p>
-<ol>
-<li>x的右子树指向y的左子树</li>
-<li>本来指向x结点的父指针，改成指向y</li>
-<li>y的左子树指向x结点</li>
-</ol>
-<p><img src="/images/code/algo/tree/rbtree2.png" alt="img"></p>
-<p>右旋就是以某节点为中心进行向右的旋转，取代并成为之前自己的父节点，然后把之前的父节点变为自己的右子节点，最后调整颜色的过程。</p>
-<ol>
-<li>x的左子树指向y的右子树</li>
-<li>本来指向x结点的父指针，改成指向y</li>
-<li>y的右子树指向x结点</li>
-</ol>
-<hr>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wuqinglong/p/9709048.html">https://www.cnblogs.com/wuqinglong/p/9709048.html</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1627,7 +1518,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">218</span>
+          <span class="site-state-item-count">219</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

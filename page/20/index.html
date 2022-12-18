@@ -176,6 +176,123 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/uart-bus/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/hardware/uart-bus/" class="post-title-link" itemprop="url">串口通信协议</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-07-05 17:04:27" itemprop="dateModified" datetime="2022-07-05T17:04:27+08:00">2022-07-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="UART"><a href="#UART" class="headerlink" title="UART"></a>UART</h2><p>UART通用异步接收器/发送。传输数据包由起始位、数据帧、奇偶校验位和停止位组成。</p>
+<p><img src="/images/uart/uart.png" alt="img"></p>
+<p><strong>起始位</strong></p>
+<p>当不传输数据时，UART数据传输线通常保持高电压电平。若要开始数据传输，发送UART会将传输线从高电平拉到低电平并保持1个时钟周期。当接收UART检测到高到低电压跃迁时，便开始以波特率对应的频率读取数据帧中的位。</p>
+<p><strong>数据帧</strong></p>
+<p>数据帧包含所传输的实际数据，如果使用奇偶校验位，数据帧长度可以是5 - 8位。如果不使用奇偶校验位，数据帧长度可以是9位。低位先发送。</p>
+<p><strong>校验</strong></p>
+<p>通过奇偶校验位，接收器就可以判断传输期间是否有数据发生改变，当奇偶校验位与数据匹配时，则认为传输未出错。</p>
+<ul>
+<li>奇校验(odd parity)：让传输的数据（包含校验位）中1的个数是否为奇数，即如果传输字节中1的个数是偶数，则校验位就要为1，否则为0。</li>
+<li>偶校验(even parity)：传输的数据（包含校验位）中1的个数是否为偶数，即如果传输字节中1的个数是偶数，则校验位就要为0，否则为0。</li>
+<li>1校验(mark parity): 校验位始终为1。</li>
+<li>0校验(space parity): 校验位始终为0。</li>
+</ul>
+<p><strong>停止位</strong></p>
+<p>表示一帧数据的结束，发送端将数据传输线从低电压驱动到高电压并保持1、1.5、2bit的时间。</p>
+<p>波特率：意思是每秒传输这么多个比特位数(bit)。</p>
+<p>1、当为奇数校验：”A”字符的8个bit位中有两个1,那么奇偶校验位为1才能满足1的个数为奇数(奇校验)。图-1的波形就是这种情况。<br>2、当为偶数校验：”A”字符的8个bit位中有两个1,那么奇偶校验位为0才能满足1的个数为偶数(偶校验)。<br>此位还可以去除，即不需要奇偶校验位。</p>
+<h2 id="RS232"><a href="#RS232" class="headerlink" title="RS232"></a>RS232</h2><p>RS232是串口的一个标准，RS232是负逻辑电平，它定义+5 ~ +12V为低电平，而-12 ~ -5V为高电平。</p>
+<ul>
+<li>最大传输距离 50 米。</li>
+<li>传输速率较低，在异步传输时，波特率为 20Kbps。</li>
+<li>只允许一对一通信。</li>
+</ul>
+<p><img src="/images/uart/RS232.webp" alt="img"><br><img src="/images/uart/max3232.png" alt="max3232"></p>
+<h2 id="RS485"><a href="#RS485" class="headerlink" title="RS485"></a>RS485</h2><p>RS-232接口只能点对点的通信，不能实现联网功能，于是一个新的标准RS-485产生了。RS-485使用一对双绞线采用差分传输方式，由于是差分通信，因此数据的接收和发送数据不能同时进行，只能工作在半双工模式，常用于总线网。</p>
+<ul>
+<li>电气特性：逻辑1以两线间的电压差为+2 ~ 6V表示；逻辑0以两线间的电压差为-2 ~ 6V表示。</li>
+<li>最大的通信距离约为1200米（9600bps 时），实际上可达 3000 米。</li>
+<li>最大传输速率为10Mb/s。</li>
+<li>RS-485总线一般最大支持32个节点。</li>
+</ul>
+<p><img src="/images/uart/max485.png" alt="MAX485"></p>
+<p>为了提高RS485的抗干扰性能，需要在靠近MAX485的AB引脚之间并接一个100 ~ 1K的电阻。</p>
+<h2 id="RS422"><a href="#RS422" class="headerlink" title="RS422"></a>RS422</h2><p>RS-422（EIA RS-422-A Standard）是Apple的Macintosh计算机的串口连接标准。有4根信号线：两根发送，两根接收。由于RS-422 的收与发是分开的，所以可以全双工，适用于两个站之间通信，星型网、环网，不可用于总线网。</p>
+<ul>
+<li>最大传输距离为1219米，最大传输速率为10Mb/s。</li>
+<li>最多可接10个节点。</li>
+<li>支持点对多的双向通信。</li>
+</ul>
+<p><img src="/images/uart/RS-xxx.webp" alt="RS-xxx"></p>
+<h2 id="帧协议"><a href="#帧协议" class="headerlink" title="帧协议"></a>帧协议</h2><p><img src="/images/uart/uart-protocol.jpg" alt="img"></p>
+<hr>
+<p><a target="_blank" rel="noopener" href="https://www.analog.com/cn/analog-dialogue/articles/uart-a-hardware-communication-protocol.html">https://www.analog.com/cn/analog-dialogue/articles/uart-a-hardware-communication-protocol.html</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/pci/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1659,101 +1776,6 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/rj45/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/rj45/" class="post-title-link" itemprop="url">RJ45 interface</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>以太网信号最终是通过RJ45接头接入网络的。RJ是Registered Jack的缩写，意思是注册的插座。在FCC（美国联邦通信委员会标准和规章）中RJ是描述公用电信网络的接口，计算机网络的RJ45是标准8位模块化接口的俗称。连接器由插头（8P8C接头，水晶头）和插座组成。</p>
-<p>RJ45型网线插头又称水晶头，有两种连接方式，分别称作 T568A 线序和 T568B 线序。两者的主要区别是橙色和绿色双绞线进行了交换。</p>
-<p>这两种标准只是在线缆颜色上有所区别，目的是在线缆侧实现交叉互连。直连线常用于异种网络之间的互连（比如计算机交换机之间），交叉线常用于同种网络之间的互联（比如计算机与之间）。</p>
-<p><img src="/images/net/RJ45/RJ-45_T568AB.jpg" alt="RJ-45接线图"></p>
-<p><img src="/images/net/RJ45/T568AB.bmp" alt="RJ-45接线图2"></p>
-<p>交叉互连，所谓交叉是指网线的一端和另一端与 RJ45 网线插头的接法不同，一端按 T568A 线序接，另一端按 T568B 线序接，即有几根网线在另一端是先做了交叉才接到 RJ45 插头上去的，适用的场合：</p>
-<ul>
-<li>电脑——电脑，称对等网连接</li>
-<li>集线器——集线器</li>
-<li>交换机——交换机</li>
-</ul>
-<p>直连线互连的网线的两端均按T568B接线，适用场合：</p>
-<ul>
-<li>电脑——ADSL 猫</li>
-<li>ADSL猫——ADSL 路由器的 WAN 口</li>
-<li>电脑——ADSL 路由器的 LAN 口</li>
-<li>电脑——集线器或交换机</li>
-</ul>
-<p>现在PHY芯片大部分具有自动交叉（auto MDI-X）的能力，它可以实现RJ-45接口的传送信号线和接收信号线的功能自动互相交换，有的PHY甚至支持一对线中的正信号和负信号的功能自动交换，这样就不必考虑选用直连网线还是交叉网线，只需要直连即可。</p>
-<p><img src="/images/net/RJ45/T-568A.jpg" alt="T-568A"></p>
-<p><img src="/images/net/RJ45/T-568B.jpg" alt="T-568B"></p>
-<p><img src="/images/net/RJ45/RJ45-pinout.jpg" alt="RJ45-pinout"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1823,7 +1845,7 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">218</span>
+          <span class="site-state-item-count">219</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

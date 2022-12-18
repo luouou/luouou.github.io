@@ -287,6 +287,7 @@
 </ul>
 <p>堆比较适合用数组来存储。</p>
 <p><img src="/images/code/algo/heap/heap.png" alt="heap"></p>
+<p>堆典型应用场景：实现优先队列、求 Top N 、求中位数。</p>
 <h2 id="堆化"><a href="#堆化" class="headerlink" title="堆化"></a>堆化</h2><p>堆的元素变动后，不符合堆定义的话，就需要进行调整，让其重新满足堆的特性，这个过程叫作堆化。堆化就是顺着节点所在的路径，向上或者向下进行对比，然后交换。</p>
 <p><strong>插入元素</strong></p>
 <p>插入的元素直接放到堆的最后，从下往上堆化，让新插入的节点与父节点对比大小，如果不满足子节点小于等于父节点的大小关系，就互换两个节点。一直重复这个过程，直到比对到根节点。</p>
@@ -603,43 +604,52 @@
   <entry>
     <title>二叉树</title>
     <url>/2022/09/24/algo/tree/</url>
-    <content><![CDATA[<h2 id="树的定义"><a href="#树的定义" class="headerlink" title="树的定义"></a>树的定义</h2><p>树是 n (n &gt;= 0)个节点的有限集合，当n = 0 时称为空树，在任意一棵非空树中都应满足：</p>
+    <content><![CDATA[<h2 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h2><p>树是 n (n &gt;= 0)个节点的有限集合，当n = 0 时称为空树，在任意一棵非空树中都应满足：</p>
 <ol>
 <li>有且仅有一个根节点。</li>
 <li>当 n &gt; 1 时，其余节点可分为 m ( m &gt; 0)个互不相交的有限集合T1,T2,T3, …. Tm ，其中每一个集合本身又是一棵树。</li>
 </ol>
 <ul>
-<li>父节点：若一个节点含有子节点，则这个节点称为其子节点的父节点</li>
-<li>子节点：一个节点含有的子树的根节点称为该节点的子节点</li>
-<li>节点深度：根节点到这个节点所经历的边的个数</li>
-<li>节点高度：节点到叶子节点的最长路径(边数)</li>
-<li>节点的层次：从根节点开始，根节点为第一层，根的子节点为第二层，以此类推</li>
-<li>树的深度：一棵树中节点的最大深度就是树的深度，也称为高度</li>
-<li>兄弟节点：拥有共同父节点的节点</li>
-<li>度：节点的子树数目</li>
-<li>叶子节点：度为零的节点</li>
-<li>祖先：对任意节点x，从根节点到节点x的所有节点都是x的祖先（节点x也是自己的祖先）</li>
-<li>后代：对任意节点x，从节点x到叶子节点的所有节点都是x的后代（节点x也是自己的后代）</li>
-<li>森林：m颗互不相交的树构成的集合就是森林</li>
+<li><p>父节点：若一个节点含有子节点，则这个节点称为其子节点的父节点</p>
+</li>
+<li><p>子节点：一个节点含有的子树的根节点称为该节点的子节点</p>
+</li>
+<li><p>叶子节点：度为零的节点</p>
+</li>
+<li><p>兄弟节点：拥有共同父节点的节点</p>
+</li>
+<li><p>祖先：对任意节点x，从根节点到节点x的所有节点都是x的祖先（节点x也是自己的祖先）</p>
+</li>
+<li><p>后代：对任意节点x，从节点x到叶子节点的所有节点都是x的后代（节点x也是自己的后代）</p>
+</li>
+<li><p>森林：m颗互不相交的树构成的集合就是森林</p>
+</li>
+<li><p>节点深度：根节点到这个节点所经历的边的个数，从根结点开始向下度量。</p>
+</li>
+<li><p>节点高度：节点到根节点的最长路径(边数)</p>
+</li>
+<li><p>节点的层次：从根结点开始向下度量，计数起点为1。</p>
+</li>
+<li><p>树的深度：一棵树中节点的最大深度</p>
+</li>
+<li><p>度：节点的子树数目</p>
+</li>
 </ul>
-<p>“高度”是从下往上度量，从最底层开始计数计数的起点是0。“深度”是从上往下度量，从根结点开始度量计数起点也是0。“层数”跟深度的计算类似，不过计数起点是1。</p>
-<p><img src="/images/code/algo/tree/struct.png" alt="树定义"></p>
-<h2 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h2><p>二叉树是树的一种，特点是每个节点最多有两个子节点，分别是左子节点和右子节点，有的只有左子节点，有的只有右子节点。</p>
+<p><img src="/images/code/algo/tree/tree.png" alt="树定义"></p>
+<p>二叉树是n（n&gt;=0）个结点的有限集合，该集合或者为空集（称为空二叉树），或者由一个根结点和两棵互不相交的、分别称为根结点的左子树和右子树的二叉树组成。</p>
+<p>二叉树是树的一种，特点是每个节点最多有两个子节点，分别是左子节点和右子节点，有的只有左子节点，有的只有右子节点。</p>
 <ul>
 <li>每个节点最多有两个子节点，度小于2。</li>
 <li>二叉树的第i层上至多有2^i-1^个节点(i&gt;=1)。</li>
 <li>深度为k的二叉树至多有2^k^-1个节点(k&gt;=1)。</li>
 <li>对任何一棵二叉树，如果其终端节点数为n<del>0</del>，度为2的节点数为n<del>2</del>，则n<del>0</del> = n<del>2</del> + 1。</li>
-<li>具有n个节点的完全二叉树的深度为|log2^n^|+1 (|x|表示不大于x的最大整数)。</li>
 </ul>
-<h3 id="树的存储结构"><a href="#树的存储结构" class="headerlink" title="树的存储结构"></a>树的存储结构</h3><p><strong>链式存储法</strong>：每个节点有三个字段，其中一个存储数据，另外两个是指向左右子节点的指针。从根节点开始可以通过左右子节点的指针，把整棵树都串起来。</p>
+<h2 id="存储结构"><a href="#存储结构" class="headerlink" title="存储结构"></a>存储结构</h2><p><strong>链式存储法</strong>：每个节点有三个字段，其中一个存储数据，另外两个是指向左右子节点的指针。从根节点开始可以通过左右子节点的指针，把整棵树都串起来。</p>
 <p><img src="/images/code/algo/tree/list.png" alt="链式存储"></p>
 <p><strong>数组顺序存储法</strong>：把根节点存储在下标 i = 1 的位置，那左子节点存储在下标 2 * i = 2 的位置，右子节点存储在 2 * i + 1 = 3 的位置，以此类推。</p>
 <p><img src="/images/code/algo/tree/array.png" alt="顺序存储"></p>
 <p>如果节点 X 存储在数组中下标为 i 的位置，左子节点的下标为 2 * i ，右子节点的下标为 2 * i + 1。反过来，下标为 i/2 的位置存储就是它的父节点。通过这种方式，只要知道根节点存储的位置（一般情况下，为了方便计算子节点，根节点会存储在下标为 1 的位置），就可以通过下标计算，把整棵树都串起来。</p>
-<p>这种方式比较适合完全二叉树，仅浪费了一个下标为 0 的存储位置，如果是非完全二叉树，则会比较浪费存储空间。</p>
-<p><img src="/images/code/algo/tree/array2.png" alt="顺序存储"></p>
-<h3 id="二叉树的遍历"><a href="#二叉树的遍历" class="headerlink" title="二叉树的遍历"></a>二叉树的遍历</h3><p>二叉树遍历过程中每个节点最多会被访问两次，所以遍历操作的时间复杂度跟节点的个数 n 成正比，二叉树遍历的时间复杂度是 O(n)。</p>
+<h2 id="遍历"><a href="#遍历" class="headerlink" title="遍历"></a>遍历</h2><p>二叉树遍历过程中每个节点最多会被访问两次，所以遍历操作的时间复杂度跟节点的个数 n 成正比，二叉树遍历的时间复杂度是 O(n)。</p>
 <p><img src="/images/code/algo/tree/foreach.png" alt="二叉树的遍历"></p>
 <ul>
 <li><p>前序遍历规则是若树为空，则空操作返回，否则先访问根节点，然后依次访问的左子树和右子树。</p>
@@ -648,80 +658,36 @@
 </li>
 <li><p>后序遍历规则是若树为空，则空操作返回，否则从左到右先叶子后节点的方式遍历访问左右子树，最后访问根节点。</p>
 </li>
-<li><p>层序遍历规则是若树为空，则空操作返回，否则从树的第一层，也就是根节点开始访问，从上而下逐层遍历，在同一层中，按从左到右的顺序对节点逐个访问。</p>
+<li><p>层序遍历规则是若树为空，则空操作返回，否则从根节点开始访问，从上而下逐层遍历，在同一层中，按从左到右的顺序对节点逐个访问。</p>
 </li>
 </ul>
 <p><img src="/images/code/algo/tree/foreach2.png" alt="层序遍历"></p>
-<p>按照广度优先的遍历算法的思路实现层序遍历：引入一个队列，根节点先入队列，然后开始从队列头部取元素，每取一个元素则先打印当前元素，然后依次将左右子节点加入队列，若左子节点或右子节点为空则跳过此步。</p>
-<h3 id="满二叉树"><a href="#满二叉树" class="headerlink" title="满二叉树"></a>满二叉树</h3><p>叶子节点全都在同一层，并且除了叶子节点之外，每个节点都有左右两个子节点的二叉树。</p>
+<h3 id="前序遍历"><a href="#前序遍历" class="headerlink" title="前序遍历"></a>前序遍历</h3><h3 id="中序遍历"><a href="#中序遍历" class="headerlink" title="中序遍历"></a>中序遍历</h3><h3 id="后序遍历"><a href="#后序遍历" class="headerlink" title="后序遍历"></a>后序遍历</h3><h3 id="层序遍历"><a href="#层序遍历" class="headerlink" title="层序遍历"></a>层序遍历</h3><p>按照广度优先的遍历算法的思路实现层序遍历：引入一个队列，根节点先入队列，然后开始从队列头部取元素，每取一个元素则先打印当前元素，然后依次将左右子节点加入队列，若左子节点或右子节点为空则跳过此步。</p>
+<h2 id="满二叉树"><a href="#满二叉树" class="headerlink" title="满二叉树"></a>满二叉树</h2><p>叶子节点全都在同一层，并且除了叶子节点之外，每个节点都有左右两个子节点的二叉树。</p>
 <p><img src="/images/code/algo/tree/fulltree.png" alt="满二叉树"></p>
-<h3 id="完全二叉树"><a href="#完全二叉树" class="headerlink" title="完全二叉树"></a>完全二叉树</h3><p>子节点都在最底下两层，最后一层的叶子节点都靠左排列，并且除了最后一层，其他层的节点个数都要达到最大（构成满二叉树）。</p>
+<h2 id="完全二叉树"><a href="#完全二叉树" class="headerlink" title="完全二叉树"></a>完全二叉树</h2><p>子节点都在最底下两层，最后一层的叶子节点都靠左排列，并且除了最后一层，其他层的节点个数都要达到最大（构成满二叉树）。</p>
 <p><img src="/images/code/algo/tree/alltree.png" alt="完全二叉树"></p>
-<ol>
-<li>叶子节点只能出现在最下两层。</li>
-<li>最下层的叶子一定集中在左部连续位置。</li>
-<li>倒数二层，若有叶子节点，一定都在右部连续位置。</li>
-<li>如果节点度数为1,则该节点只有左子树，即不存在只有右子树的情况。</li>
-<li>同样节点数的二叉树，完全二叉树的深度最小。</li>
-</ol>
-<h3 id="二叉搜索树"><a href="#二叉搜索树" class="headerlink" title="二叉搜索树"></a>二叉搜索树</h3><p>二叉搜索树（Binary Search Tree， BST）支持动态数据集合的快速插入、删除、查找操作，是一棵空树或者有如下性质的二叉树：</p>
 <ul>
-<li>若任意节点的左子树不空，其左子树中的每个节点的值都小于这个节点的值；</li>
-<li>若任意节点的右子树不空，其右子树每个节点的值都大于这个节点的值；</li>
-<li>任意节点的左、右子树也分别为二叉查找树；</li>
-<li>没有键值相等的节点。</li>
+<li><p>叶子节点只能出现在最下两层。</p>
+</li>
+<li><p>最下层的叶子一定集中在左部连续位置。</p>
+</li>
+<li><p>倒数二层，若有叶子节点，一定都在右部连续位置。</p>
+</li>
+<li><p>如果节点度数为1,则该节点只有左子树，即不存在只有右子树的情况。</p>
+</li>
+<li><p>同样节点数的二叉树，完全二叉树的深度最小。</p>
+</li>
+<li><p>具有n个结点的完全二叉树的深度为不大于log2^n^的最大整数 + 1 。</p>
+</li>
+<li><p>对一棵有n个结点的完全二叉树的结点按层序编号（从第一层到最后一层，每层从左到右），对任一结点i（1&lt;=i&lt;=n）有：</p>
+</li>
 </ul>
-<p>不管操作是插入、删除还是查找，其时间复杂度其实都跟树的高度成正比，也就是 O(height)。</p>
-<p><strong>查找操作</strong></p>
-<p>先取根节点，如果它等于要查找的数据就返回。如果要查找的数据比根节点的值小，那就在左子树中递归查找；如果要查找的数据比根节点的值大，那就在右子树中递归查找。</p>
-<p><img src="/images/code/algo/tree/findtree.png" alt="二叉搜索树"></p>
-<p><strong>插入操作</strong></p>
-<p>二叉查找树的插入过程需要从根节点开始，依次比较要插入的数据和节点的大小关系：</p>
 <ol>
-<li><p>如果要插入的数据比节点的数据大，并且节点的右子树为空，就将新数据直接插到右子节点的位置；如果不为空，就再递归遍历右子树，查找插入位置。</p>
-</li>
-<li><p>如果要插入的数据比节点数值小，并且节点的左子树为空，就将新数据插入到左子节点的位置；如果不为空，就再递归遍历左子树，查找插入位置。</p>
-</li>
+<li>如果i=1，则结点i是二叉树的根，无双亲；如果i&gt;1，则其双亲是结点 ⌊ i/2 ⌋ 。</li>
+<li>如果2i&gt;n，则结点i无左孩子（结点i为叶子结点）；否则其左孩子是结点2i 。</li>
+<li>如果2i+1&gt;n，则结点i无右孩子；否则其右孩子是结点2i+1 。</li>
 </ol>
-<p><img src="/images/code/algo/tree/findtree-add.png" alt="img"></p>
-<p><strong>删除操作</strong></p>
-<p>针对要删除节点的子节点个数的不同需要分2种情况来处理:</p>
-<ol>
-<li><p>如果要删除的节点只有一个子节点或没有子节点，只需要要将要删除节点的父节点的指针指向要删除节点的子节点。比如下图中删除节点 55、 13。</p>
-</li>
-<li><p>如果要删除的节点有两个子节点。需要找到这个节点的右子树中的最小节点，把它替换到要删除的节点上。然后再按照上面方法删除掉这个最小节点。比如下图中的删除节点 18。（用左子树的最大节点进行替换也可以）。</p>
-</li>
-</ol>
-<p><img src="/images/code/algo/tree/findtree-del.png" alt="img"></p>
-<h3 id="平衡二叉树"><a href="#平衡二叉树" class="headerlink" title="平衡二叉树"></a>平衡二叉树</h3><p>为了解决普通二叉查找树在频繁的插入、删除等动态更新的情况下，出现时间复杂度退化的问题。平衡二叉查找树就是让整棵树左右看起来比较平衡，不要出现左子树很高、右子树很矮的情况。这样就能让整棵树的高度相对来说低一些，相应的插入、删除、查找等操作的效率高一些。</p>
-<p>任何节点的左右子树高度相差不超过 1，完全二叉树、满二叉树都是平衡二叉树，非完全二叉树有可能是平衡二叉树。</p>
-<h3 id="霍夫曼树"><a href="#霍夫曼树" class="headerlink" title="霍夫曼树"></a>霍夫曼树</h3><p>带权路径最短的二叉树称为哈夫曼树或最优二叉树。</p>
-<h3 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h3><p>红黑树是一颗特殊的二叉查找树，除了二叉查找树的要求外，它还具有以下特性：</p>
-<ul>
-<li>每个节点是黑色或者红色。</li>
-<li>根节点是黑色。</li>
-<li>每个叶子节点(NIL，空节点)是黑色。</li>
-<li>从根节点到叶子节点，不会出现两个连续的红色节点。如果一个节点是红色的，则它的子节点必是黑色。</li>
-<li>从任何节点到叶子节点，这条路径上有相同数目的黑色节点。</li>
-</ul>
-<p><strong>旋转</strong></p>
-<p>左旋就是当新加入节点之后，树的高度及颜色不再满足红黑树定义规则后；将不满足的节点进行左旋转，使得它取代之前它的父节点，同时它的父节点变为它的左子节点，最后调整颜色的过程。</p>
-<p><img src="/images/code/algo/tree/rbtree.png" alt="img"></p>
-<p>对x左旋，意味着降低x节点的高度，将x变成一个左节点，提升x节点右节点y的高度。</p>
-<ol>
-<li>x的右子树指向y的左子树</li>
-<li>本来指向x结点的父指针，改成指向y</li>
-<li>y的左子树指向x结点</li>
-</ol>
-<p><img src="/images/code/algo/tree/rbtree2.png" alt="img"></p>
-<p>右旋就是以某节点为中心进行向右的旋转，取代并成为之前自己的父节点，然后把之前的父节点变为自己的右子节点，最后调整颜色的过程。</p>
-<ol>
-<li>x的左子树指向y的右子树</li>
-<li>本来指向x结点的父指针，改成指向y</li>
-<li>y的右子树指向x结点</li>
-</ol>
-<hr>
-<p><a href="https://www.cnblogs.com/wuqinglong/p/9709048.html">https://www.cnblogs.com/wuqinglong/p/9709048.html</a></p>
 ]]></content>
       <categories>
         <category>algorithm</category>
@@ -14638,9 +14604,6 @@
 <h2 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h2><p>容器是一种类模板，包含各种数据结构的实现，用来存放数据。按元素是否线性，且插入时是否会自动排序，可分为序列式容器和关联式容器。</p>
 <p>序列式容器按顺序存储数据，顺序容器具有插入速度快但查找操作相对较慢的特征。</p>
 <p>关联式容器每个元素都有一个键值和一个实値，以key-value对形式存在。当元素被插入到容器中时，容器内部会依照其键値大小安排放置的位置，所以关联式容器没有所谓头尾，但在查询方面有很大的优势。</p>
-<p>set基于红黑树实现，红黑树具有自动排序的功能，因此内部所有的数据在任何时候都是有序的。适合需要有序数据，能顺序遍历场合。</p>
-<p>unordered_set基于哈希表实现，使用一个下标范围比较大的数组来存储元素，形成很多的桶，利用hash函数对key进行映射到不同区域进行保存。数据插入和查找的时间复杂度是常数，会消耗较多的内存，无自动排序功能。适合不需要排序，单个元素访问场合。</p>
-<p>multiset与 set 类似，但允许存储多个值相同的项。务必使用 multiset::count(value)确定有多少个元素包含特定的值。</p>
 <table>
 <thead>
 <tr>
@@ -14660,6 +14623,16 @@
 <td>不能随机访问</td>
 </tr>
 <tr>
+<td align="center">queue</td>
+<td>队列</td>
+<td>先进先出<br/>只能在访问队首，在队尾插入</td>
+</tr>
+<tr>
+<td align="center">priority_queue</td>
+<td>以特定顺序存储元素，优先级高在队列开头</td>
+<td></td>
+</tr>
+<tr>
 <td align="center">list</td>
 <td>插入时间固定<br/>插入或删除元素后，迭代器仍有效</td>
 <td>不能随机访问<br/>搜索速度慢，因为内存不连续<br/>搜索时间与容器中的元素个数成反比</td>
@@ -14668,6 +14641,11 @@
 <td align="center">forward_list</td>
 <td>单向链表</td>
 <td>只能沿一个方向遍历<br/>只能在开头插入</td>
+</tr>
+<tr>
+<td align="center">stack</td>
+<td>栈</td>
+<td>后进先出<br/>只能在栈顶压入和弹出元素</td>
 </tr>
 <tr>
 <td align="center">set</td>
@@ -14699,24 +14677,12 @@
 <td>查找、插入和删除复杂度为常数，不受容器长度影响</td>
 <td>元素未被严格排序,不适合用于顺序很重要的情形</td>
 </tr>
-<tr>
-<td align="center">stack</td>
-<td>栈</td>
-<td>后进先出<br/>只能在栈顶压入和弹出元素</td>
-</tr>
-<tr>
-<td align="center">queue</td>
-<td>队列</td>
-<td>先进先出<br/>只能在访问队首，在队尾插入</td>
-</tr>
-<tr>
-<td align="center">priority_queue</td>
-<td>以特定顺序存储元素，优先级高在队列开头</td>
-<td></td>
-</tr>
 </tbody></table>
 <p>push_back() 向容器添加元素时，先会调用构造函数构造一个临时对象，而 emplace_back() 是直接在容器空间内原地构造临时对象，省去移动或复制的过程。其传入的参数不是对象，而是对象的构造参数。但要保证容器是有剩余空间存放新元素的，不然跟 push_back() 一样。一般左值用 push_back()，右值用 emplace_back()。</p>
 <h3 id="vector"><a href="#vector" class="headerlink" title="vector"></a>vector</h3><p>可以通过swap()方法与一个小容量的vector交换的方式来减小过剩容量。</p>
+<h3 id="set"><a href="#set" class="headerlink" title="set"></a>set</h3><p>set基于红黑树实现，具有自动排序的功能，适合需要有序数据，能顺序遍历场合。</p>
+<p>unordered_set基于哈希表实现，使用一个下标范围比较大的数组来存储元素，形成很多的桶，利用hash函数对key进行映射到不同区域进行保存。数据插入和查找的时间复杂度是常数，会消耗较多的内存，无自动排序功能。适合不需要排序，单个元素访问场合。</p>
+<p>multiset与 set 类似，但允许存储多个值相同的项。务必使用 multiset::count(value)确定有多少个元素包含特定的值。</p>
 <h2 id="iterator"><a href="#iterator" class="headerlink" title="iterator"></a>iterator</h2><p>迭代器是一种行为类似指针的对象，通过对迭代器解引用，它将引用对象，对容器中元素进行迭代遍历，扮演着容器和算法之间的胶合剂。常用的迭代器按功能强弱分为:</p>
 <ul>
 <li>输入迭代器:只能以只读的方式访问对象。</li>
@@ -24755,7 +24721,7 @@ tcpdump ip multicast
   <entry>
     <title>Sublime Text插件与配置</title>
     <url>/2022/08/27/tool/sublime/</url>
-    <content><![CDATA[<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;auto_complete&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;auto_complete_commit_on_tab&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;auto_complete_with_fields&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;color_scheme&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Packages/Color Scheme - Default/Mariana.sublime-color-scheme&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;theme&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Default.sublime-theme&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_face&quot;</span><span class="punctuation">:</span> <span class="string">&quot;JetBrains Mono&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_face1&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Consolas&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_face2&quot;</span><span class="punctuation">:</span> <span class="string">&quot;DejaVu Sans Mono&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;default_encoding&quot;</span><span class="punctuation">:</span> <span class="string">&quot;UTF-8&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;default_line_ending&quot;</span><span class="punctuation">:</span> <span class="string">&quot;unix&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_size&quot;</span><span class="punctuation">:</span> <span class="number">18</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;tab_size&quot;</span><span class="punctuation">:</span> <span class="number">4</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;translate_tabs_to_spaces&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;highlight_line&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;update_check&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;vintage_ctrl_keys&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;vintage_start_in_command_mode&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;word_wrap&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;rulers&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="number">100</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;ignored_packages&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;Package Control&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;ignored_packages_bak&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;Vintage&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;file_exclude_patterns&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;*.pyc&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.pyo&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.exe&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.dll&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.obj&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.o&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.a&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.lib&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.so&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.dylib&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.ncb&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.sdf&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.suo&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.pdb&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.idb&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.DS_Store&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.class&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.psd&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.db&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.sublime-workspace&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.ko.*&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.mod.*&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.o.*&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;a.out&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.order&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.ko&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.symvers&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*_test&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;folder_exclude_patterns&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;.svn&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.git&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.hg&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;CVS&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.tags&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.tmp*&quot;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+    <content><![CDATA[<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;auto_complete&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;auto_complete_commit_on_tab&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;auto_complete_with_fields&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;color_scheme&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Packages/Color Scheme - Default/Mariana.sublime-color-scheme&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;theme&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Default.sublime-theme&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_face&quot;</span><span class="punctuation">:</span> <span class="string">&quot;JetBrains Mono&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_face1&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Consolas&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_face2&quot;</span><span class="punctuation">:</span> <span class="string">&quot;DejaVu Sans Mono&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_options&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;gray_antialias&quot;</span><span class="punctuation">,</span> <span class="string">&quot;gdi&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;default_encoding&quot;</span><span class="punctuation">:</span> <span class="string">&quot;UTF-8&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;default_line_ending&quot;</span><span class="punctuation">:</span> <span class="string">&quot;unix&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_size&quot;</span><span class="punctuation">:</span> <span class="number">18</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;tab_size&quot;</span><span class="punctuation">:</span> <span class="number">4</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;translate_tabs_to_spaces&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;highlight_line&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;update_check&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;vintage_ctrl_keys&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;vintage_start_in_command_mode&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;word_wrap&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;rulers&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="number">100</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;ignored_packages&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;Package Control&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;ignored_packages_bak&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;Vintage&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;file_exclude_patterns&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;*.pyc&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.pyo&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.exe&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.dll&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.obj&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.o&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.a&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.lib&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.so&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.dylib&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.ncb&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.sdf&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.suo&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.pdb&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.idb&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.DS_Store&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.class&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.psd&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.db&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.sublime-workspace&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.ko.*&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.mod.*&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.o.*&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;a.out&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.order&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.ko&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.symvers&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*_test&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;folder_exclude_patterns&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;.svn&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.git&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.hg&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;CVS&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.tags&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.tmp*&quot;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 
 <h2 id="快捷键"><a href="#快捷键" class="headerlink" title="快捷键"></a>快捷键</h2><figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;navigate_to_definition&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;keys&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;alt+t&quot;</span><span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line"></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;jump_prev&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;keys&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;alt+b&quot;</span><span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line"></span><br><span class="line">    <span class="punctuation">&#123;</span> </span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;alignment&quot;</span><span class="punctuation">,</span> </span><br><span class="line">        <span class="attr">&quot;keys&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;ctrl+shift+a&quot;</span><span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
 
@@ -26235,6 +26201,71 @@ tcpdump ip multicast
 <h2 id="寻找假币"><a href="#寻找假币" class="headerlink" title="寻找假币"></a>寻找假币</h2><p>有N个硬币，其中有一个质量较轻的假币，如何通过一个天平将假币挑出。</p>
 <p>将硬币分成2份去称，轻的寻一半包含假币，再将轻的那一份又分为2份，直到最后剩下两枚，轻的那一枚即为假币。考虑到硬币个数为奇数的情况，照样分为两半，剩下一个多余的，如果两半相等，多余那个就是假币，否则处理那两半。</p>
 <figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">FakeCoin</span><span class="params">(<span class="type">const</span> vector&lt;<span class="type">int</span>&gt; &amp;coins, <span class="type">int</span> start, <span class="type">int</span> end)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> num = end - start + <span class="number">1</span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;num = &quot;</span> &lt;&lt; num &lt;&lt; <span class="string">&quot; [&quot;</span> &lt;&lt; start &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; end &lt;&lt; <span class="string">&quot;]&quot;</span> &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">if</span> (num &lt;= <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> coins[start] &lt; coins[end] ? start : end;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> mid = num / <span class="number">2</span> + start;</span><br><span class="line">    <span class="type">int</span> left = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> right = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (num % <span class="number">2</span> == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = start; i &lt; mid; ++i) &#123;</span><br><span class="line">            left += coins[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = mid; i &lt;= end; ++i) &#123;</span><br><span class="line">            right += coins[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;(&quot;</span> &lt;&lt; left &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; right &lt;&lt; <span class="string">&quot;) --&gt; &quot;</span> &lt;&lt; mid &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (left &gt; right) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">FakeCoin</span>(coins, mid, end);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">FakeCoin</span>(coins, start, mid - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = start; i &lt; mid; ++i) &#123;</span><br><span class="line">            left += coins[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = mid + <span class="number">1</span>; i &lt;= end; ++i) &#123;</span><br><span class="line">            right += coins[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;(&quot;</span> &lt;&lt; left &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; right &lt;&lt; <span class="string">&quot;) --&gt; &quot;</span> &lt;&lt; mid &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (left &gt; right) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">FakeCoin</span>(coins, mid + <span class="number">1</span>, end);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (left &lt; right) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">FakeCoin</span>(coins, start, mid - <span class="number">1</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> mid;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; coins = &#123;<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>&#125;;</span><br><span class="line">    <span class="comment">// vector&lt;int&gt; coins = &#123;1, 1, 1, 1, 0, 1, 1, 1, 1&#125;;</span></span><br><span class="line">    <span class="comment">// vector&lt;int&gt; coins = &#123;1, 1, 1, 1, 1, 1, 1, 1, 0&#125;;</span></span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; <span class="built_in">FakeCoin</span>(coins, <span class="number">0</span>, coins.<span class="built_in">size</span>() - <span class="number">1</span>) &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>algorithm</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>二叉搜索树</title>
+    <url>/2022/12/17/algo/tree-search/</url>
+    <content><![CDATA[<p>二叉搜索树（Binary Search Tree， BST）支持动态数据集合的快速插入、删除、查找操作，是一棵空树或者有如下性质的二叉树：</p>
+<ul>
+<li>若任意节点的左子树不空，其左子树中的每个节点的值都小于这个节点的值；</li>
+<li>若任意节点的右子树不空，其右子树每个节点的值都大于这个节点的值；</li>
+<li>任意节点的左、右子树也分别为二叉查找树；</li>
+<li>没有键值相等的节点。</li>
+</ul>
+<p>不管操作是插入、删除还是查找，其时间复杂度其实都跟树的高度成正比，也就是 O(height)。</p>
+<p><strong>查找操作</strong></p>
+<p>先取根节点，如果它等于要查找的数据就返回。如果要查找的数据比根节点的值小，那就在左子树中递归查找；如果要查找的数据比根节点的值大，那就在右子树中递归查找。</p>
+<p><img src="/images/code/algo/tree/findtree.png" alt="二叉搜索树"></p>
+<p><strong>插入操作</strong></p>
+<p>二叉查找树的插入过程需要从根节点开始，依次比较要插入的数据和节点的大小关系：</p>
+<ol>
+<li><p>如果要插入的数据比节点的数据大，并且节点的右子树为空，就将新数据直接插到右子节点的位置；如果不为空，就再递归遍历右子树，查找插入位置。</p>
+</li>
+<li><p>如果要插入的数据比节点数值小，并且节点的左子树为空，就将新数据插入到左子节点的位置；如果不为空，就再递归遍历左子树，查找插入位置。</p>
+</li>
+</ol>
+<p><img src="/images/code/algo/tree/findtree-add.png" alt="img"></p>
+<p><strong>删除操作</strong></p>
+<p>针对要删除节点的子节点个数的不同需要分2种情况来处理:</p>
+<ol>
+<li><p>如果要删除的节点只有一个子节点或没有子节点，只需要要将要删除节点的父节点的指针指向要删除节点的子节点。比如下图中删除节点 55、 13。</p>
+</li>
+<li><p>如果要删除的节点有两个子节点。需要找到这个节点的右子树中的最小节点，把它替换到要删除的节点上。然后再按照上面方法删除掉这个最小节点。比如下图中的删除节点 18。（用左子树的最大节点进行替换也可以）。</p>
+</li>
+</ol>
+<p><img src="/images/code/algo/tree/findtree-del.png" alt="img"></p>
+<h2 id="平衡二叉树"><a href="#平衡二叉树" class="headerlink" title="平衡二叉树"></a>平衡二叉树</h2><p>为了解决普通二叉查找树在频繁的插入、删除等动态更新的情况下，出现时间复杂度退化的问题。平衡二叉查找树就是让整棵树左右看起来比较平衡，不要出现左子树很高、右子树很矮的情况。这样就能让整棵树的高度相对来说低一些，相应的插入、删除、查找等操作的效率高一些。</p>
+<p>任何节点的左右子树高度相差不超过 1，完全二叉树、满二叉树都是平衡二叉树，非完全二叉树有可能是平衡二叉树。</p>
+<h2 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h2><p>红黑树是一颗特殊的二叉查找树，除了二叉查找树的要求外，它还具有以下特性：</p>
+<ul>
+<li>每个节点是黑色或者红色。</li>
+<li>根节点是黑色。</li>
+<li>每个叶子节点(NIL，空节点)是黑色。</li>
+<li>从根节点到叶子节点，不会出现两个连续的红色节点。如果一个节点是红色的，则它的子节点必是黑色。</li>
+<li>从任何节点到叶子节点，这条路径上有相同数目的黑色节点。</li>
+</ul>
+<p><strong>旋转</strong></p>
+<p>左旋就是当新加入节点之后，树的高度及颜色不再满足红黑树定义规则后；将不满足的节点进行左旋转，使得它取代之前它的父节点，同时它的父节点变为它的左子节点，最后调整颜色的过程。</p>
+<p><img src="/images/code/algo/tree/rbtree.png" alt="img"></p>
+<p>对x左旋，意味着降低x节点的高度，将x变成一个左节点，提升x节点右节点y的高度。</p>
+<ol>
+<li>x的右子树指向y的左子树</li>
+<li>本来指向x结点的父指针，改成指向y</li>
+<li>y的左子树指向x结点</li>
+</ol>
+<p><img src="/images/code/algo/tree/rbtree2.png" alt="img"></p>
+<p>右旋就是以某节点为中心进行向右的旋转，取代并成为之前自己的父节点，然后把之前的父节点变为自己的右子节点，最后调整颜色的过程。</p>
+<ol>
+<li>x的左子树指向y的右子树</li>
+<li>本来指向x结点的父指针，改成指向y</li>
+<li>y的右子树指向x结点</li>
+</ol>
+<hr>
+<h2 id="霍夫曼树"><a href="#霍夫曼树" class="headerlink" title="霍夫曼树"></a>霍夫曼树</h2><p>带权路径最短的二叉树称为哈夫曼树或最优二叉树。<br><a href="https://www.cnblogs.com/wuqinglong/p/9709048.html">https://www.cnblogs.com/wuqinglong/p/9709048.html</a></p>
 ]]></content>
       <categories>
         <category>algorithm</category>
