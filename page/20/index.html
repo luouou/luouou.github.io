@@ -176,6 +176,371 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/spi-bus/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/hardware/spi-bus/" class="post-title-link" itemprop="url">spi总线</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:55:21" itemprop="dateModified" datetime="2022-06-08T17:55:21+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>SPI(Serial Peripheral Interface)串行外设接口是一种用于芯片通信的串行同步传输总线协议，最初由Motorola在2000年提出。</p>
+<ul>
+<li><p>SPI允许传输单个bit数据，甚至允许暂停，因为SCK时钟线由主控设备控制，当没有时钟跳变时，从设备不采集或传送数据。</p>
+</li>
+<li><p>支持全双工通信，每个从设备需要独立的使能信号。</p>
+</li>
+<li><p>推挽输出的驱动性能相比开漏输出信号完整性更好，支持高速应用（100MHz以上）。</p>
+</li>
+<li><p>协议支持字长不限于8bits，可根据应用特点灵活选择消息字长。</p>
+</li>
+<li><p>相比I2C和SMbus节省上拉电阻，不需要仲裁机制。</p>
+</li>
+<li><p>没有寻址机制，只能靠设备片选选择不同从设备，故没有数据流控制和应答机制。</p>
+</li>
+<li><p>SPI没有规定最大传输速率，通常能达到10Mbps。</p>
+</li>
+</ul>
+<p><strong>Dual SPI</strong>是针对SPI Flash而言，不是针对所有SPI外设。对于SPI Flash，全双工并不常用，因此修改了mosi和miso的用法，使其工作在半双工，能够加倍传输数据。也就是说对于Dual SPI Flash，可以发送一个命令字节进入dual mode，这样mosi变成SIO0，mosi变成SIO1，这样一个时钟周期内就能传输2个bit数据。</p>
+<p><strong>Qual SPI</strong>也是针对SPI Flash，Qual SPI 在Dual SPI基础上增加了两根线（SIO2、SIO3），目的是一个时钟内能传输4个bit数据。</p>
+<h2 id="信号定义"><a href="#信号定义" class="headerlink" title="信号定义"></a>信号定义</h2><p><strong>MOSI</strong>：主设备数据输出，从设备数据输入。</p>
+<p><strong>MISO</strong>：主设备数据输入，从设备数据输出。</p>
+<p><strong>SCLK</strong>：时钟信号，由主设备产生。</p>
+<p><strong>CS/SS</strong>：片选，从设备使能信号，由主设备控制。</p>
+<p>SPI总线定义两个及以上设备间的数据传输，提供时钟的设备为主设备，接收时钟的设备为从设备。片选信号SS通常低电平有效。SPI数据传输原理是基于主从设备内部移位寄存器的数据交换。在主设备SCK的控制下，待传数据由各自设备的数据寄存器传输到移位寄存器，再通过MOSI和MISO信号线完成主从设备间的数据交换。</p>
+<p><img src="/images/spi/spi_ms_mod_reg.png" alt="spi框图"></p>
+<h2 id="传输模式"><a href="#传输模式" class="headerlink" title="传输模式"></a>传输模式</h2><p>SPI有4种操作模式，每种模式由一对参数决定，主从设备必须使用相同的工作参数，才能正常工作。</p>
+<p>CPOL时钟极性(clock polarity)，决定时钟空闲时的电平为高或低，对于SPI数据传输格式没有显著影响。</p>
+<ul>
+<li>0 : 时钟高电平时有效，空闲时为低。</li>
+<li>1 : 时钟低电平时有效，空闲时为高。</li>
+</ul>
+<p>CPHA时钟相位(clock phase)，定义时钟脉冲在哪条边沿转换输出信号，哪条边沿采样输入信号。</p>
+<ul>
+<li>0 : 数据采样发生在时钟奇数边沿。</li>
+<li>1 : 数据采样发生在时钟偶数边沿。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Mode 0</td>
+<td>SCLK 空闲是为低电平，数据在上升沿有效</td>
+</tr>
+<tr>
+<td>Mode 1</td>
+<td>SCLK 空闲是为低电平，数据在下降沿有效</td>
+</tr>
+<tr>
+<td>Mode 2</td>
+<td>SCLK 空闲是为高电平，数据在下降沿有效</td>
+</tr>
+<tr>
+<td>Mode 3</td>
+<td>SCLK 空闲是为高电平，数据在上升沿有效</td>
+</tr>
+</tbody></table>
+<p><img src="/images/spi/4mode.png" alt="4种模式"></p>
+<p><img src="/images/spi/timing_diagram.png" alt="时序"></p>
+<h2 id="多个从设备"><a href="#多个从设备" class="headerlink" title="多个从设备"></a>多个从设备</h2><ul>
+<li><strong>片选方式</strong></li>
+</ul>
+<p>每个从设备都需要单独的片选信号，主设备每次只能选择其中一个从设备进行通信。因为所有从设备的SCK、MOSI、MISO都是连在一起的，未被选中从设备的MISO要表现为高阻状态以避免数据传输错误。由于每个设备都需要单独的片选信号，如果需要的片选信号过多，可以使用译码器产生所有的片选信号。</p>
+<p><img src="/images/spi/multiple-slaves.png" alt="主设备以片选方式控制多个从设备"></p>
+<ul>
+<li><strong>菊花链方式</strong></li>
+</ul>
+<p>数据信号经过主从设备所有的移位寄存器构成闭环。数据通过主设备发送（绿色线）经过从设备返回（蓝色线）到主设备。在这种方式下，片选和时钟同时接到所有从设备。</p>
+<p>菊花链式连接常用于仅需主设备发送数据而不需要接收返回数据的场合，如LED驱动器。在这种应用下，主设备MISO可以不连。如果需要接收从设备的返回数据，则需要连接主设备的MISO形成闭环。同样地，切记要发送足够多的接收指令以确保数据移位送达主设备。</p>
+<p><img src="/images/spi/multiple-slaves2.png" alt="主设备以菊花链方式控制多个从设备"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/i2c-bus/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/hardware/i2c-bus/" class="post-title-link" itemprop="url">i2c总线</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:56:48" itemprop="dateModified" datetime="2022-06-08T17:56:48+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p><a target="_blank" rel="noopener" href="https://www.i2c-bus.org/">https://www.i2c-bus.org/</a></p>
+<p>I2C总线(Inter Integrated-Circuit)是由PHILIPS公司在上世纪80年代发明的一种电路板级串行总线标准，通过时钟线SCL和数据线SDA即可完成主从机的单工通信，广泛应用于电路板级的内部通信。</p>
+<ul>
+<li><p>总线上的所有设备通过软件寻址且具有唯一的地址。</p>
+</li>
+<li><p>总线上所有器件都具有自动应答功能，保证数据传输的正确性；</p>
+</li>
+<li><p>主机和从机的区别在于对SCL的发送权，只有主机才能发送SCL；</p>
+</li>
+<li><p>I2C数据传输速率有标准模式(100 kbps)、快速模式(400 kbps)和高速模式(3.4 Mbps)。</p>
+</li>
+</ul>
+<p><img src="/images/i2c/i2c-bus.png" alt=" I2C连接示意图"></p>
+<p>I2C总线上所有器件的SDA、SCL引脚输出驱动都为漏极开路结构，因此SDA和SCL可以被拉低为低电平，但是不能被驱动为高电平，低电平输出电压最大为0.4V，上拉电阻一般为4.7KΩ。通过外接上拉电阻实现总线上所有节点SDA、SCL信号的线与逻辑关系。<strong>线与</strong>的意思是只要总线上有一个设备输出底电平，总线信号就会被拉底。线与的作用在于可以实现总线的仲裁控制，总线的控制权会交给最后一个输出低电平的设备，其它设备(输出为高)通过检测总线上的电平状态(表现为低)，对比与自己输出状态不一致，则自动退出对总线的控制请求。</p>
+<p>漏极开路/集电极开路的缺点是对于一个距离长的数据线，信号传输速率得不到有效保证。更长的走线对于输出驱动器表现为更大的容性负载，等效容性负载C和信号线的上拉电阻R构成RC振荡器。RC越大，意味着反射和振荡越强，从而影响总线的信号完整性。所以I2C总线允许挂载最多的设备数量取决于总线上最大电容值，一般为400pf(Hs模式100pf)。</p>
+<h2 id="时序"><a href="#时序" class="headerlink" title="时序"></a>时序</h2><p><img src="/images/i2c/i2c-data.webp" alt="数据序列"></p>
+<h3 id="数据有效性"><a href="#数据有效性" class="headerlink" title="数据有效性"></a>数据有效性</h3><p>协议没有规定I2C逻辑1和0的电平值。每传输一比特数据SDA，对应产生一个时钟脉冲SCL。<strong>SCL为高时，SDA不允许变化；只有在SCL为低时，SDA才可以变化</strong>。</p>
+<p><img src="/images/i2c/bit.png" alt="位的传输"></p>
+<h3 id="开始-结束条件"><a href="#开始-结束条件" class="headerlink" title="开始/结束条件"></a>开始/结束条件</h3><p>如果I2C总线空闲，那么SCL和SDA信号线将都为高电平。<strong>在SCL为高电平时，将SDA由高到低电平跳变，作为起始信号，SDA由低到高电平跳变，作为结束信号</strong>。</p>
+<p><img src="/images/i2c/start-stop.png" alt="开始和结束条件"></p>
+<p>开始/结束条件总是由主机发起的。主机发出开始条件后，总线处于忙的状态；主机发出结束条件后，总线处于空闲状态。如果两个主机在同一时刻都希望获得总线的所有权，那么谁先将SDA拉低，谁就赢得了总线的控制权。</p>
+<p>当所有数据都发送完成时，主设备需要产生一个停止信号，告诉从设备自己已经操作完成。停止信号在SDA置于低电平时，将SCL拉高并保持高电平，然后将SDA拉高。在正常传输数据过程中，当SCL处于高电平时，SDA上的值不应该变化，防止意外产生一个停止信号。</p>
+<p>在操作中，如果主机发出重复开始条件而非结束条件，则总线仍处于忙的状态。也就是说重复开始条件和开始条件在功能上是相同的。</p>
+<h3 id="传输数据"><a href="#传输数据" class="headerlink" title="传输数据"></a>传输数据</h3><p>在地址帧发送之后，就可以开始传输数据了。主设备负责产生时钟，并且在时钟上升沿之前准备好数据。每个数据帧8bits，数据帧的数量可以是任意的，直到产生停止条件。每一帧数据传输之后，接收方就需要回复一个ACK或NACK。数据传输过程中，<strong>先发送高位，再发送低位</strong>。</p>
+<p>如果在数据传输过程中，从机如果没有准备好接收或发送下一个字节（比如内部中断需要处理等），它可以通过拉低SCL强制主机进入等待状态。直到从机释放SCL，主机才开始下一个字节的发送或接收。</p>
+<p><img src="/images/i2c/tu4.png" alt="I2C总线的数据传输"></p>
+<h3 id="应答"><a href="#应答" class="headerlink" title="应答"></a>应答</h3><p><img src="/images/i2c/ack.png" alt="I2C总线的数据应答"></p>
+<p>当主设备发送完地址帧之后，在应答时钟周期内，会放弃SDA总线控制权，让从设备获得SDA控制权，这样从设备才能通过将SDA拉低通知发送器数据已被成功接收。此时从设备应该在第9个时钟脉冲之前回复一个ACK以表示接收正常。SCL为高的时候，SDA数据才是有效的，因此接收器发送ACK时，要保证SCL为高的同时，SDA为低电平；建立和保持时间也要满足规范要求。</p>
+<p>如果在第9个时钟周期，SDA为高，表明接收设备无应答（NACK）。主机可以据此发出结束条件命令结束此次传输，或发起重传请求重新传输数据。有5种情况可能导致无应答：</p>
+<ul>
+<li>总线上没有报文中所指定地址的设备不存在。</li>
+<li>接收器件尚未准备好与主机的通信。</li>
+<li>接收器件无法解析读取的数据。</li>
+<li>接收器件无法收取更多的数据，比如程序或者芯片内置缓冲区已经满了。</li>
+<li>主机作为接收器时，在读取从机发出的最后一个字节数据后，发出NACK通知从发送器释放数据线SDA，以便主机发起结束或重传指令。</li>
+</ul>
+<p>主机作为发送器和接收器在写和读情况下的数据格式：</p>
+<h3 id="重复开始信号"><a href="#重复开始信号" class="headerlink" title="重复开始信号"></a>重复开始信号</h3><p>主设备可以发起多个开始信号来完成数据的传输，只要不发停止信号，总线上的其他主设备就不能占据这条总线，有时候发送完一组数据后，希望重新发数据，所以就有了重复开始信号。重复的开始信号为，SDA在SCL低电平时拉高，然后SCL拉高。重复开始条件的传输时序如下图所示：</p>
+<p><img src="/images/i2c/restart.jpg" alt="重复开始条件的传输时序"></p>
+<h2 id="时钟同步和仲裁"><a href="#时钟同步和仲裁" class="headerlink" title="时钟同步和仲裁"></a>时钟同步和仲裁</h2><p>I2C的一大特点是可以在同一条总线上接多个主机，当两个及以上的主机同时发起传输请求时，需要通过某种机制确定哪个主机获得总线的使用权；另外，每个主机都独立产生时钟，时钟速率可能千差万别，这也需要某种机制解决时钟速率不一致的问题。这种机制就是时钟同步（Clock Synchronization）和仲裁（Arbitration）。在单主机的I2C系统中，不需要时钟同步和仲裁。</p>
+<h3 id="时钟同步"><a href="#时钟同步" class="headerlink" title="时钟同步"></a>时钟同步</h3><p>每个I2C的主机内部都有两个计数器，分别计数SCL上高电平和低电平的时间。如果总线上只有一个主机，则这两个计数器的值取决于系统时钟速率。当多个主机存在时，不同设备的计数器速度可能不一致，因此涉及时钟同步的概念。</p>
+<p>时钟同步是通过I2C接口的“线与”逻辑实现的。SCL信号线由高变低时，所有连接在SCL上的主机都开始计数低电平的时间（低电平计数器复位），由线与的逻辑可知：只有当SCL总线上所有主机的时钟输出端都为高时，SCL总线才会由低变高。SCL的低电平时间由总线上低电平时间最长的主机决定。时钟端口先跳变为高的其它主机进入等待状态。这样所有主机的时钟输出和SCL线上的状态保持相同；当SCL由低变高后，所有主机（高电平计数器）开始计数SCL高电平的时间；最早由高跳变到低的主机再次将SCL拉低。通过这种方式产生的同步时钟：其低电平时间是所有主机时钟中最长的低电平时间，其高电平时间是所有主机时钟中最短的高电平时间。</p>
+<p><img src="/images/i2c/clock_sync.png" alt="仲裁阶段的时钟同步"></p>
+<h3 id="仲裁"><a href="#仲裁" class="headerlink" title="仲裁"></a>仲裁</h3><p>当总线上有一个以上的主机时，协议通过仲裁的方法确定哪个主机获得总线的使用权。从机不参与仲裁的过程。</p>
+<p>当总线处于空闲状态时，在最小的保持时间内，多个主机都可能发起开始条件在总线上传输数据。仲裁用来判断哪个主机的传输可以正常进行。</p>
+<p>仲裁是按位进行的。仲裁开始时，对于每一位数据，SCL为高时，每个主机都检测SDA上的数据是否和自己发送的数据相同。可能需要进行多个位的比较，主机才开始检测到SDA上数据和自己发送的不一致。实际上，只要SDA上的数据和主机发送的数据一致，这些主机就可以将数据一致发送下去。当主机发送为HIGH，检测SDA上电平却为LOW，那么该主机就在仲裁中失去主控权，并将其SDA输出关闭。余下的主机获得总线控制权并继续数据的传输。如图8，当主机1在检测到SDA数据和它自身的输出DATA1不一致时，将自动关闭DATA1的输出，停止向总线上发送数据。</p>
+<p>由此可见，在仲裁过程中胜出的主机是没有丢失数据的。在仲裁中失去总线控制权的主机在本次字节传输结束后继续产生时钟，并在总线空闲时开始上次数据的重传。如果同一个器件可以工作在主从两种模式，它在仲裁过程中失去总线控制权，那么有可能是仲裁胜出的主机将要访问该器件，该器件应该立即切换到从机模式。</p>
+<p><img src="/images/i2c/arbitration.png" alt="两个主机的仲裁过程"></p>
+<p>从上面的原理分析可知，I2C不存在核心主机，是没有优先级的概念的。总线的控制权仅取决于主机在SDA上的竞争（SDA包含地址和数据）。</p>
+<p>在仲裁过程中，存在以下未定条件会导致不可预期的结果：</p>
+<ul>
+<li>主机1在主机2发送数据的过程中发出重复开始条件</li>
+<li>主机1在主机2发送数据的过程中发出结束条件</li>
+<li>主机1在主机发出结束条件的过程中发出重复开始条件</li>
+</ul>
+<h3 id="时钟拉伸"><a href="#时钟拉伸" class="headerlink" title="时钟拉伸"></a>时钟拉伸</h3><p>如果主设备发送的速度比从设备接收的速度快，因为是同步传输，可能就会出现问题，这时候，从设备可以通过控制时钟线，要求主设备线暂停传输，这就叫时钟拉伸(clock stretching)。</p>
+<p>时钟拉伸通过拉低SCL延迟数据的传输。从机在主机释放SCL后，将SCL主动拉低并保持，此时主机停止在SCL上产生脉冲以及在SDA上发送数据，直到slave释放SCL，让SCL变成高电平。之后，主机便可以继续正常的数据传输了。可见时钟拉伸实际上是利用了时钟同步的机制，只是时钟由从机产生。</p>
+<p>时钟拉伸是可选功能，实际上许多从机不包括SCL驱动器，因此也无法拉伸时钟。</p>
+<p>包含时钟拉伸的I2C数据传输时序图为：</p>
+<h2 id="地址"><a href="#地址" class="headerlink" title="地址"></a>地址</h2><h3 id="7位地址"><a href="#7位地址" class="headerlink" title="7位地址"></a>7位地址</h3><p>7位从机地址，其高4位为设备类型地址，由生产厂家制定，低3位为器件引脚定义地址，由使用者定义。</p>
+<p>8位地址的第0位是数据方向控制位：为0表示主机写数据，1表示主机读数据。</p>
+<p>主机发送结束条件（P）终止一次传输。主机也可以通过发起重复开始条件（Sr）进行一次新的传输，而不需要先产生结束条件（P）。在一次传输过程中，可能存在多种读写组合，包括：</p>
+<ul>
+<li>主机作为发送，向从机发送（写）数据，传输的方向不变；</li>
+</ul>
+<p><img src="/images/i2c/tu10.png" alt="7位地址主发从收模式"></p>
+<ul>
+<li>主机发送开始条件（S）以及其后的第一个字节，立即改为从总线上读取状态。收到从机的应答（ACK）后，主机由主发模式切换到主收模式，从机由从收模式切换到从发模式。第一个应答是从机发出的。主机先发送NACK，再发送结束条件（P）结束本次传输；</li>
+</ul>
+<p><img src="/images/i2c/tu11.png" alt="主机在第一个字节后立即读取从机内容"></p>
+<p><img src="/images/i2c/tu12.png" alt="混合模式"></p>
+<h3 id="10位地址"><a href="#10位地址" class="headerlink" title="10位地址"></a>10位地址</h3><p>任何I2C设备都有一个7位地址，理论上，现实中只能有127种不同的IIC设备。实际上，已有IIC的设备种类远远多于这个限制，在一条总线上出现相同的地址的IIC设备的概率相当高。为了突破这个限制，很多设备使用了双重地址，7位地址加引脚地址。IIC 标准也预知了这种限制，提出10位的地址方案。</p>
+<p>在10-bit地址的I2C系统中，需要两帧来传输slave的地址。第一个帧的前<strong>5个bit固定为b11110</strong>，后接slave地址的高2位，第8位仍然是R/W位，接着是一个ACK位，然后再发送另外8bit的地址，发送完后从设备会给出应答。</p>
+<p><img src="/images/i2c/10-addr.bmp" alt="10位地址"></p>
+<p><img src="/images/i2c/tu13.png" alt="主发送器寻址从接收器"></p>
+<p>主接收器读取10位地址的从发送器发送的数据。数据传送方向在第二个R/W后发生改变。如图15所示，A2之前的操作和主发送器向从接收器写数据没有区别。通过Sr，匹配地址的从机得知它就是被寻址的设备，接下来从机检测Sr后的七个比特是否和先前START后的七比特一致（1111 0XX），并检测第八位（R/W）是否为1。如果是，则从机据此判断它被寻址并将要作为发送器往总线上发送数据，此时从机产生响应A3。从机一直占用总线，直到接收到STOP或Sr指向另一个从机地址。收到Sr信号后，所有从机都会对比Sr后第一个字节的前七位（1111 0XX），并检测该字节的第八位（R/W）。对于10位地址设备R/W=1，对于7位地址设备，地址（1111 0XX）不匹配，因此这些设备都不会响应Sr，不会被寻址。</p>
+<p><img src="/images/i2c/tu14.png" alt="主接收器寻址从发送器"></p>
+<h3 id="保留地址"><a href="#保留地址" class="headerlink" title="保留地址"></a>保留地址</h3><table>
+<thead>
+<tr>
+<th align="left">设备地址</th>
+<th align="left">读写位</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">0000 000</td>
+<td align="left">0</td>
+<td align="left">广播地址</td>
+</tr>
+<tr>
+<td align="left">0000 000</td>
+<td align="left">1</td>
+<td align="left">启动字节</td>
+</tr>
+<tr>
+<td align="left">0000 001</td>
+<td align="left">X</td>
+<td align="left">CBUS 地址</td>
+</tr>
+<tr>
+<td align="left">0000 010</td>
+<td align="left">X</td>
+<td align="left">预留给不同的总线格式</td>
+</tr>
+<tr>
+<td align="left">0000 011</td>
+<td align="left">X</td>
+<td align="left">预留未来扩展使用</td>
+</tr>
+<tr>
+<td align="left">0000 1XX</td>
+<td align="left">1</td>
+<td align="left">Hs-mode 主代码</td>
+</tr>
+<tr>
+<td align="left">1111 1XX</td>
+<td align="left">1</td>
+<td align="left">设备 ID</td>
+</tr>
+<tr>
+<td align="left">1111 0XX</td>
+<td align="left">X</td>
+<td align="left">10 位从地址</td>
+</tr>
+</tbody></table>
+<h3 id="通用广播地址"><a href="#通用广播地址" class="headerlink" title="通用广播地址"></a>通用广播地址</h3><p>通用广播地址是为了寻址总线上所有设备。如果一个设备不需要使用广播功能，可以不响应广播。如果设备需要使用广播功能，则它在检测到广播地址后发送响应，并作为从接收器读取总线上发送的数据。主机不知道总线上有多少从机发送响应。总线上所有可以响应广播的从机读取广播地址后的第二个及后面的字节。不能处理这些广播数据的从机通过不发送响应的方式忽略它。同样地，如果有一个或一个以上的从机发送响应，则主机就检测不到总线上其它没有响应的设备。广播消息的含义总是定义在第二个字节。</p>
+<p><img src="/images/i2c/tu15.png" alt="广播消息格式"></p>
+<p>有两种可能情况：</p>
+<ul>
+<li>最低位“B”为0</li>
+<li>最低位“B”为1</li>
+</ul>
+<p><strong>“B”为0</strong>，第二个字节包括以下定义：</p>
+<ul>
+<li><strong>0000 0110（06h）</strong>：复位并通过硬件写内容到从机的可编程部分。所有可以响应此类广播的从机，收到此两字节后，进行复位并进入它们地址的可编程部分。注意确保设备在加电后不会将SDA或SCL拉低，因为这些低电平会阻塞总线；</li>
+<li><strong>0000 0100（04h）</strong>：通过硬件写内容到从机的可编程部分，作用类似（06h），但设备不会复位；</li>
+<li><strong>0000 0000（00h）</strong>：这个不应该作为第二个字节用。</li>
+</ul>
+<p>编程时序参考相应设备的DATASHEET。</p>
+<p><strong>“B”为1</strong>，两字节广播定义为“硬件广播”。主机（如键盘扫描器）在编程后，可以发送既定的从机地址到总线上，构成两字节序列的“硬件广播”。既然主机可能并不知道总线上从机的地址，它只能通过硬件广播的方式，将自身地址通知给系统。</p>
+<p><img src="/images/i2c/tu16.png" alt="主发送器的数据传输格式"></p>
+<p>硬件广播的第二个字节的前七位包括主机的地址。总线上的智能设备如微控制器，读取此地址并接收主机发送的其它信息。如果主机也可以作为从机使用，则以上读取的主机地址实际上也就是（切换主从模式后的）从机地址。</p>
+<p>在系统中，一种可能是系统复位后设备由主机发送模式切换到从机接收模式，这时由系统主机先告诉硬件主机数据应送往的从机地址，这样当硬件主机发送数据时就可以直接向指定从机地址发送数据了。</p>
+<p><strong>软件复位</strong></p>
+<p>通用广播地址0000 0000后发送0000 0110（06h）可以使总线上设备进入复位过程。该功能是可选的，所有预留该功能的设备在收到该两字节序列（00 06h）后，开始响应（复位），并进入它们地址的可编程部分。注意确保设备在加电后不会将SDA或SCL拉低，因为这些低电平会阻塞总线。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/uart-bus/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1339,448 +1704,11 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/phy/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/phy/" class="post-title-link" itemprop="url">PHY</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>PHY（Physical Layer）即物理接口收发器，它实现OSI模型的物理层。包括MII/GMII（介质独立接口）子层、PCS（物理编码子层）、PMA（物理介质附加）子层、PMD（物理介质相关）子层、MDI子层。PHY是IEEE802.3中定义的一个标准模块，STA（station management entity，管理实体，一般为MAC或CPU）通过SMI（Serial Manage Interface）对PHY的行为、状态进行管理和控制，而具体管理和控制动作是通过读写PHY内部的寄存器实现的。<br>10BaseT 和 100BaseTX PHY两种实现的帧格式是一样的，但信令机制不同，而且10BaseT采用曼彻斯特编码，100BaseTX 采用4B/5B编码。</p>
-<p><img src="/images/net/phy/PHY.png" alt="img"></p>
-<p>PHY里面的部分寄存器是IEEE定义的，这样PHY把自己的目前的状态反映到寄存器里面，MAC通过SMI总线不断的读取PHY的状态寄存器以得知目前PHY的状态，例如连接速度，双工的能力等。当然也可以通过SMI设置PHY的寄存器达到控制的目的，例如流控的打开关闭，自协商模式还是强制模式等。不论是物理连接的MII总线和SMI总线还是PHY的状态寄存器和控制寄存器都是有IEEE的规范的，因此不同公司的MAC和PHY一样可以协调工作。当然为了配合不同公司的PHY的自己特有的一些功能，驱动需要做相应的修改。</p>
-<ul>
-<li><strong>工作过程</strong></li>
-</ul>
-<p>PHY在发送数据的时候，收到MAC过来的数据(对PHY来说，没有帧的概念，对它来说，都是数据而不管什么地址，数据还是CRC)，每4bit就增加1bit的检错码，然后把并行数据转化为串行流数据，再按照物理层的编码规则(10Based-T的NRZ编码或100based-T的曼彻斯特编码)把数据编码，再变为模拟信号把数据送出去。收数据时的流程反之。</p>
-<h2 id="PHY寄存器"><a href="#PHY寄存器" class="headerlink" title="PHY寄存器"></a>PHY寄存器</h2><p>PHY寄存器的地址空间为5位，从0到31最多可以定义32个寄存器（随着芯片功能不断增加，很多PHY芯片采用分页技术来扩展地址空间以定义更多的寄存器），IEEE802.3定义了地址为0-15这16个寄存器的功能，地址16-31的寄存器留给芯片制造商自由定义，如下表所示。</p>
-<p><img src="/images/net/phy/PHY_REG.png" alt="PHY_REG"></p>
-<h3 id="Control-Register-Register-0"><a href="#Control-Register-Register-0" class="headerlink" title="Control Register (Register 0)"></a>Control Register (Register 0)</h3><p>寄存器0是PHY控制寄存器，通过Control Register可以对PHY的主要工作状态进行设置。应该保证控制寄存器每个位的默认值，以便在没有管理干预的情况下，上电或复位时PHY的初始状态为正常操作状态。Control Register的每一位完成的功能见下。</p>
-<p><img src="/images/net/phy/PHY_CTRL_REG.png" alt="PHY_CTRL_REG"></p>
-<ul>
-<li><strong>Reset：</strong> 通过将位0.15设置为逻辑1来完成复位PHY。 该操作应将状态和控制寄存器设置为其默认状态。 因此，此操作可能会改变PHY的内部状态以及与PHY关联的物理链路的状态。复位过程中Bit15保持为1，复位完成之后该位应该自动清零。在复位过程完成之前，PHY不需要接受对控制寄存器的写入操作，并且在复位过程完成之前写入0.15以外的控制寄存器位可能不起作用。 复位过程应在0.15位设置的0.5 s内完成。</li>
-</ul>
-<blockquote>
-<p>（1）一般要改变端口的工作模式（如速率、双工、流控或协商信息等）时，在设置完相应位置的寄存器之后，需要通过Reset位复位PHY来使配置生效。<br>（2）该比特位的默认值为 0。</p>
-</blockquote>
-<ul>
-<li><strong>Loopback：</strong> 当位0.14被设置为逻辑1时，PHY应置于环回操作模式。 当位0.14置位时，PHY接收电路应与网络介质隔离，并且MII或GMII处的TX_EN断言不应导致网络介质上的数据传输。 当位0.14置位时，PHY应接受来自MII或GMII发送数据路径的数据，并将其返回给MII或GMII接收数据路径，以响应TX_EN的断言。 当位0.14置位时，从断言TX_EN到断言RX_DV的延迟应小于512 BT。 当位0.14置位时，除非设置了位0.7，否则COL信号应始终保持无效，在这种情况下，COL信号的行为应如22.2.4.1.9所述。 清0.14位为零允许正常操作。</li>
-</ul>
-<p>Loopback是一个调试以及故障诊断中常用的功能，Bit14置1之后，PHY和外部MDI的连接在逻辑上将被断开，从MAC经过MII/GMII（也可能是其他的MAC/PHY接口）发送过来的数据将不会被发送到MDI上，而是在PHY内部（一般在PCS）回环到本端口的MII/GMII接收通道上，通过Loopback功能可以检查MII/GMII以及PHY接口部分是否工作正常，对于端口不通的情况可用于故障定位。</p>
-<blockquote>
-<p>（1）需要注意的是，很多时候PHY设置Loopback后端口可能就Link down了，MAC无法向该端口发帧，这时就需要通过设置端口Force Link up才能使用Loopback功能。<br>（2）该比特位的默认值为 0。</p>
-</blockquote>
-<ul>
-<li><p><strong>Speed Selection：</strong> <em><strong>Bit13和Bit6两位联合实现</strong></em>对端口的速率控制功能。链接速度可以通过自动协商过程或手动速度选择来选择。 通过将位0.12清零来禁用自动协商时，允许手动速度选择。</p>
-</li>
-<li><p>当禁用自动协商并将位0.6清除为逻辑0时，将位0.13设置为逻辑1将PHY配置为100 Mb / s操作，并将位0.13清除为逻辑0将PHY配置为10 Mb / s操作 。</p>
-</li>
-<li><p>当禁用自动协商并将位0.6设置为逻辑1时，将位0.13清零为逻辑0会选择1000 Mb / s的操作。 将位0.6和0.13设置为逻辑1的组合保留用于未来的标准化。</p>
-</li>
-<li><p>当使能自动协商时，可以读取或写入位0.6和0.13，但位0.6和位0.13的状态对链路配置没有影响，位0.6和位0.13不需要反映当它被读取时链接。</p>
-</li>
-</ul>
-<p>如果PHY通过比特1.15：9和比特15.15：12报告它不能工作在所有速度时，则比特0.6和0.13的值应该与PHY可以操作的速度相对应。并且任何试图将该位设置为无效的操作均将被忽略。</p>
-<blockquote>
-<p>（1）对Speed Selection的修改设置，往往需要复位端口才能配置生效。因此在设置该位置的时候需要检查自动协商的设置并通过Bit15复位端口。<br>（2）位0.6和0.13的默认值是根据位1.15：9和15.15：12所指示的PHY可以操作的最高数据速率的编码组合。</p>
-</blockquote>
-<ul>
-<li><strong>Auto-Negotiation Enable：</strong> 自动协商过程应通过将位0.12设置为逻辑1来启用。 如果位0.12设置为逻辑1，则位0.13、0.8和0.6不应对链路配置和除了自动协商协议规定之外的站操作产生影响。 如果将位0.12清零为逻辑0，则无论链路配置和自动协商过程的先前状态如何，位0.13、0.8和0.6都将确定链路配置。</li>
-</ul>
-<p>如果PHY通过位1.3报告它缺乏执行自动协商的能力，则PHY应在位0.12返回零值。 如果PHY通过位1.3报告它缺乏执行自动协商的能力，则位0.12应该始终写为0，并且任何尝试将1写入位0.12都应该被忽略。</p>
-<blockquote>
-<p>必须注意的是，对于1000BASE-T接口,自动协商必须打开。</p>
-</blockquote>
-<ul>
-<li><strong>Power Down：</strong> 通过将位0.11设置为逻辑1，可以将PHY置于低功耗状态。 清0.11位为零允许正常操作。 PHY在掉电状态下的具体行为是特定实现的。 处于掉电状态时，PHY应响应管理事务。 在转换到掉电状态期间和处于掉电状态期间，PHY不应在MII或GMII上产生寄生信号。</li>
-</ul>
-<p>当位0.11或位0.10被设置为逻辑1时，PHY不需要满足RX_CLK和TX_CLK信号功能要求。 在位0.11和0.10清零后，PHY应在0.5 s内满足22.2.2中定义的RX_CLK和TX_CLK信号功能要求。</p>
-<blockquote>
-<p>（1）Power Down模式一般在软件shut down端口的时候使用，需要注意的是端口从Power Down模式恢复，需要复位端口以保证端口可靠的连接。<br>（2）该位的默认值为 0。</p>
-</blockquote>
-<ul>
-<li><strong>Isolate：</strong> 通过将位0.10设置为逻辑1，PHY可能被迫将其数据路径与MII或GMII电隔离。 清零位0.10允许正常操作。 当PHY与MII或GMII隔离时，它不会响应TXD数据包和TX_EN，TX_ER、GTX_CLK的输入。并且它的TX_CLK，RX_CLK，RX_DV，RX_ER，RXD数据包、COL和CRS输出均应为高阻态。 当PHY与MII或GMII隔离时，它将响应管理事务（MDC/MDIO接口的信号）。</li>
-</ul>
-<blockquote>
-<p>（1）IEEE802.3没有对Isolate 时MDI接口的状态进行规范，此时MDI端可能还在正常运行。Isolate在实际应用中并没有用到。<br>（2）由于目前很多百兆的PHY芯片其MAC接口主流的都是SMII/S3MII，8个端口的接口是相互关联的，一个端口设置Isolate可能会影响其他端口的正常使用，因此在使用中注意不要随意更改bit10的状态。</p>
-</blockquote>
-<ul>
-<li><strong>Restart Auto-Negotiation：</strong> 如果PHY通过位1.3报告它缺乏执行自动协商的能力，或者如果自动协商被禁用，则PHY应在位0.9返回零值。 如果PHY通过位1.3报告它缺乏执行自动协商的能力，或者如果禁用了自动协商，则应将位0.9始终写为0，并且任何尝试将1写入位0.9应被忽略。</li>
-</ul>
-<p>Bit9置1将重新启动端口的自动协商进程，当然前提是Auto-Negotiation Enable是使能的。</p>
-<blockquote>
-<p>一般在修改端口的自动协商能力信息之后通过Bit9置1重新启动自动协商来使端口按照新的配置建立link。</p>
-</blockquote>
-<ul>
-<li><strong>Duplex Mode：</strong> 可以通过自动协商过程或手动双面选择来选择双工模式。 通过将位0.12清零来禁用自动协商时，允许手动双面选择。</li>
-</ul>
-<ul>
-<li>当禁用自动协商时，将位0.8设置为逻辑1将PHY配置为全双工操作，并将位0.8清零以将逻辑0配置为用于半双工操作的PHY。</li>
-<li>当启用自动协商时，可以读取或写入位0.8，但位0.8的状态对链路配置没有影响。</li>
-</ul>
-<p>如果PHY通过位1.15：9和15.15：12报告它只能在一个双工模式下工作，则位0.8的值应该与PHY可以工作的模式相对应，并且任何尝试改变将该位0.8修改为无效指的操作应被忽略。</p>
-<blockquote>
-<p>对Duplex Mode的修改配置也需要复位端口才能生效。</p>
-</blockquote>
-<ul>
-<li><strong>Collision Test：</strong> 冲突信号（COL）测试开关。在需要对COL信号进行测试时，可以通过Bit7置1，这时PHY将输出一个COL脉冲以供测试。实际测试操作中也可以将端口配置为半双工状态，通过发帧冲突来测试COL信号，因此该配置实用价值不大。</li>
-<li><strong>Unidirectional enable：</strong> 如果PHY通过比特1.7报告它不具备编码和传输来自媒体独立接口的数据的能力，而不管PHY是否确定已建立有效链路，则PHY应在比特0.5中返回零值，并且 任何尝试写一个到位0.5应该被忽略。</li>
-</ul>
-<h3 id="Status-register"><a href="#Status-register" class="headerlink" title="Status register"></a>Status register</h3><p>寄存器1是PHY状态寄存器，主要包含PHY的状态信息，大多数bit的值都是由芯片厂家确定的，每一个bit的功能在表3种已有详细说明。</p>
-<p><img src="/images/net/phy/PHY_STA_REG.png" alt="PHY_STA_REG"></p>
-<ul>
-<li><strong>100BASE-T4 ability：</strong> 当读为逻辑1时，位1.15指示PHY有能力使用100BASE-T4信令规范执行链路发送和接收。 当读为逻辑0时，位1.15表示PHY缺乏使用100BASE-T4信令规范执行链路发送和接收的能力。</li>
-<li><strong>100BASE-X full duplex ability：</strong> 当读为逻辑1时，位1.14指示PHY有能力使用100BASE-X信令规范执行全双工链路传输和接收。 当作为逻辑0读取时，bit1.14表示PHY缺乏使用100BASE-X信令规范执行全双工链路传输和接收的能力。</li>
-<li><strong>100BASE-X half duplex ability：</strong> 当读为逻辑1时，位1.13指示PHY有能力使用100BASE-X信令规范执行半双工链路传输和接收。 当读为逻辑0时，位1.13指示PHY缺乏使用100BASE-X信令规范执行半双工链路传输和接收的能力。</li>
-<li><strong>Unidirectional ability：</strong> 当读为逻辑1时，位1.7指示PHY具有编码和传输来自媒体独立接口的数据的能力，而不管PHY是否确定已建立有效链路。 当读为逻辑0时，位1.7指示PHY只有在PHY确定已建立有效链路时才能从媒体独立接口传输数据。</li>
-<li><strong>MF preamble suppression ability：</strong> 当读为逻辑1时，位1.6指示PHY能够接受管理帧，而不管它们是否在22.2.4.5.2中描述的前导码模式之前。 当读为逻辑0时，位1.6指示PHY不能接受管理帧，除非它们之前是22.2.4.5.2中描述的前导码模式。</li>
-<li><strong>Auto-Negotiation Complete：</strong> 当读为逻辑1时，位1.5指示自动协商过程已完成，并且由自动协商协议（条款28或条款37）实施的扩展寄存器的内容是有效的。 当读为逻辑0时，位1.5指示自动协商过程尚未完成，并且扩展寄存器的内容由自动协商协议的当前状态定义，或者为手动配置写入。 如果自动协商通过清除位0.12禁用，则PHY应在位1.5返回零值。 如果PHY缺乏执行自动协商的能力，它还应在位1.5返回零值。</li>
-</ul>
-<blockquote>
-<p>在调试以及异常故障处理时，可以通过该位寄存器的状态判断AN是否成功，从而进一步的检查AN相关的设置是否正确，或者芯片的AN功能是否正常等。</p>
-</blockquote>
-<ul>
-<li><strong>Remote Fault：</strong> 当读为逻辑1时，位1.4表示检测到远程故障状态。 故障类型以及故障检测的标准和方法是PHY特定的。 远程故障位必须使用锁存功能来实现，以便发生远程故障将导致远程故障位置位，并保持置位状态直至被清除。 每当通过管理接口读取寄存器1时，远程故障位应清零，并且还应通过PHY复位清零。</li>
-</ul>
-<p>远端错误指示位。Bit4=1代表连接对端（Link Partner）出错，至于出错的具体类型以及错误检测机制在规范中并没有定义，由PHY的制造商自由发挥，一般的厂商都会在其他的寄存器（Register16-31由厂商自行定义）指示比较详细的错误类型。在与端口相关的故障查证中，Remote Fault是一个重要的指示信息，通过互联双方的Remote Fault信息（可能要加上其他的具体错误指示），可以帮助定位故障原因。</p>
-<ul>
-<li><p><strong>Auto-Negotiation ability：</strong> 当读为逻辑1时，位1.3指示PHY有能力执行自动协商。 当读为逻辑0时，位1.3指示PHY缺乏执行自动协商的能力。</p>
-</li>
-<li><p><strong>Link Status：</strong> 当读为逻辑1时，位1.2指示PHY已经确定已建立有效链路。 当作为逻辑0读取时，位1.2指示该链接无效。 确定链路有效性的标准是PHY特定的。 链路状态位应该使用锁存功能来实现，以便发生链路故障情况将导致链路状态位清零并保持清零，直到通过管理接口读取。 此状态指示旨在支持在30.5.1.1.4，aMediaAvailable中定义的管理属性。</p>
-</li>
-</ul>
-<p>实际应用中一般都是通过Bit2来判断端口的状态。而且，一般的MAC芯片也是通过轮询PHY的这个寄存器值来判断端口的Link状态的（这个过程可能有不同的名称，比如BCM叫做Link Scan，而Marvell叫做PHY Polling。）如前所述，在AN Enable的情况下，Link Status的信息只有在Auto-Negotiation Complete指示已经完成的情况下才是正确可靠的，否则有可能出错。</p>
-<ul>
-<li><strong>Jabber Detect：</strong> 当作为逻辑1读取时，位1.1指示已经检测到爆音条件。 此状态指示旨在支持30.5.1.1.6中定义的管理属性，aJabber和30.5.1.3.1 nJabber中定义的MAU通知。 检测Jabber条件的标准是PHY特定的。 Jabber检测位应该使用锁存功能来实现，以便发生Jabber条件将导致Jabber检测位置位，并保持置位状态直至被清除。 每次通过管理接口读取寄存器1时，Jabber检测位应清零，并且还应通过PHY复位清零。</li>
-</ul>
-<p>IEEE802.3对Jabber的解释是“A condition wherein a station transmits for a period of time longer than the maximum permissible packet length, usually due to a fault condition”。这一位指示的是Link Partner发送的时间超过了规定的最大长度。值得注意的是，Jabber Detect只有在10BASE-T模式下才有意义，100和1000M模式是没有定义Jabber这一功能的。</p>
-<h3 id="PHY-Identifier-Register"><a href="#PHY-Identifier-Register" class="headerlink" title="PHY Identifier Register"></a>PHY Identifier Register</h3><p>寄存器2和3存放PHY芯片的型号代码，寄存器2(PHY ID1)为高16位，而寄存器3(PHY ID2)为低16位。由芯片制造商自行定义，实际应用中软件通过读取这两个寄存器的内容可以识别PHY的型号和版本。</p>
-<p>PHY标识符应由由IEEE分配给PHY制造商的组织唯一标识符（OUI）的（<em>只需要使用第3至第24位，共22位</em>），加上6位制造商的型号以及4位制造商的修订版编号组成。 PHY标识符旨在提供足够的信息来支持30.1.2中所要求的oResourceTypeID对象。</p>
-<p>OUI的第三位分配给位2.15，OUI的第四位分配给位2.14，依此类推。 位2.0包含OUI的第十八位。 位3.15包含OUI的第十九位，位3.10包含OUI的第二十四位。 位3.9包含制造商型号的MSB。 位3.4包含制造商型号的LSB。 位3.3包含制造商版本号的MSB，位3.0包含制造商版本号的LSB。具体如下图所示：</p>
-<p><img src="/images/net/phy/PHY_ID_REG.png" alt="PHY_ID_REG"></p>
-<h3 id="Auto-Negotiation-Advertisement-Register-Register-4-R-W"><a href="#Auto-Negotiation-Advertisement-Register-Register-4-R-W" class="headerlink" title="Auto-Negotiation Advertisement Register (Register 4) (R/W)"></a>Auto-Negotiation Advertisement Register (Register 4) (R/W)</h3><p>寄存器4是自动协商的能力通告寄存器，在AN Enable的前提下（见寄存器0），端口根据该寄存器的相关配置将自动协商信息通过FLP在MDI上进行通告。当AN配置为Disable状态的时候，寄存器4的配置将不起作用，端口的工作模式由控制寄存器中的配置决定。</p>
-<p>该寄存器包含PHY的通告能力，它们将在自动协商期间传送给其链接伙伴。 基本页的位定义在IEEE标准的28.2.1.2中定义。 上电时，在自动协商开始之前，该寄存器应具有以下默认配置：</p>
-<ul>
-<li><strong>Selector Field （4.4：0）：</strong> 被设置为适当的代码，如IEEE标准的附件28A中所规定。</li>
-<li><strong>Reserved（4.14）：</strong> 被设置为逻辑0。</li>
-<li><strong>Technology Ability Field（4.11：5）：</strong> <em><strong>根据MII状态寄存器（寄存器1）（1.15：11）中设置的值或等效值设置</strong></em>。 另见28.2.1.2.3和附件28D。</li>
-</ul>
-<p><img src="/images/net/phy/PHY_REG_4.png" alt="PHY_REG_4"></p>
-<h3 id="Link-codeword-encoding（基本链路码字）"><a href="#Link-codeword-encoding（基本链路码字）" class="headerlink" title="Link codeword encoding（基本链路码字）"></a>Link codeword encoding（基本链路码字）</h3><p>在FLP Burst内传输的基本链路代码字（基本页面）应该传达如图28-7所示的编码。 自动协商功能可以使用下一页功能支持其他页面。 下一页交换中使用的链接代码字的编码在28.2.3.4中定义。 在FLP Burst中，D0应该是第一个传输的位。</p>
-<p><img src="/images/net/phy/20180428154543415.png" alt="这里写图片描述"></p>
-<h3 id="Next-Page-function"><a href="#Next-Page-function" class="headerlink" title="Next Page function"></a>Next Page function</h3><p>下一页功能使用标准的自动协商仲裁机制来允许交换任意的数据。 数据由可选的下一页信息携带，其遵循用于基本链接码字的传输和确认过程。 定义了四种类型的下一页编码：消息页面，未格式化页面，扩展消息页面和扩展的未格式化页面。</p>
-<p>关于该部分，具体见IEEE标准的<strong>28.2.3.4 Next Page function</strong>。</p>
-<p>在IEEE标准中，Auto-Negotiation Advertisement Register中的各部分全部是在独立章节中进行介绍的。具体如下：</p>
-<ul>
-<li><strong>Selector Field：</strong> 选择器字段（S [4：0]）是一个5位宽的字段，编码32个可能的消息。 链路码字中的选择器字段S [4：0]应用于识别自动协商发送的消息的类型。 下表列出了可能发送的消息的类型。 随着新消息的发展，该表格将相应更新。</li>
-</ul>
-<p><img src="/images/net/phy/20180428155653138.png" alt="Selector Field"></p>
-<p>未指定的组合保留供将来使用。 不会传输选择器字段的预留组合。<em><strong>我们所接触的以太网PHY遵从IEEE802.3规范，Selector Field=0001，该区域不可随意更改（很多PHY将此区域设计为只读寄存器，以免被修改）</strong></em>。</p>
-<ul>
-<li><strong>Technology Ability Field：</strong> 技术能力字段（A [6：0]）是一个7位宽的字段，其中包含指示选择器字段值特定的支持技术的信息。 这些位被映射到各个技术，以便能够针对单个选择器字段值并行通告能力。 附录28B.2和附件28D描述了IEEE 802.3选择器的技术能力字段编码。 链接代码字中可能会公布多种技术。 设备应支持其宣传的技术的数据服务能力。</li>
-</ul>
-<p><img src="/images/net/phy/20180428152215994.png" alt="Technology Ability Field"></p>
-<ul>
-<li><p><strong>Extended Next Page：</strong> 扩展下一页（XNP）被编码在基本链路码字的位D12中。 扩展下一页位指示本地设备在设置为逻辑1时支持扩展下一页的传输，并指示本地设备在设置为逻辑0时不支持扩展下一页。 Extended Next Page的使用与协商的数据速率，媒体或链接技术是正交的。 扩展下一页位按照28.2.3.4中的扩展下一页功能规范使用。</p>
-</li>
-<li><p><strong>Next Page：</strong> 无论选择器字段值还是链接码字编码，下一页（NP）都在D15位编码。 支持附加链接码字编码的传输和接收是可选的。 如果不支持Next Page功能，NP位应始终设置为逻辑0。 如果设备实现下一页功能并希望进行下一页交换，则应将NP位设置为逻辑1。 设备可以实现下一页功能，并通过将NP位设置为逻辑0来选择不参与下一页交换。 下一页功能在28.2.3.4中定义。</p>
-</li>
-<li><p><strong>Remote Fault：</strong> 远程故障（RF）编码在基本链路码字的位D13中。 默认值是逻辑零。 远程故障位为传输简单的故障信息提供了一种标准的传输机制。 当自动协商通告寄存器（寄存器4）中的RF位设置为逻辑1时，发送的基本链路码字中的RF位被设置为逻辑1。 当接收到的基本链路代码字中的RF位被设置为逻辑1时，如果存在MII管理功能，则MII状态寄存器（寄存器1）中的远程故障位将被设置为逻辑1。</p>
-</li>
-</ul>
-<h3 id="Auto-Negotiation-Link-Partner-ability-register-Register-5-RO"><a href="#Auto-Negotiation-Link-Partner-ability-register-Register-5-RO" class="headerlink" title="Auto-Negotiation Link Partner ability register (Register 5) (RO)"></a>Auto-Negotiation Link Partner ability register (Register 5) (RO)</h3><p>寄存器5保存的是本端PHY接收到的对端PHY所通告的端口能力，寄存器5的结构和寄存器4基本一致。</p>
-<h3 id="Auto-Negotiation-Expansion-Register-Register-6-RO"><a href="#Auto-Negotiation-Expansion-Register-Register-6-RO" class="headerlink" title="Auto-Negotiation Expansion Register (Register 6) (RO)"></a>Auto-Negotiation Expansion Register (Register 6) (RO)</h3><p>寄存器6保存了PHY自动协商过程的异常信息。从这个寄存其中我们可以获取到Link Partner子否支持自动协商以及自动协商下一页有没有收到的信息。</p>
-<p><img src="/images/net/phy/20180428163901700.png" alt="Auto-Negotiation Expansion Register"></p>
-<h3 id="Auto-Negotiation-Next-Page-transmit-register-Register-7-R-W"><a href="#Auto-Negotiation-Next-Page-transmit-register-Register-7-R-W" class="headerlink" title="Auto-Negotiation Next Page transmit register (Register 7) (R/W)"></a>Auto-Negotiation Next Page transmit register (Register 7) (R/W)</h3><p>自动协商下一页发送寄存器包含在支持下一页功能时要发送的下一页链接码字。 （见表28-6）内容在28.2.3.4中定义。 上电时，该寄存器应包含默认值2001H，该值表示消息代码设置为Null消息的消息页面。 该值可以由设备希望传输的任何有效的下一页消息代码替换。 写入该寄存器应将mr_next_page_loaded设置为true。</p>
-<p><img src="/images/net/phy/2018042816462224.png" alt="Register 7"></p>
-<h3 id="Auto-Negotiation-Link-Partner-Received-Next-Page-register-Register-8-RO"><a href="#Auto-Negotiation-Link-Partner-Received-Next-Page-register-Register-8-RO" class="headerlink" title="Auto-Negotiation Link Partner Received Next Page register (Register 8) (RO)"></a>Auto-Negotiation Link Partner Received Next Page register (Register 8) (RO)</h3><p><img src="/images/net/phy/20180428164942266.png" alt="Register 8"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/mii/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/mii/" class="post-title-link" itemprop="url">Media Independent Interface</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="MII"><a href="#MII" class="headerlink" title="MII"></a>MII</h2><p>MII（Media Independent Interface）即媒体独立接口，MII接口是MAC与PHY连接的标准接口。它是IEEE-802.3定义的以太网行业标准。MII接口提供了MAC与PHY之间、PHY与STA(Station Management)之间的互联技术，该接口支持10Mb/s与100Mb/s的数据传输速率，单向传输的数据线有4根，整个接口由14根线组成。媒体独立的意思，是指不管铜轴、光纤、电缆等媒体的变化，媒体处理的相关工作都由PHY和MAC的芯片完成。</p>
-<p>MII接口主要包括四个部分。一是从MAC层到PHY层的发送数据接口，二是从PHY层到MAC层的接收数据接口，三是从PHY层到MAC层的状态指示信号，四是MAC层和PHY层之间传送控制和状态信息的MDIO接口。</p>
-<p><img src="/images/net/mii/MII.jpg" alt="MII"></p>
-<ul>
-<li><p>TXD[3:0]：数据发送信号，共4根信号线；</p>
-</li>
-<li><p>TX_CLK：发送数据使用的时钟信号，对于10M位/s的数据传输，此时钟为2.5MHz，对于100M位/s的数据传输，此时钟为25MHz。</p>
-</li>
-<li><p>TX_ER（transmit coding error）： TX_ER同步于TX_CLK，在数据传输过程中，如果TX_ER有效超过一个时钟周期，并且此时TX_EN是有效的，则数据通道中传输的数据是无效的，没用的。注：当TX_ER有效并不影响工作在10Mb/s的PHY或者TX_EN无效时的数据传输。在MII接口的连线中，如果TX_ER信号线没有用到，必须将它下拉接地。</p>
-</li>
-<li><p>TX_EN：传输使能信号，此信号必需与数据前导符的起始位同步出现，并在传输完毕前一直保持。</p>
-</li>
-<li><p>TXD[3:0]：发送数据线，每次传输4位数据，数据在TX_EN信号有效时有效。当TX_EN信号无效时，PHY忽略传输的数据。</p>
-</li>
-<li><p>RX_CLK：接收数据使用的时钟信号，对于10M位/s的数据传输，此时钟为2.5MHz，对于100M位/s的数据传输，此时钟为25MHz。</p>
-</li>
-<li><p>RXD[3:0]：接收数据线，每次接收4位数据，数据在RX_DV信号有效时有效。当RX_EN无效，而RX_ER有效时，RXD[3:0]数据值代表特定的信息。</p>
-</li>
-<li><p>RX_DV：接收数据使能信号，由PHY控制，当PHY准备好数据供MAC接收时，使能该信号。此信号必需和帧数据的首位同步出现，并保持有效直到数据传输完成。在传送最后4位数据后的第一个时钟之前，此信号必需变为无效状态。为了正确的接收一个帧，有效电平不能滞后于数据线上的SFD位出现。</p>
-</li>
-<li><p>RX_ER：接收出错信号，保持一个或多个时钟周期(RX_CLK)的有效状态，表明MAC在接收过程中检测到错误。具体错误原因需配合RX_DV的状态及RXD[3:0]的数据值。</p>
-</li>
-<li><p>CRS：载波侦听信号，仅工作在半双工模式下，由PHY控制，当发送或接收的介质非空闲时，使能此信号。 PHY必需保证CRS信号在发生冲突的整个时间段内都保持有效，不需要此信号与发送/接收的时钟同步。</p>
-</li>
-<li><p>COL：冲突检测信号，仅工作在半双工模式下，由PHY控制，当检测到介质发生冲突时，使能此信号，并且在整个冲突的持续时间内，保持此信号有效。此信号不需要和发送/接收的时钟同步。</p>
-</li>
-<li><p>MDC：配置接口时钟。</p>
-</li>
-<li><p>MDIO：配置接口I/O，是PHY和STA之间的双向信号。 它用于在PHY和STA之间传输控制信息和状态。 控制信息由STA同步地针对MDC驱动并且由PHY同步地采样。 状态信息由PHY针对MDC同步驱动并由STA同步采样。需要1.5K电阻上拉。</p>
-</li>
-</ul>
-<p>MII接口的类型有很多，常用的有MII、RMII、SMII、SSMII、SSSMII、GMII、RGMII、SGMII、TBI、RTBI、XGMII、XAUI、XLAUI等。</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>MII</th>
-<th>RMII</th>
-<th>GMII</th>
-<th>RGMII</th>
-<th>SMII</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>传输速度</td>
-<td>100/10M</td>
-<td>100/10M</td>
-<td>1000/100/10M</td>
-<td>1000/100/10M</td>
-<td>100M</td>
-</tr>
-<tr>
-<td>单向数据线数</td>
-<td>4</td>
-<td>2</td>
-<td>8</td>
-<td>4</td>
-<td>1</td>
-</tr>
-<tr>
-<td>时钟速率</td>
-<td>25/2.5M</td>
-<td>50/5M</td>
-<td>25/2.5M</td>
-<td>125/25/2.5M</td>
-<td>125M</td>
-</tr>
-</tbody></table>
-<h2 id="RMII"><a href="#RMII" class="headerlink" title="RMII"></a>RMII</h2><p>RMII即Reduced MII，是简化的MII接口。连线数量由MII的16根减少为8根，对于10Mbps线速，MII的时钟速率是2.5MHz就可以了，RMII则需要5MHz；对于100Mbps线速，MII需要的时钟速率是25MHz，RMII则是50MHz。</p>
-<p><img src="/images/net/mii/RMII.jpg" alt="RMII"></p>
-<ul>
-<li><p>TXD[1:0]：数据发送信号线，数据位宽为2</p>
-</li>
-<li><p>RXD[1:0]：数据接收信号线，数据位宽为2</p>
-</li>
-<li><p>TX_EN(Transmit Enable)：数据发送使能信号</p>
-</li>
-<li><p>RX_ER(Receive Error)：数据接收错误提示信号</p>
-</li>
-<li><p>CLK_REF：是由外部时钟源提供的50MHz参考时钟，与MII接口不同，MII接口中的接收时钟和发送时钟是分开的，而且都是由PHY芯片提供给MAC芯片的。这里需要注意的是，由于数据接收时钟是由外部晶振提供而不是由载波信号提取的，所以在PHY层芯片内的数据接收部分需要设计一个FIFO，用来协调两个不同的时钟,在发送接收的数据时提供缓冲。PHY层芯片的发送部分则不需要FIFO，它直接将接收到的数据发送到MAC就可以了。</p>
-</li>
-<li><p>CRS_DV：此信号是由MII接口中的RX_DV和CRS两个信号合并而成。当介质不空闲时，CRS_DV和RE_CLK相异步的方式给出。当CRS比RX_DV早结束时(即载波消失而队列中还有数据要传输时)，就会出现CRS_DV在半位元组的边界以25MHz/2.5MHz的频率在0、1之间的来回切换。因此，MAC能够从 CRS_DV中精确的恢复出RX_DV和CRS。</p>
-</li>
-</ul>
-<p>在100Mbps速率时，TX/RX每个时钟周期采样一个数据；在10Mbps速率时，TX/RX每隔10个周期采样一个数据，因而TX/RX数据需要在数据线上保留10个周期，相当于一个数据发送10次。</p>
-<p>当PHY层芯片收到有效的载波信号后，CRS_DV信号变为有效，此时如果FIFO中还没有数据，则它会发送出全0的数据给MAC，然后当FIFO中填入有效的数据帧，数据帧的开头是“101010—”交叉的前导码，当数据中出现“01”的比特时，代表正式数据传输开始，MAC芯片检测到这一变化，从而开始接收数据。</p>
-<p>当外部载波信号消失后，CRS_DV会变为无效，但如果FIFO中还有数据要发送时，CRS_DV在下一周期又会变为有效，然后再无效再有效，直到FIFO中数据发送完为止。在接收过程中如果出现无效的载波信号或者无效的数据编码，则RX_ER会变为有效，表示物理层芯片接收出错。</p>
-<h2 id="SMII"><a href="#SMII" class="headerlink" title="SMII"></a>SMII</h2><p>SMII即Serial MII，串行MII的意思，跟RMII相比，连线进一步减少到4根。只用一根信号线传送发送数据，一根信号线传输接受数据，所以在时钟上为了满足100的需求，它的时钟频率高达到125M，数据线里面还会传送一些控制信息。所有端口的数据收发都公用同一个外部的125M时钟。</p>
-<p><img src="/images/net/mii/SMII.jpg" alt="SMII"></p>
-<ul>
-<li>TXD：发送数据信号，位宽为1；</li>
-<li>RXD：接收数据信号，位宽为1；</li>
-<li>SYNC：收发数据同步信号，每10个时钟周期置1次高电平，指示同步。</li>
-<li>CLK_REF：所有端口共用的一个参考时钟，频率为125MHz，为什么100Mbps速率要用125MHz时钟？因为在每8位数据中会插入2位控制信号，请看下面介绍。</li>
-</ul>
-<p>TXD/RXD以10比特为一组，以SYNC为高电平来指示一组数据的开始，在SYNC变高后的10个时钟周期内，TXD上依次输出的数据是：TXD[7:0]、TX_EN、TX_ER，控制信号的含义与MII接口中的相同；RXD上依次输出的数据是：RXD[7:0]、RX_DV、CRS，RXD[7:0]的含义与RX_DV有关，当RX_DV为有效时(高电平)，RXD[7:0]上传输的是物理层接收的数据。当RX_DV为无效时(低电平)，RXD[7:0]上传输的是物理层的状态信息数据。见下表：</p>
-<p><img src="/images/net/mii/SMII2.jpg" alt="img"></p>
-<p>当速率为10Mbps时，每一组数据要重复10次，MAC/PHY芯片每10个周期采样一次。MAC/PHY芯片在接收到数据后会进行串/并转换。</p>
-<h2 id="SSMII"><a href="#SSMII" class="headerlink" title="SSMII"></a>SSMII</h2><p>SSMII即Serial Sync MII，叫串行同步接口，跟SMII接口很类似，只是收发使用独立的参考时钟和同步时钟，不再像SMII那样收发共用参考时钟和同步时钟，传输距离比SMII更远。</p>
-<p><img src="/images/net/mii/SSMII.jpg" alt="img"></p>
-<h2 id="SSSMII"><a href="#SSSMII" class="headerlink" title="SSSMII"></a>SSSMII</h2><p>SSSMII即Source Sync Serial MII，叫源同步串行MII接口，SSSMII与SSMII的区别在于参考时钟和同步时钟的方向，SSMII的TX/RX参考时钟和同步时钟都是由PHY芯片提供的，而SSSMII的TX参考时钟和同步时钟是由MAC芯片提供的，RX参考时钟和同步时钟是由PHY芯片提供的，所以顾名思义叫源同步串行。</p>
-<p><img src="/images/net/mii/SSSMII.jpg" alt="img"></p>
-<h2 id="GMII"><a href="#GMII" class="headerlink" title="GMII"></a>GMII</h2><p>GMII(Gigabit MII)是千兆网的MII接口。GMII采用8位接口数据，工作时钟125MHz，因此传输速率可达1000Mbps。同时兼容MII所规定的10/100 Mbps工作方式。GMII接口数据结构符合IEEE 802.3-2000以太网标准。</p>
-<p>与MII接口相比，GMII的数据宽度由4位变为8位，GMII接口中的控制信号如TX_ER、TX_EN、RX_ER、RX_DV、CRS和COL的作用同MII接口中的一样，发送参考时钟GTX_CLK和接收参考时钟RX_CLK的频率均为125MHz(1000Mbps/8=125MHz)。</p>
-<p>发送参考时钟GTX_CLK，它和MII接口中的TX_CLK是不同的，MII接口中的TX_CLK是由PHY芯片提供给MAC芯片的，而GMII接口中的GTX_CLK是由MAC芯片提供给PHY芯片的。两者方向不一样。绝大多数GMII接口都是兼容MII接口的，所以GMII接口都有两个发送参考时钟：TX_CLK和GTX_CLK(两者方向不一样)，在用作MII模式时，使用TX_CLK和8根数据线中的4根。</p>
-<p><img src="/images/net/mii/GMII.jpg" alt="GMII"></p>
-<p>在千兆速率下，向PHY提供GTXCLK信号、TXD、TXEN、TXER信号与此时钟信号同步。否则在10/100Mbps速率下，PHY提供TXCLK时钟信号，其它信号与此信号同步。其工作频率为25MHz(100M网络)或2.5MHz(10M网络)。</p>
-<h2 id="RGMII"><a href="#RGMII" class="headerlink" title="RGMII"></a>RGMII</h2><p>RGMII即Reduced GMII，是GMII的简化版本，将接口信号线数量从24根减少到14根，时钟频率仍旧为125MHz，TX/RX数据宽度从8为变为4位，为了保持1000Mbps的传输速率不变，RGMII接口在时钟的上升沿和下降沿都采样数据。在参考时钟的上升沿发送GMII接口中的TXD[3:0]/RXD[3:0]，在参考时钟的下降沿发送GMII接口中的TXD[7:4]/RXD[7:4]。RGMI同时也兼容100Mbps和10Mbps两种速率，此时参考时钟速率分别为25MHz和2.5MHz。</p>
-<p>TX_EN信号线上传送TX_EN和TX_ER两种信息，在TX_CLK的上升沿发送TX_EN，下降沿发送TX_ER；同样的，RX_DV信号线上也传送RX_DV和RX_ER两种信息，在RX_CLK的上升沿发送RX_DV，下降沿发送RX_ER。</p>
-<p><img src="/images/net/mii/RGMII.jpg" alt="RGMII"></p>
-<p><img src="/images/net/mii/RGMII2.jpg" alt="img"></p>
-<h2 id="SGMII"><a href="#SGMII" class="headerlink" title="SGMII"></a>SGMII</h2><p>SGMII即Serial GMII，串行GMII，收发各一对差分信号线，时钟频率625MHz，在时钟信号的上升沿和下降沿均采样，参考时钟RX_CLK由PHY提供，是可选的，主要用于MAC侧没有时钟的情况，一般情况下，RX_CLK不使用。收发都可以从数据中恢复出时钟。</p>
-<p>在TXD发送的串行数据中，每8比特数据会插入TX_EN/TX_ER 两比特控制信息，同样，在RXD接收数据中，每8比特数据会插入RX_DV/RX_ER 两比特控制信息，所以总的数据速率为1.25Gbps=625Mbps*2。</p>
-<p>其实，大多数MAC芯片的SGMII接口都可以配置成SerDes接口(在物理上完全兼容，只需配置寄存器即可)，直接外接光模块，而不需要PHY层芯片，此时时钟速率仍旧是625MHz，不过此时跟SGMII接口不同，SGMII接口速率被提高到1.25Gbps是因为插入了控制信息，而SerDes端口速率被提高是因为进行了8B/10B变换，本来8B/10B变换是PHY芯片的工作，在SerDes接口中，因为外面不接PHY芯片，此时8B/10B变换在MAC芯片中完成了。8B/10B变换的主要作用是扰码，让信号中不出现过长的连“0”和连“1”情况，影响时钟信息的提取，关于8B/10B变换知识，我后续会单独介绍。</p>
-<p><img src="/images/net/mii/SGMII.jpg" alt="SGMII"></p>
-<h2 id="TBI"><a href="#TBI" class="headerlink" title="TBI"></a>TBI</h2><p>TBI即Ten Bit Interface，接口数据位宽由GMII接口的8位增加到10位，其实，TBI接口跟GMII接口的差别不是很大，多出来的2位数据主要是因为在TBI接口下，MAC芯片在将数据发给PHY芯片之前进行了8B/10B变换(8B/10B变换本是在PHY芯片中完成的，前面已经说过了)，另外，RX_CLK+/-是从接收数据中恢复出来的半频时钟，频率为62.5MHz，RX_CLK+/-不是差分信号，而是两个独立的信号，两者之间有180度的相位差，在这两个时钟的上升沿都采样数据。RX_CLK+/-也叫伪差分信号。除掉上面说到的之外，剩下的信号都跟GMII接口中的相同。大多数芯片的TBI接口和GMII接口兼容。在用作TBI接口时，CRS和COL一般不用。</p>
-<p><img src="/images/net/mii/TBI.jpg" alt="img"></p>
-<h2 id="RTBI"><a href="#RTBI" class="headerlink" title="RTBI"></a>RTBI</h2><p>RTBI即Reduced TBI，简化版TBI，接口数据位宽为5bit，时钟频率为125MHz，在时钟的上升沿和下降沿都采样数据，同RGMII接口一样，TX_EN线上会传送TX_EN和TX_ER两种信息，在时钟的上升沿传TX_EN，下降沿传TX_ER；RX_DV线上传送RX_DV和RX_ER两种信息，在RX_CLK上升沿传RX_DV，下降沿传RX_ER。</p>
-<p><img src="/images/net/mii/RTBI.jpg" alt="img"></p>
-<h2 id="XGMII"><a href="#XGMII" class="headerlink" title="XGMII"></a>XGMII</h2><p>XGMII–10 Gigabit Media Independent Interface 即10Gb独立于媒体的接口，X对应罗马数字10。</p>
-<p><img src="/images/net/mii/XGMII.jpg" alt="XGMII"></p>
-<p>XGMII接口共74根连线，单端信号，采用HSTL/SSTL_2逻辑，端口电压1.5V/2.5V，由于SSTL_2的端口电压高，功耗大，现在已很少使用。</p>
-<ul>
-<li><p>TXD[31:0]：数据发送通道，32位并行数据。</p>
-</li>
-<li><p>RXD[31:0]：数据接收通道，32位并行数据。</p>
-</li>
-<li><p>TXC[3:0]：发送通道控制信号，TXC=0时，表示TXD上传输的是数据；TXC=1时，表示TXD上传输的是控制字符。TXC[3:0]分别对应TXD[31:24], TXD[23:16], TXD[15:8], TXD[7:0]。</p>
-</li>
-<li><p>RXC[3:0]：接收通道控制信号，RXC=0时，表示RXD上传输的是数据；RXC=1时，表示RXD上传输的是控制字符。RXC[3:0]分别对应RXD[31:24], RXD[23:16], RXD[15:8], RXD[7:0]。</p>
-</li>
-<li><p>TX_CLK：TXD和TXC的参考时钟，时钟频率156.25MHz，在时钟信号的上升沿和下降沿都采样数据。156.25MHz - 2 - 32 = 10Gbps 。</p>
-</li>
-<li><p>RX_CLK：RXD和RXC的参考时钟，时钟频率156.25MHz，在时钟信号的上升沿和下降沿都采样数据。</p>
-</li>
-</ul>
-<p>HSTL即High Speed Transceiver Logic，高速发送逻辑的意思。</p>
-<p>SSTL，即Stub Series Terminated Logic，短路终止逻辑，主要用于高速内存接口，SSTL目前存在两种标准，SSTL_3是3.3V标准；SSTL_2是2.5V标准。</p>
-<h2 id="XAUI"><a href="#XAUI" class="headerlink" title="XAUI"></a>XAUI</h2><p>由于受电气特性的影响，XGMII接口的PCB走线最大传输距离仅有7cm，并且XGMII接口的连线数量太多，给实际应用带来不便，因此，在实际应用中，XGMII接口通常被XAUI接口代替，XAUI即10 Gigabit attachment unit interface，将XGMII集成到芯片内部，XAUI在XGMII的基础上实现了XGMII接口的物理距离扩展，将PCB走线的传输距离增加到50cm，使背板走线成为可能。</p>
-<p>源端XGMII把收发32位宽度数据流分为4个独立的lane通道，每个lane通道对应一个字节，经XGXS(XGMII Extender Sublayer)完成8B/10B编码后，将4个lane分别对应XAUI的4个独立通道，XAUI端口速率为：<code>2.5Gbps - 1.25 - 4＝12.5Gbps</code>。</p>
-<p><img src="/images/net/mii/XAUI.jpg" alt="img"></p>
-<p>在发送端的XGXS模块中，将TXD[31:0]/ RXD[31:0],TXC[3:0]/ RXC[3:0], TX_CLK/ RX_CLK转换成串行数据从TX Lane[3:0]/ RX Lane[3:0]中发出去，在接收端的XGXS模块中，串行数据被转换成并行，并且进行时钟恢复和补偿，完成时钟去抖，经过5B/4B解码后，重新聚合成XGMII。</p>
-<p>万兆以太网接口的端口速率为10Gbps，主要有XGMII和XAUI两种，另外还有HIGIG。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/19/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><span class="page-number current">20</span><a class="page-number" href="/page/21/">21</a><a class="page-number" href="/page/22/">22</a><a class="extend next" rel="next" href="/page/21/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/19/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><span class="page-number current">20</span><a class="page-number" href="/page/21/">21</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/21/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1845,7 +1773,7 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">219</span>
+          <span class="site-state-item-count">221</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1858,7 +1786,7 @@ J——表示该步进减速电机的减速型式，“减”汉语拼音（Jian
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-count">42</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

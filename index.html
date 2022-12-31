@@ -176,7 +176,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/12/17/algo/tree-search/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/12/31/algo/tree-code/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -190,7 +190,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/12/17/algo/tree-search/" class="post-title-link" itemprop="url">二叉搜索树</a>
+            <a href="/2022/12/31/algo/tree-code/" class="post-title-link" itemprop="url">二叉树算法题</a>
         </h1>
 
         <div class="post-meta">
@@ -201,8 +201,605 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2022-12-17 11:15:01 / 修改时间：11:16:26" itemprop="dateCreated datePublished" datetime="2022-12-17T11:15:01+08:00">2022-12-17</time>
+              <time title="创建时间：2022-12-31 22:09:51 / 修改时间：22:21:32" itemprop="dateCreated datePublished" datetime="2022-12-31T22:09:51+08:00">2022-12-31</time>
             </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="最大深度"><a href="#最大深度" class="headerlink" title="最大深度"></a>最大深度</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MAX(a, b) ((a) &gt; (b) ? (a) : (b))</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">MaxDepth</span><span class="params">(TreeNode *root)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (root == <span class="literal">nullptr</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> left = <span class="built_in">MaxDepth</span>(root-&gt;left);</span><br><span class="line">    <span class="type">int</span> right = <span class="built_in">MaxDepth</span>(root-&gt;right);</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">MAX</span>(left, right) + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="翻转二叉树"><a href="#翻转二叉树" class="headerlink" title="翻转二叉树"></a>翻转二叉树</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Flip</span><span class="params">(TreeNode *root)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (root == <span class="literal">nullptr</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    TreeNode *tmp = root-&gt;left;</span><br><span class="line">    root-&gt;left = root-&gt;right;</span><br><span class="line">    root-&gt;right = tmp;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">Flip</span>(root-&gt;left);</span><br><span class="line">    <span class="built_in">Flip</span>(root-&gt;right);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="相同的二叉树"><a href="#相同的二叉树" class="headerlink" title="相同的二叉树"></a>相同的二叉树</h2><p>(1)如果两棵树的根结点都为空，则两棵树相同。<br>(2)如果两棵树的根结点有一个为空，则两棵树必然不相同。<br>(3)如果两棵树都不为空，则判断根结点的值是否相同，不相同则这两棵树必然不相同。<br>(4)如果两棵树根结点的值相同，则需要判断两棵树的左右子树是否相同，如果相同则这两棵树相同。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isSameTree</span><span class="params">(TreeNode p, TreeNode q)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (p == q &amp;&amp; p == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;                                                            <span class="comment">//(1)</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="literal">null</span> || q == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;                                                           <span class="comment">//(2)</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (p.val != q.val) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;                                                           <span class="comment">//(3)</span></span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> isSameTree(p.left, q.left) &amp;&amp; isSameTree(p.right, q.right);      <span class="comment">//(4)</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="另一棵树的子树"><a href="#另一棵树的子树" class="headerlink" title="另一棵树的子树"></a>另一棵树的子树</h2><p>判断一棵树是否为另一棵树的子树我们可以基于判断两棵树是否相同去做。<br>(1)如果<code>root</code>与<code>subRoot</code>的地址相同，则说明两棵树是同一棵树，那么<code>subRoot</code>肯定是<code>root</code>的子树。<br>(2)如果<code>root</code>与<code>subRoot</code>有一棵树是空，那么<code>subRoot</code>必然不是<code>root</code>的子树。<br>(3)如果<code>root</code>与<code>subRoot</code>相同，那么<code>subRoot</code>肯定是<code>root</code>的子树。<br>(4)如果<code>root</code>的子树含有与<code>subRoot</code>相同的树，那么<code>subRoot</code>肯定是<code>root</code>的子树。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">	<span class="comment">//判断两棵树是否相同</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isSameTree</span><span class="params">(TreeNode p, TreeNode q)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (p == q &amp;&amp; q == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="literal">null</span> || q == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (p.val != q.val) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125; </span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> isSameTree(p.left, q.left) &amp;&amp; isSameTree(p.right, q.right);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isSubtree</span><span class="params">(TreeNode root, TreeNode subRoot)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (root == subRoot) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="literal">null</span> || subRoot == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="comment">//整棵树是否与subRoot相同</span></span><br><span class="line">        <span class="keyword">if</span> (isSameTree(root, subRoot)) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="comment">//subRoot是否是左子树的子树</span></span><br><span class="line">        <span class="keyword">if</span> (isSubtree(root.left, subRoot)) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="comment">//subRoot是否是右子树的子树</span></span><br><span class="line">        <span class="keyword">if</span> (isSubtree(root.right, subRoot)) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="comment">//上面都不满足，则subRoot不是该树的子树</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="对称二叉树"><a href="#对称二叉树" class="headerlink" title="对称二叉树"></a>对称二叉树</h2><p>判断一棵树是否是对称二叉树，其实就是判断这棵树的左右子树是否相同，如果相同则该二叉树对称，反之不对称，当然如果这棵二叉树是空树，那这棵树也是对称的。所以这又回到比较两棵树是否相等这个题目上去了。<br>(1)如果二叉树为空，返回<code>true</code>。<br>(2)比较左右子树是否相等，相等返回<code>true</code>，否则返回<code>false</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="comment">//(2)判断左右子树是否相同</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isSymmetricChild</span><span class="params">(TreeNode leftTree,TreeNode rightTree)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (leftTree == rightTree &amp;&amp; leftTree == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (leftTree == <span class="literal">null</span> || rightTree == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (leftTree.val != rightTree.val) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> isSymmetricChild(leftTree.left, rightTree.right) &amp;&amp; isSymmetricChild(leftTree.right, rightTree.left);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isSymmetric</span><span class="params">(TreeNode root)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(root == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">true</span>;       <span class="comment">//(1)</span></span><br><span class="line">        <span class="keyword">return</span> isSymmetricChild(root.left,root.right);<span class="comment">//(2)</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="判断平衡二叉树"><a href="#判断平衡二叉树" class="headerlink" title="判断平衡二叉树"></a>判断平衡二叉树</h2><p>(1)如果树为空，则这棵树是平衡二叉树。<br>(2)获取该树左右子树的高度差的绝对值，如果大于1，则这棵树肯定不是平衡二叉树。<br>(3)如果高度差绝对值不大于1，再判断该树的左右子树是否都是平衡二叉树，如果是，则这一整棵树是平衡二叉树。</p>
+<p>所以这道题最终回到了求二叉树的高度上来。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="comment">//获取二叉树的高度</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">maxDeep</span><span class="params">(TreeNode subtree)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (subtree == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span> + Math.max(maxDeep(subtree.left), maxDeep(subtree.right));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isBalanced</span><span class="params">(TreeNode root)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;            <span class="comment">//(1)</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">int</span> <span class="variable">ret</span> <span class="operator">=</span> Math.abs(maxDeep(root.left) - maxDeep(root.right));       <span class="comment">//(2)</span></span><br><span class="line">        <span class="keyword">if</span> (ret &lt;= <span class="number">1</span> &amp;&amp; isBalanced(root.left) &amp;&amp; isBalanced(root.right)) &#123;  <span class="comment">//(3)</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="判断完全二叉树"><a href="#判断完全二叉树" class="headerlink" title="判断完全二叉树"></a>判断完全二叉树</h2><p>当遍历当前层时如果遇到空节点，如果该空节点右侧还有节点，说明该树一定不是完全二叉树，直接返回false，遍历完返回true；</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> boolean <span class="title">isCompleteTree</span> <span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 层次遍历方法</span></span><br><span class="line">        <span class="comment">// 标记空节点</span></span><br><span class="line">        boolean target = <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">if</span>(root == null) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        Queue&lt;TreeNode&gt; queue = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        queue.<span class="built_in">offer</span>(root);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">while</span>(!queue.<span class="built_in">isEmpty</span>())&#123;</span><br><span class="line">            TreeNode cur = queue.<span class="built_in">poll</span>();</span><br><span class="line">            <span class="comment">//如果当前结点为空结点，将标记位left设置为false</span></span><br><span class="line">            <span class="keyword">if</span>(cur == null)&#123;</span><br><span class="line">                target = <span class="literal">false</span>;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">               <span class="comment">// 遇到空节点直接返回false</span></span><br><span class="line">                <span class="keyword">if</span>(target == <span class="literal">false</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">                queue.<span class="built_in">offer</span>(cur.left);</span><br><span class="line">                queue.<span class="built_in">offer</span>(cur.right);</span><br><span class="line">                </span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">           </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="判断二叉搜索树"><a href="#判断二叉搜索树" class="headerlink" title="判断二叉搜索树"></a>判断二叉搜索树</h2><p>提前设置最小值pre<br>1、先判断空<br>2、进行递归左子树，如果不满足，返回false<br>3、判断当前root值和pre值大小，如果root&lt;pre,则返回false<br>4、更新pre值<br>5、然后递归右子树</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * </span></span><br><span class="line"><span class="comment">     * @param root TreeNode类 </span></span><br><span class="line"><span class="comment">     * @return bool布尔型</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">int</span> pre = Integer.MIN_VALUE; </span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> boolean <span class="title">isValidBST</span> <span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 首先判断为空</span></span><br><span class="line">        <span class="keyword">if</span>(root ==null) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">if</span>(!<span class="built_in">isValidBST</span>(root.left))</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">if</span>(root.val &lt; pre) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="comment">// 更新最值</span></span><br><span class="line">        pre = root.val;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">isValidBST</span>(root.right);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_36317312/article/details/124026664">https://blog.csdn.net/qq_36317312/article/details/124026664</a></p>
+<p><a target="_blank" rel="noopener" href="https://labuladong.gitee.io/algo/di-yi-zhan-da78c/shou-ba-sh-66994/dong-ge-da-172f0/">https://labuladong.gitee.io/algo/di-yi-zhan-da78c/shou-ba-sh-66994/dong-ge-da-172f0/</a></p>
+<p><a target="_blank" rel="noopener" href="https://bbs.huaweicloud.com/blogs/357408">https://bbs.huaweicloud.com/blogs/357408</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/12/31/cpu/asm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/12/31/cpu/asm/" class="post-title-link" itemprop="url">ARM指令集</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-12-31 20:37:59 / 修改时间：22:05:44" itemprop="dateCreated datePublished" datetime="2022-12-31T20:37:59+08:00">2022-12-31</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="跳转指令"><a href="#跳转指令" class="headerlink" title="跳转指令"></a>跳转指令</h2><p>跳转指令用于实现程序流程的跳转，在ARM程序中有以下两种方法可以实现程序流程的跳转：</p>
+<ul>
+<li>使用跳转指令，可以从当前指令向前或向后的32MB的地址空间的跳转</li>
+<li>直接向程序计数器PC写入跳转地址值，通过向程序计数器PC写入跳转地址值，可以实现在4GB的地址空间中的任意跳转，在跳转之前结合使用MOV LR，PC等类似指令，可以保存将来的返回地址值，从而实现在4GB连续的线性地址空间的子程序调用。</li>
+</ul>
+<h3 id="B"><a href="#B" class="headerlink" title="B"></a>B</h3><p>B指令立即跳转到给定的目标地址，从那里继续执行。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">B&#123;条件&#125; 目标地址</span><br></pre></td></tr></table></figure>
+
+<h3 id="BL"><a href="#BL" class="headerlink" title="BL"></a>BL</h3><p>BL跳转到某地址（有返回），先将下一指令地址（即函数返回地址）保存到寄存器 lr (x30)中，再进行跳转。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">BL&#123;条件&#125; 目标地址</span><br></pre></td></tr></table></figure>
+
+<h3 id="BLX"><a href="#BLX" class="headerlink" title="BLX"></a>BLX</h3><p>BLX指令从ARM指令集跳转到指令中所指定的目标地址，并将处理器的工作状态有ARM状态切换到Thumb状态，该指令同时将PC的当前内容保存到寄存器R14中。因此，当子程序使用Thumb指令集，而调用者使用ARM指令集时，可以通过BLX指令实现子程序的调用和处理器工作状态的切换。同时，子程序的返回可以通过将寄存器R14值复制到PC中来完成。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">BLX 目标地址</span><br></pre></td></tr></table></figure>
+
+<h3 id="BX"><a href="#BX" class="headerlink" title="BX"></a>BX</h3><p>BX指令跳转到指令中所指定的目标地址，目标地址处的指令既可以是ARM指令，也可以是Thumb指令。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">BX&#123;条件&#125; 目标地址</span><br></pre></td></tr></table></figure>
+
+<h3 id="BR"><a href="#BR" class="headerlink" title="BR"></a>BR</h3><p>跳转到某寄存器(的值)指向的地址（无返回）, 不会改变 lr (x30) 寄存器的值。</p>
+<h3 id="RET"><a href="#RET" class="headerlink" title="RET"></a>RET</h3><p>子程序（函数调用）返回指令，返回地址已默认保存在寄存器 lr (x30) 中。</p>
+<h2 id="数据传送指令"><a href="#数据传送指令" class="headerlink" title="数据传送指令"></a>数据传送指令</h2><h3 id="MOV"><a href="#MOV" class="headerlink" title="MOV"></a>MOV</h3><p>MOV指令可完成从另一个寄存器、被移位的寄存器或将一个立即数加载到目的寄存器。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MOV&#123;条件&#125;&#123;S&#125; 目的寄存器，源操作数</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>S选项决定指令的操作是否影响CPSR中条件标志位的值，当没有S 时指令不更新CPSR中条件标志位的值。</li>
+</ul>
+<h3 id="MVN"><a href="#MVN" class="headerlink" title="MVN"></a>MVN</h3><p>MVN取反移动指令可完成从另一个寄存器、被移位的寄存器、或将一个立即数加载到目的寄存器，与MOV指令不同之处是在传送之前按位被取反了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MVN&#123;条件&#125;&#123;S&#125; 目的寄存器，源操作数</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>S决定指令的操作是否影响CPSR中条件标志位的值，当没有S时指令不更新CPSR中条件标志位的值。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MVN R0，#0   ; 将立即数0取反传送到寄存器R0中，完成后R0=-1</span><br></pre></td></tr></table></figure>
+
+<h2 id="比较指令"><a href="#比较指令" class="headerlink" title="比较指令"></a>比较指令</h2><h3 id="CMP"><a href="#CMP" class="headerlink" title="CMP"></a>CMP</h3><p>CMP指令用于把一个寄存器的内容和另一个寄存器的内容或立即数进行比较（操作数1 - 操作数2），同时更新CPSR中条件标志位的值。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CMP&#123;条件&#125; 操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<p>该指令进行一次减法运算，但不存储结果，只更改条件标志位。 标志位表示的是操作数1与操作数2的关系(大、小、相等)，例如，当操作数1大于操作操作数2，则此后的有GT后缀的指令将可以执行。</p>
+<h3 id="CMN"><a href="#CMN" class="headerlink" title="CMN"></a>CMN</h3><p>CMN指令用于把一个寄存器的内容和另一个寄存器的内容或立即数取反后进行比较，同时更新CPSR中条件标志位的值。该指令实际完成操作数1和操作数2相加，并根据结果更改条件标志位。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CMN&#123;条件&#125; 操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<h3 id="TST"><a href="#TST" class="headerlink" title="TST"></a>TST</h3><p>TST指令用于把一个寄存器的内容和另一个寄存器的内容或立即数进行按位的与运算，并根据运算结果更新CPSR中条件标志位的值。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">TST&#123;条件&#125; 操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数1是要测试的数据，而操作数2是一个位掩码，该指令一般用来检测是否设置了特定的位。</li>
+</ul>
+<h3 id="TEQ"><a href="#TEQ" class="headerlink" title="TEQ"></a>TEQ</h3><p>TEQ是相等测试指令，用于把一个寄存器的内容和另一个寄存器的内容或立即数进行按位异或运算，并根据结果设置CPSR的标志位。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">TEQ&#123;条件&#125; 操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<h2 id="算术运算指令"><a href="#算术运算指令" class="headerlink" title="算术运算指令"></a>算术运算指令</h2><h3 id="ADD"><a href="#ADD" class="headerlink" title="ADD"></a>ADD</h3><p>ADD指令用于把两个操作数相加，并将结果存放到目的寄存器中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ADD&#123;条件&#125;&#123;S&#125; 目的寄存器，操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数1应是一个寄存器，操作数2可以是一个寄存器，被移位的寄存器，或一个立即数。</li>
+</ul>
+<h3 id="ADC"><a href="#ADC" class="headerlink" title="ADC"></a>ADC</h3><p>ADC是带进位相加指令，用于把两个操作数相加，再加上CPSR中的C条件标志位的值，并将结果存放到目的寄存器中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ADC&#123;条件&#125;&#123;S&#125; 目的寄存器，操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>它使用一个进位标志位，这样就可以做比32位大的数的加法，注意不要忘记设置S后缀来更改进位标志。</li>
+<li>操作数1应是一个寄存器</li>
+<li>操作数2可以是一 个寄存器，被移位的寄存器，或一个立即数</li>
+</ul>
+<p>示例：</p>
+<p>以下指令序列完成两个128位数的加法，第一个数由高到低存放在寄存器R7～R4，第二个数由高到低存放在寄存器R11～R8，运算结果由高到低存放在寄 存器R3～R0：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ADDS    R0，R4，R8         ;  加低端的字</span><br><span class="line">ADCS    R1，R5，R9         ;  加第二个字，带进位</span><br><span class="line">ADCS    R2，R6，R10        ;  加第三个字，带进位</span><br><span class="line">ADC     R3，R7，R11        ;  加第四个字，带进位</span><br></pre></td></tr></table></figure>
+
+<h3 id="SUB"><a href="#SUB" class="headerlink" title="SUB"></a>SUB</h3><p>SUB指令用于把操作数1减去操作数2，并将结果存放到目的寄存器中。该指令可用于有符号数或无符号数的减法运算。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SUB&#123;条件&#125;&#123;S&#125; 目的寄存器，操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数1应是一个寄存器</li>
+<li>操作数2可以是一个寄存器，被移位的寄存器，或一个立即数。</li>
+</ul>
+<h3 id="SBC"><a href="#SBC" class="headerlink" title="SBC"></a>SBC</h3><p>SBC带进位减法指令用于把操作数1减去操作数2，再减去CPSR中的C条件标志位的反码，并将结果存放到目的寄存器中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SBC&#123;条件&#125;&#123;S&#125; 目的寄存器，操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数1应是一个寄存器</li>
+<li>操作数2可以是一个寄存器，被移位的寄存器，或一个立即数。</li>
+</ul>
+<p>该指令使用进位标志来表示借位，这样就可以做大于32位的减法，注意不要忘记设置S后缀来更改进位标志。该指令可用于有符号数或无符号数的减法运算。</p>
+<h3 id="RSB"><a href="#RSB" class="headerlink" title="RSB"></a>RSB</h3><p>RSB指令称为逆向减法指令，用于把操作数2减去操作数1，并将结果存放到目的寄存器中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RSB&#123;条件&#125;&#123;S&#125; 目的寄存器，操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数1应是一个寄存器</li>
+<li>操作数2可以是一个寄存器，被移位的寄存器，或一个立即数。</li>
+</ul>
+<p>该指令可用于有符号数或无符号数的减法运算。</p>
+<h3 id="RSC"><a href="#RSC" class="headerlink" title="RSC"></a>RSC</h3><p>RSC反向带进位减法指令用于把操作数2减去操作数1，再减去CPSR中的C条件标志位的反码，并将结果存放到目的寄存器中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RSC&#123;条件&#125;&#123;S&#125; 目的寄存器，操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数1应是一个寄存器操作</li>
+<li>数2可以是一个寄存器，被移位 的寄存器，或一个立即数。</li>
+</ul>
+<p>该指令使用进位标志来表示借位，这样就可以做大于32位的减法，注意不要忘记设置S后缀来更改进位标志。该指令可用于有符号数或 无符号数的减法运算。</p>
+<p><strong>乘法指令</strong></p>
+<p>乘法指令与前面的数据处理指令不同，指令中的所有操作数、目的寄存器 必须为通用寄存器，不能对操作数使用立即数或被移位的寄存器，同时，目的寄存器和操作数1必须是不同的寄存器。</p>
+<h3 id="MUL"><a href="#MUL" class="headerlink" title="MUL"></a>MUL</h3><p>MUL指令完成将操作数1与操作数2的乘法运算，并把结果放置到目的寄存器中，同时可以根据运算结果设置CPSR中相应的条件标志位。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MUL&#123;条件&#125;&#123;S&#125; 目的寄存器，操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数1和操 作数2均为32位的有符号数或无符号数。</li>
+</ul>
+<h3 id="MLA"><a href="#MLA" class="headerlink" title="MLA"></a>MLA</h3><p>MLA带累加的相乘指令完成将操作数1与操作数2的乘法运算，再将乘积加上操作数3，并把结果放置到目的寄存器中，同时可以根据运算结果设置CPSR中相应的条件标志位。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MLA&#123;条件&#125;&#123;S&#125; 目的寄存器，操作数1，操作数2，操作数3</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数1和操作数2均为32位的有符号数或无符号数。</li>
+</ul>
+<h3 id="SMULL"><a href="#SMULL" class="headerlink" title="SMULL"></a>SMULL</h3><p>SMULL指令完成将操作数1与操作数2的乘法运算，并把结果的低32位放置到目的寄存器Low中，结果的高32位放置到目的寄存器High中，同时可以根据运算结果设置CPSR中相应的条件标志位。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SMULL&#123;条件&#125;&#123;S&#125;   目的寄存器Low，目的寄存器High，操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数1和操作数2均为32位的有符号数。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SMULL   R0，R1，R2，R3     ; R0 = （R2 × R3）的低32位</span><br><span class="line">                          ; R1 = （R2 × R3）的高32位</span><br></pre></td></tr></table></figure>
+
+<h3 id="SMLAL"><a href="#SMLAL" class="headerlink" title="SMLAL"></a>SMLAL</h3><p>SMLAL指令完成将操作数1与操作数2的乘法运算，并把结果的低32位同目的寄存器Low中的值相加后又放置到目的寄存器Low中，结果的高32位同目的寄存器High中的值相加后又放置到目的寄存器High中，同时可以根据运算结果设置CPSR中相应的条件标志位。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SMLAL&#123;条件&#125;&#123;S&#125;   目的寄存器Low，目的寄存器High，操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数1和操作数2均为32位的有符号数。</li>
+<li>对于目的寄存器Low，在指令执行前存放64位加数的低32位，指令执行后存放结果的低32位;</li>
+<li>对于目的寄存器High，在指令执行前存放64位加数的高32位，指令执行后存放结果的高32位。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SMLAL   R0，R1，R2，R3       ; R0 = （R2 × R3）的低32位 ＋ R0</span><br><span class="line">                            ; R1 = （R2 × R3）的高32位 ＋ R1</span><br></pre></td></tr></table></figure>
+
+<h3 id="UMULL"><a href="#UMULL" class="headerlink" title="UMULL"></a>UMULL</h3><p>UMULL指令完成将操作数1与操作数2的乘法运算，并把结果的低32位放置到目的寄存器Low中，结果的高32位放置到目的寄存器High中，同时可以根据运算结果设置CPSR中相应的条件标志位。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UMULL&#123;条件&#125;&#123;S&#125;   目的寄存器Low，目的寄存器High，操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数1和操作数2均为32位的无符号数。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UMULL   R0，R1，R2，R3       ; R0 = （R2 × R3）的低32位</span><br><span class="line">                            ; R1 = （R2 × R3）的高32位</span><br></pre></td></tr></table></figure>
+
+<h3 id="UMLAL"><a href="#UMLAL" class="headerlink" title="UMLAL"></a>UMLAL</h3><p>UMLAL指令完成将操作数1与操作数2的乘法运算，并把结果的低32位同目的寄存器Low中的值相加后又放置到目的寄存器Low中，结果的高32位同目的寄存器High中的值相加后又放置到目的寄存器High 中，同时可以根据运算结果设置CPSR中相应的条件标志位。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UMLAL&#123;条件&#125;&#123;S&#125;   目的寄存器Low，目的寄存器High，操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数1和操作数2均为32位的无符号数；</li>
+<li>对于目的寄存器Low，在指令执行前存放64位加数的低32位，指令执行后存放结果的低32位;</li>
+<li>对于目的寄存器High，在指令执行前存放64位加数的高32位，指令执行后存放结果的高32位。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UMLAL   R0，R1，R2，R3            ; R0 = （R2 × R3）的低32位 ＋ R0</span><br><span class="line">                                 ; R1 = （R2 × R3）的高32位 ＋ R1</span><br></pre></td></tr></table></figure>
+
+<h3 id="SDIV"><a href="#SDIV" class="headerlink" title="SDIV"></a>SDIV</h3><p>SDIV指令有符号数)将某一寄存器的值和另一个寄存器的值相除 并将结果保存在另一寄存器中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SDIV 目的寄存器，操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<h2 id="逻辑运算指令"><a href="#逻辑运算指令" class="headerlink" title="逻辑运算指令"></a>逻辑运算指令</h2><h3 id="AND"><a href="#AND" class="headerlink" title="AND"></a>AND</h3><p>AND指令用于在两个操作数上进行逻辑与运算，并把结果放置到目的寄存器中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AND&#123;条件&#125;&#123;S&#125; 目的寄存器，操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数1应是一个寄存器</li>
+<li>操作数2可以是一个寄存器，被移位的寄存器，或一个立即数。</li>
+</ul>
+<p>该指令常用于屏蔽操作数1的某些位。</p>
+<h3 id="ORR"><a href="#ORR" class="headerlink" title="ORR"></a>ORR</h3><p>ORR指令用于在两个操作数上进行逻辑或运算，并把结果放置到目的寄存器中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ORR&#123;条件&#125;&#123;S&#125; 目的寄存器，操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数1应是一个寄存器</li>
+<li>操作数2可以是一个寄存器，被移位的寄存器，或一个立即数。</li>
+</ul>
+<p>该指令常用于设置操作数1的某些位。</p>
+<h3 id="EOR"><a href="#EOR" class="headerlink" title="EOR"></a>EOR</h3><p>EOR指令用于在两个操作数上进行逻辑异或运算，并把结果放置到目的寄存器中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EOR&#123;条件&#125;&#123;S&#125; 目的寄存器，操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数1应是一个寄存器</li>
+<li>操作数2可以是一个寄存器，被移位的寄存器，或一个立即数</li>
+</ul>
+<p>该指令常用于反转操作数1的某些位。</p>
+<h3 id="BIC指令"><a href="#BIC指令" class="headerlink" title="BIC指令"></a>BIC指令</h3><p>BIC指令用于清除操作数1的某些位，并把结果放置到目的寄存器中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">BIC&#123;条件&#125;&#123;S&#125; 目的寄存器，操作数1，操作数2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数1应是一个寄存器</li>
+<li>操作数2可以是一个寄存器，被移位的寄存器，或一个立即数。 操作数2为32位的掩码，如果在掩码中设置了某一位，则清除这一位。未设置的掩码位保持不变。</li>
+</ul>
+<h3 id="LSL-ASL"><a href="#LSL-ASL" class="headerlink" title="LSL ASL"></a>LSL ASL</h3><p>LSL逻辑左移、ASL算术左移可完成对通用寄存器中的内容进行逻辑（或算术）的左移操作，按操作数所指定的数量向左移位，低位用零来填充。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">通用寄存器，LSL/ASL 操作数</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数可以是通用寄存器，也可以是立即数（0～31）。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MOV   R0, R1, LSL #2          ; 将R1中的内容左移两位后传送到R0 中。</span><br></pre></td></tr></table></figure>
+
+<h3 id="LSR"><a href="#LSR" class="headerlink" title="LSR"></a>LSR</h3><p>LSR逻辑右移可完成对通用寄存器中的内容进行右移的操作，按操作数所指定的数量向右移位，左端用零来填充。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">通用寄存器，LSR 操作数</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数可以是通用寄存器，也可以是立即数（0～31）。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MOV   R0, R1, LSR #2         ; 将R1中的内容右移两位后传送到R0 中，左端用零来填充。</span><br></pre></td></tr></table></figure>
+
+<h3 id="ASR"><a href="#ASR" class="headerlink" title="ASR"></a>ASR</h3><p>ASR算术右移可完成对通用寄存器中的内容进行右移的操作，按操作数所指定的数量向右移位，左端用第31位的值来填充。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">通用寄存器，ASR 操作数</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数可以是通用寄存器，也可以是立即数（0～31）。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MOV    R0, R1, ASR #2        ; 将R1中的内容右移两位后传送到R0 中，左端用第31位的值来填充。</span><br></pre></td></tr></table></figure>
+
+<h3 id="ROR"><a href="#ROR" class="headerlink" title="ROR"></a>ROR</h3><p>ROR可完成对通用寄存器中的内容进行循环右移的操作，按操作数所指定的数量向右循环移位，左端用右端移出的位来填充。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">通用寄存器，ROR 操作数</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>其中，操作数可以是通用寄存器，也可以是立即数（0～31）。显然，当进行32位的循环右移操作时，通用寄存器中的值不改变。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MOV    R0, R1, ROR #2       ; 将R1中的内容循环右移两位后传送到R0 中。</span><br></pre></td></tr></table></figure>
+
+<h3 id="RRX"><a href="#RRX" class="headerlink" title="RRX"></a>RRX</h3><p>RRX可完成对通用寄存器中的内容进行带扩展的循环右移的操作，按操作数所指定的数量向右循环移位，左端用进位标志位C来填充。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">通用寄存器，RRX 操作数</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>操作数可以是通用寄存器，也可以是立即数（0～31）。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MOV   R0, R1, RRX #2         ; 将R1中的内容进行带扩展的循环右移两位 后传送到R0中。</span><br></pre></td></tr></table></figure>
+
+<h2 id="程序状态寄存器访问指令"><a href="#程序状态寄存器访问指令" class="headerlink" title="程序状态寄存器访问指令"></a>程序状态寄存器访问指令</h2><p>此类指令向通用寄存器或者从通用寄存器往外移动状态寄存器的内容。</p>
+<h3 id="MRS指令"><a href="#MRS指令" class="headerlink" title="MRS指令"></a>MRS指令</h3><p>MRS指令用于将程序状态寄存器的内容传送到通用寄存器中。该指令一般用在以下两种情况：</p>
+<ul>
+<li>当需要改变程序状态寄存器的内容时，可用MRS将程序状态寄存器的内容读入通用寄存器，修改后再写回程序状态寄存器。</li>
+<li>当在异常处理或进程切换时，需要保存程序状态寄存器的值，可先用该指令读出程序状态寄存器的值，然后保存。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MRS&#123;条件&#125;  通用寄存器 程序状态寄存器（CPSR或SPSR）</span><br></pre></td></tr></table></figure>
+
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MRS R0，CPSR      ; 传送 CPSR的内容到R0</span><br><span class="line">MRS R0，SPSR      ; 传送 SPSR的内容到R0</span><br></pre></td></tr></table></figure>
+
+<h3 id="MSR指令"><a href="#MSR指令" class="headerlink" title="MSR指令"></a>MSR指令</h3><p>MSR指令用于将操作数的内容传送到程序状态寄存器的特定域中。其中，操作数可以为通用寄存器或立即数。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MSR&#123;条件&#125;    程序状态寄存器（CPSR或SPSR）_&lt;域&gt;，操作数</span><br></pre></td></tr></table></figure>
+
+<p>&lt;域&gt;用于设置程序状态寄存器中需要 操作的位，32位的程序状态寄存器可分为4个域：</p>
+<ul>
+<li>位[31：24]为条件位域，用f表示；</li>
+<li>位[23：16]为状态位域，用s表示；</li>
+<li>位[15：8] 为扩展位域，用x表示；</li>
+<li>位[7：0] 为控制位域，用c表示；</li>
+</ul>
+<p>该指令通常用于恢复或改变程序状态寄存器的内容，在使用时，一般要在MSR指令中指明将要操作的域。</p>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MSR CPSR，R0        ; 传送R0的内容到CPSR</span><br><span class="line">MSR SPSR，R0        ; 传送R0的内容到SPSR</span><br><span class="line">MSR CPSR_c，R0      ; 传送R0的内容到SPSR，但仅仅修改CPSR中的控制位域</span><br></pre></td></tr></table></figure>
+
+<h2 id="加载-存储指令"><a href="#加载-存储指令" class="headerlink" title="加载/存储指令"></a>加载/存储指令</h2><p>数据在存储器中，都是二进制码，计算机单凭数据本身是无法区分数据格式(有符号、无符号、多少位是一个数据)，甚至无法区分数据和代码的区别。这个取决于我们使用的汇编指令。</p>
+<p>ARM微处理器支持加载/存储指令用于在寄存器和存储器之间传送数据：</p>
+<ul>
+<li>加载指令用于将存储器中的数据传送到寄存器；</li>
+<li>存储指令则完成相反的操作。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ldr = Load Word</span><br><span class="line">ldrh = Load unsigned Half Word</span><br><span class="line">ldrsh = Load signed Half Word</span><br><span class="line">ldrb = Load unsigned Byte</span><br><span class="line">ldrsb = Load signed Bytes</span><br><span class="line"></span><br><span class="line">str = Store Word</span><br><span class="line">strh = Store unsigned Half Word</span><br><span class="line">strsh = Store signed Half Word</span><br><span class="line">strb = Store unsigned Byte</span><br><span class="line">strsb = Store signed Byte</span><br></pre></td></tr></table></figure>
+
+<h3 id="LDR"><a href="#LDR" class="headerlink" title="LDR"></a>LDR</h3><p>LDR(Load Word)指令用于从存储器中将一个32位的字数据传送到目的寄存器中。该指令通常用于从存储器中读取32位的字数据到通用寄存器，然后对数据进行处理。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LDR&#123;条件&#125; 目的寄存器，&lt;存储器地址&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>当程序计数器PC作为目的寄存器时，指令从存储器中读取的字数据被当作目的地址，从而可以实现程序流程的跳转。</li>
+</ul>
+<p>该指令在程序设计中比较常用，且寻址方式灵活多样，请读者认真掌握。</p>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">LDR R0，[R1]             ; 将存储器地址为R1的字数据读入寄存器R0。</span><br><span class="line">LDR R0，[R1，R2]         ; 将存储器地址为R1+R2的字数据读入寄存器R0。</span><br><span class="line">LDR R0，[R1，#8]         ; 将存储器地址为R1+8的字数据读入寄存器R0。</span><br><span class="line">LDR R0，[R1，R2] ！       ; 将存储器地址为R1+R2的字数据读入寄存器R0，并将新地址R1＋R2写入R1。</span><br><span class="line">LDR R0，[R1，#8] ！       ; 将存储器地址为R1+8的字数据读入寄存器R0，并将新地址 R1＋8写入R1。</span><br><span class="line">LDR R0，[R1]，R2          ; 将存储器地址为R1的字数据读入寄存器R0，并将新地址 R1＋R2写入R1。</span><br><span class="line">LDR R0，[R1，R2，LSL#2]！  ; 将存储器地址为R1＋R2×4的字数据读入寄存器R0，并将新地址R1＋R2×4写入R1。</span><br><span class="line">LDR R0，[R1]，R2，LSL#2   ; 将存储器地址为R1的字数据读入 寄存器R0，并将新地址R1＋R2×4写入R1。</span><br></pre></td></tr></table></figure>
+
+<h3 id="LDRB"><a href="#LDRB" class="headerlink" title="LDRB"></a>LDRB</h3><p>LDRB(Load unsigned Byte)指令用于从存储器中将一个8位的字节数据传送到目的寄存器中，同时将寄存器的高24位清零。 该指令通常用于从存储器中读取8位的字节数据到通用寄存器，然后对数据进行处理。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LDR&#123;条件&#125;B 目的寄存器，&lt;存储器地址&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>当程序计数器PC作为目的寄存器时，指令从存储器中读取的字数据被当作目的地址，从而可以实现程序流程的跳转。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">LDRB R0，[R1]           ; 将存储器地址为R1的字节数据读入寄存器R0，并将R0的高24位清零。</span><br><span class="line">LDRB R0，[R1，#8]       ; 将存储器地址为R1＋8的字节数据读入寄存器R0，并将R0的高24位清零。</span><br></pre></td></tr></table></figure>
+
+<h3 id="LDRH"><a href="#LDRH" class="headerlink" title="LDRH"></a>LDRH</h3><p>LDRH(Load unsigned Half Word)指令用于从存储器中将一个16位的半字数据传送到目的寄存器中，同时将寄存器的高16位清零。 该指令通常用于从存储器中读取16位的半字数据到通用寄存器，然后对数据进行处理。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LDR&#123;条件&#125;H 目的寄存器，&lt;存储器地址&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>当程序计数器PC作为目的寄存器时，指令从存储器中读取的字数据被当作目的地址，从而可以实现程序流程的跳转。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">LDRH   R0，[R1]         ; 将存储器地址为R1的半字数据读入寄存器 R0，并将R0的高16位清零。</span><br><span class="line">LDRH   R0，[R1，#8]     ; 将存储器地址为R1＋8的半字数据读入寄存器R0，并将R0 的高16位清零。</span><br><span class="line">LDRH   R0，[R1，R2]     ; 将存储器地址为R1＋R2的半字数据读入寄存器R0，并将 R0的高16位清零。</span><br></pre></td></tr></table></figure>
+
+<h3 id="STR"><a href="#STR" class="headerlink" title="STR"></a>STR</h3><p>STR(Store Word)指令用于从源寄存器中将一个32位的字数据传送到存储器中。 该指令在程序设计中比较常用，且寻址方式灵活多样，使用方式可参考指令LDR。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">STR&#123;条件&#125; 源寄存器，&lt;存储器地址&gt;</span><br></pre></td></tr></table></figure>
+
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">STR R0，[R1]，#8           ; 将R0中的字数据写入以R1为地址的存储器中，并将新地址R1＋8写入R1。</span><br><span class="line">STR R0，[R1，#8]           ; 将R0中的字数据写入以R1＋8为地址的存储器中。</span><br></pre></td></tr></table></figure>
+
+<h3 id="STRB"><a href="#STRB" class="headerlink" title="STRB"></a>STRB</h3><p>STRB(Store unsigned Byte)指令用于从源寄存器中将一个8位的字节数据传送到存储器中。该字节数据为源寄存器中的低8位。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">STR&#123;条件&#125;B 源寄存器，&lt;存储器地址&gt;</span><br></pre></td></tr></table></figure>
+
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">STRB    R0，[R1]             ; 将寄存器R0中的字节数据写入以R1为地 址的存储器中。</span><br><span class="line">STRB    R0，[R1，#8]         ; 将寄存器R0中的字节数据写入以R1＋8为地址的存 储器中。</span><br></pre></td></tr></table></figure>
+
+<h3 id="STRH"><a href="#STRH" class="headerlink" title="STRH"></a>STRH</h3><p>STRH(Store unsigned Half Word)指令用于从源寄存器中将一个16位的半字数据传送到存储器中。该半字数据为源寄存器中的低16位。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">STR&#123;条件&#125;H 源寄存器，&lt;存储器地址&gt;</span><br></pre></td></tr></table></figure>
+
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">STRH   R0，[R1]            ; 将寄存器R0中的半字数据写入以R1为地址的 存储器中。</span><br><span class="line">STRH   R0，[R1，#8]        ; 将寄存器R0中的半字数据写入以R1＋8 为地址的存储器中。</span><br></pre></td></tr></table></figure>
+
+<h3 id="ADR"><a href="#ADR" class="headerlink" title="ADR"></a>ADR</h3><p>将一个立即值与 pc 值相加，并将结果写入目标寄存器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ADR&#123;cond&#125;&#123;.W&#125;  Rd,label</span><br></pre></td></tr></table></figure>
+
+<h3 id="ADRP"><a href="#ADRP" class="headerlink" title="ADRP"></a>ADRP</h3><p>以页为单位的大范围的地址读取指令，这里的P就是page的意思。取得page的基地址存入寄存器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ADRP&#123;cond&#125;  Rd  label</span><br></pre></td></tr></table></figure>
+
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">adrp    x2, .LANCHOR0   ; .LANCHOR0是个&lt;lable&gt;——一个大小为4KB的页的基址，指令的作用就是将该页的基址存到寄存器x2中</span><br><span class="line"></span><br><span class="line">adrp    x0, l_.str@PAGE         ; 将符号l.str所在的page基址读入x0</span><br><span class="line">add     x0, x0, l_.str@PAGEOFF  ; x0 = x0 + l.str所在page中的偏移量</span><br></pre></td></tr></table></figure>
+
+<p><strong>批量数据加载/存储指令</strong></p>
+<p>ARM微处理器所支持批量数据加载/存储指令可以一次在一片连续的存储器单元和多个寄存器之间传送数据，批量加载指令 用于将一片连续的存储器中的数据传送到多个寄存器，批量数据存储指令则完成相反的操作。</p>
+<h3 id="LDM-STM-指令（加载、存储多个寄存器）"><a href="#LDM-STM-指令（加载、存储多个寄存器）" class="headerlink" title="LDM(STM)指令（加载、存储多个寄存器）"></a>LDM(STM)指令（加载、存储多个寄存器）</h3><p>LDM（或STM）指令用于从由基址寄存器所指示的一片连续存储器到寄存器列表所指示的多个寄存器之间传送数据，该指令的常见用途是将多个寄存器的内容入栈或出栈。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LDM（或STM）&#123;条件&#125;&#123;类型&#125; 基址寄存器&#123;！&#125;，寄存器列表&#123;∧&#125;</span><br></pre></td></tr></table></figure>
+
+<p>类型为以下几种情况：</p>
+<ul>
+<li>IA 每次传送后地址加1;</li>
+<li>IB 每次传送前地址加1;</li>
+<li>DA 每次传送后地址减1;</li>
+<li>DB 每次传送前地址减1;</li>
+<li>FD 满递减堆栈;</li>
+<li>ED 空递减堆栈;</li>
+<li>FA 满递增堆栈;</li>
+<li>EA 空递增堆栈;</li>
+</ul>
+<p><code>&#123;！&#125;</code>为可选后缀，若选用该后缀，则当数据传送完毕之后，将最后的地址写入基址寄存器，否则基址寄存器的内容不改变。基址寄存器不允许为R15，寄存器列表可以为R0～R15的任意组合。</p>
+<p><code>&#123;∧&#125;</code> 为可选后缀，当指令为LDM且寄存器列表中包含R15，选用该后缀时表示：除了正常的数据传送之外，还将SPSR复制到CPSR。同时，该后缀还表 示传入或传出的是用户模式下的寄存器，而不是当前模式下的寄存器。</p>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">STMFD R13!， &#123;R0，R4-R12，LR&#125;        ; 将寄存器列表中的寄存器（R0，R4到R12，LR）存入堆栈。</span><br><span class="line">LDMFD R13!， &#123;R0，R4-R12，PC&#125;        ; 将堆栈内容恢复到寄存器（R0，R4到R12，LR）。</span><br></pre></td></tr></table></figure>
+
+<p><strong>数据交换指令</strong></p>
+<p>在寄存器和内存之间交换数据</p>
+<h3 id="SWP"><a href="#SWP" class="headerlink" title="SWP"></a>SWP</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SWP&#123;条件&#125; 目的寄存器，源寄存器1，[源寄存器2]</span><br></pre></td></tr></table></figure>
+
+<p>SWP指令用于将源寄存器2所指向的存储器中的字数据传送到目的寄存器中，同时将源寄存器1中的字数据传送到源寄存器2所指向的存储器中。显然，当源寄存器1和目的寄存器为同一个寄存器时，指令交换该寄存器和存储器的内容。</p>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SWP   R0，R1，[R2]     ; 将R2所指向的存储器中的字数据传送到R0，同时将R1 中的字数据传送到R2所指向的存储单元。</span><br><span class="line">SWP   R0，R0，[R1]     ; 该指令完成将R1所指向的存储器中的字数 据与R0中的数据交换。</span><br></pre></td></tr></table></figure>
+
+<p>SWP{B}：B是一个可选的后缀。如果存在 B，则交换一个字节。否则，交换一个32位字。</p>
+<h3 id="SWPB"><a href="#SWPB" class="headerlink" title="SWPB"></a>SWPB</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SWP&#123;条件&#125;B 目的寄存器，源寄存器1，[源寄存器2]</span><br></pre></td></tr></table></figure>
+
+<p>SWPB指令用于将源寄存器2所指向的存储器中的字节数据传送到目的寄存器中，目的寄存器的高24清零，同时将源寄存器1中的字节数据传送到源寄存器2所指向的存储器中。</p>
+<p>显然，当源寄存器1和目的寄存器为同一个寄存器时，指令交换该寄存器和存储器的内容。</p>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SWPB   R0，R1，[R2]       ; 将R2所指向的存储器中的字节数据传送到 R0，R0的高24位清零，同时将R1中的低8位数据传送到R2所指向的存储单元。</span><br><span class="line">SWPB   R0，R0，[R1]       ; 该指令完成将R1所指向的存储器中的 字节数据与R0中的低8位数据交换。</span><br></pre></td></tr></table></figure>
+
+<h2 id="协处理器指令"><a href="#协处理器指令" class="headerlink" title="协处理器指令"></a>协处理器指令</h2><p>ARM 微处理器可支持多达 16 个协处理器，用于各种协处理操作，在程序执行的过程中，每个协处理器只执行针对自身的协处理指令，忽略 ARM 处理器和其他协处理器的指令。</p>
+<p>ARM 的协处理器指令主要用于 ARM 处理器初始化 ARM 协处理器的数据处理操作，以及在ARM 处理器的寄存器和协处理器的寄存器之间传送数据，和在 ARM 协处理器的寄存器和存储器之间传送数据。</p>
+<h3 id="CDP"><a href="#CDP" class="headerlink" title="CDP"></a>CDP</h3><p>CDP指令用于ARM处理器通知ARM协处理器执行特定的操作，若协处理器不能成功完成特定的操作，则产生未定义指令异常。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CDP&#123;条件&#125; 协处理器编码，协处理器操作码1，目的寄存器，源寄存器1，源寄存器2，协处理器操作码2。</span><br></pre></td></tr></table></figure>
+
+<p>其中协处理器操作码1和协处理 器操作码2为协处理器将要执行的操作，目的寄存器和源寄存器均为协处理器的寄存器，指令不涉及ARM处理器的寄存器和存储器。</p>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CDP   P3，2，C12，C10，C3，4  ; 该指令完成协处理器P3的初始化 </span><br></pre></td></tr></table></figure>
+
+<h3 id="LDC"><a href="#LDC" class="headerlink" title="LDC"></a>LDC</h3><p>LDC指令用于将源寄存器所指向的存储器中的字数据传送到目的寄存器中，若协处理器不能成功完成传送操作，则产生未定义指令异常。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LDC&#123;条件&#125;&#123;L&#125; 协处理器编码，目的寄存器，[源寄存器]</span><br></pre></td></tr></table></figure>
+
+<p>其中，{L}选项表示指 令为长读取操作，如用于双精度数据的传输。</p>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LDC   P3，C4，[R0]        ; 将ARM处理器的寄存器R0所指向的存储器中的字数 据传送到协处理器P3的寄存器C4中。 </span><br></pre></td></tr></table></figure>
+
+<h3 id="STC"><a href="#STC" class="headerlink" title="STC"></a>STC</h3><p>STC指令用于将源寄存器中的字数据传送到目的寄存器所指向的存储器中，若协处理器不能成功完成传送操作，则产生未定义指令异常。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">STC&#123;条件&#125;&#123;L&#125; 协处理器编码，源寄存器，[目的寄存器]</span><br></pre></td></tr></table></figure>
+
+<p>其中，{L}选项表示指 令为长读取操作，如用于双精度数据的传输。</p>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">STC   P3，C4，[R0]     ; 将协处理器P3的寄存器C4中的字数据传送到ARM处理 器的寄存器R0所指向的存储器中。 </span><br></pre></td></tr></table></figure>
+
+<h3 id="MCR"><a href="#MCR" class="headerlink" title="MCR"></a>MCR</h3><p>MCR指令用于将ARM处理器寄存器中的数据传送到协处理器寄存器中，若协处理器不能成功完成操作，则产生未定义指令异常。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MCR&#123;条件&#125; 协处理器编码，协处理器操作码1，源寄存器，目的寄存器1，目的寄存器2，协处理器操作码2。</span><br></pre></td></tr></table></figure>
+
+<p>其中协处理器操作码1和协处理 器操作码2为协处理器将要执行的操作，源寄存器为ARM处理器的寄存器，目的寄存器1和目的寄存器2均为协处理器的寄 存器。</p>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MCR   P3，3，R0，C4，C5，6     ; 将ARM处理器寄存器R0中的数据传送到协处 理器P3的寄存器C4和C5中。 </span><br></pre></td></tr></table></figure>
+
+<h3 id="MRC"><a href="#MRC" class="headerlink" title="MRC"></a>MRC</h3><p>MRC指令用于将协处理器寄存器中的数据传送到ARM处理器寄存器中,若协处理器不能成功完成操作，则产生未定义指令异常。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MRC&#123;条件&#125; 协处理器编码，协处理器操作码1，目的寄存器，源寄存器1，源寄存器2，协处理器操作码2。</span><br></pre></td></tr></table></figure>
+
+<p>其中协处理器操作码1和协处理器操作码2为协处理器将要执行的操作，目的寄存器为ARM处理器的寄存器，源寄存器1和源寄存器2均为协处理器的寄存器。</p>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MRC   P3，3，R0，C4，C5，6     ; 该指令将协处理器P3的寄存器中的数据传送到 ARM处理器寄存器中。</span><br></pre></td></tr></table></figure>
+
+<h2 id="异常产生指令"><a href="#异常产生指令" class="headerlink" title="异常产生指令"></a>异常产生指令</h2><p>ARM指令集中提供了两条产生异常的指令，通过这两条指令可以用软件的方法实现异常。</p>
+<h3 id="SWI"><a href="#SWI" class="headerlink" title="SWI"></a>SWI</h3><p>SWI指令用于产生软件中断，以便用户程序能调用操作系统的系统例程。操作系统在SWI的异常处理程序中提供相应的系统服务。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SWI&#123;条件&#125; 24位的立即数</span><br></pre></td></tr></table></figure>
+
+<p>指令中24位的立即数指定用户程序调用系统例程的类型，相关参数通过通用寄存器传递，当指令中24位的立即数被忽略时，用户程序调用系统例程的类型由通用寄存器R0的内容决定，同时，参数通过其他通用寄存器传递。</p>
+<p>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SWI   0x02     ; 该指令调用操作系统编号位02的系统例程。</span><br></pre></td></tr></table></figure>
+
+<h3 id="BKPT"><a href="#BKPT" class="headerlink" title="BKPT"></a>BKPT</h3><p>BKPT指令产生软件断点中断，可用于程序的调试。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">BKPT   16位的立即数</span><br></pre></td></tr></table></figure>
+
+<h2 id=""><a href="#" class="headerlink" title=""></a></h2><h3 id="WFE"><a href="#WFE" class="headerlink" title="WFE"></a>WFE</h3><p>等待事件（Wait For Event）指令。自旋锁就使用到了WFE指令。</p>
+<p>ARM架构下，有一个全局的事件寄存器（Event Register），系统中的每一个CPU核在这个寄存器上都有对应的位。当前CPU执行WFE指令的时候，如果事件寄存器对应当前CPU的位没有被设置（也就是0），则当前CPU核会进入低功耗模式，会被挂起，不会再执行其它操作；而如果事件寄存器对应当前CPU的位被设置了（也就是1），则会将事件寄存器对应当前CPU的位清空（设置成0），然后立即返回，继续执行下面的指令，不会进入低功耗模式。</p>
+<p>只有在如下情况下才可能被重新唤醒：</p>
+<ul>
+<li>发生了IRQ中断（前提是没有被屏蔽）；</li>
+<li>发生了FIQ中断（前提是没有被屏蔽）；</li>
+<li>发生了SError中断（前提是没有被屏蔽）；</li>
+<li>事件寄存器对应当前CPU核的位被置位（设置成1），如果是通过这种方式唤醒的，唤醒后会立即将事件寄存器对应当前CPU核的位清0。</li>
+</ul>
+<h3 id="WFI"><a href="#WFI" class="headerlink" title="WFI"></a>WFI</h3><p>等待中断（Wait For Interrupt）指令。执行WFI指令后，当前CPU核会立即进入低功耗状态。只有在如下情况下才可能被重新唤醒：</p>
+<ul>
+<li>发生了IRQ中断（不管有没有被屏蔽）；</li>
+<li>发生了FIQ中断（不管有没有被屏蔽）；</li>
+<li>发生了SError中断（不管有没有被屏蔽）。</li>
+</ul>
+<h3 id="SEV"><a href="#SEV" class="headerlink" title="SEV"></a>SEV</h3><p>发送事件（Send Event）指令将想系统中的所有CPU核发送事件。对应系统中的每个CPU核，设置事件寄存器（Event Register）相应的位。如果某个CPU核正在等待事件（WFE），那么该CPU核会被立即唤醒，并清除掉表示该CPU的事件寄存器相应的位。</p>
+<h3 id="SEVL"><a href="#SEVL" class="headerlink" title="SEVL"></a>SEVL</h3><p>发送本地事件（Send Event Locally）指令。只会向当前CPU核心发送。如果是多核CPU那也只向当前核心，不会向CPU内的其它核心发送。</p>
+<p>stp： 入栈指令（str 的变种指令，可以同时操作两个寄存器）</p>
+<p>stp x29, x30, [sp, #0x10]     ; 将 x29, x30 的值存入 sp 偏移 16 个字节的位置 </p>
+<p>ldp： 出栈指令（ldr 的变种指令，可以同时操作两个寄存器）</p>
+<p>ldp x29, x30, [sp, #0x10]     ; 将 sp 偏移 16 个字节的值取出来，存入寄存器 x29 和寄存器 x30 </p>
+<p>scvtf： (Signed Convert To Float)带符号 定点数 转换为 浮点数</p>
+<p>scvtf    d1, w0      ; 将寄存器 w0 的值(顶点数，转化成 浮点数) 保存到 向量寄存器/浮点寄存器 d1 中</p>
+<p>fcvtzs： (Float Convert To Zero Signed)浮点数 转化为 定点数 （舍入为0）</p>
+<p>fcvtzs w0, s0        ; 将向量寄存器 s0 的值(浮点数，转换成 定点数)保存到寄存器 w0 中</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/12/17/algo/tree_search/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/12/17/algo/tree_search/" class="post-title-link" itemprop="url">二叉搜索树</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-17 11:15:01" itemprop="dateCreated datePublished" datetime="2022-12-17T11:15:01+08:00">2022-12-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-31 19:38:57" itemprop="dateModified" datetime="2022-12-31T19:38:57+08:00">2022-12-31</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -231,7 +828,8 @@
 <li>任意节点的左、右子树也分别为二叉查找树；</li>
 <li>没有键值相等的节点。</li>
 </ul>
-<p>不管操作是插入、删除还是查找，其时间复杂度其实都跟树的高度成正比，也就是 O(height)。</p>
+<p>不管操作是插入、删除还是查找，其时间复杂度其实都跟树的高度成正比， O(height)。</p>
+<p>将二叉搜索树进行中序亢奋可以等到由小到大的顺序排序。</p>
 <p><strong>查找操作</strong></p>
 <p>先取根节点，如果它等于要查找的数据就返回。如果要查找的数据比根节点的值小，那就在左子树中递归查找；如果要查找的数据比根节点的值大，那就在右子树中递归查找。</p>
 <p><img src="/images/code/algo/tree/findtree.png" alt="二叉搜索树"></p>
@@ -323,10 +921,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-12-11 19:04:14 / 修改时间：20:59:02" itemprop="dateCreated datePublished" datetime="2022-12-11T19:04:14+08:00">2022-12-11</time>
+              <time title="创建时间：2022-12-11 19:04:14" itemprop="dateCreated datePublished" datetime="2022-12-11T19:04:14+08:00">2022-12-11</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-31 19:05:31" itemprop="dateModified" datetime="2022-12-31T19:05:31+08:00">2022-12-31</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -360,6 +964,15 @@
 <h2 id="寻找假币"><a href="#寻找假币" class="headerlink" title="寻找假币"></a>寻找假币</h2><p>有N个硬币，其中有一个质量较轻的假币，如何通过一个天平将假币挑出。</p>
 <p>将硬币分成2份去称，轻的寻一半包含假币，再将轻的那一份又分为2份，直到最后剩下两枚，轻的那一枚即为假币。考虑到硬币个数为奇数的情况，照样分为两半，剩下一个多余的，如果两半相等，多余那个就是假币，否则处理那两半。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">FakeCoin</span><span class="params">(<span class="type">const</span> vector&lt;<span class="type">int</span>&gt; &amp;coins, <span class="type">int</span> start, <span class="type">int</span> end)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> num = end - start + <span class="number">1</span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;num = &quot;</span> &lt;&lt; num &lt;&lt; <span class="string">&quot; [&quot;</span> &lt;&lt; start &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; end &lt;&lt; <span class="string">&quot;]&quot;</span> &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">if</span> (num &lt;= <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> coins[start] &lt; coins[end] ? start : end;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> mid = num / <span class="number">2</span> + start;</span><br><span class="line">    <span class="type">int</span> left = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> right = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (num % <span class="number">2</span> == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = start; i &lt; mid; ++i) &#123;</span><br><span class="line">            left += coins[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = mid; i &lt;= end; ++i) &#123;</span><br><span class="line">            right += coins[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;(&quot;</span> &lt;&lt; left &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; right &lt;&lt; <span class="string">&quot;) --&gt; &quot;</span> &lt;&lt; mid &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (left &gt; right) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">FakeCoin</span>(coins, mid, end);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">FakeCoin</span>(coins, start, mid - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = start; i &lt; mid; ++i) &#123;</span><br><span class="line">            left += coins[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = mid + <span class="number">1</span>; i &lt;= end; ++i) &#123;</span><br><span class="line">            right += coins[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;(&quot;</span> &lt;&lt; left &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; right &lt;&lt; <span class="string">&quot;) --&gt; &quot;</span> &lt;&lt; mid &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (left &gt; right) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">FakeCoin</span>(coins, mid + <span class="number">1</span>, end);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (left &lt; right) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">FakeCoin</span>(coins, start, mid - <span class="number">1</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> mid;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; coins = &#123;<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>&#125;;</span><br><span class="line">    <span class="comment">// vector&lt;int&gt; coins = &#123;1, 1, 1, 1, 0, 1, 1, 1, 1&#125;;</span></span><br><span class="line">    <span class="comment">// vector&lt;int&gt; coins = &#123;1, 1, 1, 1, 1, 1, 1, 1, 0&#125;;</span></span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; <span class="built_in">FakeCoin</span>(coins, <span class="number">0</span>, coins.<span class="built_in">size</span>() - <span class="number">1</span>) &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="汉诺塔"><a href="#汉诺塔" class="headerlink" title="汉诺塔"></a>汉诺塔</h2><p>从左到右有A、B、C三根柱子，其中A柱子上面有从小叠到大的3个圆盘，现要求将A柱子上的圆盘移到C柱子上去，期间有一个原则：一次只能移到一个盘子且大盘子不能在小盘子上面，求移动的步骤和移动的次数。</p>
+<p>实现汉诺塔算法只需要以下三个步骤：</p>
+<p>​ 1.利用目标柱为媒介，将上面n-1个圆盘从原始柱暂时移动到辅助柱</p>
+<p>​ 2.将原始柱上的最后一个最大的圆盘移动到目标柱上</p>
+<p>​ 3.将暂存在辅助柱上的n-1个柱子全部移动到目标柱上</p>
+<p><img src="/images/code/algo/hanoi.png" alt="汉诺塔"></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Move</span><span class="params">(<span class="type">char</span> src, <span class="type">char</span> dest)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;move &quot;</span> &lt;&lt; src &lt;&lt; <span class="string">&quot; to &quot;</span> &lt;&lt; dest &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Hanoi</span><span class="params">(<span class="type">int</span> n, <span class="type">char</span> src, <span class="type">char</span> dest, <span class="type">char</span> tmp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (n == <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="built_in">Move</span>(src, dest);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">Hanoi</span>(n - <span class="number">1</span>, src, tmp, dest);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">Move</span>(src, dest);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">Hanoi</span>(n - <span class="number">1</span>, tmp, dest, src);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 
       
     </div>
@@ -1017,217 +1630,11 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/TrustZone/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/25/cpu/TrustZone/" class="post-title-link" itemprop="url">TrustZone</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-09-25 16:27:12 / 修改时间：20:37:37" itemprop="dateCreated datePublished" datetime="2022-09-25T16:27:12+08:00">2022-09-25</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>TrustZone是ARM针对消费电子设备设计的一种硬件架构，其目的是为消费电子产品构建一个安全框架来抵御各种可能的攻击。</p>
-<p>TrustZone在概念上将SoC的硬件和软件资源划分为Secure World和Normal World两个世界，所有需要保密的操作在安全世界执行（如指纹识别、密码处理、数据加解密、安全认证等），其余操作在非安全世界执行（如用户操作系统、各种应用程序等），安全世界和非安全世界通过一个名为Monitor Mode的模式进行转换。</p>
-<p>实现TrustZone需要组件有：</p>
-<ul>
-<li>AMBA3 AXI总线，安全机制的基础设施。</li>
-<li>虚拟化的ARM Core，虚拟安全和非安全核。</li>
-<li>TZPC (TrustZone Protection Controller)，根据需要控制外设的安全特性。</li>
-<li>TZASC (TrustZone Address Space Controller)，对内存进行安全和非安全区域划分和保护。</li>
-<li>TZMA (TrustZone Memory Adapter)，片上ROM或RAM安全区域和非安全区域的划分和保护，可选。</li>
-<li>AXI-to-APB bridge，桥接APB总线，配合TZPC使APB总线外设支持TrustZone安全特性，可选。</li>
-</ul>
-<p><img src="/images/cpu/arm/TrustZone.png" alt="img"></p>
-<h2 id="总线设计"><a href="#总线设计" class="headerlink" title="总线设计"></a>总线设计</h2><p>AMBA3 AXI(AMBA3 Advanced eXtensible Interface)系统总线作为TrustZone的基础架构设施，提供了安全世界和非安全世界的隔离机制，确保非安全核只能访问非安全世界的系统资源，而安全核能访问所有资源。</p>
-<p>AMBA-AXI总线的扩展，增加了标志secure读和写地址线：AWPROT[1]和ARPROT[1]。</p>
-<p>TrustZone 在系统总线上针对每一个信道的读写增加了一个额外的控制信号位，这个控制位叫做Non-Secure或者NS位。所有非安全世界的主设备在操作时必须将信号的NS位置高，而NS位置高又使得其无法访问总线上安全世界的从设备，简单来说就是对非安全世界主设备发出的地址信号进行解码时在安全世界中找不到对应的从设备，从而导致操作失败。当然，非安全世界的主设备尝试访问安全世界的从设备会引发访问错误。</p>
-<p>在TrustZone出现前，ARM的外设基于AMBA2 APB (Advanced Peripheral Bus)总线协议，由于APB总线的设备不支持AXI总线的NS控制信号，所以AXI到APB总线需要AXI-to-APB bridge设备连接。AXI-to-APB bridge负责管理APB总线设备的安全事宜，其会拒绝不合理的安全请求，保证这些请求不会被转发到相应的外设。</p>
-<h2 id="处理器设计"><a href="#处理器设计" class="headerlink" title="处理器设计"></a>处理器设计</h2><p>TrustZone将每个物理核虚拟为两个核，非安全核，运行非安全世界的代码；和安全核，运行安全世界的代码。两个虚拟的核以基于时间片的方式运行，根据需要实时占用物理核，并通过Monitor Mode实现了同一CPU上两个操作系统间的切换。</p>
-<p>安全世界和非安全世界都有自己的虚拟MMU，各自管理物理地址的映射。实际上只是两个世界都有一份TTBR0、TTBR1、TTBCR寄存器，因此就会对应两个MMU表。尽管MMU有两套，但TBL缓存硬件上只有一套，因此TBL对于两个世界来说是共享的，其通过NS位来标志其每一项具体属于哪一个世界。这样在两个世界间进行切换时不再需要重新刷新TLB，提高执行效率。</p>
-<p>Cache也是两个世界共享，具体Cache数据属于哪一个世界也由其NS位指定，在世界间切换也不需要刷新Cache。</p>
-<p>在gicv2、gicv3的版本中，都增加了对安全扩展的支持:</p>
-<p>在gicv2/gicv3中，支持了安全中断，配置有如下：<br>gicv2分组</p>
-<ul>
-<li>group0：安全中断，由nFIQ驱动</li>
-<li>group1：非安全中断，由nIRQ驱动</li>
-</ul>
-<p>gicv3分组</p>
-<ul>
-<li>group0：安全中断</li>
-<li>non-secure group1：非安全中断</li>
-<li>secure group1：安全中断</li>
-</ul>
-<h2 id="隔离机制"><a href="#隔离机制" class="headerlink" title="隔离机制"></a>隔离机制</h2><p>内存隔离和保护通过总线组件TZASC和TZMA的设置来实现。</p>
-<ul>
-<li><p>TZASC (TrustZone Address Space Controller)可以把外部DDR分成多个区域，每个区域可以单独配置为安全或非安全区域，非安全世界的代码和应用只能访问非安全区域。TZASC只能用于内存设备，不适合用于配置块设备，如Nand Flash。</p>
-</li>
-<li><p>TZMA (TrustZone Memory Adapter)可以把片上ROM和SRAM隔离出安全和非安全区域。TZMA最大可以将片上存储的低2MB配置为安全区域，其余部分配置为非安全区域。大小划分上，片上安全区域可以在芯片出厂前设置为固定大小，或运行时通过TZPC动态配置。TZMA使用上有些限制，其不适用于外部内存划分，而且也只能配置一个安全区域。</p>
-</li>
-</ul>
-<p>在外设上需要TZPC (TrustZone Protection Controller) 来向APB总线上的设备提供类似AXI上的NS控制信号。由于TZPC可以在运行时动态设置，这就决定了外设的安全特性是动态变化的，例如键盘平时可以作为非安全的输入设备，在输入密码时可以配置为安全设备，只允许安全世界访问。</p>
-<h2 id="安全启动"><a href="#安全启动" class="headerlink" title="安全启动"></a>安全启动</h2><p>系统上电复位后，先从安全世界开始执行。安全世界会对非安全世界的bootloader进行验证，确保非安全世界执行的代码经过授权而没有被篡改过。然后非安全世界的bootloader会加载非安全世界的OS，完成整个系统的启动。下一级的安全依赖于上一级的验证，逐级的验证构成了整个系统的信任链。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/cpu/ATF/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/25/cpu/ATF/" class="post-title-link" itemprop="url">ARM Trusted Firmware</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-09-25 16:26:11 / 修改时间：21:26:56" itemprop="dateCreated datePublished" datetime="2022-09-25T16:26:11+08:00">2022-09-25</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>ARM Trusted Firmware启动实现分为5个步骤：</p>
-<p><img src="/images/cpu/arm/ATF3.png" alt="img"><br><img src="/images/cpu/arm/ATF2.jpg" alt="img"></p>
-<h2 id="BL1"><a href="#BL1" class="headerlink" title="BL1"></a>BL1</h2><p>BL1是Trusted Boot ROM，就是BootRom，是信任链的根所在，位于ROM中。BL1主要目的是建立Trusted SRAM、exception vector、初始化串口等。然后找到并验证BL2（验签CSF头），然后跳转过去。</p>
-<ul>
-<li>决定启动路径：冷启动还是热启动。</li>
-<li>架构初始化：异常向量、CPU复位处理函数配置、控制寄存器设置(SCRLR_EL3/SCR_EL3/CPTR_EL3/DAIF)</li>
-<li>平台初始化：使能Trusted Watchdog、初始化控制台、配置硬件一致性互联、配置MMU、初始化相关存储设备。</li>
-<li>固件更新处理</li>
-<li>BL2镜像加载和执行</li>
-</ul>
-<p>bl1_main()开始就是c程序了，那c运行依靠的堆和栈空间在哪里呢？在CPU内部的SRAM里。SRAM一启动就已经可以访问了，bl1_plat_arch_setup（）简单地在其中划分出来一块作为Trusted SRAM给c程序用，而不用像x86在cache里面扣一块出来，简单了很多。</p>
-<p>BL1镜像的异常向量表初始化了两个：一个是入口bl1_entrypoint，EL1镜像正常执行流程；另一个是SMC调用接口，EL2执行结束会通过SMC返回执行BL31。</p>
-<h2 id="BL2"><a href="#BL2" class="headerlink" title="BL2"></a>BL2</h2><p>BL2在Flash上，作为Trusted Boot Firmware，也叫Trusted Bootloader。</p>
-<ul>
-<li>架构初始化：EL1/EL0使能浮点单元和ASMID。</li>
-<li>平台初始化：控制台初始化、相关存储设备初始化、MMU、相关设备安全配置、</li>
-<li>SCP_BL2：系统控制核镜像加载，单独核处理系统功耗、时钟、复位等控制。</li>
-<li>寻找BL31，BL32和BL33镜像加载到RAM中，验签并运行BL31。</li>
-</ul>
-<h2 id="BL31"><a href="#BL31" class="headerlink" title="BL31"></a>BL31</h2><p>BL31是EL3 Runtime Firmware，一般为SML，管理SMC执行处理和中断，运行在secure monitor中，通过SMC指令在Secure World和Non-Secure World之间进行切换。它的主要任务是找到BL32，验签，并运行BL32。</p>
-<ul>
-<li>PSCI服务初始化，后续提供CPU功耗管理操作。</li>
-<li>BL32镜像运行初始化。</li>
-<li>初始化非安全EL2或EL1，跳转到BL33执行。</li>
-<li>负责安全非安全世界切换。</li>
-<li>进行安全服务请求的分发。</li>
-</ul>
-<h2 id="BL32"><a href="#BL32" class="headerlink" title="BL32"></a>BL32</h2><p>BL32是Trust OS，，它是一个可信安全的OS运行在EL1并在EL0启动可信任APP（如指纹信息，移动支付的密码等），并在Trust OS运行完成后通过SMC指令返回BL31，BL31找到BL33，验签并切换到Non-Seucre World运行BL33。</p>
-<h2 id="BL33"><a href="#BL33" class="headerlink" title="BL33"></a>BL33</h2><p>BL33运行的都是非安全固件，如UEFI 或u-boot。</p>
-<p><img src="/images/cpu/arm/ATF.jpg" alt="img"><br><img src="/images/cpu/arm/ATF.png" alt="img"></p>
-<hr>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/arnoldlu/p/14175126.html">https://www.cnblogs.com/arnoldlu/p/14175126.html</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/22/">22</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1292,7 +1699,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">219</span>
+          <span class="site-state-item-count">221</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1305,7 +1712,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-count">42</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

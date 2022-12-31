@@ -176,6 +176,443 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/c/gnu_c/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/08/13/c/gnu_c/" class="post-title-link" itemprop="url">GNU extend c syntax</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-08-13 21:56:50" itemprop="dateCreated datePublished" datetime="2022-08-13T21:56:50+08:00">2022-08-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>GCC 对c语言语法进行了扩展，这些扩展对优化、目标代码布局、更安全的检查等提供了很强的支持，其实这并不完全符合 ANSI C 标准。</p>
+<p>gcc如果使用“-ansi –pedantic”编译选项，则不使用 GNU 扩展语法。</p>
+<h2 id="语句表达式"><a href="#语句表达式" class="headerlink" title="语句表达式"></a>语句表达式</h2><p>GCC把包含在括号中的复合语句看作是一个表达式，称为语句表达式，它允许在一个表达式内使用循环、跳转、局部变量，并可以出现在任何允许表达式出现的地方。位于括号中的复合语句的最后一句必需是一个以分号结尾的表达式，它的值将成为这个语句表达式的值。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MIN(x,y) (&#123; \</span></span><br><span class="line"><span class="meta">    const typeof(x) _x = (x); \</span></span><br><span class="line"><span class="meta">    const typeof(y) _y = (y); \</span></span><br><span class="line"><span class="meta">    (void) (&amp;_x == &amp;_y); \</span></span><br><span class="line"><span class="meta">    _x &lt; _y ? _x : _y; &#125;)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="零长数组"><a href="#零长数组" class="headerlink" title="零长数组"></a>零长数组</h2><p>零长数组是长度为0的数组，也可以称之为可变长数组，它并不占用结构的空间，一般用作结构体最后一个成员，用于访问该结构体对象之后的一段内存，来看<a target="_blank" rel="noopener" href="https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html">GNU C官网</a>的一个例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">line</span> &#123;</span></span><br><span class="line">  <span class="type">int</span> length;</span><br><span class="line">  <span class="type">char</span> contents[<span class="number">0</span>];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">line</span> *<span class="title">thisline</span> =</span> (<span class="keyword">struct</span> line *)<span class="built_in">malloc</span> (<span class="keyword">sizeof</span> (<span class="keyword">struct</span> line) + this_length);</span><br><span class="line">thisline-&gt;length = this_length;</span><br></pre></td></tr></table></figure>
+
+<p>contents只是结构体之后一段内存的标记，使用时往后申请this_length大的内存，即可使用thisline-&gt;contents进行访问。</p>
+<h2 id="可变参数宏"><a href="#可变参数宏" class="headerlink" title="可变参数宏"></a>可变参数宏</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> debug(format, ...) fprintf(stderr, format, __VA_ARGS__)</span></span><br></pre></td></tr></table></figure>
+
+<p>其中的“…”表示可变参数，实际调用时，它们会替代宏体里的<code>__VA_ARGS__</code>。甚至还可以给可变参数取个名字。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> pr_info(fmt,arg...) printk(KERN_INFO fmt,##arg)</span></span><br></pre></td></tr></table></figure>
+
+<p>其中“##”主要针对参数为空的情况，既然称为可变参数，那传递空参数也是可以的。宏展开后，其中的字符串后面会多个多余的逗号，而“##”则会使预处理器去掉这个多余的逗号。</p>
+<h2 id="标号元素"><a href="#标号元素" class="headerlink" title="标号元素"></a>标号元素</h2><p>在标准 C 里，数组或结构变量的初始化值必须以固定的顺序出现，而在 GCC 中，通过指定索引或结构域名，则允许初始化值以任意顺序出现。</p>
+<p>指定数组索引的方法是在初始化值前写<code>[INDEX] =</code>，还可以使用<code>[FIRST ... LAST] =</code>的形式指定一个范围，比如:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> num[SIZE] = &#123;</span><br><span class="line">    [<span class="number">0</span>] = <span class="number">0</span>,</span><br><span class="line">    [<span class="number">1</span> ... SIZE] = <span class="number">-1</span>,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>对于结构初始化，使用这种形式，当结构体的定义变化导致元素的偏移位置改变时，仍然可以确保已知元素的正确性。对于未出现在初始化中的元素，其初值为 0。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">misc_ops</span> =</span> </span><br><span class="line">&#123;</span><br><span class="line">    .owner = THIS_MODULE,</span><br><span class="line">    .open = gpio_drv_open,</span><br><span class="line">    .release = gpio_drv_release,</span><br><span class="line">    .unlocked_ioctl = gpio_drv_ioctl,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="attribute-属性"><a href="#attribute-属性" class="headerlink" title="__attribute__属性"></a>__attribute__属性</h2><ul>
+<li><strong>format</strong></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((format(<span class="built_in">printf</span>,m,n)))</span><br><span class="line">__attribute__((format(<span class="built_in">scanf</span>,m,n)))</span><br></pre></td></tr></table></figure>
+
+<p>编译器会检查格式化字符串与“…”的匹配情况，其中参数m与n的含义为：<br>    m 格式化字符串（format string）的位置（顺序从1开始）；<br>    n 参数“…”的位置（顺序从1开始）；</p>
+<ul>
+<li><strong>availability</strong></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((availability(macosx,introduced=m,deprecated=n)))</span><br></pre></td></tr></table></figure>
+
+<p>指明API版本的变更。m 引入的版本；n 过时的版本</p>
+<ul>
+<li><strong>deprecated</strong></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((deprecated))</span><br><span class="line">__attribute__((deprecated(s)))</span><br></pre></td></tr></table></figure>
+
+<p>使编译会给出过时的警告。</p>
+<ul>
+<li><strong>unavailable</strong></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((unavailable))</span><br></pre></td></tr></table></figure>
+
+<p>告诉编译器该方法不可用，如果强行调用编译器会提示错误。比如某个类在构造的时候不想直接通过init来初始化，只能通过特定的初始化方法，就可以将init方法标记为unavailable。</p>
+<ul>
+<li><strong>const</strong></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((<span class="type">const</span>))</span><br></pre></td></tr></table></figure>
+
+<p>用于带有数值类型参数的函数上。当重复调用带有数值参数的函数时，由于返回值是相同的，所以此时编译器可以进行优化处理，除第一次需要运算外， 其它只需要返回第一次的结果就可以了，进而可以提高效率。该属性主要适用于没有静态状态和副作用的一些函数，并且返回值仅仅依赖输入的参数。（const参数不能用在带有指针类型参数的函数中，因为该属性不但影响函数的参数值，同样也影响到了参数指向的数据，它可能会对代码本身产生严重甚至是不可恢复的严重后果）。</p>
+<ul>
+<li><strong>cleanup</strong></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((cleanup(...)))</span><br></pre></td></tr></table></figure>
+
+<p>离开作用域之后执行指定的方法。实际应用中可以在作用域结束之后做一些特定的工作，比如清理。</p>
+<ul>
+<li><strong>constructor / destructor</strong></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((constructor))</span><br><span class="line">__attribute__((destructor))</span><br><span class="line">__attribute__((constructor(PRIORITY)))</span><br><span class="line">__attribute__((destructor(PRIORITY)))</span><br></pre></td></tr></table></figure>
+
+<p>constructor标志的函数和全局变量对象（或静态变量）的构造函数在main函数之前调用。destructor标志的函数和全局变量对象（或静态变量）的析构函数在main函数之后调用。PRIORITY 为优先级。main函数之前的，数值越小,越先调用；main函数之后的数值越大，越先调用。（可用于动态库注入的Hook）</p>
+<ul>
+<li><strong>noreturn</strong></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((<span class="keyword">noreturn</span>))</span><br></pre></td></tr></table></figure>
+
+<p>定义有返回值的函数时，而实际情况有可能没有返回值，避免编译器产生警告信息。</p>
+<ul>
+<li><strong>unused</strong></li>
+</ul>
+<p>表示该函数或变量可能并不使用,这个属性能够避免编译器产生警告信息。</p>
+<ul>
+<li><strong>nonnull</strong></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((nonnull(...)))</span><br></pre></td></tr></table></figure>
+
+<p>编译器对函数参数进行NULL的检查</p>
+<ul>
+<li><strong>aligned</strong></li>
+<li><strong>packed</strong></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((aligned (m)))</span><br><span class="line">__attribute__((aligned))</span><br><span class="line">__attribute__((packed))</span><br></pre></td></tr></table></figure>
+
+<p>aligned(m) 将强制编译器尽其所能地确保变量在分配空间时采用m字节对齐方式。packed该属性对struct 或者union 类型进行定义，设定其类型的每个变量按1字节对齐,这个常用于与协议有关的网络传输中，当用在enum 类型定义时，暗示了应该使用最小完整的类型。aligned 属性使被设置的对象占用更多的空间，使用packed 可以减小对象占用的空间。</p>
+<ul>
+<li><strong>overloadable</strong></li>
+</ul>
+<p>用于c语言函数,可以定义若干个函数名相同，但参数不同的方法，调用时编译器会自动根据参数选择函数原型。</p>
+<h2 id="builtin函数"><a href="#builtin函数" class="headerlink" title="__builtin函数"></a>__builtin函数</h2><p>GNU C 提供了大量的内建函数，其中大部分是标准 C 库函数的内建版本，不属于库函数的其他内建函数通常以__builtin 开始命名。</p>
+<blockquote>
+<p>__builtin_return_address(LEVEL)</p>
+</blockquote>
+<p>返回当前函数或其调用者的返回地址，参数LEVEL 指定调用栈的级数，如 0表 示当前函数的返回地址，1 表示当前函数的调用者的返回地址。</p>
+<blockquote>
+<p>__builtin_constant_p(EXP)</p>
+</blockquote>
+<p>用于判断一个值是否为编译时常数，如果参数 EXP的值是常数，函数返回 1，否则返回 0。</p>
+<blockquote>
+<p>__builtin_expect(long exp, long c)</p>
+</blockquote>
+<p>这个内建函数的意思就是exp的预期值为c，用于为编译器提供分支预测信息，其返回值是整数表达式exp的值，c的值必须是编译时常数。内核的likely函数就是利用这个实现的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> likely(x)    __builtin_expect(!!(x), 1)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> unlikely(x)  __builtin_expect(!!(x), 0)</span></span><br></pre></td></tr></table></figure>
+
+<p>likely和unlikely主要用于if语句中，当条件被认为是非常有可能满足时，则使用likely()宏，而条件很难满足时，则使用unlikely()宏。好让编译器对这个条件判断进行优化，生成了高效的汇编码。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __builtin_types_compatible_p(type_a, type_b);</span><br></pre></td></tr></table></figure>
+
+<p>此函数为GNU扩展，用来判断两个类型是否相同，如果type_a与 type_b相同的话，就会返回1，否则的话，返回0。</p>
+<ol>
+<li>限定符会被忽略，例如const long和long的类型是相同的。</li>
+<li>用typedef定义的类型，当且它们定义的类型是相同的时候，它们才是相同的。</li>
+<li>两个enum类型是不相同的。</li>
+</ol>
+<h2 id="weak"><a href="#weak" class="headerlink" title="__weak"></a>__weak</h2><p>在include\linux\compiler-gcc.h中__weak是这样定义的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> __weak              __attribute__((weak))</span></span><br></pre></td></tr></table></figure>
+
+<p>GCC通过<code>__attribute__((weak))</code>指令定义的函数或变量称为弱符号，实际上这个指令大部分时候都是用来定义函数，很少用于定义变量。编译器默认函数和初始化了的全局变量为强符号，未初始化的全局变量为弱符号。规则如下：</p>
+<ol>
+<li>当两者都为强符号时，报错：redefinition of ‘xxx’</li>
+<li>当两者为一强一弱时，选取强符号的值</li>
+<li>当两者同时为弱时，选择其中占用空间较大的符号，保证至少不会造成诸如溢出、越界等严重后果。</li>
+</ol>
+<h2 id="case"><a href="#case" class="headerlink" title="case"></a>case</h2><p>GNU C支持 case x…y 这样的语法，区间[x,y]的数都会满足这个case的条件。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span> (num) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">0</span> ... <span class="number">4</span> :</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;0 - 4\n&quot;</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> <span class="number">5</span> ... <span class="number">8</span> :</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;5 - 8\n&quot;</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>switch类型必须是一个整型或枚举类型，因为可以隐式转换，所以char short也是可以的。</p>
+<h2 id="typeof-x"><a href="#typeof-x" class="headerlink" title="typeof(x)"></a>typeof(x)</h2><p>typeof(x)语句可以获得x的类型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> min(x,y) (&#123; \</span></span><br><span class="line"><span class="meta">    const typeof(x) _x = (x); \</span></span><br><span class="line"><span class="meta">    const typeof(y) _y = (y); \</span></span><br><span class="line"><span class="meta">    (void) (&amp;_x == &amp;_y); \</span></span><br><span class="line"><span class="meta">    _x &lt; _y ? _x : _y; &#125;)</span></span><br></pre></td></tr></table></figure>
+
+<p><code>(void) (&amp;_x == &amp;_y);</code>检查_x 和_y 的类型是否一致。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/c/ipc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/08/13/c/ipc/" class="post-title-link" itemprop="url">linux ipc</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-08-13 21:56:50" itemprop="dateCreated datePublished" datetime="2022-08-13T21:56:50+08:00">2022-08-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="无名管道"><a href="#无名管道" class="headerlink" title="无名管道"></a>无名管道</h2><p>无名管道通常用于具有亲缘关系的父子进程或者兄弟进程间通信，是半双工的，数据只能往一个方向流动，先入先出，要想双向通信，需要建立两个管道。</p>
+<p><img src="/images/linux/ipc/pipe.png" alt="pipe"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pipe</span><span class="params">(<span class="type">int</span> pipefd[<span class="number">2</span>])</span>;</span><br></pre></td></tr></table></figure>
+
+<p>pipe创建的管道两端处于一个进程中，用于父子进程间的通信。管道建立时会创建两个文件描述符，pipefd[0]固定用于读管道，而pipefd[1]固定用于写管道。</p>
+<ol>
+<li><p>如果读一个写端已被关闭的管道，在所有数据都被读取后，read返回0指示达到了文件结束处。</p>
+</li>
+<li><p>只有在管道的读端存在时，向管道写入数据才有意义。否则写一个读端已被关闭的管道，将产生信号SIGPIPE。如果忽略该信号或者捕捉该信号并从其处理程序返回，则write出错返回，errno设置为EPIPE。</p>
+</li>
+<li><p>管道写入数据不保证原子性，管道存在缓冲区，如果读进程不读取管道缓冲区中的数据，那么写操作将会一直阻塞。</p>
+</li>
+</ol>
+<h2 id="标准流管道"><a href="#标准流管道" class="headerlink" title="标准流管道"></a>标准流管道</h2><p><img src="/images/linux/ipc/popen.png" alt="popen"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">FILE *<span class="title function_">popen</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *command, <span class="type">const</span> <span class="type">char</span> *type)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pclose</span><span class="params">(FILE *stream)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>popen提供连接到另一个进程的标准输入或标准输出的一个单行管道，创建的管道必须使用标准I/O函数进行操作。popen先执行fork，然后调用exec以执行command，并且返回一个标准I/O文件指针。如果type是”r”，则文件指针连接到command的标准输出。如果type是”w”，则文件指针连接到command的标准输入。</p>
+<p>pclose用来关闭创建的管道流，返回由popen所执行的进程的终止状态。</p>
+<h2 id="命名管道"><a href="#命名管道" class="headerlink" title="命名管道"></a>命名管道</h2><p>命名管道在非父子、兄弟进程之间也可相互通信。FIFO遵循先进先出规则，对FIFO的读总是从开始处返回数据，写则把数据添加到末尾，不支持如 lseek()等文件定位操作。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">mkfifo</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">mode_t</span> mode)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>对于读进程：</p>
+<ul>
+<li>若该管道是阻塞打开，且当前 FIFO 内没有数据，则对读进程而言将一直阻塞到有数据写入。</li>
+<li>若该管道是非阻塞打开，则不论 FIFO 内是否有数据，读进程都会立即执行读操作。即如果 FIFO<br>内没有数据，则读函数将立刻返回 0。</li>
+</ul>
+<p>对于写进程：</p>
+<ul>
+<li><p>若该管道是阻塞打开，则写操作将一直阻塞到数据可以被写入。</p>
+</li>
+<li><p>若该管道是非阻塞打开而不能写入全部数据，则读操作进行部分写入或者调用失败。</p>
+</li>
+<li><p>O_RDONLY  读管道</p>
+</li>
+<li><p>O_WRONLY  写管道</p>
+</li>
+<li><p>O_RDWR      读写管道</p>
+</li>
+<li><p>O_NONBLOCK  非阻塞</p>
+</li>
+<li><p>O_CREAT  如果该文件不存在，那么就创建一个新的文件，并用第三个参数为其设置权限。</p>
+</li>
+<li><p>O_EXCL   如果使用O_CREAT时文件存在，那么可返回错误消息。可测试文件是否存在。</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>返回错误类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>EACCESS</td>
+<td>所指定的目录路径无可执行的权限</td>
+</tr>
+<tr>
+<td>EEXIST</td>
+<td>所指定的文件已存在</td>
+</tr>
+<tr>
+<td>ENAMETOOLONG</td>
+<td>的路径名称太长</td>
+</tr>
+<tr>
+<td>ENOENT</td>
+<td>包含的目录不存在</td>
+</tr>
+<tr>
+<td>ENOSPC</td>
+<td>文件系统的剩余空间不足</td>
+</tr>
+<tr>
+<td>ENOTDIR</td>
+<td>路径中的目录存在但却非真正的目录</td>
+</tr>
+<tr>
+<td>EROFS</td>
+<td>指定的文件存在于只读文件系统内</td>
+</tr>
+</tbody></table>
+<h2 id="信号"><a href="#信号" class="headerlink" title="信号"></a>信号</h2><p>信号是软件中断，用于在多个进程之间传递异步信号，可以直接进行用户空间进程和内核进程之间的交互。<code>kill -l</code>命令可以查看系统支持的信号列表。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"> 1) SIGHUP       2) SIGINT       3) SIGQUIT      4) SIGILL       5) SIGTRAP</span><br><span class="line"> 6) SIGABRT      7) SIGBUS       8) SIGFPE       9) SIGKILL     10) SIGUSR1</span><br><span class="line">11) SIGSEGV     12) SIGUSR2     13) SIGPIPE     14) SIGALRM     15) SIGTERM</span><br><span class="line">16) SIGSTKFLT   17) SIGCHLD     18) SIGCONT     19) SIGSTOP     20) SIGTSTP</span><br><span class="line">21) SIGTTIN     22) SIGTTOU     23) SIGURG      24) SIGXCPU     25) SIGXFSZ</span><br><span class="line">26) SIGVTALRM   27) SIGPROF     28) SIGWINCH    29) SIGIO       30) SIGPWR</span><br><span class="line">31) SIGSYS      34) SIGRTMIN    35) SIGRTMIN+1  36) SIGRTMIN+2  37) SIGRTMIN+3</span><br><span class="line">38) SIGRTMIN+4  39) SIGRTMIN+5  40) SIGRTMIN+6  41) SIGRTMIN+7  42) SIGRTMIN+8</span><br><span class="line">43) SIGRTMIN+9  44) SIGRTMIN+10 45) SIGRTMIN+11 46) SIGRTMIN+12 47) SIGRTMIN+13</span><br><span class="line">48) SIGRTMIN+14 49) SIGRTMIN+15 50) SIGRTMAX-14 51) SIGRTMAX-13 52) SIGRTMAX-12</span><br><span class="line">53) SIGRTMAX-11 54) SIGRTMAX-10 55) SIGRTMAX-9  56) SIGRTMAX-8  57) SIGRTMAX-7</span><br><span class="line">58) SIGRTMAX-6  59) SIGRTMAX-5  60) SIGRTMAX-4  61) SIGRTMAX-3  62) SIGRTMAX-2</span><br><span class="line">63) SIGRTMAX-1  64) SIGRTMAX</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>SIGABRT 调用abort函数时产生此信号。进程异常终止。</li>
+<li>SIGALRM 超过用alarm函数设置的时间时产生此信号。由setitimer函数设置的间隔时间已经过时。</li>
+<li>SIGBUS 指示一个实现定义的硬件故障。</li>
+<li>SIGCHLD 在一个进程终止或停止时被送给其父进程。</li>
+<li>SIGCONT 此作业控制信号送给需要继续运行的处于停止状态的进程。如果接收到此信号的进程处于停止状态,则系统默认动作是使该进程继续运行，否则默认动作是忽略此信号。</li>
+<li>SIGEMT 指示一个实现定义的硬件故障。</li>
+<li>SIGFPE 此信号表示一个算术运算异常，例如除以0，浮点溢出等。</li>
+<li>SIGHUP 如果终端界面检测到一个连接断开，则将此信号送给与该终端相关的控制进程。</li>
+<li>SIGILL 此信号指示进程已执行一条非法硬件指令。</li>
+<li>SIGINT 当用户按中断键(Ctrl+C)时，此信号送至前台进程组中的每一个进程。</li>
+<li>SIGIO 此信号指示一个异步I/O事件。</li>
+<li>SIGIOT 这指示一个实现定义的硬件故障。</li>
+<li>SIGKILL  杀死任一进程。不能被捕捉或忽略。</li>
+<li>SIGPIPE 如果在读进程已终止时写管道，则产生此信号。当套接口的一端已经终止时，若进程写该套接口也产生此信号。</li>
+<li>SIGPOLL 在一个可轮询设备上发生一特定事件时产生此信号。</li>
+<li>SIGPROF 当setitimer函数设置的梗概统计间隔时间已经超过时产生此信号。</li>
+<li>SIGPWR 它主要用于具有不间断电源(UPS)的系统上。蓄电池电压过低时将信号发送给init进程，然后由init处理停机操作。</li>
+<li>SIGQUIT 当用户在终端上按退出键(Ctrl+)时，产生此信号，并送至前台进程组中的所有进程。终止前台进程组并产生core文件。</li>
+<li>SIGSEGV 指示进程进行了一次无效的存储访问。</li>
+<li>SIGSTOP 这是一个作业控制信号，它停止一个进程。不能被捕捉或忽略。</li>
+<li>SIGSYS 指示一个无效的系统调用。</li>
+<li>SIGTERM kill命令发送的系统默认终止信号。</li>
+<li>SIGTRAP 指示一个实现定义的硬件故障。</li>
+<li>SIGTSTP 交互停止信号，当用户在终端上按挂起键(Ctrl+Z)时，终端驱动程序产生此信号。</li>
+<li>SIGTTIN 当一个后台进程组进程试图读其控制终端时，终端驱动程序产生此信号。当读进程忽略或阻塞此信号，或读进程所属的进程组是孤儿进程组时不产生此信号，读操作出错并设置errno。</li>
+<li>SIGTTOU 当一个后台进程组进程试图写其控制终端时产生此信号。当写进程忽略或阻塞此信号，或写进程所属的进程组是孤儿进程组时不产生此信号，写操作出错并设置errno。</li>
+<li>SIGURG 此信号通知进程已经发生一个紧急情况。在网络连接上，接到非规定波特率的数据时，此信号可选择地产生。</li>
+<li>SIGUSR1 这是一个用户定义的信号，可用于应用程序。</li>
+<li>SIGUSR2 这是一个用户定义的信号，可用于应用程序。</li>
+<li>SIGVTALRM 当一个由setitimer函数设置的虚拟间隔时间已经超过时产生此信号。</li>
+<li>SIGWINCH 如果一个进程用ioctl设置窗口大小命令更改了窗口大小，则内核将信号送至前台进程组。</li>
+<li>SIGXCPU 如果进程超过了其软CPU时间限制，则产生此信号。</li>
+<li>SIGXFSZ 如果进程超过了其软文件长度限制产生此信号。</li>
+</ul>
+<p>一个完整的信号生命周期可以分为几个阶段：信号产生、信号在进程中注册、信号在进程中注销、执行信号处理函数。</p>
+<p><strong>signal()</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(*<span class="type">sighandler_t</span>)</span><span class="params">(<span class="type">int</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIG_ERR  ((__sighandler_t) -1) <span class="comment">/* Error return.  */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIG_DFL  ((__sighandler_t)  0) <span class="comment">/* Default action.  */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIG_IGN  ((__sighandler_t)  1) <span class="comment">/* Ignore signal.  */</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">sighandler_t</span> <span class="title function_">signal</span><span class="params">(<span class="type">int</span> signum, <span class="type">sighandler_t</span> handler)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>对于handler参数：</p>
+<ul>
+<li>SIG_IGN  表示忽略此信号(SIGKILL和SIGSTOP不能忽略)</li>
+<li>SIG_DFL  表示执行系统默认动作。</li>
+<li>自定义的信号处理函数指针。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sigaction</span> &#123;</span></span><br><span class="line">    <span class="type">void</span>     (*sa_handler)(<span class="type">int</span>);</span><br><span class="line">    <span class="type">void</span>     (*sa_sigaction)(<span class="type">int</span>, <span class="type">siginfo_t</span> *, <span class="type">void</span> *);</span><br><span class="line">    <span class="type">sigset_t</span>   sa_mask;</span><br><span class="line">    <span class="type">int</span>        sa_flags;</span><br><span class="line">    <span class="type">void</span>     (*sa_restorer)(<span class="type">void</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">sigaction</span><span class="params">(<span class="type">int</span> signum, <span class="type">const</span> <span class="keyword">struct</span> sigaction *act, <span class="keyword">struct</span> sigaction *oldact)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/linux/ipc/sighandle_r.png" alt="sighandle_r"></p>
+<p><strong>raise()</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">raise</span><span class="params">(<span class="type">int</span> sig)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>raise()给进程本身发送信号。</p>
+<p><strong>kill()</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">kill</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">int</span> sig)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>kill()给一个进程发送信号，pid参数:</p>
+<ul>
+<li><code>pid &gt; 0</code>   将信号发送给pid相等的进程。</li>
+<li><code>pid == 0</code>  将信号发送给与其进程组ID相等的进程。</li>
+<li><code>pid &lt; 0</code>   将信号发送给进程组ID等于pid绝对值的进程。</li>
+</ul>
+<p>进程将信号发送给其他进程需要许可权，对于非root用户，其规则是发送者的实际或有效用户ID必须等于接收者的实际或有效用户ID。</p>
+<p><strong>alarm()</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">alarm</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> seconds)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>alarm()函数可以设置一个闹钟时间，超时后产生SIGALRM信号，如果不忽略或不捕捉此信号，则其默认动作是终止进程。</p>
+<p>每个进程只能有一个闹钟时间。如果在调用alarm()时，以前已设置过闹钟时间，而且还没有超时，则该闹钟时间的余留值作为本次函数调用的值返回，以前登记的闹钟时间则被新值代换。</p>
+<p><strong>pause()</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pause</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>pause()函数是用于将调用进程挂起直至捕捉到信号为止。</p>
+<h2 id="信号集"><a href="#信号集" class="headerlink" title="信号集"></a>信号集</h2><h2 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h2><p>信号量用于进程同步，只有获得了信号量的进程才可以运行，没有获得信号量的进程则只能等待。</p>
+<p>信号量包括一个称为信号量的变量和在该信号量下等待资源的进程等待队列，以及对信号量进行的两个原子操作(PV操作)。其中信号量对应于某一种资源，取一个非负的整型值，信号量值指的是当前可用的该资源的数量，若它等于 0 则意味着目前没有可用的资源。PV原子操作的具体定义如下:</p>
+<ul>
+<li><p>P操作：获得信号量，将值-1。如果值非负，表明有可用的资源，则占用一个资源直接返回，否则被阻塞，直到别的任务释放该信号量才能运行。它会导致调用的进程睡眠，因此不能在中断上下文使用。</p>
+</li>
+<li><p>V操作：释放信号量，把值+1，如果值为非正数，表明有任务等待该信号量，因此唤醒这些任务。</p>
+</li>
+</ul>
+<h2 id="共享内存"><a href="#共享内存" class="headerlink" title="共享内存"></a>共享内存</h2><p>因为进程可以直接读写内存，不需要任何数据的复制。为了在多个进程间交换信息，内核专门留出了一块内存区。这段内存区可以由需要访问的进<br>程将其映射到自己的私有地址空间。因此，进程就可以直接读写这一内存区而不需要进行数据的复制，从而大大提高了效率。当然，由于多个进程共享一段内存，因此也需要有相应的同步机制。</p>
+<p><code>ipcs -m</code>命令可以查看系统的共享内存，共享存储段紧靠在栈之下。</p>
+<h2 id="消息队列"><a href="#消息队列" class="headerlink" title="消息队列"></a>消息队列</h2><p>消息队列是消息的链表，存放在内核中并由消息队列标识符标识，用户可以从消息队列中添加消息和读取消息等，消息队列具有一定的FIFO特性，但是也可以按消息的类型字段随机查取消息。</p>
+<p>消息队列的实现包括创建或打开消息队列、添加消息、读取消息和控制消息队列这 4 种操作：</p>
+<ul>
+<li>创建或打开消息队列使用的函数是 msgget()，这里创建的消息队列的数量会受到系统消息队列数量的限制。</li>
+<li>添加消息使用的函数是 msgsnd()函数，它把消息添加到已打开的消息队列末尾。</li>
+<li>读取消息使用的函数是msgrcv()，它把消息从消息队列中取走，与 FIFO 不同的是，这里可以指定取走某一条消息。</li>
+<li>控制消息队列使用的函数是 msgctl()。</li>
+</ul>
+<h2 id="Socket"><a href="#Socket" class="headerlink" title="Socket"></a>Socket</h2>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/c/stdio/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1301,162 +1738,11 @@ tcpdump ip multicast
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/cmd/test/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/26/cmd/test/" class="post-title-link" itemprop="url">test</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-06-26 15:56:04 / 修改时间：15:59:10" itemprop="dateCreated datePublished" datetime="2022-06-26T15:56:04+08:00">2022-06-26</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cmd/" itemprop="url" rel="index"><span itemprop="name">cmd</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><strong>test命令</strong> 是shell环境中测试条件表达式的实用工具。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">-b &lt;文件&gt;：如果文件为一个块特殊文件，则为true；</span><br><span class="line">-c &lt;文件&gt;：如果文件为一个字符特殊文件，则为true；</span><br><span class="line">-d &lt;文件&gt;：如果文件为一个目录，则为true；</span><br><span class="line">-e &lt;文件&gt;：如果文件存在，则为true；</span><br><span class="line">-f &lt;文件&gt;：如果文件为一个普通文件，则为true；</span><br><span class="line">-g &lt;文件&gt;：如果设置了文件的SGID位，则为true；</span><br><span class="line">-G &lt;文件&gt;：如果文件存在且归该组所有，则为true；</span><br><span class="line">-k &lt;文件&gt;：如果设置了文件的粘着位，则为true；</span><br><span class="line">-O &lt;文件&gt;：如果文件存在并且归该用户所有，则为true；</span><br><span class="line">-p &lt;文件&gt;：如果文件为一个命名管道，则为true；</span><br><span class="line">-r &lt;文件&gt;：如果文件可读，则为true；</span><br><span class="line">-s &lt;文件&gt;：如果文件的长度不为零，则为true；</span><br><span class="line">-S &lt;文件&gt;：如果文件为一个套接字特殊文件，则为true；</span><br><span class="line">-u &lt;文件&gt;：如果设置了文件的SUID位，则为true；</span><br><span class="line">-w &lt;文件&gt;：如果文件可写，则为true；</span><br><span class="line">-x &lt;文件&gt;：如果文件可执行，则为true。</span><br></pre></td></tr></table></figure>
-
-<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><p>linux中shell编程中的test常见用法：</p>
-<p> <strong>判断表达式</strong> </p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if test     #表达式为真</span><br><span class="line">if test !   #表达式为假</span><br><span class="line">test 表达式1 –a 表达式2     #两个表达式都为真</span><br><span class="line">test 表达式1 –o 表达式2     #两个表达式有一个为真</span><br><span class="line">test 表达式1 ! 表达式2       #条件求反</span><br></pre></td></tr></table></figure>
-
-<p> <strong>判断字符串</strong> </p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">test –n 字符串    #字符串的长度非零</span><br><span class="line">test –z 字符串    #字符串的长度是否为零</span><br><span class="line">test 字符串1＝字符串2       #字符串是否相等，若相等返回true</span><br><span class="line">test 字符串1!＝字符串2      #字符串是否不等，若不等反悔false</span><br></pre></td></tr></table></figure>
-
-<p> <strong>判断整数</strong> </p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">test 整数1 -eq 整数2    #整数相等</span><br><span class="line">test 整数1 -ge 整数2    #整数1大于等于整数2</span><br><span class="line">test 整数1 -gt 整数2    #整数1大于整数2</span><br><span class="line">test 整数1 -le 整数2    #整数1小于等于整数2</span><br><span class="line">test 整数1 -lt 整数2    #整数1小于整数2</span><br><span class="line">test 整数1 -ne 整数2    #整数1不等于整数2</span><br></pre></td></tr></table></figure>
-
-<p> <strong>判断文件</strong> </p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">test File1 –ef File2    两个文件是否为同一个文件，可用于硬连接。主要判断两个文件是否指向同一个inode。</span><br><span class="line">test File1 –nt File2    判断文件1是否比文件2新</span><br><span class="line">test File1 –ot File2    判断文件1比是否文件2旧</span><br><span class="line">test –b file   #文件是否块设备文件</span><br><span class="line">test –c File   #文件并且是字符设备文件</span><br><span class="line">test –d File   #文件并且是目录</span><br><span class="line">test –e File   #文件是否存在 （常用）</span><br><span class="line">test –f File   #文件是否为正规文件 （常用）</span><br><span class="line">test –g File   #文件是否是设置了组id</span><br><span class="line">test –G File   #文件属于的有效组ID</span><br><span class="line">test –h File   #文件是否是一个符号链接（同-L）</span><br><span class="line">test –k File   #文件是否设置了Sticky bit位</span><br><span class="line">test –b File   #文件存在并且是块设备文件</span><br><span class="line">test –L File   #文件是否是一个符号链接（同-h）</span><br><span class="line">test –o File   #文件的属于有效用户ID</span><br><span class="line">test –p File   #文件是一个命名管道</span><br><span class="line">test –r File   #文件是否可读</span><br><span class="line">test –s File   #文件是否是非空白文件</span><br><span class="line">test –t FD     #文件描述符是在一个终端打开的</span><br><span class="line">test –u File   #文件存在并且设置了它的set-user-id位</span><br><span class="line">test –w File   #文件是否存在并可写</span><br><span class="line">test –x File   #文件属否存在并可执行</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/cmd/sh/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/26/cmd/sh/" class="post-title-link" itemprop="url">sh</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-06-26 15:56:04 / 修改时间：15:59:10" itemprop="dateCreated datePublished" datetime="2022-06-26T15:56:04+08:00">2022-06-26</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cmd/" itemprop="url" rel="index"><span itemprop="name">cmd</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><strong>sh</strong> 是shell命令语言解释器，执行命令从标准输入读取或从一个文件中读取。通过用户输入命令，和内核进行沟通。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">bash [options] [file]</span><br><span class="line"></span><br><span class="line">-c string  命令从-c后的字符串读取。</span><br><span class="line">-i  实现脚本交互。</span><br><span class="line">-n  进行shell脚本的语法检查。</span><br><span class="line">-x  跟踪脚本调试shell脚本，能打印出所执行的每一行命令以及当前状态。</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/22/">22</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1521,7 +1807,7 @@ tcpdump ip multicast
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">219</span>
+          <span class="site-state-item-count">221</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1534,7 +1820,7 @@ tcpdump ip multicast
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-count">42</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

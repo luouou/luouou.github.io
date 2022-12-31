@@ -176,6 +176,225 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/linux/etc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/linux/etc/" class="post-title-link" itemprop="url">linux /etc/passwd config</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="etc-passwd"><a href="#etc-passwd" class="headerlink" title="/etc/passwd"></a>/etc/passwd</h2><p>/etc/passwd该文件对所有用户可读。文件中的每个用户都有一个对应的记录行，记录着这个用户的一下基本属性，每行记录又被冒号(:)分隔为7个字段，其格式和具体含义如下：</p>
+<p><strong>用户名:口令:用户标识号:组标识号:注释性描述:主目录:登录Shell</strong></p>
+<ul>
+<li>用户名(login_name):是代表用户账号的字符串。通常长度不超过8个字符，并且由大小写字母和/或数字组成。登录名中不能有冒号(:)，因为冒号在这里是分隔符。为了兼容起见，登录名中最好不要包含点字符(.)，并且不使用连字符(-)和加号(+)打头。</li>
+<li>口令(passwd):一些系统中，存放着加密后的用户口令字。虽然这个字段存放的只是用户口令的加密串，不是明文，但是由于/etc/passwd文件对所有用户都可读，所以这仍是一个安全隐患。因此，现在许多Linux系统（如SVR4）都使用了shadow技术，把真正的加密后的用户口令字存放到/etc/shadow文件中，而在/etc/passwd文件的口令字段中只存放一个特殊的字符，例如“x”或者“*”。</li>
+<li>用户标识号(UID):是一个整数，系统内部用它来标识用户。一般情况下它与用户名是一一对应的。如果几个用户名对应的用户标识号是一样的，系统内部将把它们视为同一个用户，但是它们可以有不同的口令、不同的主目录以及不同的登录Shell等。取值范围是0-65535。0是超级用户root的标识号，1-99由系统保留，作为管理账号，普通用户的标识号从100开始。在Linux系统中，这个界限是500。</li>
+<li>组标识号(GID):字段记录的是用户所属的用户组。它对应着/etc/group文件中的一条记录。</li>
+<li>注释性描述(users):字段记录着用户的一些个人情况，例如用户的真实姓名、电话、地址等，这个字段并没有什么实际的用途。在不同的Linux系统中，这个字段的格式并没有统一。在许多Linux系统中，这个字段存放的是一段任意的注释性描述文字，用做finger命令的输出。</li>
+<li>主目录(home_directory):也就是用户的起始工作目录，它是用户在登录到系统之后所处的目录。在大多数系统中，各用户的主目录都被组织在同一个特定的目录下，而用户主目录的名称就是该用户的登录名。各用户对自己的主目录有读、写、执行（搜索）权限，其他用户对此目录的访问权限则根据具体情况设置。</li>
+<li>登录Shell(Shell):用户登录后，要启动一个进程，负责将用户的操作传给内核，这个进程是用户登录到系统后运行的命令解释器或某个特定的程序，即Shell。Shell是用户与Linux系统之间的接口。系统管理员可以根据系统情况和用户习惯为用户指定某个Shell。如果不指定Shell，那么系统使用sh为默认的登录Shell，即这个字段的值为/bin/sh。</li>
+</ul>
+<h2 id="etc-shadow"><a href="#etc-shadow" class="headerlink" title="/etc/shadow"></a>/etc/shadow</h2><p>/etc/shadow文件中的记录行与/etc/passwd中的一一对应，是passwd文件的一个影子。它由pwconv命令根据/etc/passwd中的数据自动产生。但是/etc/shadow文件只有系统管理员才能够进行修改和查看。</p>
+<p><strong>登录名:加密口令:最后一次修改时间:最小时间间隔:最大时间间隔:警告时间:不活动时间:失效时间:标志</strong></p>
+<ol>
+<li>“登录名”是与/etc/passwd文件中的登录名相一致的用户账号</li>
+<li>“口令”字段存放的是加密后的用户口令字，格式为<code>$id$salt$hashed</code>，则表示该用户密码正常。其中<code>$id$</code>的id表示密码的加密算法，<code>$salt$</code>是加密时使用的salt，hashed才是真正的密码部分。</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">如果为空，则对应用户没有口令，登录时不需要口令；</span><br><span class="line">* 代表帐号被锁定；</span><br><span class="line">!! 表示这个密码已经过期了；</span><br><span class="line">$1$ 是用MD5加密；</span><br><span class="line">$2a$ 是用Blowfish加密；</span><br><span class="line">$2y$ 是另一算法长度的Blowfish</span><br><span class="line">$5$ 是用 SHA-256加密；</span><br><span class="line">$6$ 表示SHA-512算法</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>“最后一次修改时间”表示的是从某个时刻起，到用户最后一次修改口令时的天数。时间起点对不同的系统可能不一样。例如在SCOLinux中，这个时间起点是1970年1月1日。</li>
+<li>“最小时间间隔”指的是两次修改口令之间所需的最小天数。</li>
+<li>“最大时间间隔”指的是口令保持有效的最大天数。</li>
+<li>“警告时间”字段表示的是从系统开始警告用户到用户密码正式失效之间的天数。</li>
+<li>“不活动时间”表示的是用户没有登录活动但账号仍能保持有效的最大天数。</li>
+<li>“失效时间”字段给出的是一个绝对的天数，如果使用了这个字段，那么就给出相应账号的生存期。期满后，该账号就不再是一个合法的账号，也就不能再用来登录了。</li>
+</ol>
+<h2 id="etc-group"><a href="#etc-group" class="headerlink" title="/etc/group"></a>/etc/group</h2><ul>
+<li>组名：组的名称，可以将其视为与数值型组标识符相对应的人类可读(符号)标识符。</li>
+<li>组密码：这里的 “x” 仅仅是密码标识，真正加密后的组密码默认保存在 /etc/gshadow 文件中。</li>
+<li>组 ID (GID)：该组的数值型 ID。正常情况下,对应于组 ID 号 0，只定义一个名为 root的组。</li>
+<li>用户列表：属于该组的用户名列表,之间以逗号分隔。</li>
+</ul>
+<h2 id="省略密码验证"><a href="#省略密码验证" class="headerlink" title="省略密码验证"></a>省略密码验证</h2><p>把/etc/passwd中的<code>root:x:0:0:root:/root:/bin/bash</code>，改为<code>root::0:0:root:/root:/bin/bash</code>，就可以了，就是去掉了里面的x，这样root用户就不用密码了。其他用户也一样。</p>
+<h2 id="省略输入用户名"><a href="#省略输入用户名" class="headerlink" title="省略输入用户名"></a>省略输入用户名</h2><p>修改/etc/inittab</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1:2345:respawn:/sbin/agetty tty1 9600</span><br><span class="line">2:2345:respawn:/sbin/agetty tty2 9600</span><br><span class="line">3:2345:respawn:/sbin/agetty tty3 9600</span><br><span class="line">4:2345:respawn:/sbin/agetty tty4 9600</span><br><span class="line">5:2345:respawn:/sbin/agetty tty5 9600</span><br><span class="line">6:2345:respawn:/sbin/agetty tty6 9600</span><br></pre></td></tr></table></figure>
+
+<p>表示系统可以有六个控制台，可以用ALT+(F1~F6)来切换。而/sbin/agetty就是一个登陆验证程序，执行它，会提示用户输入用户名和密码，然后启动一个指定的shell（在passwd文件中指定的）。所以，我们只需将其修改为不执行agettty，而是执行自己编写的一个脚本，就可以跳过用户名和密码的输入。修改如下：</p>
+<blockquote>
+<p>1:2345:respawn:/bin/autologin tty1 9600</p>
+</blockquote>
+<p>autologin脚本内容：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/sh</span></span><br><span class="line">/bin/login -f root</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/waitqueue/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/kernel/waitqueue/" class="post-title-link" itemprop="url">waitqueue</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>阻塞操作是指在执行设备操作时，若不能获得资源，则挂起的进程进入休眠状态，直到等待的条件被满足，而非阻塞操作是直接返回，并不挂起。</p>
+<p>等待队列用来同步对系统资源的访问，可实现进程阻塞。</p>
+<h2 id="waitqueue"><a href="#waitqueue" class="headerlink" title="waitqueue"></a>waitqueue</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">wait_queue_head</span> &#123;</span></span><br><span class="line">    <span class="type">spinlock_t</span> lock;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">task_list</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> __<span class="title">wait_queue_head</span> <span class="title">wait_queue_head_t</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">wait_queue</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> flags;</span><br><span class="line">    <span class="type">void</span> *private;</span><br><span class="line">    <span class="type">wait_queue_func_t</span> func;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">task_list</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> __<span class="title">wait_queue</span> <span class="title">wait_queue_t</span>;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>定义等待队列头</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">init_waitqueue_head(&amp;<span class="built_in">queue</span>);</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DECLARE_WAIT_QUEUE_HEAD(name) \</span></span><br><span class="line"><span class="meta">    wait_queue_head_t name = __WAIT_QUEUE_HEAD_INITIALIZER(name)</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>定义等待队列</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> DECLARE_WAITQUEUE(name, tsk)                    \</span></span><br><span class="line"><span class="meta">    wait_queue_t name = __WAITQUEUE_INITIALIZER(name, tsk)</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>添加/移除等待队列到等待队列头</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> fastcall <span class="title function_">add_wait_queue</span><span class="params">(<span class="type">wait_queue_head_t</span> *q, <span class="type">wait_queue_t</span> *wait)</span>;</span><br><span class="line"><span class="type">void</span> fastcall <span class="title function_">remove_wait_queue</span><span class="params">(<span class="type">wait_queue_head_t</span> *q, <span class="type">wait_queue_t</span> *wait)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>等待事件</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*有条件等待*/</span></span><br><span class="line">wait_event(<span class="built_in">queue</span>, condition)</span><br><span class="line">wait_event_interruptible(<span class="built_in">queue</span>, condition)</span><br><span class="line">wait_event_timeout(<span class="built_in">queue</span>, condition, timeout)</span><br><span class="line">wait_event_interruptible_timeout(<span class="built_in">queue</span>, condition, timeout)</span><br><span class="line"></span><br><span class="line"><span class="comment">/*无条件等待 */</span></span><br><span class="line"><span class="type">void</span> __sched <span class="title function_">sleep_on</span><span class="params">(<span class="type">wait_queue_head_t</span> *q)</span>;</span><br><span class="line"><span class="type">void</span> __sched <span class="title function_">interruptible_sleep_on</span><span class="params">(<span class="type">wait_queue_head_t</span> *q)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>sleep_on()函数将目前进程的状态置成 TASK_UNINTERRUPTIBLE，并定义一个等待队列，之后把它附属到等待队列头 q，直到资源可获得，q引导的等待队列被唤醒。</p>
+<p>interruptible_sleep_on()将进程的状态置成TASK_INTERRUPTIBLE，能被等待队列或者信号唤醒。</p>
+<p><strong>唤醒队列</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">wake_up</span><span class="params">(<span class="type">wait_queue_head_t</span> *<span class="built_in">queue</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">wake_up_interruptible</span><span class="params">(<span class="type">wait_queue_head_t</span> *<span class="built_in">queue</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>wake_up()应该与 wait_event()或 wait_event_timeout()成对使用，而 wake_up_interruptible()则应与 wait_event_interruptible()或 wait_event_interruptible_timeout()成对使用。</p>
+<p>wake_up()可唤醒处于 TASK_INTERRUPTIBLE 和 TASK_UNINTERRUPTIBLE 的进程，而 wake_up_interruptible()只能唤醒处于 TASK_INTERRUPTIBLE 的进程。</p>
+<p><strong>进程状态切换</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> TASK_RUNNING        0</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TASK_INTERRUPTIBLE  1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TASK_UNINTERRUPTIBLE    2</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __set_current_state(state_value)            \</span></span><br><span class="line"><span class="meta">    do &#123; current-&gt;state = (state_value); &#125; while (0)</span></span><br><span class="line">    </span><br><span class="line"><span class="meta">#<span class="keyword">define</span> set_current_state(state_value)      \</span></span><br><span class="line"><span class="meta">    set_mb(current-&gt;state, (state_value))</span></span><br></pre></td></tr></table></figure>
+
+<p>内核中使用<code>set_current_state()</code>函数或<code>__add_current_state()</code>函数来实现目前进程状态的改变，直接采用<code>current-&gt;state = TASK_UNINTERRUPTIBLE</code>类似的赋值语句也行。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 改变进程状态为睡眠 */</span></span><br><span class="line">__set_current_state(TASK_INTERRUPTIBLE);</span><br><span class="line"></span><br><span class="line">schedule(); </span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (signal_pending(current)) <span class="comment">//如果是被信号唤醒</span></span><br><span class="line">&#123;</span><br><span class="line">    ret = -ERESTARTSYS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果是非阻塞访问，设备忙时，直接返回-EAGAIN。如果是阻塞访问，需要进行状态切换，通过调用schedule()函数来调度其他进程执行。唤醒后，需通过 signal_pending(current) 判断是否是信号唤醒，如果是则返回-ERESTARTSYS。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/lock/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1132,133 +1351,11 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/linux/core_dump/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/linux/core_dump/" class="post-title-link" itemprop="url">core dump</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 15:46:32" itemprop="dateCreated datePublished" datetime="2022-06-07T15:46:32+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><strong>设置core文件大小</strong></p>
-<p>使用<code>ulimit -c</code>命令可查看core文件大小，若结果为0，则表示不会生成core文件。</p>
-<p>使用<code>ulimit -c filesize</code>命令，可以限制core文件的大小，filesize的单位为kbyte。若设置为<code>ulimit -c unlimited</code>则表示core文件的大小不受限制。</p>
-<p>永久设置，修改/etc/security/limits.conf文件：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#*               soft    core            0</span><br></pre></td></tr></table></figure>
-
-<p>修改成：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*                soft    core            unlimited</span><br></pre></td></tr></table></figure>
-
-<p><strong>查询coredump文件路径</strong></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cat /proc/sys/kernel/core_pattern</span><br><span class="line"></span><br><span class="line">/sbin/sysctl kernel.core_pattern</span><br></pre></td></tr></table></figure>
-
-<p><strong>修改coredump文件路径</strong></p>
-<ul>
-<li>临时修改</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;/tmp/core_%e_%p_%t&quot; &gt; /proc/sys/kernel/core_pattern</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>永久修改</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/sbin/sysctl -w kernel.core_pattern=/var/log/%e.core.%p</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>永久设置, 修改<code>/etc/sysctl.conf</code>配置文件，添加一行，然后执行<code>sysctl -p</code>生效。</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kernel.core_pattern = %e.core.%p</span><br></pre></td></tr></table></figure>
-
-<p>可通过以下参数来丰富core文件的命名：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">%% 单个%字符</span><br><span class="line">%p 所dump进程的进程ID</span><br><span class="line">%u 所dump进程的实际用户ID</span><br><span class="line">%g 所dump进程的实际组ID</span><br><span class="line">%s 导致本次core dump的信号</span><br><span class="line">%t core dump的时间 (由1970年1月1日计起的秒数)</span><br><span class="line">%h 主机名</span><br><span class="line">%e 程序文件名</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>core文件带pid</li>
-</ul>
-<ol>
-<li>修改<code>/proc/sys/kernel/core_uses_pid</code>，如果这个文件的内容被配置成1，即使core_pattern中没有设置%p，最后生成的core dump文件名仍会加上进程ID。</li>
-<li>永久设置, 修改/etc/sysctl.conf配置文件，添加一行，然后执行<code>sysctl -p</code></li>
-</ol>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kernel.core_uses_pid = 1</span><br></pre></td></tr></table></figure>
-
-<p><em>注意</em>：</p>
-<ol>
-<li><p>要保证存放coredump文件的目录存在，且进程对该目录有写权限。</p>
-</li>
-<li><p>若程序调用了seteuid()/setegid()改变了进程的有效用户或组，则在默认情况下系统不会为这些进程生成coredump文件。需要将<code>/proc/sys/fs/suid_dumpable</code>文件的内容设为1。</p>
-</li>
-<li><p>在普通用户下运行调用了setuid的程序，要将<code>/proc/sys/fs/suid_dumpable</code>设置为2才能生成coredump文件。</p>
-</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/21/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><span class="page-number current">22</span>
+    <a class="extend prev" rel="prev" href="/page/21/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><span class="page-number current">22</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/23/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1323,7 +1420,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">219</span>
+          <span class="site-state-item-count">221</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1336,7 +1433,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-count">42</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

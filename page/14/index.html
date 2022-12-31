@@ -176,6 +176,544 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/sql/sqlite-sql/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/sql/sqlite-sql/" class="post-title-link" itemprop="url">sqlite sql commands and clauses</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:42:45" itemprop="dateModified" datetime="2022-06-08T20:42:45+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/sqlite/" itemprop="url" rel="index"><span itemprop="name">sqlite</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>SQLite有4类SQL语句：</p>
+<ul>
+<li>DDL(数据定义语言)用来定义数据库对象、创建库、表、列等。</li>
+<li>DML(数据库操作语言)用来操作数据库表中的记录。</li>
+<li>DQL(数据查询语言)用来查询数据。</li>
+<li>DCL(数据控制语言)用来定义访问权限和安全级别。</li>
+</ul>
+<h3 id="创建数据库"><a href="#创建数据库" class="headerlink" title="创建数据库"></a>创建数据库</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sqlite&gt;.open database_name.db</span><br><span class="line">sqlite3 database_name.db</span><br></pre></td></tr></table></figure>
+
+<h3 id="附加-分离数据库"><a href="#附加-分离数据库" class="headerlink" title="附加/分离数据库"></a>附加/分离数据库</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ATTACH DATABASE <span class="string">&#x27;file_name&#x27;</span> <span class="keyword">AS</span> database_name;</span><br><span class="line"></span><br><span class="line">DETACH DATABASE <span class="string">&#x27;alias_name&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">sqlite&gt; attach database &#x27;test.db&#x27; as test;</span><br><span class="line">sqlite&gt; .databases</span><br><span class="line">seq  name             file                                                      </span><br><span class="line">---  ---------------  ----------------------------------------------------------</span><br><span class="line">0    main             ./test.db                                       </span><br><span class="line">2    test             ./test.db</span><br><span class="line">sqlite&gt; detach database test;</span><br><span class="line">sqlite&gt; .databases</span><br><span class="line">seq  name             file                                                      </span><br><span class="line">---  ---------------  ----------------------------------------------------------</span><br><span class="line">0    main             /home/luo_u/test.db</span><br></pre></td></tr></table></figure>
+
+<h3 id="创建-删除表"><a href="#创建-删除表" class="headerlink" title="创建/删除表"></a>创建/删除表</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> database_name.table_name(</span><br><span class="line">   col1_datatype,</span><br><span class="line">   .....</span><br><span class="line">   colN_datatype,</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> database_name.table_name;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">create table tb1(num, name);</span><br><span class="line">sqlite&gt; .tables</span><br><span class="line">tb1</span><br><span class="line">sqlite&gt; drop table tb1;</span><br><span class="line">sqlite&gt; .tables</span><br></pre></td></tr></table></figure>
+
+<h3 id="变更表"><a href="#变更表" class="headerlink" title="变更表"></a>变更表</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 重命名表</span></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> database_name.table_name RENAME <span class="keyword">TO</span> new_table_name;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 添加一个新的列</span></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> database_name.table_name <span class="keyword">ADD</span> <span class="keyword">COLUMN</span> column_def...;</span><br></pre></td></tr></table></figure>
+
+<h3 id="插入记录"><a href="#插入记录" class="headerlink" title="插入记录"></a>插入记录</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 在表的某些列添加值</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> TABLE_NAME <span class="keyword">VALUES</span> (value1, ... valueN);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 在表的所有列添加值</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> TABLE_NAME (col1, ... colN) <span class="keyword">VALUES</span> (value1, ... valueN);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 使用一个表来填充另一个表</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> table_name1 [(col1, ... colN)] <span class="keyword">SELECT</span> col1, ... colN <span class="keyword">FROM</span> table_name2 [<span class="keyword">WHERE</span> <span class="keyword">condition</span>];</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sqlite&gt; insert into tb1 values(0, &#x27;aaa&#x27;);</span><br><span class="line">sqlite&gt; insert into tb1 values(1, &#x27;bbb&#x27;);</span><br><span class="line">sqlite&gt; select * from tb1;</span><br><span class="line">0|aaa</span><br><span class="line">1|bbb</span><br></pre></td></tr></table></figure>
+
+<h3 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> table_name <span class="keyword">SET</span> col1<span class="operator">=</span>value1, .... colN<span class="operator">=</span>valueN <span class="keyword">WHERE</span> [<span class="keyword">condition</span>];</span><br></pre></td></tr></table></figure>
+
+<h3 id="替换记录"><a href="#替换记录" class="headerlink" title="替换记录"></a>替换记录</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">REPLACE <span class="keyword">INTO</span> TABLE_NAME (col1, ... colN) <span class="keyword">VALUES</span> (value1, ... valueN);</span><br></pre></td></tr></table></figure>
+
+<h3 id="删除记录"><a href="#删除记录" class="headerlink" title="删除记录"></a>删除记录</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> table_name <span class="keyword">WHERE</span> [<span class="keyword">condition</span>];</span><br></pre></td></tr></table></figure>
+
+<h3 id="查询记录"><a href="#查询记录" class="headerlink" title="查询记录"></a>查询记录</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> col1, ... colN <span class="keyword">FROM</span> table_name <span class="keyword">WHERE</span> [<span class="keyword">condition</span>];</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> table_name <span class="keyword">WHERE</span> [<span class="keyword">condition</span>];</span><br><span class="line"><span class="keyword">SELECT</span> <span class="built_in">CURRENT_TIMESTAMP</span>; <span class="comment">--返回系统日期</span></span><br></pre></td></tr></table></figure>
+
+<p>select命令可以支持算术运算，当成计算器使用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sqlite&gt; select 1+1;</span><br><span class="line">2</span><br></pre></td></tr></table></figure>
+
+<h3 id="WHERE子句"><a href="#WHERE子句" class="headerlink" title="WHERE子句"></a>WHERE子句</h3><p>WHERE子句用来过滤记录，只获取需要的记录。指定从一个表或多个表中获取数据的条件，如果满足给定的条件，则从表中返回特定的值。可在SELECT、UPDATE、DELETE语句中使用。</p>
+<p>WHERE子句支持逻辑运算符、比较运算符和<code>&amp; | ~ &lt;&lt; &gt;&gt;</code>这些位运算符，还有内置函数。</p>
+<table>
+<thead>
+<tr>
+<th align="left">运算符</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">AND</td>
+<td align="left">多个条件的与逻辑</td>
+</tr>
+<tr>
+<td align="left">OR</td>
+<td align="left">多个条件的或逻辑</td>
+</tr>
+<tr>
+<td align="left">BETWEEN</td>
+<td align="left">在给定最小值和最大值范围内的一系列值中搜索值。</td>
+</tr>
+<tr>
+<td align="left">EXISTS</td>
+<td align="left">在满足一定条件的指定表中搜索行的存在</td>
+</tr>
+<tr>
+<td align="left">IN</td>
+<td align="left">把某个值与一系列指定列表的值进行比较</td>
+</tr>
+<tr>
+<td align="left">LIKE</td>
+<td align="left">把某个值与使用通配符运算符的相似值进行比较</td>
+</tr>
+<tr>
+<td align="left">GLOB</td>
+<td align="left">把某个值与使用通配符运算符的相似值进行比较，大小写敏感的</td>
+</tr>
+<tr>
+<td align="left">NOT</td>
+<td align="left">否定运算符，与其它逻辑运算符结合使用，比如 NOT EXISTS、NOT BETWEEN、NOT IN等等</td>
+</tr>
+<tr>
+<td align="left">IS NULL</td>
+<td align="left">与 NULL 值进行比较</td>
+</tr>
+<tr>
+<td align="left">IS</td>
+<td align="left">与 = 相似</td>
+</tr>
+<tr>
+<td align="left">IS NOT</td>
+<td align="left">与 != 相似</td>
+</tr>
+<tr>
+<td align="left">||</td>
+<td align="left">连接两个不同的字符串，得到一个新的字符串</td>
+</tr>
+<tr>
+<td align="left">UNIQUE</td>
+<td align="left">搜索指定表中的每一行，确保唯一性</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left">运算符</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">==</td>
+<td align="left">检查两个操作数的值是否相等</td>
+</tr>
+<tr>
+<td align="left">=</td>
+<td align="left">检查两个操作数的值是否相等</td>
+</tr>
+<tr>
+<td align="left">!=</td>
+<td align="left">检查两个操作数的值是否不相等</td>
+</tr>
+<tr>
+<td align="left">&lt;&gt;</td>
+<td align="left">检查两个操作数的值是否不相等</td>
+</tr>
+<tr>
+<td align="left">&gt;</td>
+<td align="left">检查左操作数的值是否大于右操作数的值</td>
+</tr>
+<tr>
+<td align="left">&lt;</td>
+<td align="left">检查左操作数的值是否小于右操作数的值</td>
+</tr>
+<tr>
+<td align="left">&gt;=</td>
+<td align="left">检查左操作数的值是否大于等于右操作数的值</td>
+</tr>
+<tr>
+<td align="left">&lt;=</td>
+<td align="left">检查左操作数的值是否小于等于右操作数的值</td>
+</tr>
+<tr>
+<td align="left">!&lt;</td>
+<td align="left">检查左操作数的值是否不小于右操作数的值</td>
+</tr>
+<tr>
+<td align="left">!&gt;</td>
+<td align="left">检查左操作数的值是否不大于右操作数的值</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AVG()</td>
+<td>求平均值</td>
+</tr>
+<tr>
+<td>COUNT()</td>
+<td>求行数</td>
+</tr>
+<tr>
+<td>FIRST()</td>
+<td>返回第一个记录的值</td>
+</tr>
+<tr>
+<td>LAST()</td>
+<td>返回最后一个记录的值</td>
+</tr>
+<tr>
+<td>MAX()</td>
+<td>求最大值</td>
+</tr>
+<tr>
+<td>MIN()</td>
+<td>求最小值</td>
+</tr>
+<tr>
+<td>SUM()</td>
+<td>求总和</td>
+</tr>
+<tr>
+<td>UCASE()</td>
+<td>将字符串转换为大写</td>
+</tr>
+<tr>
+<td>LCASE()</td>
+<td>将字符串转换为小写</td>
+</tr>
+<tr>
+<td>MID()</td>
+<td>从某个文本字段提取字符，MySql 中使用</td>
+</tr>
+<tr>
+<td>SubString()</td>
+<td>从某字符串提取子字符</td>
+</tr>
+<tr>
+<td>LEN()</td>
+<td>返回字符串的长度</td>
+</tr>
+<tr>
+<td>ROUND()</td>
+<td>对某个数值字段进行指定小数位数的四舍五入</td>
+</tr>
+<tr>
+<td>NOW()</td>
+<td>返回当前的系统日期和时间</td>
+</tr>
+<tr>
+<td>FORMAT()</td>
+<td>格式化字符串的显示方式</td>
+</tr>
+<tr>
+<td>RANDOM()</td>
+<td>返回一个-9223372036854775808到9223372036854775807的伪随机数</td>
+</tr>
+<tr>
+<td>sqlite_version()</td>
+<td>返回SQLite库的版本</td>
+</tr>
+</tbody></table>
+<h3 id="Like子句"><a href="#Like子句" class="headerlink" title="Like子句"></a>Like子句</h3><p>LIKE运算符是用来匹配通配符指定模式的文本值，有两个通配符与之配合使用：</p>
+<ul>
+<li><code>%</code>：代表零个、一个或多个数字或字符</li>
+<li><code>_</code>：代表一个单一的数字或字符</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">FROM</span> table_name <span class="keyword">WHERE</span> colN <span class="keyword">LIKE</span> <span class="string">&#x27;XXXX%&#x27;</span>;</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">FROM</span> table_name <span class="keyword">WHERE</span> colN <span class="keyword">LIKE</span> <span class="string">&#x27;XXXX_&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Glob子句"><a href="#Glob子句" class="headerlink" title="Glob子句"></a>Glob子句</h3><p>GLOB运算符是用来匹配通配符指定模式的文本值，与Like子句不同的是，它是大小写敏感的，也有两个通配符：</p>
+<ul>
+<li>*：代表零个、一个或多个数字或字符</li>
+<li>?：代表一个单一的数字或字符</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">FROM</span> table_name <span class="keyword">WHERE</span> colN GLOB <span class="string">&#x27;XXXX*&#x27;</span>;</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">FROM</span> table_name <span class="keyword">WHERE</span> colN GLOB <span class="string">&#x27;XXXX?&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Limit子句"><a href="#Limit子句" class="headerlink" title="Limit子句"></a>Limit子句</h3><p>LIMIT子句用于限制由SELECT语句返回的数据数量。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> col1, ... colN <span class="keyword">FROM</span> table_name LIMIT [num <span class="keyword">of</span> <span class="keyword">rows</span>]</span><br><span class="line"><span class="keyword">SELECT</span> col1, ... colN <span class="keyword">FROM</span> table_name LIMIT [num <span class="keyword">of</span> <span class="keyword">rows</span>] <span class="keyword">OFFSET</span> [<span class="type">row</span> index]</span><br></pre></td></tr></table></figure>
+
+<h3 id="Order-By子句"><a href="#Order-By子句" class="headerlink" title="Order By子句"></a>Order By子句</h3><p>ORDER BY子句是用来指定一个或多个列按升序或降序顺序来排列返回的数据，ASC为升序，DESC为降序。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">column</span><span class="operator">-</span>list <span class="keyword">FROM</span> table_name [<span class="keyword">WHERE</span> <span class="keyword">condition</span>][<span class="keyword">ORDER</span> <span class="keyword">BY</span> column1, ... columnN] [<span class="keyword">ASC</span> <span class="operator">|</span> <span class="keyword">DESC</span>];</span><br></pre></td></tr></table></figure>
+
+<h3 id="GROUP-BY子句"><a href="#GROUP-BY子句" class="headerlink" title="GROUP BY子句"></a>GROUP BY子句</h3><p>GROUP BY子句用来对相同的数据进行分组。必须放在WHERE子句中的条件之后，必须放在ORDER BY子句之前。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">column</span><span class="operator">-</span>list <span class="keyword">FROM</span> table_name <span class="keyword">WHERE</span> [ conditions ] <span class="keyword">GROUP</span> <span class="keyword">BY</span> col1, ... colN <span class="keyword">ORDER</span> <span class="keyword">BY</span> col1, ... colN;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Having子句"><a href="#Having子句" class="headerlink" title="Having子句"></a>Having子句</h3><p>HAVING子句允许指定条件来过滤由GROUP BY子句创建的分组结果。HAVING子句必须放在GROUP BY子句之后，在ORDER BY子句之前。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> column1, column2</span><br><span class="line"><span class="keyword">FROM</span> table1, table2</span><br><span class="line"><span class="keyword">WHERE</span> [ conditions ]</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> column1, column2</span><br><span class="line"><span class="keyword">HAVING</span> [ conditions ]</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> column1, column2;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Distinct子句"><a href="#Distinct子句" class="headerlink" title="Distinct子句"></a>Distinct子句</h3><p>DISTINCT子句与SELECT语句一起使用，来消除所有重复的记录，保证唯一性。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> column1, ... columnN <span class="keyword">FROM</span> table_name <span class="keyword">WHERE</span> [<span class="keyword">condition</span>];</span><br></pre></td></tr></table></figure>
+
+<h3 id="Unions子句"><a href="#Unions子句" class="headerlink" title="Unions子句"></a>Unions子句</h3><p>UNION子句用于合并多个SELECT语句的结果，不返回任何重复的行。前提条件是每个SELECT被选择的列数必须是相同的，相同数目的列表达式，相同的数据类型，并确保它们有相同的顺序，但不需要具有相同的长度。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> column1 [, column2 ]</span><br><span class="line"><span class="keyword">FROM</span> table1 [, table2 ]</span><br><span class="line">[<span class="keyword">WHERE</span> <span class="keyword">condition</span>]</span><br><span class="line"><span class="keyword">UNION</span></span><br><span class="line"><span class="keyword">SELECT</span> column1 [, column2 ]</span><br><span class="line"><span class="keyword">FROM</span> table1 [, table2 ]</span><br><span class="line">[<span class="keyword">WHERE</span> <span class="keyword">condition</span>]</span><br></pre></td></tr></table></figure>
+
+<h3 id="UNION-ALL子句"><a href="#UNION-ALL子句" class="headerlink" title="UNION ALL子句"></a>UNION ALL子句</h3><p>UNION ALL用于结合两个SELECT语句的结果，包括重复行。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> column1 [, column2 ]</span><br><span class="line"><span class="keyword">FROM</span> table1 [, table2 ]</span><br><span class="line">[<span class="keyword">WHERE</span> <span class="keyword">condition</span>]</span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line"><span class="keyword">SELECT</span> column1 [, column2 ]</span><br><span class="line"><span class="keyword">FROM</span> table1 [, table2 ]</span><br><span class="line">[<span class="keyword">WHERE</span> <span class="keyword">condition</span>];</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><a target="_blank" rel="noopener" href="https://www.runoob.com/sqlite/sqlite-tutorial.html">https://www.runoob.com/sqlite/sqlite-tutorial.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.runoob.com/sql/sql-tutorial.html">https://www.runoob.com/sql/sql-tutorial.html</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/cpp/shared_ptr/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/cpp/shared_ptr/" class="post-title-link" itemprop="url">C++ 智能指针</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-09 19:51:44" itemprop="dateModified" datetime="2022-06-09T19:51:44+08:00">2022-06-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>在C++中，用new和delete动态内存管理经常会出现忘记或错误释放内存问题，为了更加容易和安全的使用动态内存，才引入了智能指针。</p>
+<p>智能指针就是一个类，当超出了类的作用域时，类会自动调用析构函数，析构函数会自动释放资源。智能指针通过引用计数技术来维护对象的生命周期。每当有一个新指针指向这个对象时，这个对象的引用计数就加1，相反当指针不再指向对象时，这个对象的引用计数就减1，当对象的引用计数为0时，就会自动释放。</p>
+<p>智能指针访问auto_ptr的成员函数用的是<code>.</code>，访问指向对象的成员时用的是<code>-&gt;</code>。</p>
+<p>智能指针限制：</p>
+<ul>
+<li>不能delete get()返回的指针。</li>
+<li>不要把一个原始指针给多个智能指针管理。</li>
+<li>不要用get()返回的原始指针去初始化或reset另一个智能指针。</li>
+<li>如果使用get()返回的指针，当最后一个对应的智能指针销毁后就无效。</li>
+<li>智能指针管理的资源只会默认删除new分配的内存，如果不是则需要自定义删除器作参数。</li>
+</ul>
+<h2 id="auto-ptr"><a href="#auto-ptr" class="headerlink" title="auto_ptr"></a>auto_ptr</h2><p>auto_ptr已经被c++11弃用。对auto_ptr进行赋值时会隐式转移所有权，如p2 = p，p2会接管p原来的内存管理权，p会变为空指针，如果p2原来不为空，则它会释放原来的资源，基于这个原因，应该避免把auto_ptr放到容器中，因为算法对容器操作时对容器实现了赋值传递操作，这样会使容器中很多元素被置为NULL。</p>
+<p>判断一个auto_ptr是否为空不能使用<code>if (p == NULL)</code>，应该使用<code>if (p.get() == NULL)</code>。</p>
+<p>成员函数release()会把智能指针赋值为空，但只是释放了对资源的所有权，它指向的内存并没有被释放。可以使用<code>p.reset()</code>方法来提前释放资源。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Test</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Test</span>(string s) : <span class="built_in">str_</span>(s) &#123;&#125;</span><br><span class="line">    ~<span class="built_in">Test</span>() &#123;</span><br><span class="line">        cout &lt;&lt; str_ &lt;&lt; <span class="string">&quot; destory.&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Printf</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;printf: &quot;</span> &lt;&lt; str_ &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    string str_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">auto_ptr&lt;Test&gt; <span class="title">p1</span><span class="params">(<span class="keyword">new</span> Test(<span class="string">&quot;p1&quot;</span>))</span></span>;</span><br><span class="line">    <span class="function">auto_ptr&lt;Test&gt; <span class="title">p2</span><span class="params">(<span class="keyword">new</span> Test(<span class="string">&quot;p2&quot;</span>))</span></span>;</span><br><span class="line"></span><br><span class="line">    Test *tmp = p1.<span class="built_in">get</span>();</span><br><span class="line">    tmp-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    p1 = p2;</span><br><span class="line">    <span class="keyword">if</span> (p2.<span class="built_in">get</span>() == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;auto_ptr p2 is null&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    p1.<span class="built_in">reset</span>(<span class="keyword">new</span> <span class="built_in">Test</span>(<span class="string">&quot;p4&quot;</span>));</span><br><span class="line">    p1-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    p1.<span class="built_in">release</span>();</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;p.release()&quot;</span> &lt;&lt; endl;</span><br><span class="line">    p1.<span class="built_in">reset</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="unique-ptr"><a href="#unique-ptr" class="headerlink" title="unique_ptr"></a>unique_ptr</h2><p>unique_ptr是独占对象所有权的智能指针，是用于取代auto_ptr的，虽然不能拷贝构造或者赋值操作，但可以通过调用release()或reset()方法将指针所有权从一个非const的unique_ptr转移给另一个unique。虽然无法使两个unique_ptr指向同一个对象，但可进行移动构造和移动赋值操作。</p>
+<table>
+<thead>
+<tr>
+<th>成员方法</th>
+<th>功 能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>operator*()</td>
+<td>指针解引用</td>
+</tr>
+<tr>
+<td>swap()</td>
+<td>交换2个unique_ptr 指针的内容</td>
+</tr>
+<tr>
+<td>reset()</td>
+<td>重置指针，并销毁当前unique_ptr管理的对象</td>
+</tr>
+<tr>
+<td>release()</td>
+<td>解放指针，释放所有权，并不会销毁被管理的对象，会将其返回</td>
+</tr>
+<tr>
+<td>get()</td>
+<td>获取内部包含的原生指针</td>
+</tr>
+<tr>
+<td>operator bool()</td>
+<td>判断是否为空智能指针</td>
+</tr>
+</tbody></table>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Test</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Test</span>(string s) : <span class="built_in">str_</span>(s) &#123;&#125;</span><br><span class="line">    ~<span class="built_in">Test</span>() &#123;</span><br><span class="line">        cout &lt;&lt; str_ &lt;&lt; <span class="string">&quot; destory.&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Printf</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;printf: &quot;</span> &lt;&lt; str_ &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    string str_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">unique_ptr&lt;Test&gt; <span class="title">p1</span><span class="params">(<span class="keyword">new</span> Test(<span class="string">&quot;p1&quot;</span>))</span></span>;</span><br><span class="line">    unique_ptr&lt;Test&gt; p2 = <span class="built_in">make_unique</span>&lt;Test&gt;(<span class="string">&quot;p2&quot;</span>);</span><br><span class="line"></span><br><span class="line">    Test *tmp = p1.<span class="built_in">get</span>();</span><br><span class="line">    tmp-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    p1.<span class="built_in">swap</span>(p2);</span><br><span class="line">    p1-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    p1 = <span class="built_in">move</span>(p2); <span class="comment">//不能直接赋值</span></span><br><span class="line">    <span class="keyword">if</span> (p2) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;unique_ptr p2 is null&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    p1.<span class="built_in">reset</span>(<span class="keyword">new</span> <span class="built_in">Test</span>(<span class="string">&quot;p4&quot;</span>));</span><br><span class="line">    p1-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// auto p6 = p1.release();</span></span><br><span class="line">    <span class="comment">// p6-&gt;Printf();</span></span><br><span class="line"></span><br><span class="line">    p1.<span class="built_in">reset</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="shared-ptr"><a href="#shared-ptr" class="headerlink" title="shared_ptr"></a>shared_ptr</h2><p>shared_ptr 允许多个指针指向同一个对象。</p>
+<table>
+<thead>
+<tr>
+<th>成员方法</th>
+<th>功 能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>operator=()</td>
+<td>赋值运算符，同一类型的 shared_ptr 智能指针可以相互赋值</td>
+</tr>
+<tr>
+<td>operator*()</td>
+<td>指针解引用</td>
+</tr>
+<tr>
+<td>swap()</td>
+<td>交换2个shared_ptr 指针的内容</td>
+</tr>
+<tr>
+<td>reset()</td>
+<td>当参数为空时，重置为一个空指针，引用计数减1；当传入新堆内存时，则获得该存储空间的所有权，并且引用计数的初始值为1</td>
+</tr>
+<tr>
+<td>get()</td>
+<td>获取内部包含的原生指针</td>
+</tr>
+<tr>
+<td>use_count()</td>
+<td>返回引用计数</td>
+</tr>
+<tr>
+<td>unique()</td>
+<td>判断是否有其它 shared_ptr 对象指向它</td>
+</tr>
+<tr>
+<td>operator bool()</td>
+<td>判断是否为空智能指针</td>
+</tr>
+</tbody></table>
+<p>对于申请的数组内存，可以自定义释放规则:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">p</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>[<span class="number">10</span>], [](<span class="type">int</span>* p) &#123; <span class="keyword">delete</span>[]p; &#125;)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Test</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Test</span>(string s) : <span class="built_in">str_</span>(s) &#123;&#125;</span><br><span class="line">    ~<span class="built_in">Test</span>() &#123;</span><br><span class="line">        cout &lt;&lt; str_ &lt;&lt; <span class="string">&quot; destory.&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Printf</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;printf: &quot;</span> &lt;&lt; str_ &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    string str_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">shared_ptr&lt;Test&gt; <span class="title">p1</span><span class="params">(<span class="keyword">new</span> Test(<span class="string">&quot;p1&quot;</span>))</span></span>;</span><br><span class="line">    shared_ptr&lt;Test&gt; p2 = <span class="built_in">make_shared</span>&lt;Test&gt;(<span class="string">&quot;p2&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (!p1) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;shared_ptr p is null&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;is unique: &quot;</span> &lt;&lt; p1.<span class="built_in">unique</span>() &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;use_count: &quot;</span> &lt;&lt; p1.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    shared_ptr&lt;Test&gt; p3 = p1;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;use_count: &quot;</span> &lt;&lt; p1.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;is unique: &quot;</span> &lt;&lt; p1.<span class="built_in">unique</span>() &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> tmp = p1.<span class="built_in">get</span>();</span><br><span class="line">    tmp-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    p1.<span class="built_in">swap</span>(p2);</span><br><span class="line">    p1-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    p1.<span class="built_in">reset</span>(<span class="keyword">new</span> <span class="built_in">Test</span>(<span class="string">&quot;p4&quot;</span>));</span><br><span class="line">    p1-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    p1.<span class="built_in">reset</span>();</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;use_count: &quot;</span> &lt;&lt; p1.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="dynamic-pointer-cast"><a href="#dynamic-pointer-cast" class="headerlink" title="dynamic_pointer_cast"></a>dynamic_pointer_cast</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span> <span class="title class_">U</span>&gt;</span><br><span class="line">  <span class="function">shared_ptr&lt;T&gt; <span class="title">dynamic_pointer_cast</span> <span class="params">(<span class="type">const</span> shared_ptr&lt;U&gt;&amp; sp)</span> <span class="keyword">noexcept</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>dynamic_pointer_cast常用于shared_ptr之间的类型转换，它返回一个shared_ptr副本，其存储的指针从U *动态地转换为T *。</p>
+<h2 id="weak-ptr"><a href="#weak-ptr" class="headerlink" title="weak_ptr"></a>weak_ptr</h2><p>weak_ptr 是用来解决2个shared_ptr相互引用时的死锁问题的，如果两个shared_ptr相互引用，那么这两个指针的引用计数永远不可能减少为0，资源永远不会释放。weak_ptr是对对象的一种弱引用，指向shared_ptr所管理的对象，不会改变对象的引用计数，和shared_ptr之间可以相互转化。</p>
+<table>
+<thead>
+<tr>
+<th>成员方法</th>
+<th>功 能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>operator=()</td>
+<td>赋值运算符，可以直接被 weak_ptr 或 shared_ptr 类型指针赋值</td>
+</tr>
+<tr>
+<td>swap()</td>
+<td>互换2个weak_ptr 指针内容</td>
+</tr>
+<tr>
+<td>use_count()</td>
+<td>返回和当前 weak_ptr 指针相同指向的 shared_ptr 指针的数量，每次lock后加1</td>
+</tr>
+<tr>
+<td>reset()</td>
+<td>将当前 weak_ptr 指针置为空指针</td>
+</tr>
+<tr>
+<td>expired()</td>
+<td>判断当前 weak_ptr 指针是否过期（为空或者已经被释放）</td>
+</tr>
+<tr>
+<td>lock()</td>
+<td>返回 shared_ptr 指针，有可能为空</td>
+</tr>
+</tbody></table>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span>;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">A</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    shared_ptr&lt;B&gt; pb_;</span><br><span class="line">    ~<span class="built_in">A</span>()</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;A delete&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Printf</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;use_count: &quot;</span> &lt;&lt; pb_.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// shared_ptr&lt;A&gt; pa_; </span></span><br><span class="line">    weak_ptr&lt;A&gt; pa_;</span><br><span class="line">    ~<span class="built_in">B</span>()</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;B delete&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Printf</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;use_count: &quot;</span> &lt;&lt; pa_.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">shared_ptr&lt;A&gt; <span class="title">pa</span><span class="params">(<span class="keyword">new</span> A())</span></span>;</span><br><span class="line">    <span class="function">shared_ptr&lt;B&gt; <span class="title">pb</span><span class="params">(<span class="keyword">new</span> B())</span></span>;</span><br><span class="line">    pb-&gt;pa_ = pa;</span><br><span class="line">    pa-&gt;pb_ = pb;</span><br><span class="line"></span><br><span class="line">    pa-&gt;<span class="built_in">Printf</span>();</span><br><span class="line">    pb-&gt;<span class="built_in">Printf</span>();</span><br><span class="line"></span><br><span class="line">    <span class="function">weak_ptr&lt;A&gt; <span class="title">wpa</span><span class="params">(pa)</span></span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;use_count: &quot;</span> &lt;&lt; wpa.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">auto</span> tmp = wpa.<span class="built_in">lock</span>();</span><br><span class="line">    tmp-&gt;<span class="built_in">Printf</span>();</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;use_count: &quot;</span> &lt;&lt; wpa.<span class="built_in">use_count</span>() &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;expired: &quot;</span> &lt;&lt; wpa.<span class="built_in">expired</span>() &lt;&lt; endl;</span><br><span class="line">    wpa.<span class="built_in">reset</span>();</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;expired: &quot;</span> &lt;&lt; wpa.<span class="built_in">expired</span>() &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/vimium/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1066,535 +1604,11 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/printf/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/c/printf/" class="post-title-link" itemprop="url">printf() 函数格式化与颜色显示</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="格式化输出"><a href="#格式化输出" class="headerlink" title="格式化输出"></a>格式化输出</h2><table>
-<thead>
-<tr>
-<th align="center">格式字符</th>
-<th>意义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">d i</td>
-<td>有符号十进制整数(正数不输出符号)</td>
-</tr>
-<tr>
-<td align="center">o</td>
-<td>无符号八进制(不输出前缀0)</td>
-</tr>
-<tr>
-<td align="center">x X</td>
-<td>无符号十六进制整数(不输出前缀Ox)</td>
-</tr>
-<tr>
-<td align="center">u</td>
-<td>无符号十进制整数</td>
-</tr>
-<tr>
-<td align="center">f</td>
-<td>十进制浮点数</td>
-</tr>
-<tr>
-<td align="center">e E</td>
-<td>指数形式输出</td>
-</tr>
-<tr>
-<td align="center">g G</td>
-<td>以%f或%e中较短的宽度输出</td>
-</tr>
-<tr>
-<td align="center">a A</td>
-<td>十六进制浮点数</td>
-</tr>
-<tr>
-<td align="center">c</td>
-<td>输出单个字符</td>
-</tr>
-<tr>
-<td align="center">s</td>
-<td>输出字符串</td>
-</tr>
-<tr>
-<td align="center">p</td>
-<td>指针地址</td>
-</tr>
-<tr>
-<td align="center">n</td>
-<td></td>
-</tr>
-<tr>
-<td align="center">%</td>
-<td>打印%</td>
-</tr>
-</tbody></table>
-<table>
-<thead>
-<tr>
-<th align="center">标 志</th>
-<th>意义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">-</td>
-<td>左对齐，右边填空格</td>
-</tr>
-<tr>
-<td align="center">+</td>
-<td>输出正负号</td>
-</tr>
-<tr>
-<td align="center">空格</td>
-<td>输出值为正时冠以空格，为负时冠以负号</td>
-</tr>
-<tr>
-<td align="center">#</td>
-<td>对c、s、d、u类无影响； 对o类，在输出时加前缀o； 对x类，在输出时加前缀0x； 对e、g、f 类当结果有小数时才给出小数点。</td>
-</tr>
-<tr>
-<td align="center">0</td>
-<td>指定填充时，用0而不是空格左填充数字</td>
-</tr>
-</tbody></table>
-<table>
-<thead>
-<tr>
-<th>修饰符</th>
-<th><code>d i</code></th>
-<th><code>u o x X</code></th>
-<th><code>f F e E g G a A</code></th>
-<th><code>c</code></th>
-<th><code>s</code></th>
-<th><code>p</code></th>
-<th><code>n</code></th>
-</tr>
-</thead>
-<tbody><tr>
-<td><em>(none)</em></td>
-<td><code>int</code></td>
-<td><code>unsigned int</code></td>
-<td><code>double</code></td>
-<td><code>int</code></td>
-<td><code>char*</code></td>
-<td><code>void*</code></td>
-<td><code>int*</code></td>
-</tr>
-<tr>
-<td><code>hh</code></td>
-<td><code>signed char</code></td>
-<td><code>unsigned char</code></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td><code>signed char*</code></td>
-</tr>
-<tr>
-<td><code>h</code></td>
-<td><code>short int</code></td>
-<td><code>unsigned short int</code></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td><code>short int*</code></td>
-</tr>
-<tr>
-<td><code>l</code></td>
-<td><code>long int</code></td>
-<td><code>unsigned long int</code></td>
-<td></td>
-<td><code>wint_t</code></td>
-<td><code>wchar_t*</code></td>
-<td></td>
-<td><code>long int*</code></td>
-</tr>
-<tr>
-<td><code>ll</code></td>
-<td><code>long long int</code></td>
-<td><code>unsigned long long int</code></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td><code>long long int*</code></td>
-</tr>
-<tr>
-<td><code>j</code></td>
-<td><code>intmax_t</code></td>
-<td><code>uintmax_t</code></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td><code>intmax_t*</code></td>
-</tr>
-<tr>
-<td><code>z</code></td>
-<td><code>size_t</code></td>
-<td><code>size_t</code></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td><code>size_t*</code></td>
-</tr>
-<tr>
-<td><code>t</code></td>
-<td><code>ptrdiff_t</code></td>
-<td><code>ptrdiff_t</code></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td><code>ptrdiff_t*</code></td>
-</tr>
-<tr>
-<td><code>L</code></td>
-<td></td>
-<td></td>
-<td><code>long double</code></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<ul>
-<li><em>宽度</em>：用十进制整数来表示输出的最少位数。若实际位数多于定义的宽度，则按实际位数输出，若实际位数少于定义的宽度则补以空格或0。 </li>
-<li><em>精度</em>：格式符以“.”开头，后跟十进制整数。如果输出数字，则表示小数的位数；如果输出的是字符，则表示输出字符的个数；若实际位数大于所定义的精度数，则截断超过的部分。</li>
-<li><em>长度修饰符</em>：h表示按短整型量输出，l表示按长整型量输出。</li>
-</ul>
-<h2 id="颜色显示"><a href="#颜色显示" class="headerlink" title="颜色显示"></a>颜色显示</h2><blockquote>
-<p>\033[显示方式;&lt;前景色&gt;;&lt;背景色&gt;m</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>显示方式</th>
-<th>意义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>0</td>
-<td>终端默认设置</td>
-</tr>
-<tr>
-<td>1</td>
-<td>粗体/高亮显示</td>
-</tr>
-<tr>
-<td>2</td>
-<td>模糊</td>
-</tr>
-<tr>
-<td>3</td>
-<td>斜体</td>
-</tr>
-<tr>
-<td>4</td>
-<td>下划线</td>
-</tr>
-<tr>
-<td>5</td>
-<td>闪烁（慢）</td>
-</tr>
-<tr>
-<td>6</td>
-<td>闪烁（快）</td>
-</tr>
-<tr>
-<td>7</td>
-<td>反白显示，交换背景色与前景色</td>
-</tr>
-<tr>
-<td>8</td>
-<td>不可见</td>
-</tr>
-<tr>
-<td>22</td>
-<td>关闭模糊</td>
-</tr>
-<tr>
-<td>24</td>
-<td>关闭下划线</td>
-</tr>
-<tr>
-<td>25</td>
-<td>关闭闪烁</td>
-</tr>
-<tr>
-<td>27</td>
-<td>关闭反白显示</td>
-</tr>
-</tbody></table>
-<p><img src="/images/cpp/printf_color.png" alt="img"></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;\33[1;36;47m %s \33[m\n&quot;</span>, <span class="string">&quot;hello world!&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><strong>RGB颜色</strong></li>
-</ul>
-<blockquote>
-<p>\033[显示方式;38;2;&lt;r&gt;;&lt;g&gt;;&lt;b&gt;m<br>\033[显示方式;48;2;&lt;r&gt;;&lt;g&gt;;&lt;b&gt;m</p>
-</blockquote>
-<p>38代表前景色，48代表后景色；2代表RGB模式，后面三位为RGB数值。</p>
-<p><img src="/images/cpp/printf_rgb.png" alt="rgb颜色"></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;\33[1;38;2;255;0;255;48;2;255;255;0m %s \33[m\n&quot;</span>, <span class="string">&quot;hello world!&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/operator/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/c/operator/" class="post-title-link" itemprop="url">c语言运算符</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="运算优先级"><a href="#运算优先级" class="headerlink" title="运算优先级"></a>运算优先级</h2><table>
-<thead>
-<tr>
-<th>等级</th>
-<th>名称</th>
-<th>运算符</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1</td>
-<td>作用域解析</td>
-<td><code>::</code></td>
-</tr>
-<tr>
-<td>2</td>
-<td>成员选择、下标、后缀加减</td>
-<td><code>.</code> <code>-&gt;</code> <code>[]</code> <code>()</code> <code>++</code> <code>--</code></td>
-</tr>
-<tr>
-<td>3</td>
-<td>sizeof、前缀加减、负号、取地址、解引用、new/delete、类型转换、按位取反、逻辑非</td>
-<td><code>++</code> <code>--</code> <code>-</code> <code>&amp;</code> <code>*</code> <code>~</code> <code>!</code></td>
-</tr>
-<tr>
-<td>4</td>
-<td>乘、除、取模</td>
-<td><code>*</code> <code>/</code> <code>%</code></td>
-</tr>
-<tr>
-<td>5</td>
-<td>加、减</td>
-<td><code>+</code> <code>-</code></td>
-</tr>
-<tr>
-<td>6</td>
-<td>移位</td>
-<td><code>&gt;&gt;</code> <code>&lt;&lt;</code></td>
-</tr>
-<tr>
-<td>7</td>
-<td>大于、小于、大于等于、小于等于</td>
-<td><code>&gt;</code> <code>&lt;</code> <code>&gt;=</code> <code>&lt;=</code></td>
-</tr>
-<tr>
-<td>8</td>
-<td>等于、不等于</td>
-<td><code>==</code> <code>!=</code></td>
-</tr>
-<tr>
-<td>9</td>
-<td>按位与</td>
-<td><code>&amp;</code></td>
-</tr>
-<tr>
-<td>10</td>
-<td>按位异或</td>
-<td><code>^</code></td>
-</tr>
-<tr>
-<td>11</td>
-<td>按位或</td>
-<td>`</td>
-</tr>
-<tr>
-<td>12</td>
-<td>逻辑与</td>
-<td><code>&amp;&amp;</code></td>
-</tr>
-<tr>
-<td>13</td>
-<td>逻辑或</td>
-<td>`</td>
-</tr>
-<tr>
-<td>14</td>
-<td>条件运算符</td>
-<td><code>? :</code></td>
-</tr>
-<tr>
-<td>15</td>
-<td>赋值运算符</td>
-<td><code>=</code> <code>/=</code> <code>+=</code> <code>&amp;=</code> `</td>
-</tr>
-<tr>
-<td>16</td>
-<td>逗号运算符</td>
-<td><code>,</code></td>
-</tr>
-</tbody></table>
-<h2 id="隐式转换"><a href="#隐式转换" class="headerlink" title="隐式转换"></a>隐式转换</h2><p>C在以下四种情况下会进行隐式转换:</p>
-<ol>
-<li>算术运算。</li>
-<li>赋值表达式中，右边表达式的值自动隐式转换为左边变量的类型，并赋值给他。</li>
-<li>函数调用中参数传递时，系统隐式地将实参转换为形参的类型后，赋给形参。</li>
-<li>函数有返回值时，系统将隐式地将返回表达式类型转换为返回值类型，赋值给调用函数。</li>
-</ol>
-<p>类型转换规则：</p>
-<ol>
-<li>字符必须先转换为整数。</li>
-<li>低类型转换为高类型，比如short型转换为int型。</li>
-<li>有符号先转换为无符号</li>
-<li>float型数据在运算时一律先转换为双精度double型，以提高运算精度，即使是同为float类型的运算，也一样先转换为double型。</li>
-</ol>
-<blockquote>
-<p>char -&gt; short -&gt; int -&gt; unsigned -&gt; long -&gt; double &lt;- float</p>
-</blockquote>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/13/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><span class="page-number current">14</span><a class="page-number" href="/page/15/">15</a><span class="space">&hellip;</span><a class="page-number" href="/page/22/">22</a><a class="extend next" rel="next" href="/page/15/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/13/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><span class="page-number current">14</span><a class="page-number" href="/page/15/">15</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/15/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1659,7 +1673,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">219</span>
+          <span class="site-state-item-count">221</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1672,7 +1686,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-count">42</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

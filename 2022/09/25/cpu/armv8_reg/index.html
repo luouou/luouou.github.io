@@ -35,7 +35,7 @@
 <meta property="og:image" content="http://example.com/images/cpu/arm/armv8_simd_reg.png">
 <meta property="og:image" content="http://example.com/images/cpu/arm/armv8_reg_map.png">
 <meta property="article:published_time" content="2022-09-25T07:11:47.804Z">
-<meta property="article:modified_time" content="2022-10-30T04:50:26.832Z">
+<meta property="article:modified_time" content="2022-12-31T12:33:15.663Z">
 <meta property="article:author" content="ubun2">
 <meta property="article:tag" content="arm">
 <meta name="twitter:card" content="summary">
@@ -219,7 +219,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-10-30 12:50:26" itemprop="dateModified" datetime="2022-10-30T12:50:26+08:00">2022-10-30</time>
+                <time title="修改时间：2022-12-31 20:33:15" itemprop="dateModified" datetime="2022-12-31T20:33:15+08:00">2022-12-31</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -255,9 +255,9 @@
 <h2 id="通用寄存器"><a href="#通用寄存器" class="headerlink" title="通用寄存器"></a>通用寄存器</h2><p><img src="/images/cpu/arm/reg2.png" alt="img"><br><img src="/images/cpu/arm/armv8_register.png" alt="img"></p>
 <p>AArch64执行状态拥有 31 个通用寄存器，可以在任何时间和所有异常级别访问。</p>
 <ul>
-<li><p>X0-X7：参数/结果寄存器，被调用子程序返回前无需恢复。</p>
+<li><p>X0-X7：参数寄存器，用于传递函数前面8个参数。</p>
 </li>
-<li><p>X8：间接结果未知寄存器，用于保存子程序返回地址，尽量不使用</p>
+<li><p>X0,X8：返回值寄存器，如果是基本数据类型，返回值保存在X0，如果是结构体，保存在X8。</p>
 </li>
 <li><p>X9-X15：临时寄存器，使用需要保存现场，返回时需要恢复现场。</p>
 </li>
@@ -267,11 +267,11 @@
 </li>
 <li><p>X19-X28：被保存的寄存器，这些寄存器保存在被调用者帧中。使用需要保存现场，返回时需要恢复现场。</p>
 </li>
-<li><p>X29：帧指针寄存器（FP），保存函数栈基地址。</p>
+<li><p>X29：帧指针寄存器（Frame Pointer）。</p>
 </li>
-<li><p>X30：链接寄存器（LR）</p>
+<li><p>X30：链接寄存器（Link Register）</p>
 </li>
-<li><p>X31：堆栈指针寄存器 SP 或零寄存器 ZXR</p>
+<li><p>X31：堆栈指针寄存器（Stack Pointer），存储栈顶地址。</p>
 </li>
 </ul>
 <h2 id="特殊寄存器"><a href="#特殊寄存器" class="headerlink" title="特殊寄存器"></a>特殊寄存器</h2><p><strong>Zero register(WZR, XZR)</strong></p>
@@ -286,10 +286,10 @@
 <p><img src="/images/cpu/arm/SPSR.png" alt="img"></p>
 <p>各个位域定义如下：</p>
 <ul>
-<li>N 符号位（N flag）</li>
-<li>Z 0标志（Z flag）</li>
-<li>C 操作进位（C flag）</li>
-<li>V 溢出标志（V flag）</li>
+<li>N (Negative)符号位标志位，记录相关指令执行后其结果是否为负数，如果为负数，则 N = 1；如果是非负数，则 N = 0。</li>
+<li>Z (Zero)0标志位，记录相关指令执行后，其结果是否为0，如果结果为0，则 Z = 1；如果结果不为0，则 Z = 0。</li>
+<li>C (Carry)进位标志位，当加法运算产生了进位时，C = 1，否则 C = 0 ；当减法运算（包括 CMP）产生了借位时，C = 0，否则 C = 1 。</li>
+<li>V (Overflow)溢出标志位</li>
 <li>SS 用于软件调试。异常发生的时候，通过设置MDSCR_EL1.SS为1启动单步调试机制</li>
 <li>IL 不合法的执行状态（非法异常），保存自PSTATE.IL</li>
 <li>D 处理器状态调试掩码。指示是否屏蔽来自观察点、断点和软件步骤调试事件的调试异常</li>
@@ -498,7 +498,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">219</span>
+          <span class="site-state-item-count">221</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -511,7 +511,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-count">42</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

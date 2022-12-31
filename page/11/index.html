@@ -176,6 +176,183 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/cpp/jsoncpp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/cpp/jsoncpp/" class="post-title-link" itemprop="url">JsonCpp</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-09 19:51:44" itemprop="dateModified" datetime="2022-06-09T19:51:44+08:00">2022-06-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>JsonCpp 中所有对象、类名都在 namespace Json 中，只需要包含 json/json.h 即可。JsonCpp 主要包含三个类:</p>
+<ul>
+<li><p>Json::Value：表示json对象或数组，支持的类型有int, double, string, object, array等。其包含节点的类型判断(isNull, isBool, isInt, isArray, isMember, isValidIndex等)，类型获取(type)，类型转换(asInt, asString等)，节点获取(get, [])，节点比较(重载&lt;, &lt;=, &gt;, &gt;=, ==, !=)，节点操作(compare, swap, removeMember, removeindex, append等)等函数。</p>
+</li>
+<li><p>Json::Reader：将文件流或字符串解析到Json::Value中，主要使用parse函数。Json::Reader的构造函数还允许用户使用特性Features来自定义Json的严格等级。</p>
+</li>
+<li><p>Json::Writer：将Json::Value转换成字符串流，Writer类是一个纯虚类，并不能直接使用。在此我们使用 Json::Writer 的子类：Json::FastWriter(将数据写入一行, 没有格式)，Json::StyledWriter(按json格式化输出, 易于阅读)。</p>
+</li>
+</ul>
+<h2 id="解析json属性"><a href="#解析json属性" class="headerlink" title="解析json属性"></a>解析json属性</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;aaa&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;age&quot;</span><span class="punctuation">:</span> <span class="number">16</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ifstream ifs;</span><br><span class="line">Json::Reader reader;</span><br><span class="line">Json::Value root;</span><br><span class="line"></span><br><span class="line">ifs.<span class="built_in">open</span>(<span class="string">&quot;conf.json&quot;</span>);</span><br><span class="line">reader.<span class="built_in">parse</span>(ifs, root, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">cout &lt;&lt; <span class="string">&quot;name: &quot;</span> &lt;&lt; root[<span class="string">&quot;name&quot;</span>].<span class="built_in">asString</span>() &lt;&lt; endl;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;age: &quot;</span> &lt;&lt; root[<span class="string">&quot;age&quot;</span>].<span class="built_in">asInt</span>() &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<h2 id="解析json对象"><a href="#解析json对象" class="headerlink" title="解析json对象"></a>解析json对象</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;param&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;job&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;worker&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;income&quot;</span> <span class="punctuation">:</span> <span class="number">1000</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ifstream ifs;</span><br><span class="line">Json::Reader reader;</span><br><span class="line">Json::Value root;</span><br><span class="line"></span><br><span class="line">ifs.<span class="built_in">open</span>(<span class="string">&quot;conf.json&quot;</span>);</span><br><span class="line">reader.<span class="built_in">parse</span>(ifs, root, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">Json::Value param = root[<span class="string">&quot;param&quot;</span>];</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;job: &quot;</span> &lt;&lt; param[<span class="string">&quot;job&quot;</span>].<span class="built_in">asString</span>() &lt;&lt; endl;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;income: &quot;</span> &lt;&lt; param[<span class="string">&quot;income&quot;</span>].<span class="built_in">asInt</span>() &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<h2 id="解析json数组"><a href="#解析json数组" class="headerlink" title="解析json数组"></a>解析json数组</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;files&quot;</span> <span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;./a.txt&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;./jsontest.cpp&quot;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ifstream ifs;</span><br><span class="line">Json::Reader reader;</span><br><span class="line">Json::Value root;</span><br><span class="line"></span><br><span class="line">ifs.<span class="built_in">open</span>(<span class="string">&quot;conf.json&quot;</span>);</span><br><span class="line">reader.<span class="built_in">parse</span>(ifs, root, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">Json::Value files = root[<span class="string">&quot;files&quot;</span>];</span><br><span class="line"><span class="keyword">for</span> (<span class="type">unsigned</span> <span class="type">int</span> i = <span class="number">0</span>; i &lt; files.<span class="built_in">size</span>(); ++i) &#123;</span><br><span class="line">    cout &lt;&lt; files[i].<span class="built_in">asString</span>() &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="封装json属性"><a href="#封装json属性" class="headerlink" title="封装json属性"></a>封装json属性</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Json::Value root;</span><br><span class="line">Json::FastWriter writer;</span><br><span class="line">root[<span class="string">&quot;name&quot;</span>] = <span class="string">&quot;tony&quot;</span>;</span><br><span class="line">root[<span class="string">&quot;age&quot;</span>] = <span class="number">19</span>;</span><br><span class="line"></span><br><span class="line">cout &lt;&lt; writer.<span class="built_in">write</span>(root) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<h2 id="封装json对象"><a href="#封装json对象" class="headerlink" title="封装json对象"></a>封装json对象</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Json::Value root;</span><br><span class="line">Json::FastWriter writer;</span><br><span class="line">Json::Value param;</span><br><span class="line">param[<span class="string">&quot;job&quot;</span>] = <span class="string">&quot;worker&quot;</span>;</span><br><span class="line">param[<span class="string">&quot;income&quot;</span>] = <span class="number">21</span>;</span><br><span class="line">root[<span class="string">&quot;param&quot;</span>] = param;</span><br><span class="line"></span><br><span class="line">cout &lt;&lt; writer.<span class="built_in">write</span>(root) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<h2 id="封装json数组"><a href="#封装json数组" class="headerlink" title="封装json数组"></a>封装json数组</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Json::Value root;</span><br><span class="line">Json::FastWriter writer;</span><br><span class="line">Json::Value files;</span><br><span class="line"></span><br><span class="line">files[<span class="number">0</span>] = <span class="string">&quot;./a.txt&quot;</span>;</span><br><span class="line">files[<span class="number">1</span>] = <span class="string">&quot;.jsontest.c&quot;</span>;</span><br><span class="line"></span><br><span class="line">Json::Value link;</span><br><span class="line">link[<span class="string">&quot;src&quot;</span>] = <span class="string">&quot;b_link&quot;</span>;</span><br><span class="line">link[<span class="string">&quot;dest&quot;</span>] = <span class="string">&quot;b.exe&quot;</span>;</span><br><span class="line">files.<span class="built_in">append</span>(link);</span><br><span class="line"></span><br><span class="line">root[<span class="string">&quot;files&quot;</span>] = files;</span><br><span class="line"></span><br><span class="line">cout &lt;&lt; writer.<span class="built_in">write</span>(root) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/flash/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/hardware/flash/" class="post-title-link" itemprop="url">kernel flash device</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="虚拟文件系统"><a href="#虚拟文件系统" class="headerlink" title="虚拟文件系统"></a>虚拟文件系统</h2><p>Linux 内核支持众多的逻辑文件系统,如 Ext2、Ext3、Ext4、btrfs、NFS、VFAT 等。<br>VFS 则是 Linux 基于各种逻辑文件系统抽象出的一种内存中的文件系统,隐藏了各种硬件设<br>备细节,为用户提供统一的操作接口,使用户访问各种不同文件系统和设备时,不用区分具<br>体的逻辑文件系统。</p>
+<p>虚拟文件系统(VFS)隐藏各种了硬件的具体细节，为所有的设备提供了统一的接口，使用户访问各种不同文件系统和设备时，不用区分具体的逻辑文件系统。</p>
+<p><img src="/images/kernel/kernel/VFS.webp" alt="img"></p>
+<p>在 VFS 上面，是对诸如 open、close、read 和 write 之类的函数的一个通用 API 抽象。在 VFS 下面是文件系统抽象，它定义了上层函数的实现方式。文件系统层之下是缓冲区缓存，这个缓存层通过将数据保留一段时间。缓冲区缓存之下是设备驱动程序，它实现了特定物理设备的接口。</p>
+<p>文件系统使用超级块super block 存放文件系统相关信息，使用索引节点inode存放文件的物理信息，使用目录项dentry存放文件的逻辑信息。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/mmu/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1032,436 +1209,11 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/async/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/kernel/async/" class="post-title-link" itemprop="url">linux async</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="异步通知"><a href="#异步通知" class="headerlink" title="异步通知"></a>异步通知</h2><p>异步通知是应用程序不需要一直查询设备状态，一旦设备就绪，则主动通知应用程序。为了使设备支持异步通知机制，驱动程序中涉及 3 项工作：</p>
-<ul>
-<li><p>支持 F_SETOWN 命令，能在这个控制命令处理中设置 filp-&gt;f_owner 为对应进程 ID。不<br>过此项工作已由内核完成，设备驱动无需处理。</p>
-</li>
-<li><p>支持 F_SETFL 命令的处理，当应用改变 FASYNC 标志时，驱动程序中的fasync()函数将得以执行。</p>
-</li>
-<li><p>在设备资源可获得时，激发相应的信号。</p>
-</li>
-</ul>
-<p><img src="/images/kernel/async/async.png" alt="async"></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> (*fasync) (<span class="type">int</span> fd, <span class="keyword">struct</span> file *filp, <span class="type">int</span> mode);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 处理 FASYNC 标志变更 */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fasync_helper</span><span class="params">(<span class="type">int</span> fd, <span class="keyword">struct</span> file *filp, <span class="type">int</span> mode, <span class="keyword">struct</span> fasync_struct **fa)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 释放信号 */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">kill_fasync</span><span class="params">(<span class="keyword">struct</span> fasync_struct **fp, <span class="type">int</span> sig, <span class="type">int</span> band)</span></span><br></pre></td></tr></table></figure>
-
-<p>驱动中要实现fasync()函数，当应用改变 FASYNC 标志时，驱动程序中的fasync()函数将得以执行。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">xxx_fasync</span><span class="params">(<span class="type">int</span> fd, <span class="keyword">struct</span> file *filp, <span class="type">int</span> mode)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">xxx_object</span> *<span class="title">dev</span> =</span> filp-&gt;private_data;</span><br><span class="line">    <span class="keyword">return</span> fasync_helper(fd, filp, mode, &amp;dev-&gt;async_queue);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在设备资源可以获得时，应该调用 kill_fasync()释放 SIGIO 信号，可读时band参数设置为 <code>POLL_IN</code>，可写时设置为 <code>POLL_OUT</code>。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 产生异步读信号 */</span></span><br><span class="line"><span class="keyword">if</span> (dev-&gt;async_queue)</span><br><span class="line">&#123;</span><br><span class="line">    kill_fasync(&amp;dev-&gt;async_queue, SIGIO, POLL_IN);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>最后在设备驱动的 release()函数中，应调用设备驱动的 fasync()函数将文件从异步通知的列表中删除。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">xxx_release</span><span class="params">(<span class="keyword">struct</span> inode *inode, <span class="keyword">struct</span> file *file)</span></span><br><span class="line">&#123;</span><br><span class="line">    xxx_fasync(<span class="number">-1</span>, file, <span class="number">0</span>);</span><br><span class="line">        </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="异步IO"><a href="#异步IO" class="headerlink" title="异步IO"></a>异步IO</h2>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/udev/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/kernel/udev/" class="post-title-link" itemprop="url">udev</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-10-05 21:11:19" itemprop="dateModified" datetime="2022-10-05T21:11:19+08:00">2022-10-05</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="udev"><a href="#udev" class="headerlink" title="udev"></a>udev</h2><p>udev负责在用户空间，根据用户设置的规则，在监测到设备热插拔事件后，在/dev/下自动创建并命名设备文件节点，也可以自动设置设备属性。热插拔时，设备的详细信息会由内核输出到sysfs 文件系统。udev 的设备命名策略、权限控制和事件处理都是在用户态下完成的，它利用 sysfs 中的信息来进行创建设备文件节点等工作。</p>
-<p>udev 根据系统中硬件设备的状态动态更新、创建和删除设备文件，进行设备文件的等，因此/dev 目录下只包含系统中真正存在的设备。linux在设备被发现的时候加载驱动模块。</p>
-<p>udev主页 <a target="_blank" rel="noopener" href="http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html">http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html</a></p>
-<p>udev包下载 <a target="_blank" rel="noopener" href="http://www.us.kernel.org/pub/linux/utils/kernel/hotplug/">http://www.us.kernel.org/pub/linux/utils/kernel/hotplug/</a></p>
-<p>udev 的设计目标如下：</p>
-<ul>
-<li>在用户空间中执行。</li>
-<li>动态建立/删除设备文件。</li>
-<li>允许每个人都不用关心主/次设备号。</li>
-<li>提供 LSB 标准名称，如果需要，可提供固定的名称。</li>
-</ul>
-<p>udev 以 3 个分割的子计划发展：namedev、libsysfs 和 udev。namedev 为设备命名子系统；libsysfs 提供访问 sysfs 文件系统从中获取信息的标准接口；udev 提供/dev 设备节点文件的动态创建和删除策略，负责与 namedev 和 libsysfs 库交互的任务，当/sbin/hotplug程序被内核调用时，udev 将被运行。udev 的工作过程如下：</p>
-<ol>
-<li><p>当内核检测到在系统中出现了新设备后，内核会在 sysfs 文件系统中为该新设备生成新的记录并导出一些设备特定的信息及所发生的事件。</p>
-</li>
-<li><p>udev 获取内核导出的信息，它调用 namedev 决定应该给该设备指定的名称，如果是新插入设备，udev 将调用 libsysfs 决定应该为该设备的设备文件指定的主/次设备号，并用分析获得的设备名称和主/次设备号创建/dev 中的设备文件;如果是设备移除，则之前已经被创建的/dev 文件将被删除。</p>
-</li>
-</ol>
-<p>namedev 中使用 5 步序列来决定指定设备的命名：</p>
-<ol>
-<li><p>标签(label)/序号(serial):这一步检查设备是否有惟一的识别记号，例如 USB 设备有惟一的 USB 序号，SCSI 有惟一的 UUID。如果 namedev 找到与这种惟一编号相对应的规则，它将使用该规则提供的名称。</p>
-</li>
-<li><p>设备总线号:这一步会检查总线设备编号，对于不可热插拔的环境，这一步足以辨别设备。例如，PCI 总线编号在系统的使用期间内很少变更。如果 namedev 找到相对应的规则，规则中的名称就会被使用。</p>
-</li>
-<li><p>总线上的拓扑:当设备在总线上的位置匹配用户指定的规则时，就会使用该规则指定的名称。</p>
-</li>
-<li><p>替换名称:当内核提供的名称匹配指定的替代字符串时，就会使用替代字符串指定的名称。</p>
-</li>
-<li><p>内核提供的名称:如果以前的几个步骤都没有被提供，默认的内核将被指定给该设备。</p>
-</li>
-</ol>
-<h2 id="udev规则文件"><a href="#udev规则文件" class="headerlink" title="udev规则文件"></a>udev规则文件</h2><p><strong>配置文件</strong></p>
-<p>udev的配置文件位于 /etc/udev/ 和 /lib/udev/。<br>udev 的主配置文件是 /etc/udev/udev.conf。 它包含一套变量，允许用户修改 udev 默认值。可以设置的变量如下：</p>
-<ul>
-<li>udev_root  设备目录，默认是/dev</li>
-<li>udev_log   日志等级（表示严重程度），跟 syslog 一致，例如：err, info, debug。</li>
-</ul>
-<p><strong>规则文件</strong></p>
-<p>udev的规则文件一般位于 /lib/udev/rules.d/，也可以位于 /etc/udev/rules.d/(优先)。规则文件以 .rules 作为扩展名。规则文件的每一行都是 key=value 格式，代表一个规则，key 分为匹配型和赋值型 key。</p>
-<p>当所有匹配型 key 都匹配时，该规则即被采用，赋值型 key就会获得相应的值。也可以重命名网络接口，创建到设备节点的符号链或运行一个指定程序来处理该事件。</p>
-<p>一条规则由多个 key=value 组成，以英文逗号隔开。 每个key 有一个操作，取决于操作符，有效的操作符如下：</p>
-<ul>
-<li>==    比较是否相等</li>
-<li>!=    比较是否不相等</li>
-<li>=     给一个key 赋值。表示一个列表的key会被重置，并且把这个唯一的值传给它</li>
-<li>+=    将一个值增加到key中</li>
-<li>:=    将一个值传给一个key，并且不允许再修改这个key。</li>
-</ul>
-<p><strong>匹配型KEY</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">ACTION     匹配事件的动作名</span><br><span class="line">DEVPATH    匹配事件的设备devpath</span><br><span class="line">KERNEL     匹配事件的设备名</span><br><span class="line">NAME       匹配网络接口或者设备节点的名字。NAME 只有在前面的规则赋值之后才可以使用。</span><br><span class="line">SYMLINK    匹配设备节点符号链的名字。SYMLINK 只有在前面的规则赋值之后才可以使用。可以有多个 symlinks，只需要匹配一个。</span><br><span class="line">SUBSYSTEM  匹配设备子系统名</span><br><span class="line">BUS        匹配总线类型</span><br><span class="line">SYSFS      匹配从 sysfs 得到的信息，比如 label、vendor、USB 序列号</span><br><span class="line">DRIVER               匹配设备的驱动名。只对绑定到一个驱动的设备有用。</span><br><span class="line">ATTR &#123; filename &#125;    匹配事件设备的sysfs 属性。</span><br><span class="line">KERNELS         向上搜索devpath，直到找到一个匹配的设备名</span><br><span class="line">SUBSYSTEMS      向上搜索devpath，直到找到一个匹配的子系统名</span><br><span class="line">DRIVERS         向上搜索devpath，直到找到一个匹配的驱动名</span><br><span class="line">ATTRS&#123; filename &#125;    向上搜索devpath，直到找到一个含匹配 sysfs 属性的设备</span><br><span class="line">ENV&#123; key &#125;</span><br><span class="line">TAG             设备的 tag</span><br><span class="line">TEST&#123;octal mode mask&#125;   测试一个文件是否存在，可以指定一个8进制的模式掩码。</span><br><span class="line">PROGRAM     执行一个程序。如果程序成功返回， key 为 true。设备的属性被放在被执行进程的环境变量中，该程序的输出为 stdout， 可以从 RESULT 这个 key 读取。</span><br><span class="line">RESULT      匹配最近一次PROGRAM 调用的返回字符串。它应该在 PROGRAM 之后使用</span><br></pre></td></tr></table></figure>
-
-<p>支持一些通配符：</p>
-<ul>
-<li><ul>
-<li>代表任意个字符</li>
-</ul>
-</li>
-<li>? 代表一定有一个任意字符</li>
-<li><input disabled="" type="checkbox"> 代表一定有一个在括号内的字符</li>
-</ul>
-<p><strong>匹配型KEY</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">NAME     创建的设备文件名</span><br><span class="line">SYMLINK  符号创建链接名</span><br><span class="line">OWNER    设置设备的所有者</span><br><span class="line">GROUP    设置设备的组</span><br><span class="line">MODE</span><br><span class="line">ATTR &#123; key &#125;</span><br><span class="line">ENV &#123; key &#125;</span><br><span class="line">TAG</span><br><span class="line">RUN</span><br><span class="line">LABEL              GOTO 可以跳到的地方</span><br><span class="line">GOTO               跳到下一个带有匹配名字的 LABEL 处。</span><br><span class="line">IMPORT &#123; type &#125;    调用外部程序</span><br><span class="line">WAIT_FOR</span><br><span class="line">OPTIONS</span><br></pre></td></tr></table></figure>
-
-<p>NAME,  SYMLINK,   PROGRAM,   OWNER,  GROUP、MODE 和 RUN 这些 field 支持一个简单的、类似于 printf 函数的格式字符串替换。可用的字符替换如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">$kernel,  %k: 该设备的内核名字(%k 替换$kernel)</span><br><span class="line">$number,  %n：该设备的内核号码。例如 sda3 的内核号码是 <span class="number">3</span>。</span><br><span class="line">$devpath, %p：该设备的 devpath</span><br><span class="line">$id,   %b：当向上搜索devpath，寻找 SUBSYSTEMS， KERNELS， DRIVERS 和 ATTRS 时，被匹配的设备名字</span><br><span class="line">$driver：当向上搜索devpath，寻找 SUBSYSTEMS， KERNELS， DRIVERS 和 ATTRS 时，被匹配的驱动名字</span><br><span class="line">$attr &#123; file &#125;, %s &#123; file &#125;：一个被发现的设备的sysfs 属性的值。如果该设备没有该属性，且前面的 KERNELS,  SUBSYSTEMS,  DRIVERS或 ATTRS 测试选择的是一个父设备，那么就用父设备的属性。如果属性是一个符号链，符号链的最后一个元素作为返回值。</span><br><span class="line">$env &#123; key &#125;, %E &#123; key &#125;：一个设备属性值</span><br><span class="line">$major, %M：该设备的内核主号码</span><br><span class="line">$minor, %m：该设备的内核次号码</span><br><span class="line">$result, %c：由 PROGRAM 调用的外部程序返回的字符串。如果这个字符串包含空格，可以用 %c&#123;N&#125; 选中第N个字段。如果这个数字N，后面有一个 + 字符， 则表示选中从这个字段开始的所有后面的字符串 %c &#123; N + &#125;</span><br><span class="line">$parent, %p：父设备的节点名字</span><br><span class="line">$name：设备节点的名字，用一个空格作为分隔符。该值只有在前面的规则赋值之后才存在，或者是remove事件。</span><br><span class="line">$links：当前符号链的列表，用空格隔开。该值只有在前面的规则赋值之后才存在，或者是remove事件。</span><br><span class="line">$root, %r：udev_root 的值</span><br><span class="line">$sys, %S：sysfs 挂载点</span><br><span class="line">$tempnode, %N：在真正的设备节点创建之前，创建的一个临时的设备节点的名字，这个临时设备节点供外部程序使用。</span><br><span class="line">$$：<span class="string">&#x27;$&#x27;</span>字符自己</span><br><span class="line">%%：<span class="string">&#x27;%&#x27;</span> 字符自己</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SUBSYSTEM==&quot;net&quot;, ACTION==&quot;add&quot;, SYSFS&#123;address&#125;==&quot;00:0d:87:f6:59:f3&quot;, IMPORT=&quot;/sbin/rename_netiface %k eth0&quot;</span><br></pre></td></tr></table></figure>
-
-<h2 id="udevadm"><a href="#udevadm" class="headerlink" title="udevadm"></a>udevadm</h2><p>udevadm可用于控制服务、 请求内核事件、管理事件队列、进行简单的调试。</p>
-<ul>
-<li><p><code>-d</code>, <code>--debug</code></p>
-<p>在标准错误(STDERR)上显示调试信息。 <strong>udevadm test</strong> 与 <strong>udevadm test-builtin</strong> 命令隐含了此选项。</p>
-</li>
-<li><p><code>-h</code>, <code>--help</code></p>
-<p>显示简短的帮助信息并退出。</p>
-</li>
-</ul>
-<h3 id="udevadm-info-options-devpath-file-unit…"><a href="#udevadm-info-options-devpath-file-unit…" class="headerlink" title="udevadm info [options] [devpath|file|unit…]"></a>udevadm info [<em>options</em>] [<em>devpath</em>|<em>file</em>|<em>unit</em>…]</h3><p>从udev数据库中提取设备信息。</p>
-<p>位置参数用于指定一个或多个设备，它可以是 一个设备名(必须以 <code>/dev/</code> 开头)、 一个 sys 路径(必须以 <code>/sys/</code> 开头)、 一个设备单元(必须以 “<code>.device</code>“ 结尾)。详见 <a target="_blank" rel="noopener" href="http://www.jinbuguo.com/systemd/systemd.device.html#">systemd.device(5)</a> 手册。</p>
-<ul>
-<li><p><code>-q</code>, <code>--query=*TYPE*</code></p>
-<p>提取特定类型的设备信息。 <em>TYPE</em> 可以是下列值之一：<code>name</code>, <code>symlink</code>, <code>path</code>, <code>property</code>, <code>all</code>(默认值)</p>
-</li>
-<li><p><code>-p</code>, <code>--path=*DEVPATH*</code></p>
-<p>该设备在 <code>/sys</code> 目录下的路径(例如 <code>[/sys]/class/block/sda</code>)。 因为此选项是位置参数以 <code>/sys/</code> 开头时的替代， 所以通常将 <strong>udevadm info –path=/class/block/sda</strong> 直接简写为 <strong>udevadm info /sys/class/block/sda</strong></p>
-</li>
-<li><p><code>-n</code>, <code>--name=*FILE*</code></p>
-<p>设备节点或软连接的名称(例如 <code>[/dev]/sda</code>)。 因为此选项是位置参数以 <code>/dev/</code> 开头时的替代， 所以通常将 <strong>udevadm info –name=sda</strong> 直接简写为 <strong>udevadm info /dev/sda</strong></p>
-</li>
-<li><p><code>-r</code>, <code>--root</code></p>
-<p>以绝对路径显示 <code>--query=name</code> 与 <code>--query=symlink</code> 的查询结果</p>
-</li>
-<li><p><code>-a</code>, <code>--attribute-walk</code></p>
-<p>按照udev规则的格式，显示所有可用于匹配该设备的sysfs属性：从该设备自身开始，沿着设备树向上回溯(一直到树根)， 显示沿途每个设备的sysfs属性。</p>
-</li>
-<li><p><code>-x</code>, <code>--export</code></p>
-<p>以 键=’值’ 的格式输出此设备的属性(注意，值两边有单引号界定)。 仅在指定了 <code>--query=property</code> 或 <code>--device-id-of-file=*FILE*</code> 的情况下才有效。</p>
-</li>
-<li><p><code>-P</code>, <code>--export-prefix=*NAME*</code></p>
-<p>在输出的键名前添加一个前缀。 此选项隐含了 <code>--export</code></p>
-</li>
-<li><p><code>-d</code>, <code>--device-id-of-file=*FILE*</code></p>
-<p>显示 <em>FILE</em> 文件所在底层设备的主/次设备号。 如果使用了此选项，那么将忽略所有位置参数。</p>
-</li>
-<li><p><code>-e</code>, <code>--export-db</code></p>
-<p>导出udev数据库的全部内容</p>
-</li>
-<li><p><code>-c</code>, <code>--cleanup-db</code></p>
-<p>清除udev数据库</p>
-</li>
-<li><p><code>-h</code>, <code>--help</code></p>
-<p>显示简短的帮助信息并退出。</p>
-</li>
-</ul>
-<h3 id="udevadm-trigger-options-devpath-file-unit"><a href="#udevadm-trigger-options-devpath-file-unit" class="headerlink" title="udevadm trigger [options] [devpath|file|unit]"></a>udevadm trigger [<em>options</em>] [<em>devpath</em>|<em>file</em>|<em>unit</em>]</h3><p>强制内核触发设备事件，主要用于重放内核初始化过程中的冷插(coldplug)设备事件。</p>
-<p>接受一个用于指定设备的位置参数。参见前面对 <strong>info</strong> 的描述。</p>
-<ul>
-<li><p><code>-v</code>, <code>--verbose</code></p>
-<p>显示被触发的设备列表</p>
-</li>
-<li><p><code>-n</code>, <code>--dry-run</code></p>
-<p>并不真正触发设备事件</p>
-</li>
-<li><p><code>-t</code>, <code>--type=*TYPE*</code></p>
-<p>仅触发特定类型的设备， TYPE 可以是下列值之一：<strong>devices</strong>(默认值), <strong>subsystems</strong></p>
-</li>
-<li><p><code>-c</code>, <code>--action=*ACTION*</code></p>
-<p>指定触发哪种类型的设备事件，ACTION 可以是下列值之一：<strong>add</strong>, <strong>remove</strong>, <strong>change</strong>(默认值)</p>
-</li>
-<li><p><code>-s</code>, <code>--subsystem-match=*SUBSYSTEM*</code></p>
-<p>仅触发属于 <em>SUBSYSTEM</em> 子系统的设备事件。 可以在 <em>SUBSYSTEM</em> 中使用shell风格的通配符。 如果多次使用此选项，那么表示以 OR 逻辑连接每个匹配规则， 也就是说，所有匹配的子系统中的设备都会被触发。</p>
-</li>
-<li><p><code>-S</code>, <code>--subsystem-nomatch=*SUBSYSTEM*</code></p>
-<p>不触发属于 <em>SUBSYSTEM</em> 子系统的设备事件。 可以在 <em>SUBSYSTEM</em> 中使用shell风格的通配符。 如果多次使用此选项，那么表示以 AND 逻辑连接每个匹配规则， 也就是说，只有不匹配所有指定子系统的设备才会被触发。</p>
-</li>
-<li><p><code>-a</code>, <code>--attr-match=*ATTRIBUTE*=*VALUE*</code></p>
-<p>仅触发那些在设备的sysfs目录中存在 ATTRIBUTE 文件的设备事件。 如果同时还指定了”=VALUE”，那么表示仅触发那些 ATTRIBUTE 文件的内容匹配 VALUE 的设备事件。 注意，可以在 VALUE 中使用shell风格的通配符。 如果多次使用此选项，那么表示以 AND 逻辑连接每个匹配规则， 也就是说，只有匹配所有指定属性的设备才会被触发。</p>
-</li>
-<li><p><code>-A</code>, <code>--attr-nomatch=*ATTRIBUTE*=*VALUE*</code></p>
-<p>不触发那些在设备的sysfs目录中存在 ATTRIBUTE 文件的设备事件。 如果同时还指定了”=VALUE”，那么表示不触发那些 ATTRIBUTE 文件的内容匹配 VALUE 的设备事件。 注意，可以在 VALUE 中使用shell风格的通配符。 如果多次使用此选项，那么表示以 AND 逻辑连接每个匹配规则， 也就是说，只有不匹配所有指定属性的设备才会被触发。</p>
-</li>
-<li><p><code>-p</code>, <code>--property-match=*PROPERTY*=*VALUE*</code></p>
-<p>仅触发那些设备的 PROPERTY 属性值匹配 VALUE 的设备事件。注意，可以在 VALUE 中使用shell风格的通配符。 如果多次使用此选项，那么表示以 OR 逻辑连接每个匹配规则， 也就是说，匹配任意一个属性值的设备都会被触发。</p>
-</li>
-<li><p><code>-g</code>, <code>--tag-match=*PROPERTY*</code></p>
-<p>仅触发匹配 PROPERTY 标签的设备事件。如果多次使用此选项， 那么表示以 AND 逻辑连接每个匹配规则，也就是说，只有匹配所有指定标签的设备才会被触发。</p>
-</li>
-<li><p><code>-y</code>, <code>--sysname-match=*SYSNAME*</code></p>
-<p>仅触发设备sys名称(也就是该设备在 <code>/sys</code> 路径下最末端的文件名)匹配 <em>SYSNAME</em> 的设备事件。 注意，可以在 <em>SYSNAME</em> 中使用shell风格的通配符。 如果多次使用此选项，那么表示以 OR 逻辑连接每个匹配规则， 也就是说，匹配任意一个sys名称的设备都会被触发。</p>
-</li>
-<li><p><code>--name-match=*DEVPATH*</code></p>
-<p>触发给定设备及其所有子设备的事件。<em>DEVPATH</em> 是该设备在 <code>/dev</code> 目录下的路径。 如果多次使用此选项，那么仅以最后一个为准。</p>
-</li>
-<li><p><code>-b</code>, <code>--parent-match=*SYSPATH*</code></p>
-<p>触发给定设备及其所有子设备的事件。<em>SYSPATH</em> 是该设备在 <code>/sys</code> 目录下的路径。 如果多次使用此选项，那么仅以最后一个为准。</p>
-</li>
-<li><p><code>-w</code>, <code>--settle</code></p>
-<p>除了触发设备事件之外，还要等待这些事件完成。 注意，此选项仅等待该命令自身触发的事件完成， 而 <strong>udevadm settle</strong> 则要一直等到 所有设备事件全部完成。</p>
-</li>
-<li><p><code>--wait-daemon[=*SECONDS*]</code></p>
-<p>在触发设备事件之前，等待 systemd-udevd 守护进程完成初始化。 默认等待 5 秒之后超时(可以使用 <em>SECONDS</em> 参数修改)。 此选项等价于在 <strong>udevadm trigger</strong> 命令之前先使用 <strong>udevadm control –ping</strong> 命令。</p>
-</li>
-<li><p><code>-h</code>, <code>--help</code></p>
-<p>显示简短的帮助信息并退出。</p>
-</li>
-</ul>
-<p>可以直接使用 以 <code>/sys</code> 或 <code>/dev</code> 开头的绝对路径来指定目标设备。</p>
-<h3 id="udevadm-settle-options"><a href="#udevadm-settle-options" class="headerlink" title="udevadm settle [options]"></a>udevadm settle [<em>options</em>]</h3><p>监视udev事件队列，并且在所有事件全部处理完成之后退出。</p>
-<ul>
-<li><p><code>-t</code>, <code>--timeout=*SECONDS*</code></p>
-<p>最多允许花多少秒等候事件队列清空。 默认值是120秒。 设为 0 表示仅检查事件队列是否为空， 并且立即返回。</p>
-</li>
-<li><p><code>-E</code>, <code>--exit-if-exists=*FILE*</code></p>
-<p>如果 FILE 文件存在，则停止等待。</p>
-</li>
-<li><p><code>-h</code>, <code>--help</code></p>
-<p>显示简短的帮助信息并退出。</p>
-</li>
-</ul>
-<h3 id="udevadm-control-option"><a href="#udevadm-control-option" class="headerlink" title="udevadm control option"></a>udevadm control <em>option</em></h3><p>控制udev守护进程(systemd-udevd)的内部状态。</p>
-<ul>
-<li><p><code>-e</code>, <code>--exit</code></p>
-<p>向 systemd-udevd 发送”退出”信号并等待其退出。因为 <code>systemd-udevd.service</code> 中含有 <code>Restart=always</code> ，所以此选项实际是重启了 systemd-udevd 。 如果你想停止 <code>systemd-udevd.service</code> ，那么应该使用：<code>systemctl stop systemd-udevd-control.socket systemd-udevd-kernel.socket systemd-udevd.service</code></p>
-</li>
-<li><p><code>-l</code>, <code>--log-priority=*value*</code></p>
-<p>设置 <a target="_blank" rel="noopener" href="http://www.jinbuguo.com/systemd/systemd-udevd.service.html#">systemd-udevd.service(8)</a> 的内部日志等级。 可以用数字或文本表示：r<code>emerg</code>(0), <code>alert</code>(1), <code>crit</code>(2), <code>err</code>(3), <code>warning</code>(4), <code>notice</code>(5), <code>info</code>(6), <code>debug</code>(7)</p>
-</li>
-<li><p><code>-s</code>, <code>--stop-exec-queue</code></p>
-<p>向 systemd-udevd 发送”禁止处理事件”信号， 这样所有新发生的事件都将进入等候队列。</p>
-</li>
-<li><p><code>-S</code>, <code>--start-exec-queue</code></p>
-<p>向 systemd-udevd 发送”开始处理事件”信号，也就是开始处理事件队列中尚未处理的事件。</p>
-</li>
-<li><p><code>-R</code>, <code>--reload</code></p>
-<p>向 systemd-udevd 发送”重新加载”信号，也就是重新加载udev规则与各种数据库(包括内核模块索引)。 注意，重新加载之后并不影响已经存在的设备， 但是新的配置将会应用于所有将来发生的新设备事件。</p>
-</li>
-<li><p><code>-p</code>, <code>--property=*KEY*=*value*</code></p>
-<p>为所有将来发生的新设备事件统一设置一个全局的 KEY 属性，并将其值设为 value</p>
-</li>
-<li><p><code>-m</code>, <code>--children-max=</code><em>value</em></p>
-<p>设置最多允许 systemd-udevd 同时处理多少个设备事件。</p>
-</li>
-<li><p><code>--ping</code></p>
-<p>向 systemd-udevd 发送一个”ping”消息并等待应答。用于检查 systemd-udevd 守护进程是否仍在正常运行。</p>
-</li>
-<li><p><code>-t</code>, <code>--timeout=</code><em>seconds</em></p>
-<p>等候 systemd-udevd 应答的最大秒数。</p>
-</li>
-<li><p><code>-h</code>, <code>--help</code></p>
-<p>显示简短的帮助信息并退出。</p>
-</li>
-</ul>
-<h3 id="udevadm-monitor-options"><a href="#udevadm-monitor-options" class="headerlink" title="udevadm monitor [options]"></a>udevadm monitor [<em>options</em>]</h3><p>监视内核发出的设备事件(以”KERNEL”标记)， 以及udev在处理完udev规则之后发出的事件(以”UDEV”标记)，并在控制台上输出事件的设备路径(devpath)。 可用于分析udev处理设备事件所花的时间(比较”KERNEL”与”UDEV”的时间戳)。</p>
-<ul>
-<li><p><code>-k</code>, <code>--kernel</code></p>
-<p>仅显示”KERNEL”事件</p>
-</li>
-<li><p><code>-u</code>, <code>--udev</code></p>
-<p>仅显示”UDEV”事件</p>
-</li>
-<li><p><code>-p</code>, <code>--property</code></p>
-<p>同时还显示事件的各属性</p>
-</li>
-<li><p><code>-s</code>, <code>--subsystem-match=*subsystem[/devtype]*</code></p>
-<p>根据 subsystem[/devtype] 对事件(包括 kernel uevent 与 udev event)进行过滤，仅显示与”子系统[/设备类型]”匹配的”UDEV”事件。 如果多次使用此选项，那么表示以 OR 逻辑连接每个匹配规则， 也就是说，所有指定子系统中的设备都会被监视。</p>
-</li>
-<li><p><code>-t</code>, <code>--tag-match=*string*</code></p>
-<p>根据设备标签对事件(仅 udev event)进行过滤，仅显示与”标签”匹配的”UDEV”事件。 如果多次使用此选项，那么表示以 OR 逻辑连接每个匹配规则， 也就是说，拥有任一指定标签的设备都会被监视。</p>
-</li>
-<li><p><code>-h</code>, <code>--help</code></p>
-<p>显示简短的帮助信息并退出。</p>
-</li>
-</ul>
-<h3 id="udevadm-test-options-devpath"><a href="#udevadm-test-options-devpath" class="headerlink" title="udevadm test [options] [devpath]"></a>udevadm test [<em>options</em>] [<em>devpath</em>]</h3><p>模拟一个设备事件，并输出调试信息。</p>
-<ul>
-<li><p><code>-a</code>, <code>--action=*ACTION*</code></p>
-<p>指定模拟哪种类型的设备事件，ACTION 可以是下列值之一：<strong>add</strong>(默认值), <strong>remove</strong>, <strong>change</strong></p>
-</li>
-<li><p><code>-N</code>, <code>--resolve-names=early|late|never</code></p>
-<p>指定 udevadm 何时解析用户与组的名称：<code>early</code>(默认值) 表示在规则的解析阶段； <code>late</code> 表示在每个事件发生的时候； <code>never</code> 表示从不解析， 所有设备的属主与属组都是 root 。</p>
-</li>
-<li><p><code>-h</code>, <code>--help</code></p>
-<p>显示简短的帮助信息并退出。</p>
-</li>
-</ul>
-<h3 id="udevadm-test-builtin-options-command-devpath"><a href="#udevadm-test-builtin-options-command-devpath" class="headerlink" title="udevadm test-builtin [options] [command] [devpath]"></a>udevadm test-builtin [<em>options</em>] [<em>command</em>] [<em>devpath</em>]</h3><p>针对 <em>DEVPATH</em>设备 运行一个内置的 <em>COMMAND</em> 命令， 并输出调试信息。</p>
-<ul>
-<li><p><code>-h</code>, <code>--help</code></p>
-<p>显示简短的帮助信息并退出。</p>
-</li>
-</ul>
-<h2 id="mdev"><a href="#mdev" class="headerlink" title="mdev"></a>mdev</h2><p>mdev 是udev的轻量级版本，集成于 busybox中。为了使用mdev 功能，/etc/init.d/rcS 包含的如下内容:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/bin/mount -t sysfs sysfs /sys</span><br><span class="line">/bin/mount -t tmpfs mdev /dev</span><br><span class="line">echo /bin/mdev &gt; /proc/sys/kernel/hotplug</span><br><span class="line">mdev -s</span><br></pre></td></tr></table></figure>
-
-<p><code>echo /sbin/mdev &gt; /proc/sys/kernel/hotplug</code>的含义是当有热插拔事件产生时，内核会调用mdev。这时mdev扫描/sys 中所有的类设备目录，通过环境变量中的ACTION 和 DEVPATH，来确定此次热插拔事件的动作以及影响了/sys 中的那个目录。而<code>mdev -s</code>是自动扫描/sys 中所有的类设备目录。如果在目录中含有名为“dev”的文件，且文件中包含的是设备号，则mdev 就利用这些信息为该设备在/dev 下创建设备节点文件。</p>
-<p>修改/etc/mdev.conf 文件可以修改mdev 的规则。</p>
-<hr>
-<p><a target="_blank" rel="noopener" href="http://www.jinbuguo.com/systemd/udevadm.html">http://www.jinbuguo.com/systemd/udevadm.html</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/10/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><span class="page-number current">11</span><a class="page-number" href="/page/12/">12</a><span class="space">&hellip;</span><a class="page-number" href="/page/22/">22</a><a class="extend next" rel="next" href="/page/12/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/10/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><span class="page-number current">11</span><a class="page-number" href="/page/12/">12</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/12/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1526,7 +1278,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">219</span>
+          <span class="site-state-item-count">221</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1539,7 +1291,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-count">42</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
