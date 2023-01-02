@@ -176,6 +176,152 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/cmd/time/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/26/cmd/time/" class="post-title-link" itemprop="url">time</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-06-26 15:56:04 / 修改时间：15:59:10" itemprop="dateCreated datePublished" datetime="2022-06-26T15:56:04+08:00">2022-06-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cmd/" itemprop="url" rel="index"><span itemprop="name">cmd</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>time - run programs and summarize system resource usage</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">time   [ -apqvV ] [ -f FORMAT ] [ -o FILE ]</span><br><span class="line">        [ --append ] [ --verbose ] [ --quiet ] [ --portability ]</span><br><span class="line">        [ --format=FORMAT ] [ --output=FILE ] [ --version ]</span><br><span class="line">        [ --help ] COMMAND [ ARGS ]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>real时间</code>是指挂钟时间，也就是命令开始执行到结束的时间。这个短时间包括其他进程所占用的时间片，和进程被阻塞时所花费的时间。</li>
+<li><code>user时间</code>是指进程花费在用户模式中的CPU时间，这是唯一真正用于执行进程所花费的时间，其他进程和花费阻塞状态中的时间没有计算在内。</li>
+<li><code>sys时间</code>是指花费在内核模式中的CPU时间，代表在内核中执系统调用所花费的时间，这也是真正由进程使用的CPU时间。</li>
+</ul>
+<p>shell内置也有一个time命令，当运行time时候是调用的shell内建命令，其功能有限，所以需要其他功能要执行<code>/usr/bin/time</code>。</p>
+<p>使用<code>-o选项</code>将执行时间写入到文件中：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/time -o outfile.txt ls</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>-a选项</code>追加信息：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/time -a -o outfile.txt ls</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>-f选项</code>格式化时间输出：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/time -f &quot;time: %U&quot; ls</span><br></pre></td></tr></table></figure>
+
+<p>-f选项后的参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>%E</td>
+<td>real时间，显示格式为[小时:]分钟:秒</td>
+</tr>
+<tr>
+<td>%U</td>
+<td>user时间。</td>
+</tr>
+<tr>
+<td>%S</td>
+<td>sys时间。</td>
+</tr>
+<tr>
+<td>%C</td>
+<td>进行计时的命令名称和命令行参数。</td>
+</tr>
+<tr>
+<td>%D</td>
+<td>进程非共享数据区域，以KB为单位。</td>
+</tr>
+<tr>
+<td>%x</td>
+<td>命令退出状态。</td>
+</tr>
+<tr>
+<td>%k</td>
+<td>进程接收到的信号数量。</td>
+</tr>
+<tr>
+<td>%W</td>
+<td>进程被交换出主存的次数。</td>
+</tr>
+<tr>
+<td>%Z</td>
+<td>系统的页面大小，不用系统值不同</td>
+</tr>
+<tr>
+<td>%P</td>
+<td>进程所获取的CPU时间百分百，这个值等于user+system时间除以总共的运行时间</td>
+</tr>
+<tr>
+<td>%K</td>
+<td>进程的平均总内存使用量（data+stack+text），单位是KB</td>
+</tr>
+<tr>
+<td>%w</td>
+<td>进程主动进行上下文切换的次数，例如等待I/O操作完成</td>
+</tr>
+<tr>
+<td>%c</td>
+<td>进程被迫进行上下文切换的次数（由于时间片到期）</td>
+</tr>
+</tbody></table>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/cmd/test/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -969,77 +1115,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/cmd/diff3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/26/cmd/diff3/" class="post-title-link" itemprop="url">diff3</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-06-26 15:56:04 / 修改时间：15:59:10" itemprop="dateCreated datePublished" datetime="2022-06-26T15:56:04+08:00">2022-06-26</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cmd/" itemprop="url" rel="index"><span itemprop="name">cmd</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>diff3 - compare three files line by line，比较3个文件。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff3 [OPTION]... MYFILE OLDFILE YOURFILE</span><br></pre></td></tr></table></figure>
-
-<h2 id="选项"><a href="#选项" class="headerlink" title="选项"></a>选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-a：把所有的文件都当做文本文件按照行为单位进行比较，即给定的文件不是文本文件；</span><br><span class="line">-A：合并第2个文件和第3个文件之间的不同到第1个文件中，有冲突内容用括号括起来；</span><br><span class="line">-B：与选项“-A”功能相同，但是不显示冲突的内容；</span><br><span class="line">-e/--ed：生成一个“-ed”脚本，用于将第2个文件和第3个文件之间的不同合并到第1个文件中；</span><br><span class="line">--easy-only：除了不显示互相重叠的变化，与选项“-e”的功能相同；</span><br><span class="line">-i：为了和system V系统兼容，在“ed”脚本的最后生成“w”和“q”命令。此选项必须和选项“-AeExX3”连用，但是不能和“-m”连用；</span><br><span class="line">--initial-tab：在正常格式的行的文本前，输出一个TAB字符而非两个空白字符。此选项将导致在行中TAB字符的对齐方式看上去规范。</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1109,7 +1184,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">221</span>
+          <span class="site-state-item-count">222</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1147,7 +1222,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

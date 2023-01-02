@@ -176,6 +176,115 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/irq/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/kernel/irq/" class="post-title-link" itemprop="url">kernel irq</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="中断"><a href="#中断" class="headerlink" title="中断"></a>中断</h2><p>根据中断入口跳转方法的不同，分为向量中断和非向量中断。采用向量中断的 CPU 通常为不同的中断分配不同的中断号，当检测到某中断号的中断到来后，就自动跳转到与该中断号对应的地址执行。不同中断号的中断有不同的入口地址。非向量中断的多个中断共享一个入口地址，进入该入口地址后再通过软件判断中断标志来识别具体是哪个中断。</p>
+<p>中断处理程序是在中断上下文中运行的，它受到某些限制:</p>
+<ol>
+<li>不能向用户空间发送或接受数据</li>
+<li>不能使用可能引起阻塞的函数</li>
+<li>不能使用可能引起调度的函数</li>
+</ol>
+<p><img src="/images/kernel/irq/irq.png" alt="irq"></p>
+<p>Linux 将中断处理程序分为顶半部(top half)和底半部(bottom half)。顶半部完成尽可能少的比较紧急的功能，往只是简单地读取寄存器中的中断状态并清除中断标志，这样才能服务更多的中断请求。底半部处理比较耗时的事情，而且可以被新的中断打断。Linux 实现底半部的机制主要有 tasklet、工作队列和软中断。</p>
+<p>tasklet和内核定时器都是依靠软中断实现。软中断和tasklet 运行于软中断上下文，仍然属于原子上下文的一种，而工作队列则运行于进<br>程上下文。因此，软中断和 tasklet 处理函数中不能睡眠，而工作队列处理函数中允许睡眠。</p>
+<p><code>/proc/interrupts</code>文件可以获得系统中中断的统计信息，第1列是中断号，第2列是向对应CPU产后的中断的次数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/interrupt.h&gt;</span> </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/irq.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">irqreturn_t</span> <span class="params">(*<span class="type">irq_handler_t</span>)</span><span class="params">(<span class="type">int</span>, <span class="type">void</span> *)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">request_irq</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> irq, <span class="type">irq_handler_t</span> handler,</span></span><br><span class="line"><span class="params">        <span class="type">unsigned</span> <span class="type">long</span> flags, <span class="type">const</span> <span class="type">char</span> *devname, <span class="type">void</span> *dev_id)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">free_irq</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> irq, <span class="type">void</span> *dev_id)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>irq 是要申请的硬件中断号。handler 是向系统登记的中断处理函数，是一个回调函数，中断发生时，系统调用这个函数，dev_id 可在共享中断中作为参数传入中断处理函数，也可以为 NULL。</p>
+<p>flags 是中断处理的属性，可以指定中断的触发方式以及处理方式。</p>
+<ul>
+<li>IRQF_TRIGGER_RISING</li>
+<li>IRQF_TRIGGER_FALLING</li>
+<li>IRQF_TRIGGER_HIGH</li>
+<li>IRQF_TRIGGER_LOW</li>
+<li>IRQF_ISABLED  表明中断处理程序是快速处理程序，快速处理程序被调用时屏蔽所有中断，慢速处理程序则不会屏蔽其他设备的驱动。</li>
+<li>IRQF_SHARED  表示多个设备共享中断，主要是为PCI设备服务。</li>
+</ul>
+<p>request_irq()返回 0 表示成功；返回-EINVAL 表示中断号无效或处理函数指针为 NULL；返回-EBUSY 表示中断已经被占用且不能共享。</p>
+<p>request_irq()相对应的释放中断的函数为 free_irq()。</p>
+<p>共享中断到来时，会遍历执行共享此中断的所有中断处理程序，直到某一个函数返回 IRQ_HANDLED。在中断处理程序顶半部中，应对照传入的 dev_id 参数判断是否是本设备的中断，若不是返回 IRQ_NONE。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">disable_irq</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> irq)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">disable_irq_nosync</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> irq)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">enable_irq</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> irq)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这些函数用于使能和屏蔽一个中断源，disable_irq_nosync()立即返回，而disable_rq()会等待指定的中断被处理完，因此如果在顶半部调用，会引起系统的死锁。</p>
+<h2 id="tasklet"><a href="#tasklet" class="headerlink" title="tasklet"></a>tasklet</h2><p>tasklet不能休眠，同一个tasklet不能在两个CPU上同时运行。定义 tasklet 及其中断底半部处理函数并将两者关联，在中断顶半部中调度task执行。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/interrupt.h&gt;</span> </span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tasklet_struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tasklet_struct</span> *<span class="title">next</span>;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> state;</span><br><span class="line">    <span class="type">atomic_t</span> count;</span><br><span class="line">    <span class="type">void</span> (*func)(<span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> data;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*初始化tasklet，指定其处理函数及其传递的参数*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">tasklet_init</span><span class="params">(<span class="keyword">struct</span> tasklet_struct *t,</span></span><br><span class="line"><span class="params">          <span class="type">void</span> (*func)(<span class="type">unsigned</span> <span class="type">long</span>), <span class="type">unsigned</span> <span class="type">long</span> data)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*调度task执行*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">tasklet_schedule</span><span class="params">(<span class="keyword">struct</span> tasklet_struct *t)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*销毁tasklet*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">tasklet_kill</span><span class="params">(<span class="keyword">struct</span> tasklet_struct *t)</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="工作队列"><a href="#工作队列" class="headerlink" title="工作队列"></a>工作队列</h2><p>定义一个工作队列和一个底半部执行函数，并将其绑定，在中断顶半部调度工作队列执行。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/workqueue.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">work_struct</span> &#123;</span></span><br><span class="line">    <span class="type">atomic_long_t</span> data;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">entry</span>;</span></span><br><span class="line">    <span class="type">work_func_t</span> func;</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_LOCKDEP</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">lockdep_map</span> <span class="title">lockdep_map</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">workqueue_struct</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span>        flags;      <span class="comment">/* I: WQ_* flags */</span></span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">cpu_workqueue_struct</span> __<span class="title">percpu</span>    *<span class="title">pcpu</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">cpu_workqueue_struct</span>     *<span class="title">single</span>;</span></span><br><span class="line">        <span class="type">unsigned</span> <span class="type">long</span>               v;</span><br><span class="line">    &#125; cpu_wq;               <span class="comment">/* I: cwq&#x27;s */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>    <span class="title">list</span>;</span>       <span class="comment">/* W: list of all workqueues */</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mutex</span>        <span class="title">flush_mutex</span>;</span>    <span class="comment">/* protects wq flushing */</span></span><br><span class="line">    <span class="type">int</span>         work_color; <span class="comment">/* F: current work color */</span></span><br><span class="line">    <span class="type">int</span>         flush_color;    <span class="comment">/* F: current flush color */</span></span><br><span class="line">    <span class="type">atomic_t</span>        nr_cwqs_to_flush; <span class="comment">/* flush in progress */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">wq_flusher</span>   *<span class="title">first_flusher</span>;</span> <span class="comment">/* F: first flusher */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>    <span class="title">flusher_queue</span>;</span>  <span class="comment">/* F: flush waiters */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>    <span class="title">flusher_overflow</span>;</span> <span class="comment">/* F: flush overflow list */</span></span><br><span class="line"></span><br><span class="line">    <span class="type">mayday_mask_t</span>       mayday_mask;    <span class="comment">/* cpus requesting rescue */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">worker</span>       *<span class="title">rescuer</span>;</span>   <span class="comment">/* I: rescue worker */</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span>         saved_max_active; <span class="comment">/* W: saved cwq max_active */</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>      *name;      <span class="comment">/* I: workqueue name */</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_LOCKDEP</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">lockdep_map</span>  <span class="title">lockdep_map</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(*<span class="type">work_func_t</span>)</span><span class="params">(<span class="keyword">struct</span> work_struct *work)</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/*初始化工作并将其与处理函数绑定*/</span></span><br><span class="line">INIT_WORK(<span class="keyword">struct</span> work_struct *work, <span class="type">work_func_t</span> func)</span><br><span class="line"></span><br><span class="line"><span class="comment">/*调度工作执行*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">schedule_work</span><span class="params">(<span class="keyword">struct</span> work_struct *work)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">bool</span> <span class="title function_">flush_work</span><span class="params">(<span class="keyword">struct</span> work_struct *work)</span>;</span><br><span class="line"><span class="type">bool</span> <span class="title function_">flush_work_sync</span><span class="params">(<span class="keyword">struct</span> work_struct *work)</span>;</span><br><span class="line"><span class="type">bool</span> <span class="title function_">cancel_work_sync</span><span class="params">(<span class="keyword">struct</span> work_struct *work)</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> create_workqueue(name)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> create_freezable_workqueue(name)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> create_singlethread_workqueue(name)</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">flush_workqueue</span><span class="params">(<span class="keyword">struct</span> workqueue_struct *wq)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*销毁工作队列*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">destroy_workqueue</span><span class="params">(<span class="keyword">struct</span> workqueue_struct *wq)</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="delayed-work"><a href="#delayed-work" class="headerlink" title="delayed_work"></a>delayed_work</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">work_struct</span> &#123;</span></span><br><span class="line">    <span class="type">atomic_long_t</span> data;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">entry</span>;</span></span><br><span class="line">    <span class="type">work_func_t</span> func;</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_LOCKDEP</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">lockdep_map</span> <span class="title">lockdep_map</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">delayed_work</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">work_struct</span> <span class="title">work</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timer_list</span> <span class="title">timer</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(*<span class="type">work_func_t</span>)</span><span class="params">(<span class="keyword">struct</span> work_struct *work)</span>;</span><br><span class="line"></span><br><span class="line">INIT_DELAYED_WORK(<span class="keyword">struct</span> delayed_work *dwork, <span class="type">work_func_t</span> func)</span><br><span class="line"></span><br><span class="line"><span class="comment">/*调度delayed_work 在指定延时后执行*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">schedule_delayed_work</span><span class="params">(<span class="keyword">struct</span> delayed_work *dwork, <span class="type">unsigned</span> <span class="type">long</span> delay)</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">bool</span> <span class="title function_">flush_delayed_work</span><span class="params">(<span class="keyword">struct</span> delayed_work *dwork)</span>;</span><br><span class="line"><span class="type">bool</span> <span class="title function_">flush_delayed_work_sync</span><span class="params">(<span class="keyword">struct</span> delayed_work *work)</span>;</span><br><span class="line"><span class="type">bool</span> <span class="title function_">cancel_delayed_work</span><span class="params">(<span class="keyword">struct</span> delayed_work *dwork)</span>;</span><br><span class="line"><span class="type">bool</span> <span class="title function_">cancel_delayed_work_sync</span><span class="params">(<span class="keyword">struct</span> delayed_work *dwork)</span>;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/async/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1342,147 +1451,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/filedir/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/c/filedir/" class="post-title-link" itemprop="url">linux 文件管理函数</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="文件系统"><a href="#文件系统" class="headerlink" title="文件系统"></a>文件系统</h2><p><img src="/images/linux/filedir/file_fs.png" alt="文件系统"><br><img src="/images/linux/filedir/inode.png" alt="i节点"></p>
-<p>Linux 下的文件是通过索引节点(inode)来识别文件，硬链接是一个指向文件索引节点的指针。</p>
-<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><h3 id="stat"><a href="#stat" class="headerlink" title="stat"></a>stat</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span> &#123;</span></span><br><span class="line">    <span class="type">dev_t</span>     st_dev;         <span class="comment">/* ID of device containing file */</span></span><br><span class="line">    <span class="type">ino_t</span>     st_ino;         <span class="comment">/* inode number */</span></span><br><span class="line">    <span class="type">mode_t</span>    st_mode;        <span class="comment">/* protection */</span></span><br><span class="line">    <span class="type">nlink_t</span>   st_nlink;       <span class="comment">/* number of hard links */</span></span><br><span class="line">    <span class="type">uid_t</span>     st_uid;         <span class="comment">/* user ID of owner */</span></span><br><span class="line">    <span class="type">gid_t</span>     st_gid;         <span class="comment">/* group ID of owner */</span></span><br><span class="line">    <span class="type">dev_t</span>     st_rdev;        <span class="comment">/* device ID (if special file) */</span></span><br><span class="line">    <span class="type">off_t</span>     st_size;        <span class="comment">/* total size, in bytes */</span></span><br><span class="line">    <span class="type">blksize_t</span> st_blksize;     <span class="comment">/* blocksize for filesystem I/O */</span></span><br><span class="line">    <span class="type">blkcnt_t</span>  st_blocks;      <span class="comment">/* number of 512B blocks allocated */</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_atim</span>;</span>  <span class="comment">/* time of last access */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_mtim</span>;</span>  <span class="comment">/* time of last modification */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_ctim</span>;</span>  <span class="comment">/* time of last status change */</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> st_atime st_atim.tv_sec      <span class="comment">/* Backward compatibility */</span></span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> st_mtime st_mtim.tv_sec</span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> st_ctime st_ctim.tv_sec</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">stat</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="keyword">struct</span> stat *buf)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">fstat</span><span class="params">(<span class="type">int</span> fd, <span class="keyword">struct</span> stat *buf)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">lstat</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="keyword">struct</span> stat *buf)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>stat函数返回一个与此命名文件有关的信息结构， fstat函数获得已在描述符filedes上打开的文件的有关信息。lstat函数类似于stat，但是当命名的文件是一个符号连接时，lstat返回该符号连接的有关信息，而不是由该符号连接引用的文件的信息。</p>
-<p>软连接的长度是其所指向的文件名的长度。</p>
-<p>修改时间(st_mtime)是文件内容最后一次被修改的时间。更改状态时间(st_ctime)是该文件的i节点最后一次被修改的时间。很多操作影响到 i节点，但并没有更改文件的实际内容:文件的存取许可权、用户ID、连接数等等。因为i节点中的所有信息都是与文件的实际内容分开存放的，所以，除了文件数据修改时间以外，还需要更改状态时间。</p>
-<p><img src="/images/linux/filedir/file_time.png" alt="文件的时间"></p>
-<p>ls命令按这三个时间值中的一个排序进行显示。按系统默认 (用-l或-t选择项调用时 )，它按文件的修改时间的先后排序显示。 -u选择项使其用存取时间排序， -c选择项则使其用更改状态时间排序。</p>
-<p>表4-9中包含两列的原因，其中一列是与该文件(或目录)相关的三个时间，另一列是与所引用的文件(或目录)的父目录相关的三个时间。例如创建一个新文件影响到包含此新文件的目录，也影响该新文件的i节点。但读或写一个文件只影响该文件的i节点，而对父目录则无影响。</p>
-<p><img src="/images/linux/filedir/time_effect_by_function.png" alt="函数对文件时间的作用"></p>
-<h3 id="access"><a href="#access" class="headerlink" title="access"></a>access</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">access</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">int</span> mode)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>按实际用户ID和实际组ID进行存取许可权测试。成功返回0，失败返回-1。mode取值：</p>
-<ul>
-<li>R_OK 测试读许可权</li>
-<li>W_OK 测试写许可权</li>
-<li>X_OK 测试执行许可权</li>
-<li>F_OK 测试文件是否存在</li>
-</ul>
-<h3 id="umask"><a href="#umask" class="headerlink" title="umask"></a>umask</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">mode_t</span> <span class="title function_">umask</span><span class="params">(<span class="type">mode_t</span> mask)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>相对于系统umaks为0000来的，要把系统umask也算上。</p>
-<p><img src="/images/linux/filedir/mode_t.png" alt="mode_t"></p>
-<h3 id="chmod"><a href="#chmod" class="headerlink" title="chmod"></a>chmod</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">chmod</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">mode_t</span> mode)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">fchmod</span><span class="params">(<span class="type">int</span> fd, <span class="type">mode_t</span> mode)</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="truncate"><a href="#truncate" class="headerlink" title="truncate"></a>truncate</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">truncate</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">off_t</span> length)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">ftruncate</span><span class="params">(<span class="type">int</span> fd, <span class="type">off_t</span> length)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>将指定的文件的长度截短为length。如果该文件以前的长度大于length，则超过length以外的数据就不能存取。如果以前的长度短于length，则超过部分的数据将读作’\0’。</p>
-<h3 id="link"><a href="#link" class="headerlink" title="link"></a>link</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">link</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *oldpath, <span class="type">const</span> <span class="type">char</span> *newpath)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>创建硬连接，只有root用户才可以创建到目录的硬连接。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">unlink</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>解除硬连接，并将引用的文件的连接计数减1。可以用作删除文件，只有当文件的连接计数为0，没有被进程打开，文件才能删除。</p>
-<p>unlink的这种特性经常被程序用来确保即使是在程序崩溃时,它所创建的临时文件也不会遗留下来。进程用open或creat创建一个文件,然后立即调用unlink。因为该文件已经被打开了，所以不会将其内容删除。只有当进程关闭该文件或终止时，该文件的内容才被删除。</p>
-<h3 id="symlink-readlink"><a href="#symlink-readlink" class="headerlink" title="symlink readlink"></a>symlink readlink</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">symlink</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *target, <span class="type">const</span> <span class="type">char</span> *linkpath)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>创建软连接，不要求target已经存在，且target和linkpath不需要位于同一文件系统中。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">readlink</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">char</span> *buf, <span class="type">size_t</span> bufsiz)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>打开该连接本身，并读该连接中的名字，此函数组合了open,read和close的所有操作，如果此函数成功，则它返回读入buf的字节数，不包含终止符\0。</p>
-<p><img src="/images/linux/filedir/link.png" alt="link"></p>
-<h3 id="remove"><a href="#remove" class="headerlink" title="remove"></a>remove</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">remove</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname)</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="rename"><a href="#rename" class="headerlink" title="rename"></a>rename</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">rename</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *oldpath, <span class="type">const</span> <span class="type">char</span> *newpath)</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="utime"><a href="#utime" class="headerlink" title="utime"></a>utime</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;utime.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">utime</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="keyword">struct</span> utimbuf *times)</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">utimbuf</span> &#123;</span></span><br><span class="line">    <span class="type">time_t</span> actime;       <span class="comment">/* access time */</span></span><br><span class="line">    <span class="type">time_t</span> modtime;      <span class="comment">/* modification time */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>此函数的操作以及执行它所要求的优先权取决于times参数是否是NULL。</p>
-<ul>
-<li>如果times是一个空指针，则存取时间和修改时间两者都设置为当前时间。为了执行此操作必须满足下列两条件之一: (a)进程的有效用户ID必须等于该文件的所有者ID，(b)进程对该文件必须具有写许可权。</li>
-<li>如果times是非空指针，则存取时间和修改时间被设置为times所指向的结构中的值。此时进程的有效用户ID必须等于该文件的所有者ID，或者进程必须是一个超级用户进程。</li>
-</ul>
-<p>我们不能对更改状态时间st_ctime指定一个值，当调用utime函数时，此字段被自动更新。</p>
-<h3 id="mkdir-rmdir"><a href="#mkdir-rmdir" class="headerlink" title="mkdir rmdir"></a>mkdir rmdir</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">mkdir</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">mode_t</span> mode)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>创建一个新的空目录。 . 和.. 目录项是自动创建的。指定的文件存取许可权mode由进程的文件方式创建屏蔽字修改。至少要设置1个执行许可权位，以允许存取该目录中的文件名。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">rmdir</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>目录必须是空才能被删除。</p>
-<h3 id="opendir"><a href="#opendir" class="headerlink" title="opendir"></a>opendir</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;dirent.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">DIR *<span class="title function_">opendir</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"><span class="keyword">struct</span> dirent *<span class="title function_">readdir</span><span class="params">(DIR *dirp)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">closedir</span><span class="params">(DIR *dirp)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*resets the position of the directory stream dirp to the beginning of the directory.*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">rewinddir</span><span class="params">(DIR *dirp)</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">dirent</span> &#123;</span></span><br><span class="line">    <span class="type">ino_t</span>          d_ino;       <span class="comment">/* inode number */</span></span><br><span class="line">    <span class="type">off_t</span>          d_off;       <span class="comment">/* not an offset; see NOTES */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> d_reclen;    <span class="comment">/* length of this record */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span>  d_type;      <span class="comment">/* type of file; not supported</span></span><br><span class="line"><span class="comment">                                  by all filesystem types */</span></span><br><span class="line">    <span class="type">char</span>           d_name[<span class="number">256</span>]; <span class="comment">/* filename */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<h3 id="chdir"><a href="#chdir" class="headerlink" title="chdir"></a>chdir</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">chdir</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">fchdir</span><span class="params">(<span class="type">int</span> fd)</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="sync"><a href="#sync" class="headerlink" title="sync"></a>sync</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">sync</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">syncfs</span><span class="params">(<span class="type">int</span> fd)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">fsync</span><span class="params">(<span class="type">int</span> fd)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>将缓存的数据同步到磁盘文件。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1552,7 +1520,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">221</span>
+          <span class="site-state-item-count">222</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1590,7 +1558,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Makefile 分析1234567891011121314151617VERSION &#x3D; 2013    #主版本号PATCHLEVEL &#x3D; 10   #次版本号SUBLEVEL &#x3D;        #子版本号EXTRAVERSION &#x3D;    #附加的版本信息ifneq &quot;$(SUBLEVEL)&quot; &quot;&quot;U_BOOT_VERSION &#x3D; $(VERSION)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="uboot编译与配置">
+<meta property="og:url" content="http://example.com/2023/01/02/boot/uboot-make/index.html">
+<meta property="og:site_name" content="nullptr">
+<meta property="og:description" content="Makefile 分析1234567891011121314151617VERSION &#x3D; 2013    #主版本号PATCHLEVEL &#x3D; 10   #次版本号SUBLEVEL &#x3D;        #子版本号EXTRAVERSION &#x3D;    #附加的版本信息ifneq &quot;$(SUBLEVEL)&quot; &quot;&quot;U_BOOT_VERSION &#x3D; $(VERSION)">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-01-02T12:04:02.395Z">
+<meta property="article:modified_time" content="2023-01-02T12:05:09.973Z">
+<meta property="article:author" content="ubun2">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2023/01/02/boot/uboot-make/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>uboot编译与配置 | nullptr</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nullptr</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">吾生也有涯 而知也无涯</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/01/02/boot/uboot-make/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          uboot编译与配置
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-01-02 20:04:02 / 修改时间：20:05:09" itemprop="dateCreated datePublished" datetime="2023-01-02T20:04:02+08:00">2023-01-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/uboot/" itemprop="url" rel="index"><span itemprop="name">uboot</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="Makefile-分析"><a href="#Makefile-分析" class="headerlink" title="Makefile 分析"></a>Makefile 分析</h3><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">VERSION = 2013    <span class="comment">#主版本号</span></span><br><span class="line">PATCHLEVEL = 10   <span class="comment">#次版本号</span></span><br><span class="line">SUBLEVEL =        <span class="comment">#子版本号</span></span><br><span class="line">EXTRAVERSION =    <span class="comment">#附加的版本信息</span></span><br><span class="line"><span class="keyword">ifneq</span> <span class="string">&quot;<span class="variable">$(SUBLEVEL)</span>&quot;</span> <span class="string">&quot;&quot;</span></span><br><span class="line">U_BOOT_VERSION = <span class="variable">$(VERSION)</span>.<span class="variable">$(PATCHLEVEL)</span>.<span class="variable">$(SUBLEVEL)</span><span class="variable">$(EXTRAVERSION)</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">U_BOOT_VERSION = <span class="variable">$(VERSION)</span>.<span class="variable">$(PATCHLEVEL)</span><span class="variable">$(EXTRAVERSION)</span></span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line">TIMESTAMP_FILE = <span class="variable">$(obj)</span><span class="keyword">include</span>/generated/timestamp_autogenerated.h</span><br><span class="line">VERSION_FILE = <span class="variable">$(obj)</span><span class="keyword">include</span>/generated/version_autogenerated.h</span><br><span class="line"></span><br><span class="line"><span class="keyword">ifeq</span> (,<span class="variable">$(<span class="built_in">findstring</span> s,<span class="variable">$(MAKEFLAGS)</span>)</span>)</span><br><span class="line">XECHO = echo</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">XECHO = :</span><br><span class="line"><span class="keyword">endif</span></span><br></pre></td></tr></table></figure>
+
+<p>uboot编译时，会将版本信息输出到 include\generated\version_autogenerated.h 文件中。<code>make -s</code> 可以使 XECHO 变量为空，关闭编译信息打印。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">MKCONFIG := <span class="variable">$(SRCTREE)</span>/mkconfig</span><br><span class="line"><span class="keyword">export</span> MKCONFIG</span><br><span class="line"></span><br><span class="line"><span class="section">unconfig:</span></span><br><span class="line">    @rm -f <span class="variable">$(obj)</span><span class="keyword">include</span>/config.h <span class="variable">$(obj)</span><span class="keyword">include</span>/config.mk \</span><br><span class="line">        <span class="variable">$(obj)</span>board/*/config.tmp <span class="variable">$(obj)</span>board/*/*/config.tmp \</span><br><span class="line">        <span class="variable">$(obj)</span><span class="keyword">include</span>/autoconf.mk <span class="variable">$(obj)</span><span class="keyword">include</span>/autoconf.mk.dep \</span><br><span class="line">        <span class="variable">$(obj)</span><span class="keyword">include</span>/spl-autoconf.mk \</span><br><span class="line">        <span class="variable">$(obj)</span><span class="keyword">include</span>/tpl-autoconf.mk</span><br><span class="line">        </span><br><span class="line"><span class="section">%_config:: unconfig</span></span><br><span class="line">    @<span class="variable">$(MKCONFIG)</span> -A $(@:_config=)</span><br></pre></td></tr></table></figure>
+
+<p>设置[mkconfig](#mkconfig 分析)脚本的路径。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">all:</span></span><br><span class="line"><span class="keyword">sinclude</span> <span class="variable">$(obj)</span><span class="keyword">include</span>/autoconf.mk.dep</span><br><span class="line"><span class="keyword">sinclude</span> <span class="variable">$(obj)</span><span class="keyword">include</span>/autoconf.mk</span><br></pre></td></tr></table></figure>
+
+<p>导入include/autoconf.mk文件，由配置脚本根据inlcude/configs/xxx.h 头文件生成的，里面包含与开发板相关的配置。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CONFIG_SYS_TEXT_BASE=0x34800000</span><br><span class="line">CONFIG_COMMON_BOOT=&quot;&quot;console=ttySAC0,115200n8 mem=128M  &quot; MTDPARTS_DEFAULT&quot;</span><br><span class="line">CONFIG_BOOTARGS=&quot;&quot;root=/dev/mtdblock5 ubi.mtd=4 rootfstype=cramfs &quot; CONFIG_COMMON_BOOT&quot;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span> <span class="variable">$(obj)</span><span class="keyword">include</span>/config.mk</span><br><span class="line"><span class="keyword">export</span> ARCH CPU BOARD VENDOR SOC</span><br><span class="line"></span><br><span class="line"><span class="keyword">include</span> <span class="variable">$(TOPDIR)</span>/config.mk</span><br></pre></td></tr></table></figure>
+
+<p>导入include/config.mk文件，里面包含ARCH, BOARD, VENDOR, SOC 和 CPU 变量，这是配置过程自动生成的。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ARCH   = arm</span><br><span class="line">CPU    = armv7</span><br><span class="line">BOARD  = smdkc100</span><br><span class="line">VENDOR = samsung</span><br><span class="line">SOC    = s5pc1xx</span><br></pre></td></tr></table></figure>
+
+<p>导入config.mk文件，里面定义编译工具配置项。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">CC = <span class="variable">$(CROSS_COMPILE)</span>gcc</span><br><span class="line">CPP = <span class="variable">$(CC)</span> -E</span><br><span class="line">AR = <span class="variable">$(CROSS_COMPILE)</span>ar</span><br><span class="line">NM = <span class="variable">$(CROSS_COMPILE)</span>nm</span><br><span class="line">LDR = <span class="variable">$(CROSS_COMPILE)</span>ldr</span><br><span class="line">STRIP = <span class="variable">$(CROSS_COMPILE)</span>strip</span><br><span class="line">OBJCOPY = <span class="variable">$(CROSS_COMPILE)</span>objcopy</span><br><span class="line">OBJDUMP = <span class="variable">$(CROSS_COMPILE)</span>objdump</span><br><span class="line">RANLIB = <span class="variable">$(CROSS_COMPILE)</span>RANLIB</span><br><span class="line"></span><br><span class="line">LDFLAGS_u-boot += -T <span class="variable">$(obj)</span>u-boot.lds <span class="variable">$(LDFLAGS_FINAL)</span></span><br><span class="line"><span class="keyword">ifneq</span> (<span class="variable">$(CONFIG_SYS_TEXT_BASE)</span>,)</span><br><span class="line">LDFLAGS_u-boot += -Ttext <span class="variable">$(CONFIG_SYS_TEXT_BASE)</span></span><br><span class="line"><span class="keyword">endif</span></span><br></pre></td></tr></table></figure>
+
+<p><code>-Ttext</code>用 来指定uboot的链接起始地址，链接脚本也可以指定，但最终以这个为准。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ifndef</span> LDSCRIPT</span><br><span class="line">    <span class="keyword">ifeq</span> (<span class="variable">$(CONFIG_NAND_U_BOOT)</span>,y)</span><br><span class="line">        LDSCRIPT := <span class="variable">$(TOPDIR)</span>/board/<span class="variable">$(BOARDDIR)</span>/u-boot-nand.lds</span><br><span class="line">        <span class="keyword">ifeq</span> (<span class="variable">$(<span class="built_in">wildcard</span> <span class="variable">$(LDSCRIPT)</span>)</span>,)</span><br><span class="line">            LDSCRIPT := <span class="variable">$(TOPDIR)</span>/<span class="variable">$(CPUDIR)</span>/u-boot-nand.lds</span><br><span class="line">        <span class="keyword">endif</span></span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line">    <span class="keyword">ifeq</span> (<span class="variable">$(<span class="built_in">wildcard</span> <span class="variable">$(LDSCRIPT)</span>)</span>,)</span><br><span class="line">        LDSCRIPT := <span class="variable">$(TOPDIR)</span>/board/<span class="variable">$(BOARDDIR)</span>/u-boot.lds</span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line">    <span class="keyword">ifeq</span> (<span class="variable">$(<span class="built_in">wildcard</span> <span class="variable">$(LDSCRIPT)</span>)</span>,)</span><br><span class="line">        LDSCRIPT := <span class="variable">$(TOPDIR)</span>/<span class="variable">$(CPUDIR)</span>/u-boot.lds</span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line">    <span class="keyword">ifeq</span> (<span class="variable">$(<span class="built_in">wildcard</span> <span class="variable">$(LDSCRIPT)</span>)</span>,)</span><br><span class="line">        LDSCRIPT := <span class="variable">$(TOPDIR)</span>/arch/<span class="variable">$(ARCH)</span>/cpu/u-boot.lds</span><br><span class="line">        <span class="comment"># We don&#x27;t expect a Makefile here</span></span><br><span class="line">        LDSCRIPT_MAKEFILE_DIR =</span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line">    <span class="keyword">ifeq</span> (<span class="variable">$(<span class="built_in">wildcard</span> <span class="variable">$(LDSCRIPT)</span>)</span>,)</span><br><span class="line"><span class="variable">$(<span class="built_in">error</span> could not find linker script)</span></span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line"><span class="keyword">endif</span></span><br></pre></td></tr></table></figure>
+
+<p>指定链接脚本，如果定义了 CONFIG_NAND_U_BOOT 宏，则链接脚本叫 u-boot-nand.lds，如果未定义这个宏则链接脚本叫 u-boot.lds。查找顺序为 board/, cpu_xxx/, arch/。</p>
+<h3 id="mkconfig-分析"><a href="#mkconfig-分析" class="headerlink" title="mkconfig 分析"></a>mkconfig 分析</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">if [ \( $# -eq 2 \) -a \( &quot;$1&quot; = &quot;-A&quot; \) ] ; then</span><br><span class="line">    # Automatic mode</span><br><span class="line">    line=`awk &#x27;($0 !~ /^#/ &amp;&amp; $7 ~ /^&#x27;&quot;$2&quot;&#x27;$/) &#123; print $1, $2, $3, $4, $5, $6, $7, $8 &#125;&#x27; boards.cfg`</span><br><span class="line">    if [ -z &quot;$line&quot; ] ; then</span><br><span class="line">        echo &quot;make: *** No rule to make target \`$2_config&#x27;.  Stop.&quot; &gt;&amp;2</span><br><span class="line">        exit 1</span><br><span class="line">    fi</span><br><span class="line"></span><br><span class="line">    set $&#123;line&#125;</span><br><span class="line">    # add default board name if needed</span><br><span class="line">    [ $# = 3 ] &amp;&amp; set $&#123;line&#125; $&#123;1&#125;</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<p>boards.cfg 文件定义了一张 board 与arch, cpu, soc, vendor 对应的表。通过解析 boards.cfg 文件可获得相应的信息。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Active  arm         armv7          s5pc1xx     samsung         smdkc100            smdkc100                                                </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">if [ &quot;$SRCTREE&quot; != &quot;$OBJTREE&quot; ] ; then</span><br><span class="line">    mkdir -p $&#123;OBJTREE&#125;/include</span><br><span class="line">    mkdir -p $&#123;OBJTREE&#125;/include2</span><br><span class="line">    cd $&#123;OBJTREE&#125;/include2</span><br><span class="line">    rm -f asm</span><br><span class="line">    ln -s $&#123;SRCTREE&#125;/arch/$&#123;arch&#125;/include/asm asm</span><br><span class="line">    LNPREFIX=$&#123;SRCTREE&#125;/arch/$&#123;arch&#125;/include/asm/</span><br><span class="line">    cd ../include</span><br><span class="line">    mkdir -p asm</span><br><span class="line">else</span><br><span class="line">    cd ./include</span><br><span class="line">    rm -f asm</span><br><span class="line">    ln -s ../arch/$&#123;arch&#125;/include/asm asm</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">rm -f asm/arch</span><br><span class="line"></span><br><span class="line">if [ -z &quot;$&#123;soc&#125;&quot; ] ; then</span><br><span class="line">    ln -s $&#123;LNPREFIX&#125;arch-$&#123;cpu&#125; asm/arch</span><br><span class="line">else</span><br><span class="line">    ln -s $&#123;LNPREFIX&#125;arch-$&#123;soc&#125; asm/arch</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">if [ &quot;$&#123;arch&#125;&quot; = &quot;arm&quot; ] ; then</span><br><span class="line">    rm -f asm/proc</span><br><span class="line">    ln -s $&#123;LNPREFIX&#125;proc-armv asm/proc</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<p>创建 asm, arch, proc 3个指向具体平台的软连接。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">( echo &quot;ARCH   = $&#123;arch&#125;&quot;</span><br><span class="line">    if [ ! -z &quot;$spl_cpu&quot; ] ; then</span><br><span class="line">    echo &#x27;ifeq ($(CONFIG_SPL_BUILD),y)&#x27;</span><br><span class="line">    echo &quot;CPU    = $&#123;spl_cpu&#125;&quot;</span><br><span class="line">    echo &quot;else&quot;</span><br><span class="line">    echo &quot;CPU    = $&#123;cpu&#125;&quot;</span><br><span class="line">    echo &quot;endif&quot;</span><br><span class="line">    else</span><br><span class="line">    echo &quot;CPU    = $&#123;cpu&#125;&quot;</span><br><span class="line">    fi</span><br><span class="line">    echo &quot;BOARD  = $&#123;board&#125;&quot;</span><br><span class="line"></span><br><span class="line">    [ &quot;$&#123;vendor&#125;&quot; ] &amp;&amp; echo &quot;VENDOR = $&#123;vendor&#125;&quot;</span><br><span class="line">    [ &quot;$&#123;soc&#125;&quot;    ] &amp;&amp; echo &quot;SOC    = $&#123;soc&#125;&quot;</span><br><span class="line">    exit 0 ) &gt; config.mk</span><br></pre></td></tr></table></figure>
+
+<p>创建 include/config.mk 文件，被主 Makefile 包含。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;/* Automatically generated - do not edit */&quot; &gt;&gt;config.h</span><br><span class="line"></span><br><span class="line">for i in $&#123;TARGETS&#125; ; do</span><br><span class="line">    i=&quot;`echo $&#123;i&#125; | sed &#x27;/=/ &#123;s/=/	/;q; &#125; ; &#123; s/$/	1/; &#125;&#x27;`&quot;</span><br><span class="line">    echo &quot;#define CONFIG_$&#123;i&#125;&quot; &gt;&gt;config.h ;</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">echo &quot;#define CONFIG_SYS_ARCH  \&quot;$&#123;arch&#125;\&quot;&quot;  &gt;&gt; config.h</span><br><span class="line">echo &quot;#define CONFIG_SYS_CPU   \&quot;$&#123;cpu&#125;\&quot;&quot;   &gt;&gt; config.h</span><br><span class="line">echo &quot;#define CONFIG_SYS_BOARD \&quot;$&#123;board&#125;\&quot;&quot; &gt;&gt; config.h</span><br><span class="line"></span><br><span class="line">[ &quot;$&#123;vendor&#125;&quot; ] &amp;&amp; echo &quot;#define CONFIG_SYS_VENDOR \&quot;$&#123;vendor&#125;\&quot;&quot; &gt;&gt; config.h</span><br><span class="line"></span><br><span class="line">[ &quot;$&#123;soc&#125;&quot;    ] &amp;&amp; echo &quot;#define CONFIG_SYS_SOC    \&quot;$&#123;soc&#125;\&quot;&quot;    &gt;&gt; config.h</span><br><span class="line"></span><br><span class="line">cat &lt;&lt; EOF &gt;&gt; config.h</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">define CONFIG_BOARDDIR board/<span class="variable">$BOARDDIR</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;config_cmd_defaults.h&gt;</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;config_defaults.h&gt;</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;configs/<span class="variable">$&#123;CONFIG_NAME&#125;</span>.h&gt;</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;asm/config.h&gt;</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;config_fallbacks.h&gt;</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;config_uncmd_spl.h&gt;</span></span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+
+<p>创建或追加(make -a) include/config.h 头文件，这个文件会被大部分c文件包含。</p>
+<h3 id="u-boot-lds"><a href="#u-boot-lds" class="headerlink" title="u-boot.lds"></a>u-boot.lds</h3><p>arch/arm/cpu/u-boot.lds 是ld连接器的脚本文件，描述如何连接目标文件。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">/* 指定输出可执行文件是 elf 格式,32 位 ARM 指令,小端 */</span><br><span class="line">OUTPUT_FORMAT(&quot;elf32-littlearm&quot;, &quot;elf32-littlearm&quot;, &quot;elf32-littlearm&quot;)</span><br><span class="line"></span><br><span class="line">/* 指定输出可执行文件的平台架构为 ARM 架构 */</span><br><span class="line">OUTPUT_ARCH(arm)</span><br><span class="line"></span><br><span class="line">/* 指定程序的起始代码段为_start */</span><br><span class="line">ENTRY(_start)</span><br><span class="line"></span><br><span class="line">SECTIONS</span><br><span class="line">&#123;</span><br><span class="line">    . = 0x00000000;  @ 指定程序的链接地址</span><br><span class="line"></span><br><span class="line">    . = ALIGN(4);  @ 4字节对齐</span><br><span class="line">    .text :</span><br><span class="line">    &#123;</span><br><span class="line">        cpu/arm920t/start.o(.text)  @ 首先编译start.S</span><br><span class="line">        *(.text)  @ 所有的其他程序的代码段以4字节对齐放在它后面</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    . = ALIGN(4);</span><br><span class="line">    .rodata : &#123; *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.rodata*))) &#125;</span><br><span class="line"></span><br><span class="line">    . = ALIGN(4);</span><br><span class="line">    .data : &#123; *(.data) &#125;</span><br><span class="line"></span><br><span class="line">    . = ALIGN(4);</span><br><span class="line">    .got : &#123; *(.got) &#125;</span><br><span class="line"></span><br><span class="line">    . = .;</span><br><span class="line">    __u_boot_cmd_start = .;  @ 把__u_boot_cmd_start赋值为当前位置，即起始位置</span><br><span class="line">    .u_boot_cmd : &#123; *(.u_boot_cmd) &#125;  @ 指定 u_boot_cmd段，把所有的uboot命令放在该段</span><br><span class="line">    __u_boot_cmd_end = .;  @ 把 __u_boot_cmd_end赋值为当前位置，即结束位置</span><br><span class="line"></span><br><span class="line">    . = ALIGN(4);</span><br><span class="line">    __bss_start = .;</span><br><span class="line">    .bss (NOLOAD) : &#123; *(.bss) . = ALIGN(4); &#125;</span><br><span class="line">    _end = .;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由.text段的编译顺序可知，uboot 首先运行的是 _start 符号处的代码，在 arch/arm/cpu/arm920t/<a href="#start.S">start.S</a> 文件中定义。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/12/31/algo/tree-code/" rel="prev" title="二叉树算法题">
+      <i class="fa fa-chevron-left"></i> 二叉树算法题
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Makefile-%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">Makefile 分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mkconfig-%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">mkconfig 分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u-boot-lds"><span class="nav-number">3.</span> <span class="nav-text">u-boot.lds</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ubun2</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">222</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ubun2</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v5.4.2
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

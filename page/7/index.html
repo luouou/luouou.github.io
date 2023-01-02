@@ -176,6 +176,220 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/c/fileio/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/08/13/c/fileio/" class="post-title-link" itemprop="url">linux file io</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-08-13 21:56:50" itemprop="dateCreated datePublished" datetime="2022-08-13T21:56:50+08:00">2022-08-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="文件描述符"><a href="#文件描述符" class="headerlink" title="文件描述符"></a>文件描述符</h2><table>
+<thead>
+<tr>
+<th align="center">文件描述符</th>
+<th align="center">用途</th>
+<th>POSIX 名称</th>
+<th>stdio 流</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">0</td>
+<td align="center">标准输入</td>
+<td>STDIN_FILENO</td>
+<td>stdin</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">标准输出</td>
+<td>STDOUT_FILENO</td>
+<td>stdout</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="center">标准错误</td>
+<td>STDERR_FILENO</td>
+<td>stderr</td>
+</tr>
+</tbody></table>
+<p>stdout和stderr两者默认向屏幕输出，stdout是行缓冲的，他的输出会放在一个buffer里面，只有到换行的时候，才会输出到屏幕。而stderr是无缓冲的，会直接输出。如果重定向向标准输出到文件，stdout输出到文件，stderr在屏幕。</p>
+<h2 id="open"><a href="#open" class="headerlink" title="open()"></a>open()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">open</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">int</span> flags)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">open</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">int</span> flags, <span class="type">mode_t</span> mode)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">creat</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">mode_t</span> mode)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">openat</span><span class="params">(<span class="type">int</span> dirfd, <span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">int</span> flags)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">openat</span><span class="params">(<span class="type">int</span> dirfd, <span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">int</span> flags, <span class="type">mode_t</span> mode)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>flags参数：</p>
+<ul>
+<li><code>O_RDONLY</code>  只读打开；</li>
+<li><code>O_WRONLY</code>  只写打开；</li>
+<li><code>O_RDWR</code>  读写打开；</li>
+<li><code>O_CLOEXEC</code>  设置close-on-exec标志</li>
+<li><code>O_CREAT</code>  若文件不存在则创建之</li>
+<li><code>O_DIRECT</code>  无缓冲的输入/输出</li>
+<li><code>O_DIRECTORY</code>  如果pathname不是目录，则失败</li>
+<li><code>O_EXCL</code>  结合O_CREAT参数使用，如果要创建的文件已存在，则返回-1，并且修改errno的值</li>
+<li><code>O_LARGEFILE</code>  在32位系统中使用此标志打开大文件</li>
+<li><code>O_NOATIME</code> 调用read，不修改文件最近访问时间</li>
+<li><code>O_NOCTTY</code>  不要让pathname所指向的终端设备成为控制终端</li>
+<li><code>O_NOFOLLOW</code>  对符号链接不予解引用  </li>
+<li><code>O_TRUNC</code>  截断已有文件，使其长度为零</li>
+<li><code>O_APPEND</code>  总在文件尾部追加数据  </li>
+<li><code>O_ASYNC</code>  异步I/O，产生信号通知进程</li>
+<li><code>O_DSYNC</code>  提供同步的 I/O 数据完整性</li>
+<li><code>O_NONBLOCK</code>  以非阻塞方式打开</li>
+<li><code>O_NDELAY</code>  同O_NONBLOCK</li>
+<li><code>O_SYNC</code>  以同步方式写入文件</li>
+<li><code>O_TEXT</code>  打开文本文件翻译CR-LF控制字符；</li>
+<li><code>O_BINARY</code>  打开二进制字符，不作CR-LF翻译</li>
+</ul>
+<p>mode 参数:</p>
+<ul>
+<li><code>S_IRWXU</code>  00700 user (file owner) has read, write, and execute permission</li>
+<li><code>S_IRUSR</code>  00400 user has read permission</li>
+<li><code>S_IWUSR</code>  00200 user has write permission</li>
+<li><code>S_IXUSR</code>  00100 user has execute permission</li>
+<li><code>S_IRWXG</code>  00070 group has read, write, and execute permission</li>
+<li><code>S_IRGRP</code>  00040 group has read permission</li>
+<li><code>S_IWGRP</code>  00020 group has write permission</li>
+<li><code>S_IXGRP</code>  00010 group has execute permission</li>
+<li><code>S_IRWXO</code>  00007 others have read, write, and execute permission</li>
+<li><code>S_IROTH</code>  00004 others have read permission</li>
+<li><code>S_IWOTH</code>  00002 others have write permission</li>
+<li><code>S_IXOTH</code>  00001 others have execute permission</li>
+<li><code>S_ISUID</code>  0004000 set-user-ID bit</li>
+<li><code>S_ISGID</code>  0002000 set-group-ID bit (see stat(2))</li>
+<li><code>S_ISVTX</code>  0001000 sticky bit (see stat(2))</li>
+</ul>
+<p>openat() 函数使进程内的各线程拥有不同的当前目录。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">close</span><span class="params">(<span class="type">int</span> fd)</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="lseek"><a href="#lseek" class="headerlink" title="lseek()"></a>lseek()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">off_t</span> <span class="title function_">lseek</span><span class="params">(<span class="type">int</span> fd, <span class="type">off_t</span> offset, <span class="type">int</span> whence)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>lseek()函数会重新定位被打开文件的位移量，根据参数offset以及whence的组合来决定。</p>
+<ul>
+<li>SEEK_SET： 从文件头部开始偏移offset个字节。</li>
+<li>SEEK_CUR：从文件当前读写的指针位置开始，增加offset个字节的偏移量。</li>
+<li>SEEK_END：文件偏移量设置为文件的大小加上偏移量字节。</li>
+</ul>
+<p>因为管道、套接字等文件是不可定位的，所以无法在这些文件使用lseek()。</p>
+<p><strong>空洞文件</strong></p>
+<p>通过 lseek() 设置文件大小，可以形成一个空洞文件，有很多用途：</p>
+<ul>
+<li>迅雷未下载完，就占据文件全部大小的空间，可以实现多线程从多个地址写入。</li>
+<li>提前占用空间，防止所需空间不足。</li>
+<li>使磁盘尽可能的连续，减少磁盘寻道开销。</li>
+<li>追加数据不会改变大小，故不涉及元数据的修改。</li>
+</ul>
+<h3 id="read-write"><a href="#read-write" class="headerlink" title="read() write()"></a>read() write()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">read</span><span class="params">(<span class="type">int</span>  filedes, <span class="type">void</span> *buff, <span class="type">size_t</span> nbytes)</span></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">write</span><span class="params">(<span class="type">int</span> filedes, <span class="type">const</span> <span class="type">void</span> * buff, <span class="type">size_t</span> nbytes)</span></span><br></pre></td></tr></table></figure>
+
+<p>read()从打开文件中读数据，返回读到的字节数，若已到文件尾为 0，若出错为- 1。</p>
+<p>write()向打开文件写数据，若成功返回已写的字节数，若出错为- 1。不带缓存。</p>
+<p><strong>pwrite() pread()</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">ssize_t</span> <span class="title">pread</span><span class="params">(<span class="type">int</span> fd, <span class="type">void</span> *buf, <span class="type">size_t</span> count, <span class="type">off_t</span> offset)</span></span>;</span><br><span class="line"><span class="function"><span class="type">ssize_t</span> <span class="title">pwrite</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">size_t</span> count, <span class="type">off_t</span> offset)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>pwrite函数在单线程的情况下，相当于 lseek 和 write 函数的组合：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">lseek</span>(fd, offset, SEEK_SET);</span><br><span class="line"><span class="built_in">write</span>(fd, buf, len);</span><br></pre></td></tr></table></figure>
+
+<p>在 fd文件描述符没有O_APPEND属性的情况下，write函数会修改文件偏移指针，下次不seek写入位置直接调用write函数时，write函数会接着上次的位置继续写入（offset+len），而pwrite函数则不会改变文件偏移指针。另外，pwrite函数的seek和写入是原子操作，不会因为进程调度或者其他因素中断。</p>
+<h2 id="fcntl"><a href="#fcntl" class="headerlink" title="fcntl()"></a>fcntl()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">flock</span> &#123;</span></span><br><span class="line">   <span class="type">short</span> l_type;    <span class="comment">/* Type of lock: F_RDLCK,F_WRLCK, F_UNLCK */</span></span><br><span class="line">   <span class="type">short</span> l_whence;  <span class="comment">/* How to interpret l_start: SEEK_SET, SEEK_CUR, SEEK_END */</span></span><br><span class="line">   <span class="type">off_t</span> l_start;   <span class="comment">/* Starting offset for lock */</span></span><br><span class="line">   <span class="type">off_t</span> l_len;     <span class="comment">/* Number of bytes to lock */</span></span><br><span class="line">   <span class="type">pid_t</span> l_pid;     <span class="comment">/* PID of process blocking our lock(set by F_GETLK and F_OFD_GETLK) */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">fcntl</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span> cmd, ... <span class="comment">/* arg */</span> )</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>F_DUPFD  复制文件描述符</li>
+<li>F_GETFD  获得fd的close-on-exec标志，若标志未设置，则文件经过exec函数之后仍保持打开状态</li>
+<li>F_SETFD  设置close-on-exec标志，该标志由参数arg的FD_CLOEXEC位决定</li>
+<li>F_GETFL  得到文件描述符标志</li>
+<li>F_SETFL  改变文件描述符标志，新标志值按第三个参数设置。</li>
+<li>F_GETLK  根据lock参数值，决定是否上文件锁</li>
+<li>F_SETLK  设置lock参数值的文件锁</li>
+<li>F_SETLKW  这是F_SETLK的阻塞版本</li>
+</ul>
+<p>读取锁又称为共享锁，它能够使多个进程都能在文件的同一部分建立读取锁。而写入锁又称为排斥锁，在任何时刻只能有一个进程在文件的某个部分上建立写入锁。当然，在文件的同一部分不能同时建立读取锁和写入锁。</p>
+<h2 id="dup"><a href="#dup" class="headerlink" title="dup()"></a>dup()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">dup</span><span class="params">(<span class="type">int</span> oldfd)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">dup2</span><span class="params">(<span class="type">int</span> oldfd, <span class="type">int</span> newfd)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>dup返回的新文件描述符一定是当前可用文件描述符中的最小数值。dup2()则可以用newfd参数指定新描述符的数值，如果newfd已经打开，则先将其关闭，若oldfd等于newfd，则dup2返回newfd，不关闭它。</p>
+<h2 id="IO多路复用"><a href="#IO多路复用" class="headerlink" title="IO多路复用"></a>IO多路复用</h2><ul>
+<li><p>阻塞式IO：使用系统调用，并一直被阻塞，直到数据准备好且从内核复制到用户程序才返回。</p>
+</li>
+<li><p>非阻塞式IO：如果数据没有准备好，不会阻塞，而是返回一个错误码。</p>
+</li>
+<li><p>IO多路复用：类似与非阻塞，只不过轮询不是由用户线程去执行，而是由内核去轮询，直到监听到数据准备好。</p>
+</li>
+<li><p>信号驱动IO：内核在数据准备就绪时通过信号来进行通知，首先开启信号驱动io套接字，并使用sigaction系统调用来安装信号处理程序，内核直接返回，不会阻塞用户态，数据准备好时，内核会发送SIGIO信号，用户进程收到信号后才开始进行io操作。</p>
+</li>
+<li><p>异步IO：依赖信号处理程序来进行通知，等IO操作完成时通过回调函数对数据进行处理，unix中异步io函数以aio_或lio_打头。</p>
+</li>
+</ul>
+<h3 id="select"><a href="#select" class="headerlink" title="select()"></a>select()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/select.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/time.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">select</span><span class="params">(<span class="type">int</span> nfds, fd_set *readfds, fd_set *writefds,</span></span><br><span class="line"><span class="params">            fd_set *exceptfds, <span class="keyword">struct</span> timeval *timeout)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_CLR</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"><span class="type">int</span>  <span class="title function_">FD_ISSET</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_SET</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_ZERO</span><span class="params">(fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pselect</span><span class="params">(<span class="type">int</span> nfds, fd_set *readfds, fd_set *writefds,</span></span><br><span class="line"><span class="params">            fd_set *exceptfds, <span class="type">const</span> <span class="keyword">struct</span> timespec *timeout, <span class="type">const</span> <span class="type">sigset_t</span> *sigmask)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>nfds参数值为需要监视的文件描述符的最大值+1。</p>
+<p>在使用 select()函数之前，首先使用 FD_ZERO()和 FD_SET()来初始化文件描述符集，在使用了select()函数时，可循环使用 FD_ISSET()来测试描述符集，在执行完对相关文件描述符的操作之后，使用FD_CLR()来清除描述符集。</p>
+<p>select 机制的缺陷:</p>
+<ul>
+<li>内核必须检查多余的文件描述符</li>
+<li>每次调用后必须重置被监听的文件描述符集</li>
+<li>可监听的文件个数受限制，最大FD_SETSIZE</li>
+</ul>
+<h3 id="poll"><a href="#poll" class="headerlink" title="poll()"></a>poll()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;poll.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">poll</span><span class="params">(<span class="keyword">struct</span> pollfd *fds, <span class="type">nfds_t</span> nfds, <span class="type">int</span> timeout)</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> &#123;</span></span><br><span class="line">    <span class="type">int</span>   fd;         <span class="comment">/* file descriptor */</span></span><br><span class="line">    <span class="type">short</span> events;     <span class="comment">/* requested events */</span></span><br><span class="line">    <span class="type">short</span> revents;    <span class="comment">/* returned events */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>numfds:需要监听的文件个数，fds参数所指向的数组中的元素数目。<br>timeout:表示 poll 阻塞的超时时间(毫秒)。如果该值小于0，则表示无限等待。</p>
+<h3 id="epoll"><a href="#epoll" class="headerlink" title="epoll()"></a>epoll()</h3><p>用于代替poll和select，没有大小限制。使用一个文件描述符管理多个文件描述符，使用红黑树存储。同时用事件驱动代替了轮询。epoll_ctl中注册的文件描述符在事件触发的时候会通过回调机制激活该文件描述符。epoll_wait便会收到通知。epoll还采用了mmap虚拟内存映射技术减少用户态和内核态数据传输的开销。</p>
+<hr>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/159457916">https://zhuanlan.zhihu.com/p/159457916</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/c/gnu_c/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1592,152 +1806,6 @@ tcpdump ip multicast
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/cmd/time/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/26/cmd/time/" class="post-title-link" itemprop="url">time</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-06-26 15:56:04 / 修改时间：15:59:10" itemprop="dateCreated datePublished" datetime="2022-06-26T15:56:04+08:00">2022-06-26</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cmd/" itemprop="url" rel="index"><span itemprop="name">cmd</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>time - run programs and summarize system resource usage</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">time   [ -apqvV ] [ -f FORMAT ] [ -o FILE ]</span><br><span class="line">        [ --append ] [ --verbose ] [ --quiet ] [ --portability ]</span><br><span class="line">        [ --format=FORMAT ] [ --output=FILE ] [ --version ]</span><br><span class="line">        [ --help ] COMMAND [ ARGS ]</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>real时间</code>是指挂钟时间，也就是命令开始执行到结束的时间。这个短时间包括其他进程所占用的时间片，和进程被阻塞时所花费的时间。</li>
-<li><code>user时间</code>是指进程花费在用户模式中的CPU时间，这是唯一真正用于执行进程所花费的时间，其他进程和花费阻塞状态中的时间没有计算在内。</li>
-<li><code>sys时间</code>是指花费在内核模式中的CPU时间，代表在内核中执系统调用所花费的时间，这也是真正由进程使用的CPU时间。</li>
-</ul>
-<p>shell内置也有一个time命令，当运行time时候是调用的shell内建命令，其功能有限，所以需要其他功能要执行<code>/usr/bin/time</code>。</p>
-<p>使用<code>-o选项</code>将执行时间写入到文件中：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/time -o outfile.txt ls</span><br></pre></td></tr></table></figure>
-
-<p>使用<code>-a选项</code>追加信息：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/time -a -o outfile.txt ls</span><br></pre></td></tr></table></figure>
-
-<p>使用<code>-f选项</code>格式化时间输出：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/time -f &quot;time: %U&quot; ls</span><br></pre></td></tr></table></figure>
-
-<p>-f选项后的参数：</p>
-<table>
-<thead>
-<tr>
-<th>参数</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>%E</td>
-<td>real时间，显示格式为[小时:]分钟:秒</td>
-</tr>
-<tr>
-<td>%U</td>
-<td>user时间。</td>
-</tr>
-<tr>
-<td>%S</td>
-<td>sys时间。</td>
-</tr>
-<tr>
-<td>%C</td>
-<td>进行计时的命令名称和命令行参数。</td>
-</tr>
-<tr>
-<td>%D</td>
-<td>进程非共享数据区域，以KB为单位。</td>
-</tr>
-<tr>
-<td>%x</td>
-<td>命令退出状态。</td>
-</tr>
-<tr>
-<td>%k</td>
-<td>进程接收到的信号数量。</td>
-</tr>
-<tr>
-<td>%W</td>
-<td>进程被交换出主存的次数。</td>
-</tr>
-<tr>
-<td>%Z</td>
-<td>系统的页面大小，不用系统值不同</td>
-</tr>
-<tr>
-<td>%P</td>
-<td>进程所获取的CPU时间百分百，这个值等于user+system时间除以总共的运行时间</td>
-</tr>
-<tr>
-<td>%K</td>
-<td>进程的平均总内存使用量（data+stack+text），单位是KB</td>
-</tr>
-<tr>
-<td>%w</td>
-<td>进程主动进行上下文切换的次数，例如等待I/O操作完成</td>
-</tr>
-<tr>
-<td>%c</td>
-<td>进程被迫进行上下文切换的次数（由于时间片到期）</td>
-</tr>
-</tbody></table>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1807,7 +1875,7 @@ tcpdump ip multicast
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">221</span>
+          <span class="site-state-item-count">222</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1845,7 +1913,7 @@ tcpdump ip multicast
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

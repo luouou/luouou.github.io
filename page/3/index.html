@@ -176,6 +176,117 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/net/https/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/25/net/https/" class="post-title-link" itemprop="url">HTTPS协议</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-25 10:47:41 / 修改时间：10:52:16" itemprop="dateCreated datePublished" datetime="2022-09-25T10:47:41+08:00">2022-09-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>HTTP 是明文传输数据的，没有安全性。HTTPS = HTTP + SSL / TLS。HTTPS 的整个通信过程可以分为两大阶段：证书验证和数据传输阶段，数据传输阶段又可以分为非对称加密和对称加密两个阶段。具体流程如下：</p>
+<ol>
+<li><p>客户端请求 HTTPS 网址，然后连接到 server 的 443 端口 (HTTPS 默认端口)。</p>
+</li>
+<li><p>采用 HTTPS 协议的服务器必须要有一套数字 CA (Certification Authority)证书，证书是需要申请的，并由专门的数字证书认证机构(CA)通过非常严格的审核之后颁发的电子证书。颁发证书的同时会产生一个私钥和公钥。私钥由服务端自己保存，不可泄漏。公钥则是附带在证书的信息中，可以公开的。证书本身也附带一个证书电子签名，这个签名用来验证证书的完整性和真实性，可以防止证书被篡改。</p>
+</li>
+<li><p>服务器响应客户端请求，将证书传递给客户端，证书包含公钥和大量其他信息，比如证书颁发机构信息，公司信息和证书有效期等。Chrome 浏览器点击地址栏的锁标志再点击证书就可以看到证书详细信息。</p>
+</li>
+<li><p>客户端解析证书并对其进行验证。如果证书不是可信机构颁布，或者证书中的域名与实际域名不一致，或者证书已经过期，就会向访问者显示一个警告，由其选择是否还要继续通信。</p>
+</li>
+<li><p>客户端把加密后的随机码 KEY 发送给服务器，作为后面对称加密的密钥。</p>
+</li>
+<li><p>服务器在收到随机码 KEY 之后会使用私钥B将其解密。经过以上这些步骤，客户端和服务器终于建立了安全连接。</p>
+</li>
+<li><p>服务器使用密钥 (随机码 KEY)对数据进行对称加密并发送给客户端，客户端使用相同的密钥 (随机码 KEY)解密数据。</p>
+</li>
+<li><p>双方使用对称加密传输所有数据。</p>
+</li>
+</ol>
+<p><img src="/images/net/http/https.png" alt="udp head"></p>
+<p><strong>HTTPS 和 HTTP 的区别</strong></p>
+<ul>
+<li><p>HTTP 明文传输，不对数据进行加密安全性较差。HTTPS安全性较好。</p>
+</li>
+<li><p>使用 HTTPS 协议需要申请 CA 证书，一般免费证书较少，因而需要一定费用。证书颁发机构如：Symantec、Comodo、DigiCert 和 GlobalSign 等。</p>
+</li>
+<li><p>HTTP 页面响应速度比 HTTPS 快，这个很好理解，由于加了一层安全层，建立连接的过程更复杂，也要交换更多的数据，难免影响速度。</p>
+</li>
+<li><p>由于 HTTPS 是建构在 SSL / TLS 之上的 HTTP 协议，所以，要比 HTTP 更耗费服务器资源。</p>
+</li>
+<li><p>HTTPS 和 HTTP 使用的是完全不同的连接方式，用的端口也不一样，前者是 443，后者是 80。</p>
+</li>
+</ul>
+<p><strong>HTTPS 的缺点</strong></p>
+<ul>
+<li><p>在相同网络环境中，HTTPS 相比 HTTP 无论是响应时间还是耗电量都有大幅度上升。</p>
+</li>
+<li><p>HTTPS 的安全是有范围的，在黑客攻击、服务器劫持等情况下几乎起不到作用。</p>
+</li>
+<li><p>在现有的证书机制下，中间人攻击依然有可能发生。</p>
+</li>
+<li><p>HTTPS 需要更多的服务器资源，也会导致成本的升高。</p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/24/algo/DFS/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -986,7 +1097,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2022/09/04/boot/uboot/" class="post-title-link" itemprop="url">uboot</a>
+            <a href="/2022/09/04/boot/uboot/" class="post-title-link" itemprop="url">uboot启动分析</a>
         </h1>
 
         <div class="post-meta">
@@ -998,6 +1109,13 @@
 
               <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-02 20:09:49" itemprop="dateModified" datetime="2023-01-02T20:09:49+08:00">2023-01-02</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -1019,63 +1137,20 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p><a target="_blank" rel="noopener" href="https://ftp.denx.de/pub/u-boot/">下载地址</a></p>
-<h2 id="Boot-Loader"><a href="#Boot-Loader" class="headerlink" title="Boot Loader"></a>Boot Loader</h2><p>系统在上电或复位时通常都从地址0x00000000处开始执行，而在这个地址处安排的通常就是系统的Boot Loader程序。</p>
-<p>Boot Loader (引导加载程序)就是在操作系统内核运行之前运行的一段小程序。通过这段代码<br>实现硬件的初始化，建立内存空间的映射，为操作系统内核准备好硬件环境并引导内核的启动。</p>
-<p>Boot Loader的主要运行任务就是将内核镜像从硬盘(NAND flash or eMMC)上读到RAM中，然后跳转到内核的入口点去运行，即开始启动操作系统。Bootloader的启动过程可以分为单阶段(Single Stage)、多阶段(Multi-Stage)两种。</p>
-<p>u-boot是一种通用的用于嵌入式系统的Bootloader，同时支持 ARM 体系结构和 MIPS 体系结构。uboot必须要具备的能力：</p>
+          <h2 id="BootLoader"><a href="#BootLoader" class="headerlink" title="BootLoader"></a>BootLoader</h2><p>BootLoader (引导加载程序)就是在操作系统内核运行之前运行的一段小程序，通过这段代码实现硬件的初始化，建立内存空间的映射，将内核镜像从flash上读到RAM中，为操作系统内核准备好硬件环境，然后跳转到内核的入口点去运行引导内核启动。</p>
+<p>BootLoader必须要具备的能力：</p>
 <ol>
 <li>能自身开机直接启动，必须进行和硬件相对应的代码级别的更改和移植，才能够保证可以从相应的启动介质启动。</li>
 <li>能引导操作系统内核启动并给内核传参，uboot 的终极目标就是启动内核，参数通过环境变量设置。</li>
 <li>能进行 SoC 级和板级硬件管理，控制部分硬件外设。</li>
 <li>能提供系统部署功能，实现flash上的烧录下载。</li>
 </ol>
+<p><a target="_blank" rel="noopener" href="https://ftp.denx.de/pub/u-boot/">下载地址</a></p>
 <h2 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h2><p><img src="/images/uboot/uboot_arch.png" alt="img"></p>
 <p>u-boot-2010.06及以后版本目录结构：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">├── api                存放uboot提供的接口函数</span><br><span class="line">├── arch               CPU体系结构相关的代码，每种架构对应一个子目录</span><br><span class="line">├── board              开发板相关的文件，每种开发板对应一个子目录</span><br><span class="line">├── common             通用的代码，主要实现 uboot命令行下支持的命令，每一条命令对应一个文件。</span><br><span class="line">├── disk               磁盘分区相关代码</span><br><span class="line">├── doc                文档</span><br><span class="line">├── drivers            支持的设备驱动</span><br><span class="line">├── examples           示例程序</span><br><span class="line">├── fs                 文件系统，目前支持 cramfs、fat、fdos、jffs2 和 registerfs</span><br><span class="line">├── include            头文件，已通用的头文件为主</span><br><span class="line">├── lib                通用库文件</span><br><span class="line">├── nand_spl           NAND存储器相关代码</span><br><span class="line">├── net                网络相关代码，小型的协议栈</span><br><span class="line">├── onenand_ipl</span><br><span class="line">├── post               加电自检程序</span><br><span class="line">└── tools              辅助程序，用于编译和检查uboot目标文件</span><br></pre></td></tr></table></figure>
 
-<h2 id="编译与配置"><a href="#编译与配置" class="headerlink" title="编译与配置"></a>编译与配置</h2><h3 id="Makefile-分析"><a href="#Makefile-分析" class="headerlink" title="Makefile 分析"></a>Makefile 分析</h3><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">VERSION = 2013    <span class="comment">#主版本号</span></span><br><span class="line">PATCHLEVEL = 10   <span class="comment">#次版本号</span></span><br><span class="line">SUBLEVEL =        <span class="comment">#子版本号</span></span><br><span class="line">EXTRAVERSION =    <span class="comment">#附加的版本信息</span></span><br><span class="line"><span class="keyword">ifneq</span> <span class="string">&quot;<span class="variable">$(SUBLEVEL)</span>&quot;</span> <span class="string">&quot;&quot;</span></span><br><span class="line">U_BOOT_VERSION = <span class="variable">$(VERSION)</span>.<span class="variable">$(PATCHLEVEL)</span>.<span class="variable">$(SUBLEVEL)</span><span class="variable">$(EXTRAVERSION)</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">U_BOOT_VERSION = <span class="variable">$(VERSION)</span>.<span class="variable">$(PATCHLEVEL)</span><span class="variable">$(EXTRAVERSION)</span></span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line">TIMESTAMP_FILE = <span class="variable">$(obj)</span><span class="keyword">include</span>/generated/timestamp_autogenerated.h</span><br><span class="line">VERSION_FILE = <span class="variable">$(obj)</span><span class="keyword">include</span>/generated/version_autogenerated.h</span><br><span class="line"></span><br><span class="line"><span class="keyword">ifeq</span> (,<span class="variable">$(<span class="built_in">findstring</span> s,<span class="variable">$(MAKEFLAGS)</span>)</span>)</span><br><span class="line">XECHO = echo</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">XECHO = :</span><br><span class="line"><span class="keyword">endif</span></span><br></pre></td></tr></table></figure>
-
-<p>uboot编译时，会将版本信息输出到 include\generated\version_autogenerated.h 文件中。<code>make -s</code> 可以使 XECHO 变量为空，关闭编译信息打印。</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">MKCONFIG := <span class="variable">$(SRCTREE)</span>/mkconfig</span><br><span class="line"><span class="keyword">export</span> MKCONFIG</span><br><span class="line"></span><br><span class="line"><span class="section">unconfig:</span></span><br><span class="line">    @rm -f <span class="variable">$(obj)</span><span class="keyword">include</span>/config.h <span class="variable">$(obj)</span><span class="keyword">include</span>/config.mk \</span><br><span class="line">        <span class="variable">$(obj)</span>board/*/config.tmp <span class="variable">$(obj)</span>board/*/*/config.tmp \</span><br><span class="line">        <span class="variable">$(obj)</span><span class="keyword">include</span>/autoconf.mk <span class="variable">$(obj)</span><span class="keyword">include</span>/autoconf.mk.dep \</span><br><span class="line">        <span class="variable">$(obj)</span><span class="keyword">include</span>/spl-autoconf.mk \</span><br><span class="line">        <span class="variable">$(obj)</span><span class="keyword">include</span>/tpl-autoconf.mk</span><br><span class="line">        </span><br><span class="line"><span class="section">%_config:: unconfig</span></span><br><span class="line">    @<span class="variable">$(MKCONFIG)</span> -A $(@:_config=)</span><br></pre></td></tr></table></figure>
-
-<p>设置[mkconfig](#mkconfig 分析)脚本的路径。</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">all:</span></span><br><span class="line"><span class="keyword">sinclude</span> <span class="variable">$(obj)</span><span class="keyword">include</span>/autoconf.mk.dep</span><br><span class="line"><span class="keyword">sinclude</span> <span class="variable">$(obj)</span><span class="keyword">include</span>/autoconf.mk</span><br></pre></td></tr></table></figure>
-
-<p>导入include/autoconf.mk文件，由配置脚本根据inlcude/configs/xxx.h 头文件生成的，里面包含与开发板相关的配置。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CONFIG_SYS_TEXT_BASE=0x34800000</span><br><span class="line">CONFIG_COMMON_BOOT=&quot;&quot;console=ttySAC0,115200n8 mem=128M  &quot; MTDPARTS_DEFAULT&quot;</span><br><span class="line">CONFIG_BOOTARGS=&quot;&quot;root=/dev/mtdblock5 ubi.mtd=4 rootfstype=cramfs &quot; CONFIG_COMMON_BOOT&quot;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span> <span class="variable">$(obj)</span><span class="keyword">include</span>/config.mk</span><br><span class="line"><span class="keyword">export</span> ARCH CPU BOARD VENDOR SOC</span><br><span class="line"></span><br><span class="line"><span class="keyword">include</span> <span class="variable">$(TOPDIR)</span>/config.mk</span><br></pre></td></tr></table></figure>
-
-<p>导入include/config.mk文件，里面包含ARCH, BOARD, VENDOR, SOC 和 CPU 变量，这是配置过程自动生成的。</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ARCH   = arm</span><br><span class="line">CPU    = armv7</span><br><span class="line">BOARD  = smdkc100</span><br><span class="line">VENDOR = samsung</span><br><span class="line">SOC    = s5pc1xx</span><br></pre></td></tr></table></figure>
-
-<p>导入config.mk文件，里面定义编译工具配置项。</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">CC = <span class="variable">$(CROSS_COMPILE)</span>gcc</span><br><span class="line">CPP = <span class="variable">$(CC)</span> -E</span><br><span class="line">AR = <span class="variable">$(CROSS_COMPILE)</span>ar</span><br><span class="line">NM = <span class="variable">$(CROSS_COMPILE)</span>nm</span><br><span class="line">LDR = <span class="variable">$(CROSS_COMPILE)</span>ldr</span><br><span class="line">STRIP = <span class="variable">$(CROSS_COMPILE)</span>strip</span><br><span class="line">OBJCOPY = <span class="variable">$(CROSS_COMPILE)</span>objcopy</span><br><span class="line">OBJDUMP = <span class="variable">$(CROSS_COMPILE)</span>objdump</span><br><span class="line">RANLIB = <span class="variable">$(CROSS_COMPILE)</span>RANLIB</span><br><span class="line"></span><br><span class="line">LDFLAGS_u-boot += -T <span class="variable">$(obj)</span>u-boot.lds <span class="variable">$(LDFLAGS_FINAL)</span></span><br><span class="line"><span class="keyword">ifneq</span> (<span class="variable">$(CONFIG_SYS_TEXT_BASE)</span>,)</span><br><span class="line">LDFLAGS_u-boot += -Ttext <span class="variable">$(CONFIG_SYS_TEXT_BASE)</span></span><br><span class="line"><span class="keyword">endif</span></span><br></pre></td></tr></table></figure>
-
-<p><code>-Ttext</code>用 来指定uboot的链接起始地址，链接脚本也可以指定，但最终以这个为准。</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ifndef</span> LDSCRIPT</span><br><span class="line">    <span class="keyword">ifeq</span> (<span class="variable">$(CONFIG_NAND_U_BOOT)</span>,y)</span><br><span class="line">        LDSCRIPT := <span class="variable">$(TOPDIR)</span>/board/<span class="variable">$(BOARDDIR)</span>/u-boot-nand.lds</span><br><span class="line">        <span class="keyword">ifeq</span> (<span class="variable">$(<span class="built_in">wildcard</span> <span class="variable">$(LDSCRIPT)</span>)</span>,)</span><br><span class="line">            LDSCRIPT := <span class="variable">$(TOPDIR)</span>/<span class="variable">$(CPUDIR)</span>/u-boot-nand.lds</span><br><span class="line">        <span class="keyword">endif</span></span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line">    <span class="keyword">ifeq</span> (<span class="variable">$(<span class="built_in">wildcard</span> <span class="variable">$(LDSCRIPT)</span>)</span>,)</span><br><span class="line">        LDSCRIPT := <span class="variable">$(TOPDIR)</span>/board/<span class="variable">$(BOARDDIR)</span>/u-boot.lds</span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line">    <span class="keyword">ifeq</span> (<span class="variable">$(<span class="built_in">wildcard</span> <span class="variable">$(LDSCRIPT)</span>)</span>,)</span><br><span class="line">        LDSCRIPT := <span class="variable">$(TOPDIR)</span>/<span class="variable">$(CPUDIR)</span>/u-boot.lds</span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line">    <span class="keyword">ifeq</span> (<span class="variable">$(<span class="built_in">wildcard</span> <span class="variable">$(LDSCRIPT)</span>)</span>,)</span><br><span class="line">        LDSCRIPT := <span class="variable">$(TOPDIR)</span>/arch/<span class="variable">$(ARCH)</span>/cpu/u-boot.lds</span><br><span class="line">        <span class="comment"># We don&#x27;t expect a Makefile here</span></span><br><span class="line">        LDSCRIPT_MAKEFILE_DIR =</span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line">    <span class="keyword">ifeq</span> (<span class="variable">$(<span class="built_in">wildcard</span> <span class="variable">$(LDSCRIPT)</span>)</span>,)</span><br><span class="line"><span class="variable">$(<span class="built_in">error</span> could not find linker script)</span></span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line"><span class="keyword">endif</span></span><br></pre></td></tr></table></figure>
-
-<p>指定链接脚本，如果定义了 CONFIG_NAND_U_BOOT 宏，则链接脚本叫 u-boot-nand.lds，如果未定义这个宏则链接脚本叫 u-boot.lds。查找顺序为 board/, cpu_xxx/, arch/。</p>
-<h3 id="mkconfig-分析"><a href="#mkconfig-分析" class="headerlink" title="mkconfig 分析"></a>mkconfig 分析</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">if [ \( $# -eq 2 \) -a \( &quot;$1&quot; = &quot;-A&quot; \) ] ; then</span><br><span class="line">    # Automatic mode</span><br><span class="line">    line=`awk &#x27;($0 !~ /^#/ &amp;&amp; $7 ~ /^&#x27;&quot;$2&quot;&#x27;$/) &#123; print $1, $2, $3, $4, $5, $6, $7, $8 &#125;&#x27; boards.cfg`</span><br><span class="line">    if [ -z &quot;$line&quot; ] ; then</span><br><span class="line">        echo &quot;make: *** No rule to make target \`$2_config&#x27;.  Stop.&quot; &gt;&amp;2</span><br><span class="line">        exit 1</span><br><span class="line">    fi</span><br><span class="line"></span><br><span class="line">    set $&#123;line&#125;</span><br><span class="line">    # add default board name if needed</span><br><span class="line">    [ $# = 3 ] &amp;&amp; set $&#123;line&#125; $&#123;1&#125;</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
-
-<p>boards.cfg 文件定义了一张 board 与arch, cpu, soc, vendor 对应的表。通过解析 boards.cfg 文件可获得相应的信息。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Active  arm         armv7          s5pc1xx     samsung         smdkc100            smdkc100                                                </span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">if [ &quot;$SRCTREE&quot; != &quot;$OBJTREE&quot; ] ; then</span><br><span class="line">    mkdir -p $&#123;OBJTREE&#125;/include</span><br><span class="line">    mkdir -p $&#123;OBJTREE&#125;/include2</span><br><span class="line">    cd $&#123;OBJTREE&#125;/include2</span><br><span class="line">    rm -f asm</span><br><span class="line">    ln -s $&#123;SRCTREE&#125;/arch/$&#123;arch&#125;/include/asm asm</span><br><span class="line">    LNPREFIX=$&#123;SRCTREE&#125;/arch/$&#123;arch&#125;/include/asm/</span><br><span class="line">    cd ../include</span><br><span class="line">    mkdir -p asm</span><br><span class="line">else</span><br><span class="line">    cd ./include</span><br><span class="line">    rm -f asm</span><br><span class="line">    ln -s ../arch/$&#123;arch&#125;/include/asm asm</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">rm -f asm/arch</span><br><span class="line"></span><br><span class="line">if [ -z &quot;$&#123;soc&#125;&quot; ] ; then</span><br><span class="line">    ln -s $&#123;LNPREFIX&#125;arch-$&#123;cpu&#125; asm/arch</span><br><span class="line">else</span><br><span class="line">    ln -s $&#123;LNPREFIX&#125;arch-$&#123;soc&#125; asm/arch</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">if [ &quot;$&#123;arch&#125;&quot; = &quot;arm&quot; ] ; then</span><br><span class="line">    rm -f asm/proc</span><br><span class="line">    ln -s $&#123;LNPREFIX&#125;proc-armv asm/proc</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
-
-<p>创建 asm, arch, proc 3个指向具体平台的软连接。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">( echo &quot;ARCH   = $&#123;arch&#125;&quot;</span><br><span class="line">    if [ ! -z &quot;$spl_cpu&quot; ] ; then</span><br><span class="line">    echo &#x27;ifeq ($(CONFIG_SPL_BUILD),y)&#x27;</span><br><span class="line">    echo &quot;CPU    = $&#123;spl_cpu&#125;&quot;</span><br><span class="line">    echo &quot;else&quot;</span><br><span class="line">    echo &quot;CPU    = $&#123;cpu&#125;&quot;</span><br><span class="line">    echo &quot;endif&quot;</span><br><span class="line">    else</span><br><span class="line">    echo &quot;CPU    = $&#123;cpu&#125;&quot;</span><br><span class="line">    fi</span><br><span class="line">    echo &quot;BOARD  = $&#123;board&#125;&quot;</span><br><span class="line"></span><br><span class="line">    [ &quot;$&#123;vendor&#125;&quot; ] &amp;&amp; echo &quot;VENDOR = $&#123;vendor&#125;&quot;</span><br><span class="line">    [ &quot;$&#123;soc&#125;&quot;    ] &amp;&amp; echo &quot;SOC    = $&#123;soc&#125;&quot;</span><br><span class="line">    exit 0 ) &gt; config.mk</span><br></pre></td></tr></table></figure>
-
-<p>创建 include/config.mk 文件，被主 Makefile 包含。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;/* Automatically generated - do not edit */&quot; &gt;&gt;config.h</span><br><span class="line"></span><br><span class="line">for i in $&#123;TARGETS&#125; ; do</span><br><span class="line">    i=&quot;`echo $&#123;i&#125; | sed &#x27;/=/ &#123;s/=/	/;q; &#125; ; &#123; s/$/	1/; &#125;&#x27;`&quot;</span><br><span class="line">    echo &quot;#define CONFIG_$&#123;i&#125;&quot; &gt;&gt;config.h ;</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">echo &quot;#define CONFIG_SYS_ARCH  \&quot;$&#123;arch&#125;\&quot;&quot;  &gt;&gt; config.h</span><br><span class="line">echo &quot;#define CONFIG_SYS_CPU   \&quot;$&#123;cpu&#125;\&quot;&quot;   &gt;&gt; config.h</span><br><span class="line">echo &quot;#define CONFIG_SYS_BOARD \&quot;$&#123;board&#125;\&quot;&quot; &gt;&gt; config.h</span><br><span class="line"></span><br><span class="line">[ &quot;$&#123;vendor&#125;&quot; ] &amp;&amp; echo &quot;#define CONFIG_SYS_VENDOR \&quot;$&#123;vendor&#125;\&quot;&quot; &gt;&gt; config.h</span><br><span class="line"></span><br><span class="line">[ &quot;$&#123;soc&#125;&quot;    ] &amp;&amp; echo &quot;#define CONFIG_SYS_SOC    \&quot;$&#123;soc&#125;\&quot;&quot;    &gt;&gt; config.h</span><br><span class="line"></span><br><span class="line">cat &lt;&lt; EOF &gt;&gt; config.h</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">define CONFIG_BOARDDIR board/<span class="variable">$BOARDDIR</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;config_cmd_defaults.h&gt;</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;config_defaults.h&gt;</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;configs/<span class="variable">$&#123;CONFIG_NAME&#125;</span>.h&gt;</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;asm/config.h&gt;</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;config_fallbacks.h&gt;</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;config_uncmd_spl.h&gt;</span></span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
-
-<p>创建或追加(make -a) include/config.h 头文件，这个文件会被大部分c文件包含。</p>
-<h3 id="u-boot-lds"><a href="#u-boot-lds" class="headerlink" title="u-boot.lds"></a>u-boot.lds</h3><p>arch/arm/cpu/u-boot.lds 是ld连接器的脚本文件，描述如何连接目标文件。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">/* 指定输出可执行文件是 elf 格式,32 位 ARM 指令,小端 */</span><br><span class="line">OUTPUT_FORMAT(&quot;elf32-littlearm&quot;, &quot;elf32-littlearm&quot;, &quot;elf32-littlearm&quot;)</span><br><span class="line"></span><br><span class="line">/* 指定输出可执行文件的平台架构为 ARM 架构 */</span><br><span class="line">OUTPUT_ARCH(arm)</span><br><span class="line"></span><br><span class="line">/* 指定程序的起始代码段为_start */</span><br><span class="line">ENTRY(_start)</span><br><span class="line"></span><br><span class="line">SECTIONS</span><br><span class="line">&#123;</span><br><span class="line">    . = 0x00000000;  @ 指定程序的链接地址</span><br><span class="line"></span><br><span class="line">    . = ALIGN(4);  @ 4字节对齐</span><br><span class="line">    .text :</span><br><span class="line">    &#123;</span><br><span class="line">        cpu/arm920t/start.o(.text)  @ 首先编译start.S</span><br><span class="line">        *(.text)  @ 所有的其他程序的代码段以4字节对齐放在它后面</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    . = ALIGN(4);</span><br><span class="line">    .rodata : &#123; *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.rodata*))) &#125;</span><br><span class="line"></span><br><span class="line">    . = ALIGN(4);</span><br><span class="line">    .data : &#123; *(.data) &#125;</span><br><span class="line"></span><br><span class="line">    . = ALIGN(4);</span><br><span class="line">    .got : &#123; *(.got) &#125;</span><br><span class="line"></span><br><span class="line">    . = .;</span><br><span class="line">    __u_boot_cmd_start = .;  @ 把__u_boot_cmd_start赋值为当前位置，即起始位置</span><br><span class="line">    .u_boot_cmd : &#123; *(.u_boot_cmd) &#125;  @ 指定 u_boot_cmd段，把所有的uboot命令放在该段</span><br><span class="line">    __u_boot_cmd_end = .;  @ 把 __u_boot_cmd_end赋值为当前位置，即结束位置</span><br><span class="line"></span><br><span class="line">    . = ALIGN(4);</span><br><span class="line">    __bss_start = .;</span><br><span class="line">    .bss (NOLOAD) : &#123; *(.bss) . = ALIGN(4); &#125;</span><br><span class="line">    _end = .;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>由.text段的编译顺序可知，uboot 首先运行的是 _start 符号处的代码，在 arch/arm/cpu/arm920t/<a href="#start.S">start.S</a> 文件中定义。</p>
-<h2 id="启动流程分析"><a href="#启动流程分析" class="headerlink" title="启动流程分析"></a>启动流程分析</h2><p>第一阶段(stage 1)依赖于 CPU 体系结构的代码，在 SRAM 中，一般用汇编语言来实现。主要进行以下方面的设置：设置 ARM 进入 SVC 模式、禁止 IRQ 和 FIQ、关闭看门狗、屏蔽所有中断。设置CPU的速度和时钟(FCLK,HCLK,PCLK)，RAM初始化，清空 I/D cache、清空 TLB、禁止 MMU 和 cache、配置内存控制器、为搬运代码做准备、搬移 uboot 镜像到 RAM 中（使用 copy_loop 实现）、分配堆栈、清空 bss 段（使用 clbss_l 实现）。最后跳转到第二阶段。</p>
+<h2 id="启动流程分析"><a href="#启动流程分析" class="headerlink" title="启动流程分析"></a>启动流程分析</h2><p>第一阶段依赖于 CPU 体系结构的代码，在 SRAM 中，一般用汇编语言来实现。主要进行以下方面的设置：设置 ARM 进入 SVC 模式、禁止 IRQ 和 FIQ、关闭看门狗、屏蔽所有中断。设置CPU的速度和时钟(FCLK,HCLK,PCLK)，RAM初始化，清空 I/D cache、清空 TLB、禁止 MMU 和 cache、配置内存控制器、为搬运代码做准备、搬移 uboot 镜像到 RAM 中（使用 copy_loop 实现）、分配堆栈、清空 bss 段（使用 clbss_l 实现）。最后跳转到第二阶段。</p>
 <p>主要功能为：</p>
 <ul>
 <li>硬件设备初始化（关闭看门狗和中断，MMU，Cache，配置系统工作时钟）。</li>
@@ -1084,7 +1159,7 @@
 <li>设置堆栈指针sp。</li>
 <li>跳转到第二阶段代码的入口点。</li>
 </ul>
-<p>第二阶段(stage 2)在 DRAM 中，用c语言来实现，这样可以实现更复杂的功能，而且代码会具有更好的可读性和可移植性。初始化SoC 外部硬件(如 iNand、网卡芯片等)、 uboot 本身的一些东西(uboot 的命令、环境变量等)。</p>
+<p>第二阶段在 DRAM 中，用c语言来实现，这样可以实现更复杂的功能，而且代码会具有更好的可读性和可移植性。初始化SoC 外部硬件(如 iNand、网卡芯片等)、 uboot 本身的一些东西(uboot 的命令、环境变量等)。</p>
 <p>主要功能为：</p>
 <ul>
 <li>初始化本阶段要使用到的硬件设备（led uart等）。</li>
@@ -1122,6 +1197,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#if !defined(CONFIG_SPL_BUILD)</span><br><span class="line">    ldr	sp, [r9, #GD_START_ADDR_SP]	/* sp = gd-&gt;start_addr_sp */</span><br><span class="line">    bic	sp, sp, #7	/* 8-byte alignment for ABI compliance */</span><br><span class="line">    ldr	r9, [r9, #GD_BD]		/* r9 = gd-&gt;bd */</span><br><span class="line">    sub	r9, r9, #GD_SIZE		/* new GD is below bd */</span><br><span class="line"></span><br><span class="line">    adr	lr, here</span><br><span class="line">    ldr	r0, [r9, #GD_RELOC_OFF]		/* r0 = gd-&gt;reloc_off */</span><br><span class="line">    add	lr, lr, r0</span><br><span class="line">    ldr	r0, [r9, #GD_RELOCADDR]		/* r0 = gd-&gt;relocaddr */</span><br><span class="line">    b	relocate_code</span><br><span class="line">here:</span><br></pre></td></tr></table></figure>
 <p>调用<a href="#relocate_code">relocate_code</a>重新定位uboot，对于SPL，不用重新定位。relocate_code 函数在 arch/arm/lib/<br>relocate.S 文件中定义。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">    bl	c_runtime_cpu_setup	/* we still call old routine here */</span><br><span class="line"></span><br><span class="line">    ldr	r0, =__bss_start	/* this is auto-relocated! */</span><br><span class="line">    ldr	r1, =__bss_end		/* this is auto-relocated! */</span><br><span class="line"></span><br><span class="line">    mov	r2, #0x00000000		/* prepare zero to clear BSS */</span><br><span class="line"></span><br><span class="line">clbss_l:cmp	r0, r1			/* while not at end of BSS */</span><br><span class="line">    strlo	r2, [r0]		/* clear 32-bit BSS word */</span><br><span class="line">    addlo	r0, r0, #4		/* move to next */</span><br><span class="line">    blo	clbss_l</span><br><span class="line"></span><br><span class="line">    bl coloured_LED_init</span><br><span class="line">    bl red_led_on</span><br><span class="line"></span><br><span class="line">    /* call board_init_r(gd_t *id, ulong dest_addr) */</span><br><span class="line">    mov     r0, r9                  /* gd_t */</span><br><span class="line">    ldr	r1, [r9, #GD_RELOCADDR]	/* dest_addr */</span><br><span class="line">    /* call board_init_r */</span><br><span class="line">    ldr	pc, =board_init_r	/* this is auto-relocated! */</span><br><span class="line"></span><br><span class="line">ENDPROC(_main)</span><br></pre></td></tr></table></figure>
+
 <p>调用<a href="#board_init_r">board_init_r</a>函数，这个环境包含BSS段和.data段。</p>
 <h3 id="gd全局变量"><a href="#gd全局变量" class="headerlink" title="gd全局变量"></a>gd全局变量</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;asm-generic/global_data.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DECLARE_GLOBAL_DATA_PTR     register volatile gd_t *gd asm (<span class="string">&quot;r9&quot;</span>)  <span class="comment">//放到寄存器r9中</span></span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> __ASSEMBLY__</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">global_data</span> &#123;</span></span><br><span class="line">    <span class="type">bd_t</span> *bd;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> baudrate;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> cpu_clk;	<span class="comment">/* CPU clock in Hz!		*/</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> bus_clk;</span><br><span class="line">    <span class="comment">/* We cannot bracket this with CONFIG_PCI due to mpc5xxx */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> pci_clk;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> mem_clk;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_LCD) || defined(CONFIG_VIDEO)</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> fb_base;	<span class="comment">/* Base address of framebuffer mem */</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_POST) || defined(CONFIG_LOGBUFFER)</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> post_log_word;  <span class="comment">/* Record POST activities */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> post_log_res; <span class="comment">/* success of POST test */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> post_init_f_time;  <span class="comment">/* When post_init_f started */</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_BOARD_TYPES</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> board_type;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> have_console;	<span class="comment">/* serial_init() was called */</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_PRE_CONSOLE_BUFFER</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> precon_buf_idx;	<span class="comment">/* Pre-Console buffer index */</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_MODEM_SUPPORT</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> do_mdm_init;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> be_quiet;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> env_addr;	<span class="comment">/* Address  of Environment struct */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> env_valid;	<span class="comment">/* Checksum of Environment valid? */</span></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> ram_top;	<span class="comment">/* Top address of RAM used by U-Boot */</span></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> relocaddr;	<span class="comment">/* Start address of U-Boot in RAM */</span></span><br><span class="line">    <span class="type">phys_size_t</span> ram_size;	<span class="comment">/* RAM size */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> mon_len;	<span class="comment">/* monitor len */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> irq_sp;		<span class="comment">/* irq stack pointer */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> start_addr_sp;	<span class="comment">/* start_addr_stackpointer */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> reloc_off;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">global_data</span> *<span class="title">new_gd</span>;</span>	<span class="comment">/* relocated global data */</span></span><br><span class="line">    <span class="type">const</span> <span class="type">void</span> *fdt_blob;	<span class="comment">/* Our device tree, NULL if none */</span></span><br><span class="line">    <span class="type">void</span> *new_fdt;		<span class="comment">/* Relocated FDT */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> fdt_size;	<span class="comment">/* Space reserved for relocated FDT */</span></span><br><span class="line">    <span class="type">void</span> **jt;		<span class="comment">/* jump table */</span></span><br><span class="line">    <span class="type">char</span> env_buf[<span class="number">32</span>];	<span class="comment">/* buffer for getenv() before reloc. */</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_TRACE</span></span><br><span class="line">    <span class="type">void</span>		*trace_buff;	<span class="comment">/* The trace buffer */</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_SYS_I2C)</span></span><br><span class="line">    <span class="type">int</span>		cur_i2c_bus;	<span class="comment">/* current used i2c bus */</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">arch_global_data</span> <span class="title">arch</span>;</span>	<span class="comment">/* architecture-specific data */</span></span><br><span class="line">&#125; <span class="type">gd_t</span>;</span><br></pre></td></tr></table></figure>
 
@@ -1163,12 +1239,8 @@
 <p>当bootm命令执行时，uboot实际执行do_bootm()函数，在cmd_bootm.c中定义。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">do_bootm</span><span class="params">(<span class="type">cmd_tbl_t</span> *cmdtp, <span class="type">int</span> flag, <span class="type">int</span> argc, <span class="type">char</span> * <span class="type">const</span> argv[])</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_NEEDS_MANUAL_RELOC</span></span><br><span class="line">    <span class="type">static</span> <span class="type">int</span> relocated = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!relocated) &#123;</span><br><span class="line">        <span class="type">int</span> i;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* relocate boot function table */</span></span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; ARRAY_SIZE(boot_os); i++)</span><br><span class="line">            <span class="keyword">if</span> (boot_os[i] != <span class="literal">NULL</span>)</span><br><span class="line">                boot_os[i] += gd-&gt;reloc_off;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* relocate names of sub-command table */</span></span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; ARRAY_SIZE(cmd_bootm_sub); i++)</span><br><span class="line">            cmd_bootm_sub[i].name += gd-&gt;reloc_off;</span><br><span class="line"></span><br><span class="line">        relocated = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* determine if we have a sub command */</span></span><br><span class="line">    argc--; argv++;</span><br><span class="line">    <span class="keyword">if</span> (argc &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="type">char</span> *endp;</span><br><span class="line"></span><br><span class="line">        simple_strtoul(argv[<span class="number">0</span>], &amp;endp, <span class="number">16</span>);</span><br><span class="line">        <span class="comment">/* endp pointing to NULL means that argv[0] was just a</span></span><br><span class="line"><span class="comment">         * valid number, pass it along to the normal bootm processing</span></span><br><span class="line"><span class="comment">         *</span></span><br><span class="line"><span class="comment">         * If endp is &#x27;:&#x27; or &#x27;#&#x27; assume a FIT identifier so pass</span></span><br><span class="line"><span class="comment">         * along for normal processing.</span></span><br><span class="line"><span class="comment">         *</span></span><br><span class="line"><span class="comment">         * Right now we assume the first arg should never be &#x27;-&#x27;</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">if</span> ((*endp != <span class="number">0</span>) &amp;&amp; (*endp != <span class="string">&#x27;:&#x27;</span>) &amp;&amp; (*endp != <span class="string">&#x27;#&#x27;</span>))</span><br><span class="line">            <span class="keyword">return</span> do_bootm_subcommand(cmdtp, flag, argc, argv);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> do_bootm_states(cmdtp, flag, argc, argv, BOOTM_STATE_START |</span><br><span class="line">        BOOTM_STATE_FINDOS | BOOTM_STATE_FINDOTHER |</span><br><span class="line">        BOOTM_STATE_LOADOS |</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_PPC) || defined(CONFIG_MIPS)</span></span><br><span class="line">        BOOTM_STATE_OS_CMDLINE |</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">        BOOTM_STATE_OS_PREP | BOOTM_STATE_OS_FAKE_GO |</span><br><span class="line">        BOOTM_STATE_OS_GO, &amp;images, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h2 id="命令体系"><a href="#命令体系" class="headerlink" title="命令体系"></a>命令体系</h2><h2 id="uboot命令"><a href="#uboot命令" class="headerlink" title="uboot命令"></a>uboot命令</h2><h3 id="变量管理"><a href="#变量管理" class="headerlink" title="变量管理"></a>变量管理</h3><p><strong>printenv/print</strong>  打印出系统中所有的环境变量。</p>
-<p><strong>setenv/set</strong>  设置（添加/更改）环境变量，变量名后面没参数就是删除该环境变量。</p>
-<p><strong>saveenv/save</strong>  保存环境变量的更改到flash分区。</p>
-<h3 id="内存操作"><a href="#内存操作" class="headerlink" title="内存操作"></a>内存操作</h3><h3 id="flash操作"><a href="#flash操作" class="headerlink" title="flash操作"></a>flash操作</h3><h4 id="sf"><a href="#sf" class="headerlink" title="sf"></a>sf</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">sf probe [[bus:]cs] [hz] [mode]  </span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">init flash device on given SPI bus and chip select</span></span><br><span class="line"></span><br><span class="line">sf read addr offset len    </span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="built_in">read</span> `len<span class="string">&#x27; bytes starting at`offset&#x27;</span> to memory at `addr<span class="string">&#x27;</span></span></span><br><span class="line"></span><br><span class="line">sf write addr offset len  </span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="string">write `len&#x27;</span> bytes from memor at `addr<span class="string">&#x27; to flash at `offset&#x27;</span></span></span><br><span class="line"></span><br><span class="line">sf erase offset [+]len   </span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">erase `len<span class="string">&#x27; bytes from `offset&#x27;</span> `+len<span class="string">&#x27; round up `len&#x27;</span> to block size</span></span><br><span class="line"></span><br><span class="line">sf update addr offset len  </span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">erase and write `len<span class="string">&#x27; bytes from memory at `addr&#x27;</span> to flash at `offset<span class="string">&#x27;</span></span></span><br></pre></td></tr></table></figure>
-
-<h3 id="tftp"><a href="#tftp" class="headerlink" title="tftp"></a>tftp</h3><h2 id="uboot移植"><a href="#uboot移植" class="headerlink" title="uboot移植"></a>uboot移植</h2><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_45544223/category_9907716.html">https://blog.csdn.net/qq_45544223/category_9907716.html</a></p>
+<hr>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_45544223/category_9907716.html">https://blog.csdn.net/qq_45544223/category_9907716.html</a></p>
 <p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/Cqlismy/category/1603479.html">https://www.cnblogs.com/Cqlismy/category/1603479.html</a></p>
 
       
@@ -1427,130 +1499,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/cpu/pc/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/04/cpu/pc/" class="post-title-link" itemprop="url">计算机组成原理</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-09-25 15:05:22" itemprop="dateModified" datetime="2022-09-25T15:05:22+08:00">2022-09-25</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="计算机组成"><a href="#计算机组成" class="headerlink" title="计算机组成"></a>计算机组成</h2><p><strong>计算机由控制器、存储器、运算器、输入设备和输出设备5个部件组成</strong>。</p>
-<p>度量计算机性能的指标有响应时间和吞吐率，<strong>响应时间</strong>是指完成一个任务所需的总时间，<strong>吞吐量</strong>表示单位时间内完成的任务数量。</p>
-<p>集成电路主要用的是CMOS，其主要能耗来源是晶体管开头过程中产生的动态能耗，其値取决于每个晶体管的负载电容和工作电压：能耗 = 负载电容 x 电压^2^ 。每个晶体管需要的功耗是一个翻转能耗和开头频率的乘积： 功耗 = 负载电容 x 电压^2^ x 开头频率。</p>
-<h2 id="计算机设计思想"><a href="#计算机设计思想" class="headerlink" title="计算机设计思想"></a>计算机设计思想</h2><ol>
-<li>面向摩尔定律的设计，摩尔定律是指单芯片上的集成度每18 -24月翻一番。设计者必须预测其设计完成时的工艺水平。</li>
-<li>使用抽象简化设计，用抽象表示不同的设计层次，在高层次中看不到低层次的细节。</li>
-<li>加速大概率事件远比优化小概率事件更能提高性能。</li>
-<li>并行执行提高性能。</li>
-<li>通过流水线提高性能。</li>
-<li>通过预测提高性能。</li>
-<li>通过使用冗余部件提高系统的可靠性。比如汽车的备用轮胎。</li>
-<li>存储器层次结构，较快的存储器靠近处理器。</li>
-</ol>
-<h2 id="存储器结构"><a href="#存储器结构" class="headerlink" title="存储器结构"></a>存储器结构</h2><h3 id="冯诺依曼结构"><a href="#冯诺依曼结构" class="headerlink" title="冯诺依曼结构"></a>冯诺依曼结构</h3><p>冯·诺依曼结构，又称为普林斯顿体系结构，是一种将程序指令存储器和数据存储器合并在一起的存储器结构。Inter 8086、<br>ARM7、MIPS处理器都是这种结构。</p>
-<p><img src="/images/cpu/Princeton.jpg" alt="img"></p>
-<ul>
-<li>取指令和取操作数都在同一总线上，程序指令和数据的宽度相同，通过分时复用的方式进行。</li>
-<li>程序指令存储地址和数据存储地址指向同一个存储器的不同物理位置。</li>
-<li>执行单条指令耗费的周期长，必须先取指令码，再取操作数。</li>
-<li>在高速运行时，不能同时取指令和取操作数，从而形成了传输通道上的瓶颈。</li>
-</ul>
-<h3 id="哈佛结构"><a href="#哈佛结构" class="headerlink" title="哈佛结构"></a>哈佛结构</h3><p>哈佛结构是一种将程序指令存储和数据存储分开的存储器结构，程序存储器和数据存储器是两个独立的存储器，每个存储器独立编址、独立访问，在一个机器周期内可以同时获取指令和操作数。所有的DSP处理器、AVR单片机、ARM9是这种结构。</p>
-<p><img src="/images/cpu/Harvard.jpg" alt="img"></p>
-<h2 id="算术运算"><a href="#算术运算" class="headerlink" title="算术运算"></a>算术运算</h2><h3 id="补码"><a href="#补码" class="headerlink" title="补码"></a>补码</h3><p><strong>原码</strong>：用第一位表示符号，其余位表示值，负数符号位为1。</p>
-<p><strong>反码</strong>：正数的反码是其本身，负数的反码是在其原码的基础上，符号位不变，其余各个位取反。</p>
-<p><strong>补码</strong>：正数的补码就是其本身，负数的补码是在其原码的基础上，符号位不变，其余各位取反，最后+1。</p>
-<blockquote>
-<p>[+1] = [00000001]原 = [00000001]反 = [00000001]补</p>
-<p>[-1] = [10000001]原 = [11111110]反 = [11111111]补</p>
-</blockquote>
-<p><strong>移码</strong>：将符号位取反的补码（不区分正负）。</p>
-<p>原码使数字有了正负概念，但是计算不正确，正负相加不等于0，而且存在+0和-0。反码解决了正负相加不等于0的问题。为了追求连续性和唯一性，补码修复了存在两个0编码的问题，而且还能够多表示一个最低数，所以1个字节能表示的范围为[-128, 127]。</p>
-<p>用[0000 0000]表示0, 而以前出现问题的-0则不存在了.而且可以用[1000 0000]表示-128:</p>
-<blockquote>
-<p>(-1) + (-127) = [1000 0001]原 + [1111 1111]原 = [1111 1111]补 + [1000 0001]补 = [1000 0000]补</p>
-</blockquote>
-<h3 id="加法"><a href="#加法" class="headerlink" title="加法"></a>加法</h3><h3 id="乘法"><a href="#乘法" class="headerlink" title="乘法"></a>乘法</h3><h3 id="除法"><a href="#除法" class="headerlink" title="除法"></a>除法</h3><h3 id="浮点运算"><a href="#浮点运算" class="headerlink" title="浮点运算"></a>浮点运算</h3><h4 id="浮点表示"><a href="#浮点表示" class="headerlink" title="浮点表示"></a>浮点表示</h4><p><img src="/images/pc/float_mem.jpg" alt="浮点表示"></p>
-<ul>
-<li>第一段 占 1bit，表示符号位。0代表正数，1代表负数。</li>
-<li>第二段 占 8bits，表示指数。代称为 E(Exponent)。</li>
-<li>第三段 占 23bits，表示尾数。代称为 M(Mantissa)。</li>
-</ul>
-<p>浮点数在计算机存储使用二进制科学计数法。如小数 78.375，符号位为0，指数为6，尾数是001110011。</p>
-<blockquote>
-<p>整数部分：(78)<del>10</del> = (100 1110)<del>2</del><br>小数部分：(0.375)<del>10</del>　=　3/8 = 1/4 + 1/8 = 2^-2^ + 2^-3^ = (0.01)<del>2</del> + (0.001)<del>2</del> = (0.011)<del>2</del><br>(78.375)<del>10</del> = (1001110.011)<del>2</del> = 1.001110011 * 2^6^</p>
-</blockquote>
-<p>对于 int 和 float 变量类型不能使用强制类型转换，要通过float指针来转换。</p>
-<h4 id="浮点加法"><a href="#浮点加法" class="headerlink" title="浮点加法"></a>浮点加法</h4><h4 id="浮点乘法"><a href="#浮点乘法" class="headerlink" title="浮点乘法"></a>浮点乘法</h4><h2 id="时钟"><a href="#时钟" class="headerlink" title="时钟"></a>时钟</h2><p>时钟周期也叫振荡周期或晶振周期，即晶振的单位时间发出的脉冲数。是计算机中最基本的、最小的时间单位。</p>
-<p>机器周期：在计算机中，为了便于管理，常把一条指令的执行过程划分为若干个阶段，每一阶段完成一项工作。例如，取指令、存储器读、存储器写等，这每一项工作称为一个基本操作。完成一个基本操作所需要的时间称为机器周期。8051单片机的机器周期由6个状态周期组成，也就是说一个机器周期=6个状态周期=12个时钟周期。机器周期也是单片机定时器和计数器的时间基准。例如一个单片机选择了12MHZ晶振，那么当定时器的数值加1时，实际经过的时间就是1us。</p>
-<p>指令周期是执行一条指令所需要的时间，一般由若干个机器周期组成。指令不同，所需的机器周期数也不同。</p>
-<p>系统时钟就是CPU指令运行的频率，系统时钟由晶振或内部RC产生。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1620,7 +1568,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">221</span>
+          <span class="site-state-item-count">222</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1658,7 +1606,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

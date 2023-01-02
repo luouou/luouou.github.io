@@ -176,6 +176,124 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/stdlib/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/c/stdlib/" class="post-title-link" itemprop="url">c standard library</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>c语言标准函数库分为以下几类：</p>
+<ul>
+<li>输入/输出 I/O</li>
+<li>字符串和字符处理</li>
+<li>数学</li>
+<li>时间、日期和本地化</li>
+<li>动态分配</li>
+<li>其他</li>
+<li>宽字符函数</li>
+</ul>
+<h2 id="assert-h"><a href="#assert-h" class="headerlink" title="assert.h"></a>assert.h</h2><p>assert.h头文件提供了一个 assert 的宏，用于在函数开始处检验传入参数的合法性。assert会先判断表达式的真假，如果表达式值为假，那么它先向stderr打印错误信息，然后通过调用 abort 来终止程序运行。如果表达式值为真，继续运行后面的程序。</p>
+<p><code>assert</code>只在 DEBUG 下生效，在release版本中，可以通过在<code>#include &lt;assert.h&gt;</code>语句之前插入<code>#define NDEBUG</code>来禁用assert调用。</p>
+<h2 id="ctype-h"><a href="#ctype-h" class="headerlink" title="ctype.h"></a>ctype.h</h2><p>ctype.h 头文件提供了一些用于测试和映射字符，大小写转换函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*检查所传的字符是否是字母和数字*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">isalnum</span><span class="params">(<span class="type">int</span> c)</span> </span><br><span class="line"><span class="comment">/*检查所传的字符是否是字母*/</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">isalpha</span><span class="params">(<span class="type">int</span> c)</span> </span><br><span class="line"><span class="comment">/*检查所传的字符是否是控制字符*/</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">iscntrl</span><span class="params">(<span class="type">int</span> c)</span> </span><br><span class="line"><span class="comment">/*检查所传的字符是否是十进制数字*/</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">isdigit</span><span class="params">(<span class="type">int</span> c)</span> </span><br><span class="line"><span class="comment">/*检查所传的字符是否有图形表示法*/</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">isgraph</span><span class="params">(<span class="type">int</span> c)</span> </span><br><span class="line"><span class="comment">/*检查所传的字符是否是小写字母*/</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">islower</span><span class="params">(<span class="type">int</span> c)</span> </span><br><span class="line"><span class="comment">/*检查所传的字符是否是可打印的*/</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">isprint</span><span class="params">(<span class="type">int</span> c)</span> </span><br><span class="line"><span class="comment">/*检查所传的字符是否是标点符号字符*/</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">ispunct</span><span class="params">(<span class="type">int</span> c)</span> </span><br><span class="line"><span class="comment">/*检查所传的字符是否是空白字符*/</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">isspace</span><span class="params">(<span class="type">int</span> c)</span> </span><br><span class="line"><span class="comment">/*检查所传的字符是否是大写字母*/</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">isupper</span><span class="params">(<span class="type">int</span> c)</span> </span><br><span class="line"><span class="comment">/*检查所传的字符是否是十六进制数字*/</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">isxdigit</span><span class="params">(<span class="type">int</span> c)</span> </span><br><span class="line"><span class="comment">/*把大写字母转换为小写字母*/</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">tolower</span><span class="params">(<span class="type">int</span> c)</span> </span><br><span class="line"><span class="comment">/*把小写字母转换为大写字母*/</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">toupper</span><span class="params">(<span class="type">int</span> c)</span> </span><br></pre></td></tr></table></figure>
+
+<h2 id="errno-h"><a href="#errno-h" class="headerlink" title="errno.h"></a>errno.h</h2><p>errno.h 头文件定义了整数变量 errno，就近发生的系统调用错误都会存储到 errno中，下一次的错误码会覆盖掉上一次的错误。可使用<code>errno</code>命令查阅错误码定义。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 打印系统错误信息 */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">perror</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *s)</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 错误码转字符串 */</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">strerror</span><span class="params">(<span class="type">int</span> errnum)</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="float-h"><a href="#float-h" class="headerlink" title="float.h"></a>float.h</h2><p>float.h 头文件包含了一组与浮点值相关的依赖于平台的常量。</p>
+<h2 id="limits-h"><a href="#limits-h" class="headerlink" title="limits.h"></a>limits.h</h2><p>limits.h 定义了各种变量类型的最大值宏。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> CHAR_BIT    8     <span class="comment">//定义一个字节的比特数。</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SCHAR_MIN   -128  <span class="comment">//定义一个有符号字符的最小值。</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SCHAR_MAX   127   <span class="comment">//定义一个有符号字符的最大值。</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> UCHAR_MAX   255   <span class="comment">//定义一个无符号字符的最大值。</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> CHAR_MIN    0     <span class="comment">//定义类型 char 的最小值。</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> CHAR_MAX    127   <span class="comment">//定义类型 char 的最大值。</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MB_LEN_MAX  1     <span class="comment">//定义多字节字符中的最大字节数。</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SHRT_MIN    -32768     <span class="comment">//定义一个短整型的最小值。</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SHRT_MAX    +32767     <span class="comment">//定义一个短整型的最大值。</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> USHRT_MAX   65535      <span class="comment">//定义一个无符号短整型的最大值。</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> INT_MIN     -32768     <span class="comment">//定义一个整型的最小值。</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> INT_MAX     +32767     <span class="comment">//定义一个整型的最大值。</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> UINT_MAX    65535      <span class="comment">//定义一个无符号整型的最大值。</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LONG_MIN    -2147483648   <span class="comment">//定义一个长整型的最小值。</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LONG_MAX    +2147483647   <span class="comment">//定义一个长整型的最大值。</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ULONG_MAX   4294967295    <span class="comment">//定义一个无符号长整型的最大值。</span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="time-h"><a href="#time-h" class="headerlink" title="time.h"></a>time.h</h2><p>time.h 头文件定义了各种操作日期和时间的函数。</p>
+<h2 id="stdlib-h"><a href="#stdlib-h" class="headerlink" title="stdlib.h"></a>stdlib.h</h2><p>stdlib .h 头文件定义了各种通用工具函数。</p>
+<p><code>EXIT_FAILURE</code>这是 exit 函数失败时要返回的值。<br><code>EXIT_SUCCESS</code>这是 exit 函数成功时要返回的值。<br><code>RAND_MAX</code>这个宏是 rand 函数返回的最大值。<br><code>MB_CUR_MAX</code> 这个宏表示在多字节字符集中的最大字符数，不能大于 MB_LEN_MAX。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*把参数 str 所指向的字符串转换为一个浮点数（类型为 double 型）*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">atof</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把参数 str 所指向的字符串转换为一个整数（类型为 int 型）*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">atoi</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把参数 str 所指向的字符串转换为一个长整数（类型为 long int 型）*/</span></span><br><span class="line"><span class="type">long</span> <span class="type">int</span> <span class="title function_">atol</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把参数 str 所指向的字符串转换为一个浮点数（类型为 double 型）*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">strtod</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str, <span class="type">char</span> **endptr)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把参数 str 所指向的字符串转换为一个长整数（类型为 long int 型）*/</span></span><br><span class="line"><span class="type">long</span> <span class="type">int</span> <span class="title function_">strtol</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str, <span class="type">char</span> **endptr, <span class="type">int</span> base)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把参数 str 所指向的字符串转换为一个无符号长整数（类型为 unsigned long int 型）*/</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span> <span class="title function_">strtoul</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str, <span class="type">char</span> **endptr, <span class="type">int</span> base)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*分配所需的内存空间，并返回一个指向它的指针*/</span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">calloc</span><span class="params">(<span class="type">size_t</span> nitems, <span class="type">size_t</span> size)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*释放之前调用 calloc、malloc 或 realloc 所分配的内存空间*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">free</span><span class="params">(<span class="type">void</span> *ptr)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*分配所需的内存空间，并返回一个指向它的指针*/</span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">malloc</span><span class="params">(<span class="type">size_t</span> size)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*尝试重新调整之前调用 malloc 或 calloc 所分配的 ptr 所指向的内存块的大小*/</span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">realloc</span><span class="params">(<span class="type">void</span> *ptr, <span class="type">size_t</span> size)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*使一个异常程序终止并coredump*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">abort</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*当程序正常终止时，调用指定的函数 func*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">atexit</span><span class="params">(<span class="type">void</span> (*func)(<span class="type">void</span>))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*使程序正常终止*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">exit</span><span class="params">(<span class="type">int</span> status)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*搜索 name 所指向的环境字符串，并返回相关的值给字符串*/</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">getenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*由 string 指定的命令传给要被命令处理器执行的主机环境*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">system</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *<span class="built_in">string</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*执行二分查找*/</span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">bsearch</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *key, <span class="type">const</span> <span class="type">void</span> *base, <span class="type">size_t</span> nitems, <span class="type">size_t</span> size, </span></span><br><span class="line"><span class="params">    <span class="type">int</span> (*compar)(<span class="type">const</span> <span class="type">void</span> *, constoid *))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*数组排序*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">qsort</span><span class="params">(<span class="type">void</span> *base, <span class="type">size_t</span> nitems, <span class="type">size_t</span> size, </span></span><br><span class="line"><span class="params">    <span class="type">int</span> (*compar)(<span class="type">const</span> <span class="type">void</span> *, <span class="type">const</span> <span class="type">void</span>*))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回 x 的绝对值*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">abs</span><span class="params">(<span class="type">int</span> x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*分子除以分母*/</span></span><br><span class="line"><span class="type">div_t</span> <span class="title function_">div</span><span class="params">(<span class="type">int</span> numer, <span class="type">int</span> denom)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回 x 的绝对值*/</span></span><br><span class="line"><span class="type">long</span> <span class="type">int</span> <span class="title function_">labs</span><span class="params">(<span class="type">long</span> <span class="type">int</span> x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*分子除以分母*/</span></span><br><span class="line"><span class="type">ldiv_t</span> <span class="title function_">ldiv</span><span class="params">(<span class="type">long</span> <span class="type">int</span> numer, <span class="type">long</span> <span class="type">int</span> denom)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回一个范围在 0 到 RAND_MAX 之间的伪随机数*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">rand</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*该函数播种由函数 rand 使用的随机数发生器*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">srand</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> seed)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回参数 str 所指向的多字节字符的长度*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">mblen</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str, <span class="type">size_t</span> n)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把参数 str 所指向的多字节字符的字符串转换为参数 pwcs 所指向的数组*/</span></span><br><span class="line"><span class="type">size_t</span> <span class="title function_">mbstowcs</span><span class="params">(<span class="type">schar_t</span> *pwcs, <span class="type">const</span> <span class="type">char</span> *str, <span class="type">size_t</span> n)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*检查参数 str 所指向的多字节字符*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">mbtowc</span><span class="params">(<span class="type">whcar_t</span> *pwc, <span class="type">const</span> <span class="type">char</span> *str, <span class="type">size_t</span> n)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把数组 pwcs 中存储的编码转换为多字节字符，并把它们存储在字符串 str 中*/</span></span><br><span class="line"><span class="type">size_t</span> <span class="title function_">wcstombs</span><span class="params">(<span class="type">char</span> *str, <span class="type">const</span> <span class="type">wchar_t</span> *pwcs, <span class="type">size_t</span> n)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*检查对应于参数 wchar 所给出的多字节字符的编码*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">wctomb</span><span class="params">(<span class="type">char</span> *str, <span class="type">wchar_t</span> wchar)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="string-h"><a href="#string-h" class="headerlink" title="string.h"></a>string.h</h2><p>string .h 头文件定义了各种操作字符数组的函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*在参数 str 所指向的字符串的前 n 个字节中搜索第一次出现字符 c（一个无符号字符）的位置*/</span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">memchr</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *str, <span class="type">int</span> c, <span class="type">size_t</span> n)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把 str1 和 str2 的前 n 个字节进行比较*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">memcmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *str1, <span class="type">const</span> <span class="type">void</span> *str2, <span class="type">size_t</span> n)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*从 src 复制 n 个字符到 dest*/</span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">memcpy</span><span class="params">(<span class="type">void</span> *dest, <span class="type">const</span> <span class="type">void</span> *src, <span class="type">size_t</span> n)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*另一个用于从 src 复制 n 个字符到 dest 的函数*/</span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">memmove</span><span class="params">(<span class="type">void</span> *dest, <span class="type">const</span> <span class="type">void</span> *src, <span class="type">size_t</span> n)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*复制字符 c（一个无符号字符）到参数 str 所指向的字符串的前 n 个字符*/</span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">memset</span><span class="params">(<span class="type">void</span> *str, <span class="type">int</span> c, <span class="type">size_t</span> n)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把 src 所指向的字符串追加到 dest 所指向的字符串的结尾*/</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">strcat</span><span class="params">(<span class="type">char</span> *dest, <span class="type">const</span> <span class="type">char</span> *src)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把 src 所指向的字符串追加到 dest 所指向的字符串的结尾，直到 n 字符长度为止*/</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">strncat</span><span class="params">(<span class="type">char</span> *dest, <span class="type">const</span> <span class="type">char</span> *src, <span class="type">size_t</span> n)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*在参数 str 所指向的字符串中搜索第一次出现字符 c（一个无符号字符）的位置*/</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">strchr</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str, <span class="type">int</span> c)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把 str1 所指向的字符串和 str2 所指向的字符串进行比较*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">strcmp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str1, <span class="type">const</span> <span class="type">char</span> *str2)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把 str1 和 str2 进行比较，最多比较前 n 个字节*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">strncmp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str1, <span class="type">const</span> <span class="type">char</span> *str2, <span class="type">size_t</span> n)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把 str1 和 str2 进行比较，结果取决于 LC_COLLATE 的位置设置*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">strcoll</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str1, <span class="type">const</span> <span class="type">char</span> *str2)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把 src 所指向的字符串复制到 dest*/</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">strcpy</span><span class="params">(<span class="type">char</span> *dest, <span class="type">const</span> <span class="type">char</span> *src)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把 src 所指向的字符串复制到 dest，最多复制 n 个字符*/</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">strncpy</span><span class="params">(<span class="type">char</span> *dest, <span class="type">const</span> <span class="type">char</span> *src, <span class="type">size_t</span> n)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*检索字符串 str1 开头连续有几个字符都不含字符串 str2 中的字符*/</span></span><br><span class="line"><span class="type">size_t</span> <span class="title function_">strcspn</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str1, <span class="type">const</span> <span class="type">char</span> *str2)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*从内部数组中搜索错误号 errnum，并返回一个指向错误消息字符串的指针*/</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">strerror</span><span class="params">(<span class="type">int</span> errnum)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*计算字符串 str 的长度，直到空结束字符，但不包括空结束字符*/</span></span><br><span class="line"><span class="type">size_t</span> <span class="title function_">strlen</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str)</span></span><br><span class="line"></span><br><span class="line"><span class="type">char</span> *<span class="title function_">strpbrk</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str1, <span class="type">const</span> <span class="type">char</span> *str2)</span></span><br><span class="line"><span class="comment">/*也就是说，依次检验字符串 str1 中的字符，当被检验字符在字符串 str2 中也包含时，</span></span><br><span class="line"><span class="comment">检索字符串 str1 中第一个匹配字符串 str2 中字符的字符，不包含空结束字符*/</span></span><br><span class="line">则停止检验，并返回该字符位置*/</span><br><span class="line"></span><br><span class="line"><span class="comment">/*在参数 str 所指向的字符串中搜索最后一次出现字符 c（一个无符号字符）的位置*/</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">strrchr</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str, <span class="type">int</span> c)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*检索字符串 str1 中第一个不在字符串 str2 中出现的字符下标*/</span></span><br><span class="line"><span class="type">size_t</span> <span class="title function_">strspn</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str1, <span class="type">const</span> <span class="type">char</span> *str2)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*在字符串 haystack 中查找第一次出现字符串 needle（不包含空结束字符）的位置*/</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">strstr</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *haystack, <span class="type">const</span> <span class="type">char</span> *needle)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*分解字符串 str 为一组字符串，delim 为分隔符*/</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">strtok</span><span class="params">(<span class="type">char</span> *str, <span class="type">const</span> <span class="type">char</span> *delim)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*根据程序当前的区域选项中的 LC_COLLATE 来转换字符串 src 的前 n 个字符，并把它们放置在字符串 dest 中*/</span></span><br><span class="line"><span class="type">size_t</span> <span class="title function_">strxfrm</span><span class="params">(<span class="type">char</span> *dest, <span class="type">const</span> <span class="type">char</span> *src, <span class="type">size_t</span> n)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="math-h"><a href="#math-h" class="headerlink" title="math.h"></a>math.h</h2><p>math.h 头文件定义了各种数学函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*返回以弧度表示的 x 的反余弦*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">acos</span><span class="params">(<span class="type">double</span> x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回以弧度表示的 x 的反正弦*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">asin</span><span class="params">(<span class="type">double</span> x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回以弧度表示的 x 的反正切*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">atan</span><span class="params">(<span class="type">double</span> x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回以弧度表示的 y/x 的反正切，y 和 x 的值的符号决定了正确的象限*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">atan2</span><span class="params">(<span class="type">double</span> y, <span class="type">double</span> x)</span></span><br><span class="line">    </span><br><span class="line"><span class="comment">/*返回弧度角 x 的余弦*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">cos</span><span class="params">(<span class="type">double</span> x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回 x 的双曲余弦*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">cosh</span><span class="params">(<span class="type">double</span> x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回弧度角 x 的正弦*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">sin</span><span class="params">(<span class="type">double</span> x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回 x 的双曲正弦*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">sinh</span><span class="params">(<span class="type">double</span> x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回 x 的双曲正切*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">tanh</span><span class="params">(<span class="type">double</span> x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回 e 的 x 次幂的值*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">exp</span><span class="params">(<span class="type">double</span> x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把浮点数 x 分解成尾数和指数。返回值是尾数，并将指数存入 exponent 中，所得的值是 x = mantissa * 2 ^ exponent*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">frexp</span><span class="params">(<span class="type">double</span> x, <span class="type">int</span> *exponent)</span></span><br><span class="line">    </span><br><span class="line"><span class="comment">/*返回 x 乘以 2 的 exponent 次幂*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">ldexp</span><span class="params">(<span class="type">double</span> x, <span class="type">int</span> exponent)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回 x 的自然对数（基数为 e 的对数）*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">log</span><span class="params">(<span class="type">double</span> x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回 x 的常用对数（基数为 10 的对数）*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">log10</span><span class="params">(<span class="type">double</span> x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回值为小数部分（小数点后的部分），并设置 integer 为整数部分*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">modf</span><span class="params">(<span class="type">double</span> x, <span class="type">double</span> *integer)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回 x 的 y 次幂*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">pow</span><span class="params">(<span class="type">double</span> x, <span class="type">double</span> y)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回 x 的平方根*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">sqrt</span><span class="params">(<span class="type">double</span> x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回大于或等于 x 的最小的整数值*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">ceil</span><span class="params">(<span class="type">double</span> x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回 x 的绝对值*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">fabs</span><span class="params">(<span class="type">double</span> x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回小于或等于 x 的最大的整数值*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">floor</span><span class="params">(<span class="type">double</span> x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回 x 除以 y 的余数*/</span></span><br><span class="line"><span class="type">double</span> <span class="title function_">fmod</span><span class="params">(<span class="type">double</span> x, <span class="type">double</span> y)</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="stdarg-h"><a href="#stdarg-h" class="headerlink" title="stdarg.h"></a>stdarg.h</h2><p>stdarg.h 头文件定义了一个变量类型 va_list 和获取可变参数中的参数的方法。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*这个宏初始化 ap 变量，它与 va_arg 和 va_end 宏是一起使用的，last_arg 是最后一个传递给函数的已知的固定参数，即省略号之前的参数*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">va_start</span><span class="params">(va_list ap, last_arg)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*这个宏检索函数参数列表中类型为 type 的下一个参数*/</span></span><br><span class="line">type <span class="title function_">va_arg</span><span class="params">(va_list ap, type)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*这个宏允许使用了 va_start 宏的带有可变参数的函数返回，如果在从函数返回之前没有调用 va_end，则结果为未定义*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">va_end</span><span class="params">(va_list ap)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="stddef-h"><a href="#stddef-h" class="headerlink" title="stddef.h"></a>stddef.h</h2><p>stddef .h 头文件定义了各种变量类型和宏。</p>
+<p><code>ptrdiff_t</code> 这是有符号整数类型，它是两个指针相减的结果。<br><code>size_t</code> 这是无符号整数类型，它是 sizeof 关键字的结果。<br><code>wchar_t</code> 这是一个宽字符常量大小的整数类型。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*这会生成一个类型为 size_t 的整型常量，它是一个结构成员相对于结构开头的字节偏移量。成员是由 member-designator 给定的，结构的名称是在 type 中给定的*/</span></span><br><span class="line">offsetof(type, member-designator)</span><br></pre></td></tr></table></figure>
+
+<h2 id="signal-h"><a href="#signal-h" class="headerlink" title="signal.h"></a>signal.h</h2><p>signal.h 头文件定义了一些跟信号相关的函数和宏。</p>
+<h2 id="stdio-h"><a href="#stdio-h" class="headerlink" title="stdio.h"></a>stdio.h</h2><p>stdio .h 头文件定义了各种函数来执行输入和输出。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*关闭流 stream。刷新所有的缓冲区*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fclose</span><span class="params">(FILE *stream)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*清除给定流 stream 的文件结束和错误标识符*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">clearerr</span><span class="params">(FILE *stream)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*测试给定流 stream 的文件结束标识符*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">feof</span><span class="params">(FILE *stream)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*测试给定流 stream 的错误标识符*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">ferror</span><span class="params">(FILE *stream)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*刷新流 stream 的输出缓冲区*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fflush</span><span class="params">(FILE *stream)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*获取流 stream 的当前文件位置，并把它写入到 pos*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fgetpos</span><span class="params">(FILE *stream, <span class="type">fpos_t</span> *pos)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*使用给定的模式 mode 打开 filename 所指向的文件*/</span></span><br><span class="line">FILE *<span class="title function_">fopen</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="type">char</span> *mode)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*从给定流 stream 读取数据到 ptr 所指向的数组中*/</span></span><br><span class="line"><span class="type">size_t</span> <span class="title function_">fread</span><span class="params">(<span class="type">void</span> *ptr, <span class="type">size_t</span> size, <span class="type">size_t</span> nmemb, FILE *stream)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把一个新的文件名 filename 与给定的打开的流 stream 关联，同时关闭流中的旧文件*/</span></span><br><span class="line">FILE *<span class="title function_">freopen</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="type">char</span> *mode, FILE *stream)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*设置流 stream 的文件位置为给定的偏移 offset，参数offset意味着从给定的whence位置查找的字节数*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fseek</span><span class="params">(FILE *stream, <span class="type">long</span> <span class="type">int</span> offset, <span class="type">int</span> whence)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*设置给定流 stream 的文件位置为给定的位置，参数pos是由函数 fgetpos 给定的位置*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fsetpos</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">fpos_t</span> *pos)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*返回给定流 stream 的当前文件位置*/</span></span><br><span class="line"><span class="type">long</span> <span class="type">int</span> <span class="title function_">ftell</span><span class="params">(FILE *stream)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把 ptr 所指向的数组中的数据写入到给定流 stream 中*/</span></span><br><span class="line"><span class="type">size_t</span> <span class="title function_">fwrite</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *ptr, <span class="type">size_t</span> size, <span class="type">size_t</span> nmemb, FILE *stream)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*删除给定的文件名 filename，以便它不再被访问*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">remove</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把 old_filename 所指向的文件名改为 new_filename*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">rename</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *old_filename, <span class="type">const</span> <span class="type">char</span> *new_filename)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*设置文件位置为给定流 stream 的文件的开头*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">rewind</span><span class="params">(FILE *stream)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*定义流 stream 应如何缓冲*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">setbuf</span><span class="params">(FILE *stream, <span class="type">char</span> *buffer)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*另一个定义流 stream 应如何缓冲的函数*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">setvbuf</span><span class="params">(FILE *stream, <span class="type">char</span> *buffer, <span class="type">int</span> mode, <span class="type">size_t</span> size)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*以二进制更新模式(wb+)创建临时文件*/</span></span><br><span class="line">FILE *<span class="title function_">tmpfile</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*生成并返回一个有效的临时文件名，该文件名之前是不存在的*/</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">tmpnam</span><span class="params">(<span class="type">char</span> *str)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*发送格式化输出到流 stream 中*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fprintf</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">char</span> *format, ...)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*发送格式化输出到标准输出 stdout*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">printf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *format, ...)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*发送格式化输出到字符串*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sprintf</span><span class="params">(<span class="type">char</span> *str, <span class="type">const</span> <span class="type">char</span> *format, ...)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*使用参数列表发送格式化输出到流 stream 中*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">vfprintf</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">char</span> *format, va_list arg)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*使用参数列表发送格式化输出到标准输出 stdout*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">vprintf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *format, va_list arg)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*使用参数列表发送格式化输出到字符串*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">vsprintf</span><span class="params">(<span class="type">char</span> *str, <span class="type">const</span> <span class="type">char</span> *format, va_list arg)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*从流 stream 读取格式化输入*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fscanf</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">char</span> *format, ...)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*从标准输入 stdin 读取格式化输入*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">scanf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *format, ...)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*从字符串读取格式化输入*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sscanf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str, <span class="type">const</span> <span class="type">char</span> *format, ...)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*从指定的流 stream 获取下一个字符（一个无符号字符），并把位置标识符往前移动*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fgetc</span><span class="params">(FILE *stream)</span></span><br><span class="line"></span><br><span class="line"><span class="type">char</span> *<span class="title function_">fgets</span><span class="params">(<span class="type">char</span> *str, <span class="type">int</span> n, FILE *stream)</span></span><br><span class="line"><span class="comment">/*从指定的流 stream 读取一行，并把它存储在 str 所指向的字符串内，</span></span><br><span class="line"><span class="comment">当读取 (n-1) 个字符时，或者读取到换行符时，或者到达文件末尾时，它会停止，具体视情况而定*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把参数 char 指定的字符（一个无符号字符）写入到指定的流 stream 中，并把位置标识符往前移动*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fputc</span><span class="params">(<span class="type">int</span> <span class="type">char</span>, FILE *stream)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把字符串写入到指定的流 stream 中，但不包括空字符*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fputs</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str, FILE *stream)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*从指定的流 stream 获取下一个字符（一个无符号字符），并把位置标识符往前移动*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">getc</span><span class="params">(FILE *stream)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*从标准输入 stdin 获取一个字符（一个无符号字符）*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">getchar</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="type">char</span> *<span class="title function_">gets</span><span class="params">(<span class="type">char</span> *str)</span></span><br><span class="line"><span class="comment">/*从标准输入 stdin 读取一行，并把它存储在 str 所指向的字符串中，</span></span><br><span class="line"><span class="comment">/*当读取到换行符时，或者到达文件末尾时，它会停止，具体视情况而定*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把参数 char 指定的字符（一个无符号字符）写入到指定的流 stream 中，并把位置标识符往前移动*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">putc</span><span class="params">(<span class="type">int</span> <span class="type">char</span>, FILE *stream)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把参数 char 指定的字符（一个无符号字符）写入到标准输出 stdout 中*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">putchar</span><span class="params">(<span class="type">int</span> <span class="type">char</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">puts</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str)</span></span><br><span class="line"><span class="comment">/*把一个字符串写入到标准输出 stdout，直到空字符，但不包括空字符，/*换行符会被追加到输出中*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*把字符 char（一个无符号字符）推入到指定的流 stream 中，以便它是下一个被读取到的字符*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">ungetc</span><span class="params">(<span class="type">int</span> <span class="type">char</span>, FILE *stream)</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">perror</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str)</span></span><br><span class="line"><span class="comment">/*把一个描述性错误消息输出到标准错误 stderr，首先输出字符串 str，后跟一个冒号，然后是一个空格*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*格式字符串到 str 中*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">snprintf</span><span class="params">(<span class="type">char</span> *str, <span class="type">size_t</span> size, <span class="type">const</span> <span class="type">char</span> *format, ...)</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/printf/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1611,282 +1729,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/design-patterns/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/code/design-patterns/design-patterns/" class="post-title-link" itemprop="url">软件设计模式与原则</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 18:01:42" itemprop="dateModified" datetime="2022-06-08T18:01:42+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="设计模式"><a href="#设计模式" class="headerlink" title="设计模式"></a>设计模式</h2><p>设计模式是对互相通信对象和类的描述，这些对象和类被定制以解决特定场景下的一般设计问题。也可以理解为是某一类问题的通用解决方案，使用设计模式的目的是为了可重用代码，提高代码的可扩展性和可维护性。</p>
-<h3 id="创建模式"><a href="#创建模式" class="headerlink" title="创建模式"></a>创建模式</h3><p>用于创建对象，为设计类实例化新对象提供指南。</p>
-<table>
-<thead>
-<tr>
-<th>中文名称</th>
-<th>英文名称</th>
-<th>简要说明</th>
-<th>速记关键字</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>工厂方法</td>
-<td>Factory Method</td>
-<td>定义了创建对象的接口，让子类决定实例化哪个类。</td>
-<td>动态生产对象</td>
-</tr>
-<tr>
-<td>抽象工厂</td>
-<td>Abstract Factory</td>
-<td>提供一个可以创建一系列相关或相互依赖对象的接口，而无需指定它们具体的类。</td>
-<td>生产系列对象</td>
-</tr>
-<tr>
-<td>构建器</td>
-<td>Builder</td>
-<td>将一个复杂对象的构建与其表示分离，使得同样的构建过程可以创建不同的表示。</td>
-<td>复制对象构造</td>
-</tr>
-<tr>
-<td>原型</td>
-<td>Prototype</td>
-<td>通过拷贝原型对象创建新的对象。</td>
-<td>克隆对象</td>
-</tr>
-<tr>
-<td>单例</td>
-<td>Singleton</td>
-<td>确保一个类只有一个实例，并提供一个访问它的全局访问点。</td>
-<td>单实例</td>
-</tr>
-</tbody></table>
-<h3 id="结构型"><a href="#结构型" class="headerlink" title="结构型"></a>结构型</h3><p>用于处理类或对象的组合，对类如何设计以形成更大的结构提供指南。</p>
-<table>
-<thead>
-<tr>
-<th>中文名称</th>
-<th>英文名称</th>
-<th>简要说明</th>
-<th>速记关键字</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>适配器</td>
-<td>Adapter</td>
-<td>将一个类的接口转换成希望的另外一个接口，使得原本不兼容的接口可以协同工作。</td>
-<td>转化接口</td>
-</tr>
-<tr>
-<td>桥接</td>
-<td>Bridge</td>
-<td>将类的抽象部分与它的实现分离，使它们都可以独立地变化。</td>
-<td>继承树拆分</td>
-</tr>
-<tr>
-<td>组合</td>
-<td>Composite</td>
-<td>将对象组合成树形结构以表示“部分-整体”的层次结构，同时对单个对象和组合对象的使用保持一致。</td>
-<td>树形目录结构</td>
-</tr>
-<tr>
-<td>装饰</td>
-<td>Decorator</td>
-<td>动态地给一个对象添加一些额外的职责。</td>
-<td>动态附加职责</td>
-</tr>
-<tr>
-<td>外观</td>
-<td>Facade</td>
-<td>为子系统中的一组接口提供一个统一的接口。</td>
-<td>对外统一接口</td>
-</tr>
-<tr>
-<td>享元</td>
-<td>Flyweight</td>
-<td>运用共享对象有效地支持大量细粒度的对象。</td>
-<td>汉字编码</td>
-</tr>
-<tr>
-<td>代理</td>
-<td>Proxy</td>
-<td>为控制对象的访问而提供的代理对象。</td>
-<td>快捷方式</td>
-</tr>
-</tbody></table>
-<p>代理模式在不改变原始类接口的条件下，为原始类定义一个代理类，主要目的是控制访问。</p>
-<p>桥接模式的目的是将接口部分和实现部分分离，从而让它们可以较为容易、也相对独立地加以改变。</p>
-<p>装饰模式在不改变原始类接口的情况下，对原始类功能进行增强，</p>
-<p>适配器模式是一种事后的补救策略，用来补救接口不兼容。适配器提供跟原始类不同的接口，而代理模式、装饰器模式提供的都是跟原始类相同的接口。</p>
-<h3 id="行为型"><a href="#行为型" class="headerlink" title="行为型"></a>行为型</h3><p>用于描述类或对象的交互以及职责的分配，对类之间交互以及分配责任的方式提供指南。</p>
-<table>
-<thead>
-<tr>
-<th>中文名称</th>
-<th>英文名称</th>
-<th>简要说明</th>
-<th>速记关键字</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>职责链</td>
-<td>Chain of Responsibility</td>
-<td>将对象连成一条链，并沿着这条链传递请求，直到有一个对象处理它。</td>
-<td>传递职责</td>
-</tr>
-<tr>
-<td>命令</td>
-<td>Command</td>
-<td>将请求封装为对象，就可以保存、传递命令，以及支持可撤销的操作。</td>
-<td>日志记录，可撤销</td>
-</tr>
-<tr>
-<td>解释器</td>
-<td>Interpreter</td>
-<td>可以解释自定义语法表示的解释器。</td>
-<td>虚拟机的机制</td>
-</tr>
-<tr>
-<td>迭代器</td>
-<td>Iterator</td>
-<td>提供一种方法可以顺序访问集合中的各个元素，又不需要暴露该集合的内部表示。</td>
-<td>数据集</td>
-</tr>
-<tr>
-<td>中介者</td>
-<td>Mediator</td>
-<td>用一个中介对象来封装一系列的对象交互。</td>
-<td>不直接引用</td>
-</tr>
-<tr>
-<td>备忘录</td>
-<td>Memento</td>
-<td>捕获一个对象的内部状态，并在该对象之外保存这个状态。</td>
-<td>游戏存档</td>
-</tr>
-<tr>
-<td>观察者</td>
-<td>Observer</td>
-<td>定义对象间的一种一对多的依赖关系，当一个对象的状态发生改变时，所有依赖于它的对象都得到通知并被自动更新。</td>
-<td>订阅、广播、联动</td>
-</tr>
-<tr>
-<td>状态</td>
-<td>State</td>
-<td>允许对象在其内部状态改变时改变它的行为。</td>
-<td>状态变成类</td>
-</tr>
-<tr>
-<td>策略</td>
-<td>Strategy</td>
-<td>定义一系列的算法，把它们一个个封装起来，并且使它们可相互替换。</td>
-<td>多方案切换</td>
-</tr>
-<tr>
-<td>模板方法</td>
-<td>Template Method</td>
-<td>定义一个操作中的算法的骨架，使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤。</td>
-<td>框架</td>
-</tr>
-<tr>
-<td>访问者</td>
-<td>Visitor</td>
-<td>表示一个作用于某对象结构中的各元素的操作。它使你可以在不改变各元素的类的前提下定义作用于这些元素的新操作。</td>
-<td>数据与操作分离</td>
-</tr>
-</tbody></table>
-<h2 id="设计原则"><a href="#设计原则" class="headerlink" title="设计原则"></a>设计原则</h2><ul>
-<li><strong>开闭原则</strong></li>
-</ul>
-<p>一个软件实体应当对扩展开放，对修改关闭。为了满足开闭原则，需要对系统进行抽象化设计，可以为系统定义一个相对稳定的抽象层，而将不同的实现行为移至具体的实现层中完成。如果需要修改系统的行为，无须对抽象层进行任何改动，只需要增加新的具体类来实现新的业务功能即可。</p>
-<p>开闭原则的优点在于可以在不改动原有代码的前提下给程序扩展功能。增加了程序的可扩展性，同时也降低了程序的维护成本。</p>
-<ul>
-<li><strong>里氏替换原则</strong></li>
-</ul>
-<p>所有引用基类对象的地方能够透明地使用其子类的对象。在软件中将一个基类对象替换成它的子类对象，程序将不会产生任何错误和异常，反过来则不成立。因此在程序中尽量使用基类类型来对对象进行定义，而在运行时再确定其子类类型，来替换父类对象。这样可以检验继承使用的正确性，约束继承在使用上的泛滥。</p>
-<ul>
-<li><strong>依赖倒置原则</strong></li>
-</ul>
-<p>抽象不应该依赖于具体类，具体类应当依赖于抽象。换言之，要针对接口编程，而不是针对实现编程。在传递参数时或在关联关系中，尽量使用接口和抽象类进行变量类型声明、参数类型声明、方法返回类型声明，以及数据类型的转换等，而不要用具体实现类来做这些事情。</p>
-<ul>
-<li><strong>单一职责原则</strong></li>
-</ul>
-<p>类的功能应该单一，高内聚、低耦合，降低了程序的维护成本。</p>
-<ul>
-<li><strong>迪米特法则</strong></li>
-</ul>
-<p>又称为最少知道原则，降低类与类之间的耦合度，减少类与类之间的关联程度，这样当其中一个模块发生修改时，就不会波及关联的类。</p>
-<ul>
-<li><strong>接口分离原则</strong></li>
-</ul>
-<p>接口应该功能单一，责任划分明确，使用多个专门的接口，而不是单个总接口。</p>
-<p><img src="/images/code/%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99.jpg" alt="设计原则"></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/ningskyer/articles/3615312.html">https://www.cnblogs.com/ningskyer/articles/3615312.html</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/leacock1991/category_10688843.html">https://blog.csdn.net/leacock1991/category_10688843.html</a><br><a target="_blank" rel="noopener" href="https://wangyazhou.blog.csdn.net/article/details/110356374">https://wangyazhou.blog.csdn.net/article/details/110356374</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/u012611878/category_6954011.html">https://blog.csdn.net/u012611878/category_6954011.html</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1956,7 +1798,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">221</span>
+          <span class="site-state-item-count">222</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1994,7 +1836,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

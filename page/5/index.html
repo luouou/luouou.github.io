@@ -176,6 +176,88 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/kernel/spi_device/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/04/kernel/spi_device/" class="post-title-link" itemprop="url">spi 设备驱动</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="spi-device"><a href="#spi-device" class="headerlink" title="spi_device"></a>spi_device</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">spi_device</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device</span>   <span class="title">dev</span>;</span>    <span class="comment">//设备文件 </span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">spi_master</span>   *<span class="title">master</span>;</span>    <span class="comment">//spi主机 </span></span><br><span class="line">    u32 max_speed_hz;   <span class="comment">//最大速率 </span></span><br><span class="line">    u8  chip_select;    <span class="comment">//片选 </span></span><br><span class="line">    u8  mode;   <span class="comment">//模式 </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_CPHA    0x01            <span class="comment">/* clock phase */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_CPOL    0x02            <span class="comment">/* clock polarity */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_MODE_0  (0|0)           <span class="comment">/* (original MicroWire) */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_MODE_1  (0|SPI_CPHA)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_MODE_2  (SPI_CPOL|0)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_MODE_3  (SPI_CPOL|SPI_CPHA)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_CS_HIGH 0x04            <span class="comment">/* chipselect active high? */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_LSB_FIRST   0x08            <span class="comment">/* per-word bits-on-wire */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_3WIRE   0x10            <span class="comment">/* SI/SO signals shared */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_LOOP    0x20            <span class="comment">/* loopback mode */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_NO_CS   0x40            <span class="comment">/* 1 dev/bus, no chipselect */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_READY   0x80            <span class="comment">/* slave pulls low to pause */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_TX_DUAL 0x100           <span class="comment">/* transmit with 2 wires */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_TX_QUAD 0x200           <span class="comment">/* transmit with 4 wires */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_RX_DUAL 0x400           <span class="comment">/* receive with 2 wires */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_RX_QUAD 0x800           <span class="comment">/* receive with 4 wires */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_CS_WORD 0x1000          <span class="comment">/* toggle cs after each word */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_TX_OCTAL    0x2000          <span class="comment">/* transmit with 8 wires */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_RX_OCTAL    0x4000          <span class="comment">/* receive with 8 wires */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPI_3WIRE_HIZ   0x8000          <span class="comment">/* high impedance turnaround */</span></span></span><br><span class="line">    u8  bits_per_word;  <span class="comment">//一个字有多少位 </span></span><br><span class="line">    <span class="type">int</span> irq;    <span class="comment">//中断号 </span></span><br><span class="line">    <span class="type">void</span>    *controller_state;  <span class="comment">//控制器状态 </span></span><br><span class="line">    <span class="type">void</span>    *controller_data;   <span class="comment">//控制器数据 </span></span><br><span class="line">    <span class="type">char</span>    modalias[SPI_NAME_SIZE]; <span class="comment">//名字 </span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="spi-board-info"><a href="#spi-board-info" class="headerlink" title="spi_board_info"></a>spi_board_info</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">spi_board_info</span> &#123;</span> </span><br><span class="line">    <span class="type">char</span>    modalias[SPI_NAME_SIZE];    <span class="comment">//名字 </span></span><br><span class="line">    <span class="type">const</span> <span class="type">void</span>  *platform_data; <span class="comment">//平台数据 </span></span><br><span class="line">    <span class="type">void</span>    *controller_data;   <span class="comment">//控制器数据 </span></span><br><span class="line">    <span class="type">int</span> irq;            <span class="comment">//中断号 </span></span><br><span class="line">    u32 max_speed_hz;   <span class="comment">//最大速率 </span></span><br><span class="line">    u16 bus_num;        <span class="comment">//spi总线编号 </span></span><br><span class="line">    u16 chip_select;    <span class="comment">//片选 </span></span><br><span class="line">    u8  mode;           <span class="comment">//模式 </span></span><br><span class="line">&#125;; </span><br></pre></td></tr></table></figure>
+
+<h3 id="spi-device注册"><a href="#spi-device注册" class="headerlink" title="spi_device注册"></a>spi_device注册</h3><p>spi_device的注册一般在板文件中实现，先填充 spi_board_info 结构体，再使用 spi_register_board_info() 函数添加。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">spi_board_info</span> <span class="title">spi_board_info</span>[] __<span class="title">initdata</span> =</span> &#123;</span><br><span class="line">    &#123;</span><br><span class="line">        .modalias   = <span class="string">&quot;lms501kf03&quot;</span>,</span><br><span class="line">        .platform_data  = <span class="literal">NULL</span>,</span><br><span class="line">        .max_speed_hz   = <span class="number">1200000</span>,</span><br><span class="line">        .bus_num    = LCD_BUS_NUM,</span><br><span class="line">        .chip_select    = <span class="number">0</span>,</span><br><span class="line">        .mode       = SPI_MODE_3,</span><br><span class="line">        .controller_data = (<span class="type">void</span> *)DISPLAY_CS,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">spi_register_board_info(spi_board_info, ARRAY_SIZE(spi_board_info));</span><br></pre></td></tr></table></figure>
+
+<h3 id="spi-register-board-info"><a href="#spi-register-board-info" class="headerlink" title="spi_register_board_info()"></a>spi_register_board_info()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">boardinfo</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>    <span class="title">list</span>;</span></span><br><span class="line">    <span class="type">unsigned</span>        n_board_info;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">spi_board_info</span>   <span class="title">board_info</span>[0];</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="title function_">LIST_HEAD</span><span class="params">(board_list)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">spi_register_board_info</span><span class="params">(<span class="keyword">struct</span> spi_board_info <span class="type">const</span> *info, <span class="type">unsigned</span> n)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">boardinfo</span>    *<span class="title">bi</span>;</span></span><br><span class="line"></span><br><span class="line">    bi = kmalloc(<span class="keyword">sizeof</span>(*bi) + n * <span class="keyword">sizeof</span> *info, GFP_KERNEL);</span><br><span class="line">    bi-&gt;n_board_info = n;</span><br><span class="line">    <span class="built_in">memcpy</span>(bi-&gt;board_info, info, n * <span class="keyword">sizeof</span> *info);</span><br><span class="line"></span><br><span class="line">    mutex_lock(&amp;board_lock);</span><br><span class="line">    list_add_tail(&amp;bi-&gt;<span class="built_in">list</span>, &amp;board_list);</span><br><span class="line">    mutex_unlock(&amp;board_lock);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>添加到全局链表 board_list 中，注册SPI主机驱动时链表，如果匹配到控制器，则调用 spi_new_device() 函数添加一个spi设备。</p>
+<h2 id="spi-driver"><a href="#spi-driver" class="headerlink" title="spi_driver"></a>spi_driver</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">spi_driver</span> &#123;</span></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">spi_device_id</span> *<span class="title">id_table</span>;</span></span><br><span class="line">    <span class="type">int</span>  (*probe)(<span class="keyword">struct</span> spi_device *spi);</span><br><span class="line">    <span class="type">int</span>  (*remove)(<span class="keyword">struct</span> spi_device *spi);</span><br><span class="line">    <span class="type">void</span> (*shutdown)(<span class="keyword">struct</span> spi_device *spi);</span><br><span class="line">    <span class="type">int</span>  (*suspend)(<span class="keyword">struct</span> spi_device *spi, <span class="type">pm_message_t</span> mesg);</span><br><span class="line">    <span class="type">int</span>  (*resume)(<span class="keyword">struct</span> spi_device *spi);</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_driver</span> <span class="title">driver</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="spi-driver-注册"><a href="#spi-driver-注册" class="headerlink" title="spi_driver 注册"></a>spi_driver 注册</h3><p>spi设备驱动根据功能分开在各个地方，如spi flash的一般就在/drivers/mtd/device/下，siwtch的spi接口就放在/drivers/net/ethernet/下。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">spi_driver</span> <span class="title">ak_spiflash_driver</span> =</span> &#123;</span><br><span class="line">    .driver = &#123;</span><br><span class="line">        .name   = <span class="string">&quot;ak-spiflash&quot;</span>,</span><br><span class="line">        .bus    = &amp;spi_bus_type,</span><br><span class="line">        .owner  = THIS_MODULE,</span><br><span class="line">    &#125;,</span><br><span class="line">    .probe  = ak_spiflash_probe,</span><br><span class="line">    .remove = __devexit_p(ak_spiflash_remove),</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">ak_spiflash_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> spi_register_driver(&amp;ak_spiflash_driver);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="spi-register-driver"><a href="#spi-register-driver" class="headerlink" title="spi_register_driver()"></a>spi_register_driver()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">spi_register_driver</span><span class="params">(<span class="keyword">struct</span> spi_driver *sdrv)</span></span><br><span class="line">&#123;</span><br><span class="line">    sdrv-&gt;driver.bus = &amp;spi_bus_type;</span><br><span class="line">    <span class="keyword">if</span> (sdrv-&gt;probe)</span><br><span class="line">        sdrv-&gt;driver.probe = spi_drv_probe;</span><br><span class="line">    <span class="keyword">if</span> (sdrv-&gt;remove)</span><br><span class="line">        sdrv-&gt;driver.remove = spi_drv_remove;</span><br><span class="line">    <span class="keyword">if</span> (sdrv-&gt;shutdown)</span><br><span class="line">        sdrv-&gt;driver.shutdown = spi_drv_shutdown;</span><br><span class="line">    <span class="keyword">return</span> driver_register(&amp;sdrv-&gt;driver);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/kernel/rtc/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1205,97 +1287,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/algo/sqlist/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/04/algo/sqlist/" class="post-title-link" itemprop="url">线性表</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-10-04 16:17:22" itemprop="dateModified" datetime="2022-10-04T16:17:22+08:00">2022-10-04</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h2><p>数组（Array）是一种线性表数据结构，用来存储一组具有相同类型的数据，它的内存空间是连续的，支持随机访问，但插入与删除操作需要移动大量结点，同时不能预先确定分配的空间大小，会造成空间的浪费。</p>
-<p><img src="/images/code/algo/sqlist/array.jpg" alt="img"></p>
-<p>数组根据下标随机访问的时间复杂度为 O(1)。排好序的数组用二分查找，时间复杂度是 O(logn)。顺序查找，最好时间复杂度为 O(1)，最差时间复杂度为O(n)，平均时间复杂度为O(n)。</p>
-<h2 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h2><p><img src="/images/code/algo/sqlist/list.jpg" alt="img"></p>
-<p>删除给定值的结点，各种链表都需要从头结点开始遍历对比，直到找到值等于给定值的结点，然后再删除。单纯的删除操作时间复杂度是 O(1)，但遍历查找对应的时间复杂度为 O(n)。链表操作的总时间复杂度为 O(n)。</p>
-<p>删除给定指针指向的结点，删除某个结点需要知道其前驱结点，而单链表并不支持直接获取前驱结点，还是要从头结点开始遍历链表，时间复杂度 O(n)。而双向链表中的结点已经保存了前驱结点的指针，不需要像单链表那样遍历，只要 O(1) 的时间复杂度。</p>
-<p><img src="/images/code/algo/sqlist/list-del.png" alt="img"><br><img src="/images/code/algo/sqlist/list-add.png" alt="img"></p>
-<h2 id="栈"><a href="#栈" class="headerlink" title="栈"></a>栈</h2><p>栈是一种后进先出、先进后出的结构。</p>
-<p><img src="/images/code/algo/sqlist/stack.jpg" alt="img"></p>
-<h2 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h2><p>队列是一种先进先出、后进后出的结构。</p>
-<p><img src="/images/code/algo/sqlist/queue.png" alt="img"><br><img src="/images/code/algo/sqlist/ringbuf.png" alt="img"></p>
-<p>环形队列为空的判断条件是<code>head == tail</code>，满的条件是<code>(tail+1) % n = head</code>。</p>
-<h2 id="跳表"><a href="#跳表" class="headerlink" title="跳表"></a>跳表</h2><p>跳表就是链表 + 多级索引，其插入、删除操作的时间复杂度是 O(logn)。空间复杂度是 O(n)。</p>
-<p><img src="/images/code/algo/sqlist/inode.png" alt="img"></p>
-<p>加一层索引之后，查找一个结点需要遍历的结点个数就减少了。比如要查找16，当在索引层遍历到13时，发现索引层下一个节点是17大于目标16，则可从13的down指针下降到下一层索引继续遍历，最终从原始链表中找到16。</p>
-<h2 id="散列表"><a href="#散列表" class="headerlink" title="散列表"></a>散列表</h2><p>散列表利用了数组按照下标随机访问的时候时间复杂度是 O(1) 的特性。通过散列函数把元素的键值映射为下标，然后将数据存储在数组中对应下标的位置。当按照键值查询元素时，用同样的散列函数，将键值转化数组下标，从对应的数组下标的位置取数据。</p>
-<p><img src="/images/code/algo/sqlist/HashTable.png" alt="img"></p>
-<p>散列表两个核心问题是<strong>散列函数设计</strong>和<strong>散列冲突解决</strong>。解决散列冲突方法有开放寻址法和链表法。散列函数设计的好坏决定了散列冲突的概率，也就决定散列表的性能。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1365,7 +1356,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">221</span>
+          <span class="site-state-item-count">222</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1403,7 +1394,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
