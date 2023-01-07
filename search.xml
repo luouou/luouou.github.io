@@ -12851,7 +12851,7 @@
   <entry>
     <title>uboot启动分析</title>
     <url>/2022/09/04/boot/uboot/</url>
-    <content><![CDATA[<h2 id="BootLoader"><a href="#BootLoader" class="headerlink" title="BootLoader"></a>BootLoader</h2><p>BootLoader (引导加载程序)就是在操作系统内核运行之前运行的一段小程序，通过这段代码实现硬件的初始化，建立内存空间的映射，将内核镜像从flash上读到RAM中，为操作系统内核准备好硬件环境，然后跳转到内核的入口点去运行引导内核启动。</p>
+    <content><![CDATA[<p>BootLoader (引导加载程序)就是在操作系统内核运行之前运行的一段小程序，通过这段代码实现硬件的初始化，建立内存空间的映射，将内核镜像从flash上读到RAM中，为操作系统内核准备好硬件环境，然后跳转到内核的入口点去运行引导内核启动。</p>
 <p>BootLoader必须要具备的能力：</p>
 <ol>
 <li>能自身开机直接启动，必须进行和硬件相对应的代码级别的更改和移植，才能够保证可以从相应的启动介质启动。</li>
@@ -12859,12 +12859,15 @@
 <li>能进行 SoC 级和板级硬件管理，控制部分硬件外设。</li>
 <li>能提供系统部署功能，实现flash上的烧录下载。</li>
 </ol>
-<p><a href="https://ftp.denx.de/pub/u-boot/">下载地址</a></p>
+<p>u-boot下载地址：<a href="https://ftp.denx.de/pub/u-boot/">https://ftp.denx.de/pub/u-boot/</a></p>
 <h2 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h2><p><img src="/images/uboot/uboot_arch.png" alt="img"></p>
 <p>u-boot-2010.06及以后版本目录结构：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">├── api                存放uboot提供的接口函数</span><br><span class="line">├── arch               CPU体系结构相关的代码，每种架构对应一个子目录</span><br><span class="line">├── board              开发板相关的文件，每种开发板对应一个子目录</span><br><span class="line">├── common             通用的代码，主要实现 uboot命令行下支持的命令，每一条命令对应一个文件。</span><br><span class="line">├── disk               磁盘分区相关代码</span><br><span class="line">├── doc                文档</span><br><span class="line">├── drivers            支持的设备驱动</span><br><span class="line">├── examples           示例程序</span><br><span class="line">├── fs                 文件系统，目前支持 cramfs、fat、fdos、jffs2 和 registerfs</span><br><span class="line">├── include            头文件，已通用的头文件为主</span><br><span class="line">├── lib                通用库文件</span><br><span class="line">├── nand_spl           NAND存储器相关代码</span><br><span class="line">├── net                网络相关代码，小型的协议栈</span><br><span class="line">├── onenand_ipl</span><br><span class="line">├── post               加电自检程序</span><br><span class="line">└── tools              辅助程序，用于编译和检查uboot目标文件</span><br></pre></td></tr></table></figure>
 
-<h2 id="启动流程分析"><a href="#启动流程分析" class="headerlink" title="启动流程分析"></a>启动流程分析</h2><p>第一阶段依赖于 CPU 体系结构的代码，在 SRAM 中，一般用汇编语言来实现。主要进行以下方面的设置：设置 ARM 进入 SVC 模式、禁止 IRQ 和 FIQ、关闭看门狗、屏蔽所有中断。设置CPU的速度和时钟(FCLK,HCLK,PCLK)，RAM初始化，清空 I/D cache、清空 TLB、禁止 MMU 和 cache、配置内存控制器、为搬运代码做准备、搬移 uboot 镜像到 RAM 中（使用 copy_loop 实现）、分配堆栈、清空 bss 段（使用 clbss_l 实现）。最后跳转到第二阶段。</p>
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="启动流程分析"><a href="#启动流程分析" class="headerlink" title="启动流程分析"></a>启动流程分析</h2><p>第一阶段依赖于 CPU 体系结构的代码，在 SRAM 中，一般用汇编语言来实现。主要进行以下方面的设置：</p>
+<p>设置 ARM 进入 SVC 模式<br>禁止 IRQ 和 FIQ、关闭看门狗、屏蔽所有中断<br>设置CPU的速度和时钟(FCLK,HCLK,PCLK)<br>RAM初始化，清空 I/D cache<br>清空 TLB、禁止 MMU 和 cache、配置内存控制器、为搬运代码做准备<br>搬移 uboot 镜像到 RAM 中（使用 copy_loop 实现）、分配堆栈、清空 bss 段（使用 clbss_l 实现）<br>最后跳转到第二阶段。</p>
 <p>主要功能为：</p>
 <ul>
 <li>硬件设备初始化（关闭看门狗和中断，MMU，Cache，配置系统工作时钟）。</li>
@@ -12873,6 +12876,7 @@
 <li>设置堆栈指针sp。</li>
 <li>跳转到第二阶段代码的入口点。</li>
 </ul>
+<p>初始化异常向量表<br>设置 SVC 模式<br>关中断<br>配置cp15协处理器<br>初始化 mmu、cache、tlb（cpu_init_cp15）<br>板级初始化（cpu_init_crit）</p>
 <p>第二阶段在 DRAM 中，用c语言来实现，这样可以实现更复杂的功能，而且代码会具有更好的可读性和可移植性。初始化SoC 外部硬件(如 iNand、网卡芯片等)、 uboot 本身的一些东西(uboot 的命令、环境变量等)。</p>
 <p>主要功能为：</p>
 <ul>
@@ -23754,68 +23758,6 @@ tcpdump ip multicast
       </tags>
   </entry>
   <entry>
-    <title>交叉编译工具链命名规则</title>
-    <url>/2022/09/25/tool/gcc_name/</url>
-    <content><![CDATA[<p>交叉编译工具链是一个由编译器、连接器和解释器组成的综合开发环境，交叉编译工具链主要由binutils、gcc和glibc三个部分组成。有时出于减小 libc 库大小的考虑，也可以用别的 c 库来代替 glibc，例如 uClibc、dietlibc 和 newlib。</p>
-<p><strong>分类</strong></p>
-<p>从授权上，分为免费授权版和付费授权版。免费版目前有三大主流工具商提供，第一是GNU（提供源码，自行编译制作），第二是 Codesourcery，第三是Linora。收费版有ARM原厂提供的armcc、IAR提供的编译器等等。</p>
-<ul>
-<li><p>arm-linux-gnueabihf-gcc：是由 Linaro 公司基于GCC推出的的ARM交叉编译工具。可用于交叉编译ARM（32位）系统中所有环节的代码，包括裸机程序、u-boot、Linux kernel、filesystem和App应用程序。</p>
-</li>
-<li><p>aarch64-linux-gnu-gcc：是由 Linaro 公司基于GCC推出的的ARM交叉编译工具。可用于交叉编译ARMv8 64位目标中的裸机程序、u-boot、Linux kernel、filesystem和App应用程序。</p>
-</li>
-<li><p>arm-none-linux-gnueabi-gcc：是 Codesourcery 公司（目前已经被Mentor收购）基于GCC推出的的ARM交叉编译工具。可用于交叉编译ARM（32位）系统中所有环节的代码，包括裸机程序、u-boot、Linux kernel、filesystem和App应用程序。</p>
-</li>
-<li><p>arm-none-elf-gcc：是 Codesourcery 公司（目前已经被Mentor收购）基于GCC推出的的ARM交叉编译工具。可用于交叉编译ARM MCU（32位）芯片，如ARM7、ARM9、Cortex-M/R芯片程序。</p>
-</li>
-<li><p>arm-none-eabi-gcc：是 GNU 推出的的ARM交叉编译工具。可用于交叉编译ARM MCU（32位）芯片，如ARM7、ARM9、Cortex-M/R芯片程序。</p>
-</li>
-</ul>
-<p><strong>命名规则</strong></p>
-<p>交叉编译工具链的命名规则为：arch [-vendor] [-os] [-(gnu)eabi]</p>
-<ul>
-<li><p>arch - 体系架构，如ARM，MIPS</p>
-</li>
-<li><p>vendor - 工具链提供商</p>
-</li>
-<li><p>os - 目标操作系统</p>
-</li>
-<li><p>eabi - 嵌入式应用二进制接口（Embedded Application Binary Interface）</p>
-</li>
-</ul>
-<p>根据对操作系统的支持与否，ARM GCC可分为支持和不支持操作系统，如：</p>
-<ul>
-<li><p>arm-none-eabi：这个是没有操作系统的，不支持那些跟操作系统关系密切的函数，使用newlib这个专用于嵌入式系统的C库。</p>
-</li>
-<li><p>arm-none-linux-eabi 用于Linux的，使用Glibc。</p>
-</li>
-</ul>
-<p>arm-none-eabi-gcc（ARM architecture，no vendor，not target an operating system，complies with the ARM EABI）<br>用于编译 ARM 架构的裸机系统（包括 ARM Linux 的 boot、kernel，不适用编译 Linux 应用 Application），一般适合 ARM7、Cortex-M 和 Cortex-R 内核的芯片使用。</p>
-<p>arm-none-linux-gnueabi-gcc(ARM architecture, no vendor, creates binaries that run on the Linux operating system, and uses the GNU EABI)主要用于基于ARM架构的Linux系统，可用于编译 ARM 架构的 u-boot、Linux内核、linux应用等。arm-none-linux-gnueabi基于GCC，使用Glibc库，经过 Codesourcery 公司优化过推出的编译器。arm-none-linux-gnueabi-xxx 交叉编译工具的浮点运算非常优秀。一般ARM9、ARM11、Cortex-A 内核，带有 Linux 操作系统的会用到。</p>
-<p>arm-linux-gnueabi-gcc 和 arm-linux-gnueabihf-gcc两个交叉编译器分别适用于 armel 和 armhf 两个不同的架构，armel 和 armhf 这两种架构在对待浮点运算采取了不同的策略（有 fpu 的 arm 才能支持这两种浮点运算策略）。其实这两个交叉编译器只不过是 gcc 的选项 -mfloat-abi 的默认值不同。gcc 的选项 -mfloat-abi 有三种值 soft、softfp、hard（其中后两者都要求 arm 里有 fpu 浮点运算单元，soft 与后两者是兼容的，但 softfp 和 hard 两种模式互不兼容）：</p>
-<ul>
-<li><p>soft： 不用fpu进行浮点计算，即使有fpu浮点运算单元也不用，而是使用软件模式。</p>
-</li>
-<li><p>softfp： armel架构（对应的编译器为 arm-linux-gnueabi-gcc ）采用的默认值，用fpu计算，但是传参数用普通寄存器传，这样中断的时候，只需要保存普通寄存器，中断负荷小，但是参数需要转换成浮点的再计算。</p>
-</li>
-<li><p>hard： armhf架构（对应的编译器 arm-linux-gnueabihf-gcc ）采用的默认值，用fpu计算，传参数也用fpu中的浮点寄存器传，省去了转换，性能最好，但是中断负荷高。</p>
-</li>
-</ul>
-<p><strong>交叉编译器下载</strong></p>
-<p>arm-none-linux-gnueabi-gcc下载：<a href="http://www.veryarm.com/">www.veryarm.com</a></p>
-<p>arm-linux-gnueabihf-gcc下载：<a href="http://www.veryarm.com/">www.veryarm.com</a></p>
-<p>aarch64-linux-gnu-gcc下载：<a href="http://www.veryarm.com/">www.veryarm.com</a></p>
-<p>arm-none-elf-gcc下载：<a href="http://www.veryarm.com/">www.veryarm.com</a></p>
-<p>arm-none-eabi-gcc下载：<a href="http://www.veryarm.com/">www.veryarm.com</a></p>
-]]></content>
-      <categories>
-        <category>gcc</category>
-      </categories>
-      <tags>
-        <tag>gcc</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>usage for gdb</title>
     <url>/2022/06/07/tool/gdb/</url>
     <content><![CDATA[<p>set val a=10  //更改程序变量的值</p>
@@ -26715,11 +26657,29 @@ tcpdump ip multicast
       </tags>
   </entry>
   <entry>
-    <title>uboot编译与配置</title>
-    <url>/2023/01/02/boot/uboot-make/</url>
-    <content><![CDATA[<h3 id="Makefile-分析"><a href="#Makefile-分析" class="headerlink" title="Makefile 分析"></a>Makefile 分析</h3><figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line">VERSION = 2013    <span class="comment">#主版本号</span></span><br><span class="line">PATCHLEVEL = 10   <span class="comment">#次版本号</span></span><br><span class="line">SUBLEVEL =        <span class="comment">#子版本号</span></span><br><span class="line">EXTRAVERSION =    <span class="comment">#附加的版本信息</span></span><br><span class="line"><span class="keyword">ifneq</span> <span class="string">&quot;<span class="variable">$(SUBLEVEL)</span>&quot;</span> <span class="string">&quot;&quot;</span></span><br><span class="line">U_BOOT_VERSION = <span class="variable">$(VERSION)</span>.<span class="variable">$(PATCHLEVEL)</span>.<span class="variable">$(SUBLEVEL)</span><span class="variable">$(EXTRAVERSION)</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">U_BOOT_VERSION = <span class="variable">$(VERSION)</span>.<span class="variable">$(PATCHLEVEL)</span><span class="variable">$(EXTRAVERSION)</span></span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line">TIMESTAMP_FILE = <span class="variable">$(obj)</span><span class="keyword">include</span>/generated/timestamp_autogenerated.h</span><br><span class="line">VERSION_FILE = <span class="variable">$(obj)</span><span class="keyword">include</span>/generated/version_autogenerated.h</span><br><span class="line"></span><br><span class="line"><span class="keyword">ifeq</span> (,<span class="variable">$(<span class="built_in">findstring</span> s,<span class="variable">$(MAKEFLAGS)</span>)</span>)</span><br><span class="line">XECHO = echo</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">XECHO = :</span><br><span class="line"><span class="keyword">endif</span></span><br></pre></td></tr></table></figure>
+    <title>uboot Makefile 分析</title>
+    <url>/2023/01/02/boot/uboot-makefile/</url>
+    <content><![CDATA[<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line">VERSION = 2013    <span class="comment">#主版本号</span></span><br><span class="line">PATCHLEVEL = 10   <span class="comment">#次版本号</span></span><br><span class="line">SUBLEVEL =        <span class="comment">#子版本号</span></span><br><span class="line">EXTRAVERSION =    <span class="comment">#附加的版本信息</span></span><br><span class="line"></span><br><span class="line">version_h := <span class="keyword">include</span>/generated/version_autogenerated.h</span><br></pre></td></tr></table></figure>
 
-<p>uboot编译时，会将版本信息输出到 include\generated\version_autogenerated.h 文件中。<code>make -s</code> 可以使 XECHO 变量为空，关闭编译信息打印。</p>
+<p>uboot编译时，会将版本信息输出到 include\generated\version_autogenerated.h 文件中。</p>
+<p>使用 <code>make V=1</code> 可以看到完整的执行命令</p>
+<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ifeq</span> (<span class="string">&quot;$(origin V)&quot;</span>, <span class="string">&quot;command line&quot;</span>)</span><br><span class="line">  KBUILD_VERBOSE = <span class="variable">$(V)</span></span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"><span class="keyword">ifndef</span> KBUILD_VERBOSE</span><br><span class="line">  KBUILD_VERBOSE = 0</span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ifeq</span> (<span class="variable">$(KBUILD_VERBOSE)</span>,1)</span><br><span class="line">  quiet =</span><br><span class="line">  Q =</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">  quiet=quiet_</span><br><span class="line">  Q = @</span><br><span class="line"><span class="keyword">endif</span></span><br></pre></td></tr></table></figure>
+
+<p><code>make -s</code>(静默模式)，禁止命令回显</p>
+<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ifneq</span> (<span class="variable">$(<span class="built_in">filter</span> 4.%,<span class="variable">$(MAKE_VERSION)</span>)</span>,)	<span class="comment"># make-4</span></span><br><span class="line"><span class="keyword">ifneq</span> (<span class="variable">$(<span class="built_in">filter</span> %s ,$(<span class="built_in">firstword</span> x<span class="variable">$(MAKEFLAGS)</span>)</span>),)</span><br><span class="line">  quiet=silent_</span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"><span class="keyword">else</span>					<span class="comment"># make-3.8x</span></span><br><span class="line"><span class="keyword">ifneq</span> (<span class="variable">$(<span class="built_in">filter</span> s% -s%,<span class="variable">$(MAKEFLAGS)</span>)</span>,)</span><br><span class="line">  quiet=silent_</span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> quiet Q KBUILD_VERBOSE</span><br></pre></td></tr></table></figure>
+
+<p><code>make O=</code> 设置编译输出目录。</p>
+<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ifeq</span> (<span class="string">&quot;$(origin O)&quot;</span>, <span class="string">&quot;command line&quot;</span>)</span><br><span class="line">  KBUILD_OUTPUT := <span class="variable">$(O)</span></span><br><span class="line"><span class="keyword">endif</span></span><br></pre></td></tr></table></figure>
+
+<p>获取主机的CPU架构和操作系统</p>
+<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line">HOSTARCH := <span class="variable">$(<span class="built_in">shell</span> uname -m | \</span></span><br><span class="line"><span class="variable">	sed -e s/i.86/x86/ \</span></span><br><span class="line"><span class="variable">	    -e s/sun4u/sparc64/ \</span></span><br><span class="line"><span class="variable">	    -e s/arm.*/arm/ \</span></span><br><span class="line"><span class="variable">	    -e s/sa110/arm/ \</span></span><br><span class="line"><span class="variable">	    -e s/ppc64/powerpc/ \</span></span><br><span class="line"><span class="variable">	    -e s/ppc/powerpc/ \</span></span><br><span class="line"><span class="variable">	    -e s/macppc/powerpc/\</span></span><br><span class="line"><span class="variable">	    -e s/sh.*/sh/)</span></span><br><span class="line"></span><br><span class="line">HOSTOS := <span class="variable">$(<span class="built_in">shell</span> uname -s | tr &#x27;[:upper:]&#x27; &#x27;[:lower:]&#x27; | \</span></span><br><span class="line"><span class="variable">	    sed -e &#x27;s/\(cygwin\)</span>.*/cygwin/&#x27;)</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> HOSTARCH HOSTOS</span><br></pre></td></tr></table></figure>
+
+<p>设置编译器和配置文件</p>
+<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line">KCONFIG_CONFIG	?= .config</span><br><span class="line"><span class="keyword">export</span> KCONFIG_CONFIG</span><br><span class="line"></span><br><span class="line">HOST_LFS_CFLAGS := <span class="variable">$(<span class="built_in">shell</span> getconf LFS_CFLAGS 2&gt;/dev/null)</span></span><br><span class="line">HOST_LFS_LDFLAGS := <span class="variable">$(<span class="built_in">shell</span> getconf LFS_LDFLAGS 2&gt;/dev/null)</span></span><br><span class="line">HOST_LFS_LIBS := <span class="variable">$(<span class="built_in">shell</span> getconf LFS_LIBS 2&gt;/dev/null)</span></span><br><span class="line"></span><br><span class="line">HOSTCC       = cc</span><br><span class="line">HOSTCXX      = c++</span><br><span class="line">KBUILD_HOSTCFLAGS   := -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer \</span><br><span class="line">		<span class="variable">$(HOST_LFS_CFLAGS)</span> <span class="variable">$(HOSTCFLAGS)</span></span><br><span class="line">KBUILD_HOSTCXXFLAGS := -O2 <span class="variable">$(HOST_LFS_CFLAGS)</span> <span class="variable">$(HOSTCXXFLAGS)</span></span><br><span class="line">KBUILD_HOSTLDFLAGS  := <span class="variable">$(HOST_LFS_LDFLAGS)</span> <span class="variable">$(HOSTLDFLAGS)</span></span><br><span class="line">KBUILD_HOSTLDLIBS   := <span class="variable">$(HOST_LFS_LIBS)</span> <span class="variable">$(HOSTLDLIBS)</span></span><br></pre></td></tr></table></figure>
+
+<p>制作变量，设置编译器完整名称</p>
+<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line">AS		= <span class="variable">$(CROSS_COMPILE)</span>as</span><br><span class="line"><span class="comment"># Always use GNU ld</span></span><br><span class="line"><span class="keyword">ifneq</span> (<span class="variable">$(<span class="built_in">shell</span> <span class="variable">$(CROSS_COMPILE)</span>ld.bfd -v 2&gt; /dev/null)</span>,)</span><br><span class="line">LD		= <span class="variable">$(CROSS_COMPILE)</span>ld.bfd</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">LD		= <span class="variable">$(CROSS_COMPILE)</span>ld</span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line">CC		= <span class="variable">$(CROSS_COMPILE)</span>gcc</span><br><span class="line">CPP		= <span class="variable">$(CC)</span> -E</span><br><span class="line">AR		= <span class="variable">$(CROSS_COMPILE)</span>ar</span><br><span class="line">NM		= <span class="variable">$(CROSS_COMPILE)</span>nm</span><br><span class="line">LDR		= <span class="variable">$(CROSS_COMPILE)</span>ldr</span><br><span class="line">STRIP		= <span class="variable">$(CROSS_COMPILE)</span>strip</span><br><span class="line">OBJCOPY		= <span class="variable">$(CROSS_COMPILE)</span>objcopy</span><br><span class="line">OBJDUMP		= <span class="variable">$(CROSS_COMPILE)</span>objdump</span><br></pre></td></tr></table></figure>
+
 <figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line">MKCONFIG := <span class="variable">$(SRCTREE)</span>/mkconfig</span><br><span class="line"><span class="keyword">export</span> MKCONFIG</span><br><span class="line"></span><br><span class="line"><span class="section">unconfig:</span></span><br><span class="line">    @rm -f <span class="variable">$(obj)</span><span class="keyword">include</span>/config.h <span class="variable">$(obj)</span><span class="keyword">include</span>/config.mk \</span><br><span class="line">        <span class="variable">$(obj)</span>board/*/config.tmp <span class="variable">$(obj)</span>board/*/*/config.tmp \</span><br><span class="line">        <span class="variable">$(obj)</span><span class="keyword">include</span>/autoconf.mk <span class="variable">$(obj)</span><span class="keyword">include</span>/autoconf.mk.dep \</span><br><span class="line">        <span class="variable">$(obj)</span><span class="keyword">include</span>/spl-autoconf.mk \</span><br><span class="line">        <span class="variable">$(obj)</span><span class="keyword">include</span>/tpl-autoconf.mk</span><br><span class="line">        </span><br><span class="line"><span class="section">%_config:: unconfig</span></span><br><span class="line">    @<span class="variable">$(MKCONFIG)</span> -A $(@:_config=)</span><br></pre></td></tr></table></figure>
 
 <p>设置[mkconfig](#mkconfig 分析)脚本的路径。</p>
@@ -26740,27 +26700,105 @@ tcpdump ip multicast
 <figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ifndef</span> LDSCRIPT</span><br><span class="line">    <span class="keyword">ifeq</span> (<span class="variable">$(CONFIG_NAND_U_BOOT)</span>,y)</span><br><span class="line">        LDSCRIPT := <span class="variable">$(TOPDIR)</span>/board/<span class="variable">$(BOARDDIR)</span>/u-boot-nand.lds</span><br><span class="line">        <span class="keyword">ifeq</span> (<span class="variable">$(<span class="built_in">wildcard</span> <span class="variable">$(LDSCRIPT)</span>)</span>,)</span><br><span class="line">            LDSCRIPT := <span class="variable">$(TOPDIR)</span>/<span class="variable">$(CPUDIR)</span>/u-boot-nand.lds</span><br><span class="line">        <span class="keyword">endif</span></span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line">    <span class="keyword">ifeq</span> (<span class="variable">$(<span class="built_in">wildcard</span> <span class="variable">$(LDSCRIPT)</span>)</span>,)</span><br><span class="line">        LDSCRIPT := <span class="variable">$(TOPDIR)</span>/board/<span class="variable">$(BOARDDIR)</span>/u-boot.lds</span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line">    <span class="keyword">ifeq</span> (<span class="variable">$(<span class="built_in">wildcard</span> <span class="variable">$(LDSCRIPT)</span>)</span>,)</span><br><span class="line">        LDSCRIPT := <span class="variable">$(TOPDIR)</span>/<span class="variable">$(CPUDIR)</span>/u-boot.lds</span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line">    <span class="keyword">ifeq</span> (<span class="variable">$(<span class="built_in">wildcard</span> <span class="variable">$(LDSCRIPT)</span>)</span>,)</span><br><span class="line">        LDSCRIPT := <span class="variable">$(TOPDIR)</span>/arch/<span class="variable">$(ARCH)</span>/cpu/u-boot.lds</span><br><span class="line">        <span class="comment"># We don&#x27;t expect a Makefile here</span></span><br><span class="line">        LDSCRIPT_MAKEFILE_DIR =</span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line">    <span class="keyword">ifeq</span> (<span class="variable">$(<span class="built_in">wildcard</span> <span class="variable">$(LDSCRIPT)</span>)</span>,)</span><br><span class="line"><span class="variable">$(<span class="built_in">error</span> could not find linker script)</span></span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line"><span class="keyword">endif</span></span><br></pre></td></tr></table></figure>
 
 <p>指定链接脚本，如果定义了 CONFIG_NAND_U_BOOT 宏，则链接脚本叫 u-boot-nand.lds，如果未定义这个宏则链接脚本叫 u-boot.lds。查找顺序为 board/, cpu_xxx/, arch/。</p>
-<h3 id="mkconfig-分析"><a href="#mkconfig-分析" class="headerlink" title="mkconfig 分析"></a>mkconfig 分析</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">if [ \( $# -eq 2 \) -a \( &quot;$1&quot; = &quot;-A&quot; \) ] ; then</span><br><span class="line">    # Automatic mode</span><br><span class="line">    line=`awk &#x27;($0 !~ /^#/ &amp;&amp; $7 ~ /^&#x27;&quot;$2&quot;&#x27;$/) &#123; print $1, $2, $3, $4, $5, $6, $7, $8 &#125;&#x27; boards.cfg`</span><br><span class="line">    if [ -z &quot;$line&quot; ] ; then</span><br><span class="line">        echo &quot;make: *** No rule to make target \`$2_config&#x27;.  Stop.&quot; &gt;&amp;2</span><br><span class="line">        exit 1</span><br><span class="line">    fi</span><br><span class="line"></span><br><span class="line">    set $&#123;line&#125;</span><br><span class="line">    # add default board name if needed</span><br><span class="line">    [ $# = 3 ] &amp;&amp; set $&#123;line&#125; $&#123;1&#125;</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
-
-<p>boards.cfg 文件定义了一张 board 与arch, cpu, soc, vendor 对应的表。通过解析 boards.cfg 文件可获得相应的信息。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Active  arm         armv7          s5pc1xx     samsung         smdkc100            smdkc100                                                </span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">if [ &quot;$SRCTREE&quot; != &quot;$OBJTREE&quot; ] ; then</span><br><span class="line">    mkdir -p $&#123;OBJTREE&#125;/include</span><br><span class="line">    mkdir -p $&#123;OBJTREE&#125;/include2</span><br><span class="line">    cd $&#123;OBJTREE&#125;/include2</span><br><span class="line">    rm -f asm</span><br><span class="line">    ln -s $&#123;SRCTREE&#125;/arch/$&#123;arch&#125;/include/asm asm</span><br><span class="line">    LNPREFIX=$&#123;SRCTREE&#125;/arch/$&#123;arch&#125;/include/asm/</span><br><span class="line">    cd ../include</span><br><span class="line">    mkdir -p asm</span><br><span class="line">else</span><br><span class="line">    cd ./include</span><br><span class="line">    rm -f asm</span><br><span class="line">    ln -s ../arch/$&#123;arch&#125;/include/asm asm</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">rm -f asm/arch</span><br><span class="line"></span><br><span class="line">if [ -z &quot;$&#123;soc&#125;&quot; ] ; then</span><br><span class="line">    ln -s $&#123;LNPREFIX&#125;arch-$&#123;cpu&#125; asm/arch</span><br><span class="line">else</span><br><span class="line">    ln -s $&#123;LNPREFIX&#125;arch-$&#123;soc&#125; asm/arch</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">if [ &quot;$&#123;arch&#125;&quot; = &quot;arm&quot; ] ; then</span><br><span class="line">    rm -f asm/proc</span><br><span class="line">    ln -s $&#123;LNPREFIX&#125;proc-armv asm/proc</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
-
-<p>创建 asm, arch, proc 3个指向具体平台的软连接。</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">( echo &quot;ARCH   = $&#123;arch&#125;&quot;</span><br><span class="line">    if [ ! -z &quot;$spl_cpu&quot; ] ; then</span><br><span class="line">    echo &#x27;ifeq ($(CONFIG_SPL_BUILD),y)&#x27;</span><br><span class="line">    echo &quot;CPU    = $&#123;spl_cpu&#125;&quot;</span><br><span class="line">    echo &quot;else&quot;</span><br><span class="line">    echo &quot;CPU    = $&#123;cpu&#125;&quot;</span><br><span class="line">    echo &quot;endif&quot;</span><br><span class="line">    else</span><br><span class="line">    echo &quot;CPU    = $&#123;cpu&#125;&quot;</span><br><span class="line">    fi</span><br><span class="line">    echo &quot;BOARD  = $&#123;board&#125;&quot;</span><br><span class="line"></span><br><span class="line">    [ &quot;$&#123;vendor&#125;&quot; ] &amp;&amp; echo &quot;VENDOR = $&#123;vendor&#125;&quot;</span><br><span class="line">    [ &quot;$&#123;soc&#125;&quot;    ] &amp;&amp; echo &quot;SOC    = $&#123;soc&#125;&quot;</span><br><span class="line">    exit 0 ) &gt; config.mk</span><br></pre></td></tr></table></figure>
-
-<p>创建 include/config.mk 文件，被主 Makefile 包含。</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">echo &quot;/* Automatically generated - do not edit */&quot; &gt;&gt;config.h</span><br><span class="line"></span><br><span class="line">for i in $&#123;TARGETS&#125; ; do</span><br><span class="line">    i=&quot;`echo $&#123;i&#125; | sed &#x27;/=/ &#123;s/=/	/;q; &#125; ; &#123; s/$/	1/; &#125;&#x27;`&quot;</span><br><span class="line">    echo &quot;#define CONFIG_$&#123;i&#125;&quot; &gt;&gt;config.h ;</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">echo &quot;#define CONFIG_SYS_ARCH  \&quot;$&#123;arch&#125;\&quot;&quot;  &gt;&gt; config.h</span><br><span class="line">echo &quot;#define CONFIG_SYS_CPU   \&quot;$&#123;cpu&#125;\&quot;&quot;   &gt;&gt; config.h</span><br><span class="line">echo &quot;#define CONFIG_SYS_BOARD \&quot;$&#123;board&#125;\&quot;&quot; &gt;&gt; config.h</span><br><span class="line"></span><br><span class="line">[ &quot;$&#123;vendor&#125;&quot; ] &amp;&amp; echo &quot;#define CONFIG_SYS_VENDOR \&quot;$&#123;vendor&#125;\&quot;&quot; &gt;&gt; config.h</span><br><span class="line"></span><br><span class="line">[ &quot;$&#123;soc&#125;&quot;    ] &amp;&amp; echo &quot;#define CONFIG_SYS_SOC    \&quot;$&#123;soc&#125;\&quot;&quot;    &gt;&gt; config.h</span><br><span class="line"></span><br><span class="line">cat &lt;&lt; EOF &gt;&gt; config.h</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">define CONFIG_BOARDDIR board/<span class="variable">$BOARDDIR</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;config_cmd_defaults.h&gt;</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;config_defaults.h&gt;</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;configs/<span class="variable">$&#123;CONFIG_NAME&#125;</span>.h&gt;</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;asm/config.h&gt;</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;config_fallbacks.h&gt;</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">include &lt;config_uncmd_spl.h&gt;</span></span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
-
-<p>创建或追加(make -a) include/config.h 头文件，这个文件会被大部分c文件包含。</p>
-<h3 id="u-boot-lds"><a href="#u-boot-lds" class="headerlink" title="u-boot.lds"></a>u-boot.lds</h3><p>arch/arm/cpu/u-boot.lds 是ld连接器的脚本文件，描述如何连接目标文件。</p>
+<p>include/config.h 头文件，这个文件会被大部分c文件包含。</p>
+<h2 id="u-boot-lds"><a href="#u-boot-lds" class="headerlink" title="u-boot.lds"></a>u-boot.lds</h2><p>arch/arm/cpu/u-boot.lds 是ld连接器的脚本文件，描述如何连接目标文件。</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">/* 指定输出可执行文件是 elf 格式,32 位 ARM 指令,小端 */</span><br><span class="line">OUTPUT_FORMAT(&quot;elf32-littlearm&quot;, &quot;elf32-littlearm&quot;, &quot;elf32-littlearm&quot;)</span><br><span class="line"></span><br><span class="line">/* 指定输出可执行文件的平台架构为 ARM 架构 */</span><br><span class="line">OUTPUT_ARCH(arm)</span><br><span class="line"></span><br><span class="line">/* 指定程序的起始代码段为_start */</span><br><span class="line">ENTRY(_start)</span><br><span class="line"></span><br><span class="line">SECTIONS</span><br><span class="line">&#123;</span><br><span class="line">    . = 0x00000000;  @ 指定程序的链接地址</span><br><span class="line"></span><br><span class="line">    . = ALIGN(4);  @ 4字节对齐</span><br><span class="line">    .text :</span><br><span class="line">    &#123;</span><br><span class="line">        cpu/arm920t/start.o(.text)  @ 首先编译start.S</span><br><span class="line">        *(.text)  @ 所有的其他程序的代码段以4字节对齐放在它后面</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    . = ALIGN(4);</span><br><span class="line">    .rodata : &#123; *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.rodata*))) &#125;</span><br><span class="line"></span><br><span class="line">    . = ALIGN(4);</span><br><span class="line">    .data : &#123; *(.data) &#125;</span><br><span class="line"></span><br><span class="line">    . = ALIGN(4);</span><br><span class="line">    .got : &#123; *(.got) &#125;</span><br><span class="line"></span><br><span class="line">    . = .;</span><br><span class="line">    __u_boot_cmd_start = .;  @ 把__u_boot_cmd_start赋值为当前位置，即起始位置</span><br><span class="line">    .u_boot_cmd : &#123; *(.u_boot_cmd) &#125;  @ 指定 u_boot_cmd段，把所有的uboot命令放在该段</span><br><span class="line">    __u_boot_cmd_end = .;  @ 把 __u_boot_cmd_end赋值为当前位置，即结束位置</span><br><span class="line"></span><br><span class="line">    . = ALIGN(4);</span><br><span class="line">    __bss_start = .;</span><br><span class="line">    .bss (NOLOAD) : &#123; *(.bss) . = ALIGN(4); &#125;</span><br><span class="line">    _end = .;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>由.text段的编译顺序可知，uboot 首先运行的是 _start 符号处的代码，在 arch/arm/cpu/arm920t/<a href="#start.S">start.S</a> 文件中定义。</p>
+<p>由.text段的编译顺序可知，uboot 首先运行的是 _start 符号处的代码，在 arch/arm/cpu/arm920t/start.S文件中定义。</p>
 ]]></content>
       <categories>
         <category>uboot</category>
       </categories>
+  </entry>
+  <entry>
+    <title>交叉编译工具链命名规则</title>
+    <url>/2022/09/25/tool/gcc-name/</url>
+    <content><![CDATA[<p>交叉编译工具链是一个由编译器、连接器和解释器组成的综合开发环境，交叉编译工具链主要由binutils、gcc和glibc三个部分组成。有时出于减小 libc 库大小的考虑，也可以用别的 c 库来代替 glibc，例如 uClibc、dietlibc 和 newlib。</p>
+<p>从授权上分为免费授权版和付费授权版。免费版目前有三大主流工具商提供，第一是GNU（提供源码，自行编译制作），第二是 Codesourcery，第三是Linora。收费版有ARM原厂提供的armcc、IAR提供的编译器等等。</p>
+<p>交叉编译工具链的命名规则为：arch [-vendor] [-kernel] [-system]</p>
+<table>
+<thead>
+<tr>
+<th>规则</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>arch</td>
+<td>体系架构, 如ARM, MIPS</td>
+</tr>
+<tr>
+<td>vendor</td>
+<td>工具链提供商，也可以是处理器核型号</td>
+</tr>
+<tr>
+<td>kernel</td>
+<td>目标内核：Linux和bare-metal（裸机）</td>
+</tr>
+<tr>
+<td>system</td>
+<td>库函数和目标系统：gnu，eabi，uclibc</td>
+</tr>
+</tbody></table>
+<p>根据对操作系统的支持与否，ARM gcc可分为支持和不支持操作系统，如：</p>
+<ul>
+<li><p>arm-none-eabi：这个是没有操作系统的，不支持那些跟操作系统关系密切的函数如fork()。</p>
+</li>
+<li><p>arm-none-linux-eabi 用于Linux系统，使用Glibc。</p>
+</li>
+</ul>
+<p>ABI(Application Binary Interface)二进制应用程序接口，描述了应用程序和操作系统之间或其他应用程序的低级接口。</p>
+<p>OABI(Old Application Binary Interface)是老的ABI。</p>
+<p>EABI(Embedded Application Binary Interface)是嵌入式的ABI，指定了文件格式、数据类型、寄存器使用、堆积组织优化和在一个嵌入式软件中的参数的标准约定。允许使用特权指令，不需要动态链接，并且使用更紧凑的堆栈帧组织用来节省内存。</p>
+<p>system中gnu的值，其实是glibc的意思。</p>
+<ul>
+<li>gnu      = glibc+oabi</li>
+<li>gnueabi  = glibc + eabi</li>
+<li>uclibc   = uclibc + oabi</li>
+</ul>
+<p>arm-none-eabi-gcc（ARM architecture，no vendor，not target an operating system，complies with the ARM EABI）<br>用于编译 ARM 架构的裸机系统（包括 ARM Linux 的 boot、kernel，不适用编译 Linux 应用 Application），一般适合 ARM7、Cortex-M 和 Cortex-R 内核的芯片使用。</p>
+<p>arm-none-linux-gnueabi-gcc(ARM architecture, no vendor, creates binaries that run on the Linux operating system, and uses the GNU EABI)主要用于基于ARM架构的Linux系统，可用于编译 ARM 架构的 u-boot、Linux内核、linux应用等。适合ARM9、ARM11、Cortex-A 内核，带有 Linux 操作系统的芯片。</p>
+<p>arm-linux-gnueabi-gcc 和 arm-linux-gnueabihf-gcc两个交叉编译器分别适用于 armel 和 armhf 两个不同的架构，armel 和 armhf 这两种架构在对待浮点运算采取了不同的策略（有 fpu 的 arm 才能支持这两种浮点运算策略）。其实这两个交叉编译器只不过是 gcc 的选项 -mfloat-abi 的默认值不同：</p>
+<table>
+<thead>
+<tr>
+<th>浮点数配置</th>
+<th>架构</th>
+<th>对应编译器类型</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>soft</td>
+<td>无</td>
+<td>无</td>
+<td>不用fpu进行浮点计算, 即使有fpu浮点运算单元也不用, 而是使用软件模式</td>
+</tr>
+<tr>
+<td>softfp</td>
+<td>armel架构</td>
+<td>arm-linux-gnueabi-gcc</td>
+<td>用fpu计算, 但是传参数用普通寄存器传, 这样中断的时候, 只需要保存普通寄存器, 中断负荷小, 但是参数需要转换成浮点的再计算</td>
+</tr>
+<tr>
+<td>hard</td>
+<td>armhf架构</td>
+<td>arm-linux-gnueabihf-gcc</td>
+<td>用fpu计算, 传参数也用fpu中的浮点寄存器传, 省去了转换, 性能最好, 但是中断负荷高</td>
+</tr>
+</tbody></table>
+<p><strong>交叉编译器下载</strong></p>
+<p>arm-none-linux-gnueabi-gcc下载：<a href="http://www.veryarm.com/">www.veryarm.com</a></p>
+<p>arm-linux-gnueabihf-gcc下载：<a href="http://www.veryarm.com/">www.veryarm.com</a></p>
+<p>aarch64-linux-gnu-gcc下载：<a href="http://www.veryarm.com/">www.veryarm.com</a></p>
+<p>arm-none-elf-gcc下载：<a href="http://www.veryarm.com/">www.veryarm.com</a></p>
+<p>arm-none-eabi-gcc下载：<a href="http://www.veryarm.com/">www.veryarm.com</a></p>
+]]></content>
+      <categories>
+        <category>gcc</category>
+      </categories>
+      <tags>
+        <tag>gcc</tag>
+      </tags>
   </entry>
 </search>
