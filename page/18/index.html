@@ -176,6 +176,270 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/Bridge/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/design-patterns/Bridge/" class="post-title-link" itemprop="url">桥接模式</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="桥接模式"><a href="#桥接模式" class="headerlink" title="桥接模式"></a>桥接模式</h2><p>桥接模式(Bridge Pattern)：将<strong>抽象和实现分离</strong>，让它们可以独立变化。一个类存在多个独立变化的维度，桥接模式通过将继承改为组合的方式，让这多维度可以独立进行扩展。比如电脑通过usb连接鼠标，接口是固定的，电脑和鼠标品牌可以随意购买。</p>
+<p><img src="/images/code/design-pattern/Bridge.png" alt="Bridge"></p>
+<ul>
+<li><p>Abstraction（抽象类） ： 用于定义抽象类的接口，它一般是抽象类，定义了一个Implementor（实现类接口）类型的对象，与其之间具有关联关系，从而分离抽象接口与实现部分。</p>
+</li>
+<li><p>RefinedAbstraction（扩充抽象类）： 扩充由Abstraction定义的接口，通常情况下它是具体类，实现Abstraction的抽象业务方法，并可以调用在Implementor中定义的业务方法。</p>
+</li>
+<li><p>Implementor（实现类接口）: 定义实现类的接口，Implementor接口声明了一些基本操作，而具体实现交给其子类。通过关联关系，在Abstraction中不仅拥有自己的方法，还可以调用Implementor中定义的方法。</p>
+</li>
+<li><p>ConcreteImplementor：具体实现Implementor接口。</p>
+</li>
+</ul>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 实现类接口</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Implementor</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">OperationImp</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteImplementorA</span> : <span class="keyword">public</span> Implementor</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">OperationImp</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;ConcreteImplementor A&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteImplementorB</span> : <span class="keyword">public</span> Implementor</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">OperationImp</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;ConcreteImplementor B&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Abstraction</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Abstraction</span>(Implementor *imp) : <span class="built_in">imp_</span>(imp) &#123;&#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Operation</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        imp_-&gt;<span class="built_in">OperationImp</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Implementor *imp_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ConcreteImplementorA impa;</span><br><span class="line">    ConcreteImplementorB impb;</span><br><span class="line">    Abstraction abs1 = <span class="built_in">Abstraction</span>(&amp;impa);</span><br><span class="line">    abs1.<span class="built_in">Operation</span>();</span><br><span class="line"></span><br><span class="line">    Abstraction abs2 = <span class="built_in">Abstraction</span>(&amp;impb);</span><br><span class="line">    abs2.<span class="built_in">Operation</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/Adapter/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/design-patterns/Adapter/" class="post-title-link" itemprop="url">适配器模式</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="适配器模式"><a href="#适配器模式" class="headerlink" title="适配器模式"></a>适配器模式</h2><p>适配器模式(Adapter Pattern) ：通过创建它们可以进行通信和交互的公共对象，将一个类的接口转换成期望的另外一个接口，使得接口不兼容的对象能够一起工作。比如读卡器、电源适配器等各种转接头。</p>
+<p><img src="/images/code/design-pattern/Adapter.jpg" alt="Adapter"></p>
+<ul>
+<li><p>Adapter（目标抽象类）： 目标抽象类定义客户所需接口，可以是一个抽象类或接口，也可以是具体类。</p>
+</li>
+<li><p>ConcreteAdapter（适配器类）： 适配器类是适配器模式的核心，可以调用另一个接口，作为一个转换器，对Adaptee和Target进行适配。</p>
+</li>
+<li><p>Adaptee（适配者类）： 适配者即被适配的角色，它定义了一个已经存在的接口，这个接口需要适配，适配者类一般是一个具体类，包含了客户希望使用的业务方法，在某些情况下可能没有适配者类的源代码只有接口。</p>
+</li>
+</ul>
+<p>适配器模式有两种实现方式：类适配器和对象适配器。其中，类适配器是继承适配者来实现，对象适配器通过组合多个适配者来实现。</p>
+<p><img src="/images/code/design-pattern/Adapter-class.jpg" alt="类适配器"><br><img src="/images/code/design-pattern/Adapter-obj.jpg" alt="对象适配器"></p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 目标抽象类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Adapter</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Operation</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 适配者</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Adaptee</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">AdaptedOperation</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;adapted operation()&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 类适配器</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ClassAdapter</span> : <span class="keyword">public</span> Adapter, <span class="keyword">private</span> Adaptee</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Operation</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="built_in">AdaptedOperation</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 对象适配器</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ObjectAdapter</span> : <span class="keyword">public</span> Adapter</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Operation</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        adaptee.<span class="built_in">AdaptedOperation</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Adaptee adaptee;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Adapter *adapter1 = <span class="built_in">dynamic_cast</span>&lt;Adapter *&gt;(<span class="keyword">new</span> <span class="built_in">ClassAdapter</span>());</span><br><span class="line">    adapter1-&gt;<span class="built_in">Operation</span>();</span><br><span class="line"></span><br><span class="line">    Adapter *adapter2 = <span class="built_in">dynamic_cast</span>&lt;Adapter *&gt;(<span class="keyword">new</span> <span class="built_in">ObjectAdapter</span>());</span><br><span class="line">    adapter2-&gt;<span class="built_in">Operation</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> adapter1;</span><br><span class="line">    <span class="keyword">delete</span> adapter2;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><p>统一多个类的接口设计，兼容老版本接口，适配不同格式的数据。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/Prototype/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/design-patterns/Prototype/" class="post-title-link" itemprop="url">原型模式</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="原型模式"><a href="#原型模式" class="headerlink" title="原型模式"></a>原型模式</h2><p>原型模式（Prototype Pattern）也叫克隆模式，通过克隆基于现有对象来创建对象，并根据需求对新对象进行微调。和移动构造的区别在于不需要知道任何创建的细节，不调用构造函数。</p>
+<p><img src="/images/code/design-pattern/Prototype.png" alt="Prototype"></p>
+<ul>
+<li><p>抽象原型类（AbstractPrototype）：规定了具体原型对象必须实现的接口（如果要提供深拷贝，则必须具有实现clone的规定）。</p>
+</li>
+<li><p>具体原型类（ConcretePrototype）：从抽象原型派生而来，是客户程序使用的对象，即被复制的对象，需要实现抽象原型角色所要求的接口。</p>
+</li>
+<li><p>客户端（Client）：客户端中声明一个抽象原型类，根据客户需求clone具体原型类对象实例。</p>
+</li>
+</ul>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 抽象原型类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Prototype</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Prototype *<span class="title">clone</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcretePrototype</span> : <span class="keyword">public</span> Prototype</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">ConcretePrototype</span>() = <span class="keyword">default</span>;</span><br><span class="line">    <span class="built_in">ConcretePrototype</span>(<span class="type">int</span> n, <span class="type">int</span> *ptr) &#123;</span><br><span class="line">        num_ = n;</span><br><span class="line">        <span class="keyword">if</span> (ptr_ != <span class="literal">nullptr</span>) &#123;</span><br><span class="line">            ptr_ = <span class="keyword">new</span> <span class="built_in">int</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Prototype *<span class="title">clone</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">ConcretePrototype</span>(num_, ptr_);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> num_;</span><br><span class="line">    <span class="type">int</span> *ptr_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> tmp;</span><br><span class="line">    ConcretePrototype p1;</span><br><span class="line">    p1.num_ = <span class="number">1</span>;</span><br><span class="line">    p1.ptr_ = &amp;tmp;</span><br><span class="line">    cout &lt;&lt; p1.num_ &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; &amp;p1.ptr_ &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    ConcretePrototype *p2 = <span class="built_in">dynamic_cast</span>&lt;ConcretePrototype *&gt;(p1.<span class="built_in">clone</span>());</span><br><span class="line">    cout &lt;&lt; p2-&gt;num_ &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; &amp;p2-&gt;ptr_ &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> p2;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><p><strong>[优点]</strong></p>
+<p>可以利用原型模式简化对象的创建过程，尤其是对一些创建过程繁琐，可以节约系统资源，提高对象生成的效率。</p>
+<p>可以很方便得通过改变值来生成新的对象：有些对象之间的差别可能只在于某些值的不同；用原型模式可以快速复制出新的对象并手动修改值即可。</p>
+<p><strong>[缺点]</strong></p>
+<p>对象包含的所有对象都需要配备一个克隆的方法，这就使得在对象层级比较多的情况下，代码量会很大，也更加复杂。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/Builder/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -767,500 +1031,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/find/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/algo/find/" class="post-title-link" itemprop="url">查找算法</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <table>
-<thead>
-<tr>
-<th>查找算法</th>
-<th>平均时间复杂度</th>
-<th>空间复杂度</th>
-<th>查找条件</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>顺序查找</td>
-<td>O(n)</td>
-<td>O(1)</td>
-<td>无序或有序</td>
-</tr>
-<tr>
-<td>二分查找</td>
-<td>O(log<sub>2</sub>n)</td>
-<td>O(1)</td>
-<td>有序</td>
-</tr>
-<tr>
-<td>插值查找</td>
-<td>O(log<sub>2</sub>(log<sub>2</sub>n))</td>
-<td>O(1)</td>
-<td>有序</td>
-</tr>
-<tr>
-<td>斐波那契查找</td>
-<td>O(log<sub>2</sub>n)</td>
-<td>O(1)</td>
-<td>有序</td>
-</tr>
-<tr>
-<td>哈希查找</td>
-<td>O(1)</td>
-<td>O(n)</td>
-<td>无序或有序</td>
-</tr>
-<tr>
-<td>二叉查找树</td>
-<td>O(log<sub>2</sub>n)</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>红黑树</td>
-<td>O(log<sub>2</sub>n)</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>2-3树</td>
-<td>O(log<sub>2</sub>n - log<sub>3</sub>n)</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>B树/B+树</td>
-<td>O(log<sub>2</sub>n)</td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="图搜索算法"><a href="#图搜索算法" class="headerlink" title="图搜索算法"></a>图搜索算法</h3><table>
-<thead>
-<tr>
-<th>图搜索算法</th>
-<th>数据结构</th>
-<th>遍历时间复杂度</th>
-<th>空间复杂度</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>BFS广度优先搜索</td>
-<td>邻接矩阵<br/>邻接链表</td>
-<td>O(|v|<sup>2</sup>)<br/>O(|v|+|E|)</td>
-<td>O(|v|<sup>2</sup>)<br/>O(|v|+|E|)</td>
-</tr>
-<tr>
-<td>DFS深度优先搜索</td>
-<td>邻接矩阵<br/>邻接链表</td>
-<td>O(|v|<sup>2</sup>)<br/>O(|v|+|E|)</td>
-<td>O(|v|<sup>2</sup>)<br/>O(|v|+|E|)</td>
-</tr>
-</tbody></table>
-<h3 id="其他算法"><a href="#其他算法" class="headerlink" title="其他算法"></a>其他算法</h3><table>
-<thead>
-<tr>
-<th>算法</th>
-<th>思想</th>
-<th>应用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>[分治法</td>
-<td>把一个复杂的问题分成两个或更多的相同或相似的子问题，直到最后子问题可以简单的直接求解，原问题的解即子问题的解的合并</td>
-<td>循环赛日程安排问题、排序算法（快速排序、归并排序）</td>
-</tr>
-<tr>
-<td>动态规划</td>
-<td>通过把原问题分解为相对简单的子问题的方式求解复杂问题的方法，适用于有重叠子问题和最优子结构性质的问题</td>
-<td>背包问题、斐波那契数列</td>
-</tr>
-<tr>
-<td>贪心法</td>
-<td>一种在每一步选择中都采取在当前状态下最好或最优（即最有利）的选择，从而希望导致结果是最好或最优的算法</td>
-<td>旅行推销员问题（最短路径问题）、最小生成树、哈夫曼编码</td>
-</tr>
-</tbody></table>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/sort/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/algo/sort/" class="post-title-link" itemprop="url">排序算法</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><img src="/images/code/algo/sort/sort_algo.png" alt="排序算法"></p>
-<p>排序算法执行效率的评判标准：</p>
-<ul>
-<li>最好情况、最坏情况、平均情况时间复杂度</li>
-<li>时间复杂度</li>
-<li>空间复杂度</li>
-<li>比较次数和交换或移动次数</li>
-</ul>
-<p><strong>原地排序算法</strong>就是特指空间复杂度是 O(1) 的排序算法。</p>
-<p>排序算法的<strong>稳定性</strong>，如果待排序的序列中存在值相等的元素，经过排序之后，相等元素之间原有的先后顺序不变。</p>
-<table>
-<thead>
-<tr>
-<th>排序算法</th>
-<th>平均时间复杂度</th>
-<th>最差时间复杂度</th>
-<th>最差时间复杂度</th>
-<th>空间复杂度</th>
-<th>数据对象稳定性</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>冒泡排序</td>
-<td>O(n<sup>2</sup>)</td>
-<td>O(n<sup>2</sup>)</td>
-<td>O(n)</td>
-<td>O(1)</td>
-<td>稳定</td>
-</tr>
-<tr>
-<td>选择排序</td>
-<td>O(n<sup>2</sup>)</td>
-<td>O(n<sup>2</sup>)</td>
-<td>O(n<sup>2</sup>)</td>
-<td>O(1)</td>
-<td>数组不稳定、链表稳定</td>
-</tr>
-<tr>
-<td>插入排序</td>
-<td>O(n<sup>2</sup>)</td>
-<td>O(n<sup>2</sup>)</td>
-<td>O(n)</td>
-<td>O(1)</td>
-<td>稳定</td>
-</tr>
-<tr>
-<td>快速排序</td>
-<td>O(n*log<sub>2</sub>n)</td>
-<td>O(n<sup>2</sup>)</td>
-<td>O(n*log<sub>2</sub>n)</td>
-<td>O(log<sub>2</sub>n)</td>
-<td>不稳定</td>
-</tr>
-<tr>
-<td>堆排序</td>
-<td>O(n*log<sub>2</sub>n)</td>
-<td>O(n*log<sub>2</sub>n)</td>
-<td>O(n*log<sub>2</sub>n)</td>
-<td>O(1)</td>
-<td>不稳定</td>
-</tr>
-<tr>
-<td>归并排序</td>
-<td>O(n*log<sub>2</sub>n)</td>
-<td>O(n*log<sub>2</sub>n)</td>
-<td>O(n*log<sub>2</sub>n)</td>
-<td>O(n)</td>
-<td>稳定</td>
-</tr>
-<tr>
-<td>希尔排序</td>
-<td>O(n*log<sup>2</sup>n)</td>
-<td>O(n<sup>2</sup>)</td>
-<td>O(n)</td>
-<td>O(1)</td>
-<td>不稳定</td>
-</tr>
-<tr>
-<td>计数排序</td>
-<td>O(n+m)</td>
-<td>O(n+m)</td>
-<td>O(n+m)</td>
-<td>O(n+m)</td>
-<td>稳定</td>
-</tr>
-<tr>
-<td>桶排序</td>
-<td>O(n)</td>
-<td>O(n)</td>
-<td>O(n)</td>
-<td>O(m)</td>
-<td>稳定</td>
-</tr>
-<tr>
-<td>基数排序</td>
-<td>O(k*n)</td>
-<td>O(n<sup>2</sup>)</td>
-<td>O(k*n)</td>
-<td></td>
-<td>稳定</td>
-</tr>
-</tbody></table>
-<h2 id="冒泡排序"><a href="#冒泡排序" class="headerlink" title="冒泡排序"></a>冒泡排序</h2><p>冒泡排序（Bubble Sort）只会操作相邻的两个数据。每次冒泡操作都会对相邻的两个元素进行比较，看是否满足大小关系要求。如果不满足就让它俩互换。一次冒泡会让至少一个元素移动到它应该在的位置，重复 n 次，就完成了 n 个数据的排序工作。</p>
-<p><img src="/images/code/algo/sort/bubble.gif" alt="冒泡排序"></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">sort_bubble</span><span class="params">(<span class="type">int</span> *<span class="built_in">array</span>, <span class="type">size_t</span> size)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i, j;</span><br><span class="line">    <span class="type">bool</span> swap_flag = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; size; i++) &#123;</span><br><span class="line">        swap_flag = <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">for</span> (j = <span class="number">1</span>; j &lt; size - i; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="built_in">array</span>[j<span class="number">-1</span>] &gt; <span class="built_in">array</span>[j]) &#123;     <span class="comment">// 相邻元素两两对比</span></span><br><span class="line">                SWAP(<span class="built_in">array</span>[j<span class="number">-1</span>], <span class="built_in">array</span>[j]);</span><br><span class="line">                swap_flag = <span class="literal">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 通过设置哨兵，提前感知前面的序列已经是排序好的，就直接跳出完成排序</span></span><br><span class="line">        <span class="keyword">if</span> (!swap_flag) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>冒泡排序的过程只涉及数据的交换操作，所以它的空间复杂度为 O(1)，是一个原地排序算法。当有相邻的两个元素大小相等时不做交换，所以是稳定的排序算法。</p>
-<p>最好情况下，要排序的数据已经是有序的了，只需要进行一次冒泡操作，所以最好情况时间复杂度是 O(n)。而最坏的情况是，要排序的数据刚好是倒序排列的，我们需要进行 n 次冒泡操作，所以最坏情况时间复杂度为 O(n2)。</p>
-<h2 id="选择排序"><a href="#选择排序" class="headerlink" title="选择排序"></a>选择排序</h2><p>选择排序(Selection-sort)首先在未排序序列中找到最小元素，存放到排序序列的起始位置，然后，再从剩余未排序元素中继续寻找最小元素，然后放到已排序序列的末尾，直到所有元素均排序完毕。<br>￼<br><img src="/images/code/algo/sort/select.gif" alt="选择排序"></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">sort_selection</span><span class="params">(<span class="type">int</span> *<span class="built_in">array</span>, <span class="type">size_t</span> size)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> min = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; size - <span class="number">1</span>; i++) &#123;</span><br><span class="line">        min = i;</span><br><span class="line">        <span class="keyword">for</span> (j = i + <span class="number">1</span>; j &lt; size; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="built_in">array</span>[j] &lt; <span class="built_in">array</span>[min]) &#123;</span><br><span class="line">                min = j;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        SWAP(<span class="built_in">array</span>[i], <span class="built_in">array</span>[min]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>选择排序是一种原地排序算法。每次都要找剩余未排序元素中的最小值，并和前面的元素交换位置，这样破坏了稳定性，不是稳定的排序算法。最好情况时间复杂度、最坏情况和平均情况时间复杂度都为 O(n2)。</p>
-<h2 id="插入排序"><a href="#插入排序" class="headerlink" title="插入排序"></a>插入排序</h2><p>插入排序（Insertion Sort）取未排序区间中元素，将其插入已经排序的有序表中，并保证已排序区间数据一直有序。重复这个过程，直到未排序区间中元素为空。就跟打扑克摸牌放牌一样。</p>
-<p><img src="/images/code/algo/sort/insertion.gif" alt="插入排序"></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">sort_insertion</span><span class="params">(<span class="type">int</span> *<span class="built_in">array</span>, <span class="type">size_t</span> size)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i, j, tmp;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt; size; i++) &#123;</span><br><span class="line">        tmp = <span class="built_in">array</span>[i];</span><br><span class="line">        <span class="keyword">for</span> (j = i - <span class="number">1</span>; j &gt;= <span class="number">0</span>; j--) &#123;</span><br><span class="line">            <span class="keyword">if</span> (tmp &lt; <span class="built_in">array</span>[j]) &#123;</span><br><span class="line">                <span class="built_in">array</span>[j+<span class="number">1</span>] = <span class="built_in">array</span>[j];  <span class="comment">// 数据移动</span></span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">array</span>[j+<span class="number">1</span>] = tmp;  <span class="comment">// 插入数据</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>插入排序算法的运行并不需要额外的存储空间，所以空间复杂度是 O(1)，是一个原地排序算法。</p>
-<p>在插入排序中，对于值相同的元素，我们可以选择将后面出现的元素，插入到前面出现元素的后面，这样就可以保持原有的前后顺序不变，所以插入排序是稳定的排序算法。</p>
-<p>最好情况时间复杂度是 O(n)，而最坏情况时间复杂度为 O(n2)。</p>
-<h2 id="希尔排序"><a href="#希尔排序" class="headerlink" title="希尔排序"></a>希尔排序</h2><p>希尔排序（Shell Sort）1959年Shell发明，第一个突破O(n2)的排序算法，是简单插入排序的改进版。它与插入排序的不同之处在于，它会优先比较距离较远的元素，又叫缩小增量排序。</p>
-<p><img src="/images/code/algo/sort/shell.gif" alt="希尔排序"></p>
-<h2 id="快速排序"><a href="#快速排序" class="headerlink" title="快速排序"></a>快速排序</h2><p><img src="/images/code/algo/sort/quick.gif" alt="快速排序"></p>
-<h2 id="堆排序"><a href="#堆排序" class="headerlink" title="堆排序"></a>堆排序</h2><p><img src="/images/code/algo/sort/heap.gif" alt="堆排序"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/graph/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/algo/graph/" class="post-title-link" itemprop="url">图</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-10-04 16:17:22" itemprop="dateModified" datetime="2022-10-04T16:17:22+08:00">2022-10-04</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="图的定义"><a href="#图的定义" class="headerlink" title="图的定义"></a>图的定义</h2><p>图（Graph）是由顶点的有穷非空集合和顶点之间边的集合组成，通常为：G(V,E)，其中，G表示一个图，V是图G中顶点的集合，E是图G中边的集合。</p>
-<p>树中的元素称为节点，图中的元素叫作<strong>顶点</strong>。图一个顶点可以与任意其他顶点建立连接关系，这种建立的关系叫<strong>边</strong>。顶点相连接的边的条数，顶点的<strong>度</strong>。</p>
-<p>边有方向的图叫作<strong>有向图</strong>，边没有方向的图就叫作<strong>无向图</strong>。</p>
-<p>无向图中的<strong>度</strong>表示一个顶点有多少条边，在有向图中，顶点的<strong>入度</strong>表示有多少条边指向这个顶点，顶点的<strong>出度</strong>表示有多少条边是以这个顶点为起点指向其他顶点。</p>
-<p><strong>无向边</strong>：顶点vi到vj之间的边没有方向，则称这条边为无向边，用无序偶对(Vi,Vj)来表示。</p>
-<p><strong>无向图</strong>：图中的任意两个顶点之间的边都是无向边。</p>
-<p><img src="/images/code/algo/graph/undir.png" alt="无向图"></p>
-<p>上图的无向图G1，可以表示成：G1=(V1,{E1})，其中顶点集合V1={A,B,C,D}；边集合E1={(A,B),(B,C)(C,D),(D,A),(A,C)}。</p>
-<p><strong>有向边</strong>：顶点vi到vj的边有方向。 也称为<strong>弧</strong>。有向边用带尖括号的有序偶对&lt;vi,vj&gt;来表示。其中vi称为弧尾，vj称为弧头。</p>
-<p><strong>有向图</strong>：图中任意两个顶点之间都是有向边。</p>
-<p><img src="/images/code/algo/graph/dir.png" alt="有向图"></p>
-<p>上图的有向图G2，可以表示成：G2=(V2,{E2})，其中顶点集合V2={A,B,C,D}；弧集合E2={(A,D),(B,A)(C,A),(B,C)}。</p>
-<p><strong>简单图</strong>：在图中，如果不存在顶点到其自身的边，且同一条边不重复出现。</p>
-<p><strong>无向完全图</strong>：在无向图中，任意两个顶点之间都存在边，也就是说每个顶点都要与除它以外的顶点连线。此时边的数量公式为：n(n-1)/2 。</p>
-<p><img src="/images/code/algo/graph/allundir.png" alt="无向完全图"></p>
-<p><strong>有向完全图</strong>：在有向图中，任意两个顶点之间都存在方向互为相反的两条弧。此时弧的数量公式为：n(n-1)。</p>
-<p><img src="/images/code/algo/graph/alldir.png" alt="有向完全图"></p>
-<p>对于一个具有n个顶点和e条边的图，存在这样的边界：无向图：0&lt;=e&lt;=n(n-1)/2，有向图：0&lt;=e&lt;=n(n-1)。</p>
-<p>有很少条边或弧的图称为<strong>稀疏图</strong>，反之称为<strong>稠密图</strong>，这是一个很模糊的概念。</p>
-<p><strong>子图</strong>：假设两个图G=(V,{E})和G’=(V’,{E’})，如果集合V’⊆V，且集合E’⊆E，则称G’是G的子图。</p>
-<p>图的边或弧都有一个权重的图称为<strong>网</strong>。</p>
-<p><strong>路径</strong></p>
-<p><strong>路径（Path）</strong>：图中从顶点v到v’的顶点序列。在树中根结点到任意结点的路径是唯一的，但在图中顶点与顶点之间的路径并不唯一。</p>
-<p><strong>路径长度</strong>：路径上的边或弧的数目。</p>
-<p><strong>回路（Cycle）</strong>：路径中第一个顶点到最后一个顶都是同一个顶点。<strong>简单路径</strong>：路径中不存在重复出现顶点。<strong>简单回路</strong>：除了第一个顶点和最后一个顶点，路径中不存在重复出现顶点，也称<strong>简单环</strong>。</p>
-<p><strong>连通图</strong></p>
-<p>在无向图中如果顶点v到顶点v’有路径，则称v和v’是连通的。如果图中任意两个顶点vi、vj∈E，且vi和vj都是连通的。则称该图为<strong>连通图（connected graph）</strong>。无向图中的极大连通子图称为<strong>连通分量</strong>，它强调：</p>
-<ul>
-<li>要是子图</li>
-<li>子图要是连通的</li>
-<li>连通子图含有极大顶点数</li>
-<li>具有极大顶点数的连通子图包含依附于这些顶点的所有边</li>
-</ul>
-<p>任何连通图的连通分量只有一个，即是其自身，非连通的无向图有多个连通分量。</p>
-<p>在有向图G中，如果对于每一对、∈V、≠，从到和从到都存在路径，则称G是<strong>强连通图</strong>。有向图中的极大强连通子图称做有向图的<strong>强连通分量</strong>。</p>
-<p><strong>连通图生成树</strong></p>
-<p><strong>生成树</strong>(SpanningTree)是连通图的包含图中的所有顶点的极小连通子图。即生成树包含图中的全部的n个顶点，但只有足以构成一棵树的n-1条边。图的生成树不惟一。从不同的顶点出发进行遍历，可以得到不同的生成树。</p>
-<p>如果一个有向图恰有一个顶点的入度为0（根结点），其余顶点的入度均为1，则是一棵<strong>有向树</strong>。一个有向图的生成森林由若干棵有向树组成，含有图中全部顶点，但只有足以构成若干棵不相交的有向树的弧。</p>
-<h2 id="图的存储"><a href="#图的存储" class="headerlink" title="图的存储"></a>图的存储</h2><h3 id="邻接矩阵"><a href="#邻接矩阵" class="headerlink" title="邻接矩阵"></a>邻接矩阵</h3><p>邻接矩阵的底层依赖一个二维数组。对于无向图来说，如果顶点 i 与顶点 j 之间有边，我们就将 $A[i][j]$ 和 $A[j][i]$ 标记为 1；对于有向图来说，如果顶点 i 到顶点 j 之间，有一条箭头从顶点 i 指向顶点 j 的边，那我们就将 $A[i][j]$ 标记为 1。同理，如果有一条箭头从顶点 j 指向顶点 i 的边，我们就将 $A[j][i]$ 标记为 1。对于带权图，数组中就存储相应的权重。</p>
-<p><img src="/images/code/algo/graph/AdjacencyMatrix.png" alt="邻接矩阵"></p>
-<h3 id="邻接表"><a href="#邻接表" class="headerlink" title="邻接表"></a>邻接表</h3><p>邻接表的每个顶点对应一条链表，链表中存储的是与这个顶点相连接的其他顶点。</p>
-<p><img src="/images/code/algo/graph/AdjacencyList.png" alt="邻接表"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1330,7 +1100,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">222</span>
+          <span class="site-state-item-count">225</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

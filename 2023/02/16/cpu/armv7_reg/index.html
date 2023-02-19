@@ -20,19 +20,23 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="配置指定交叉工具和平台。 12make ARCH&#x3D;arm CROSS_COMPILE&#x3D;arm-none-linux-gnueabi- ARCH&#x3D;arm defconfigmake ARCH&#x3D;arm CROSS_COMPILE&#x3D;arm-none-linux-gnueabi- ARCH&#x3D;arm menuconfig  编译 屏蔽编译信息  1make &gt; &#x2F;dev&#x2F;null   使用make -">
+  <meta name="description" content="通用寄存器通用寄存器包括R0-R15，均为32位寄存器，可以分为3类：  未分组寄存器(R0-R7) 在所有运行模式下，未分组寄存器都指向同一个物理寄存器。在中断或异常处理进行异常模式转换时，由于不同的处理器运行模式均使用相同的物理寄存器，所以可能造成寄存器中数据的破坏。 分组寄存器(R8-R14) 对于分组寄存器，他们每次所访问的物理寄存器都与当前的处理器运行模式相关。 R13堆栈指针寄存器S">
 <meta property="og:type" content="article">
-<meta property="og:title" content="kernel make and menuconfig">
-<meta property="og:url" content="http://example.com/2022/09/04/kernel/kernel_make/index.html">
+<meta property="og:title" content="ARMv7 寄存器">
+<meta property="og:url" content="http://example.com/2023/02/16/cpu/armv7_reg/index.html">
 <meta property="og:site_name" content="nullptr">
-<meta property="og:description" content="配置指定交叉工具和平台。 12make ARCH&#x3D;arm CROSS_COMPILE&#x3D;arm-none-linux-gnueabi- ARCH&#x3D;arm defconfigmake ARCH&#x3D;arm CROSS_COMPILE&#x3D;arm-none-linux-gnueabi- ARCH&#x3D;arm menuconfig  编译 屏蔽编译信息  1make &gt; &#x2F;dev&#x2F;null   使用make -">
+<meta property="og:description" content="通用寄存器通用寄存器包括R0-R15，均为32位寄存器，可以分为3类：  未分组寄存器(R0-R7) 在所有运行模式下，未分组寄存器都指向同一个物理寄存器。在中断或异常处理进行异常模式转换时，由于不同的处理器运行模式均使用相同的物理寄存器，所以可能造成寄存器中数据的破坏。 分组寄存器(R8-R14) 对于分组寄存器，他们每次所访问的物理寄存器都与当前的处理器运行模式相关。 R13堆栈指针寄存器S">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-09-04T12:23:47.289Z">
-<meta property="article:modified_time" content="2022-09-04T12:23:47.289Z">
+<meta property="og:image" content="http://example.com/images/cpu/arm/armv7_reg.jpg">
+<meta property="og:image" content="http://example.com/images/cpu/arm/armv7_reg.png">
+<meta property="article:published_time" content="2023-02-16T14:34:36.509Z">
+<meta property="article:modified_time" content="2023-02-16T14:34:36.509Z">
 <meta property="article:author" content="ubun2">
+<meta property="article:tag" content="arm">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/cpu/arm/armv7_reg.jpg">
 
-<link rel="canonical" href="http://example.com/2022/09/04/kernel/kernel_make/">
+<link rel="canonical" href="http://example.com/2023/02/16/cpu/armv7_reg/">
 
 
 <script id="page-configurations">
@@ -44,7 +48,7 @@
   };
 </script>
 
-  <title>kernel make and menuconfig | nullptr</title>
+  <title>ARMv7 寄存器 | nullptr</title>
   
 
 
@@ -180,7 +184,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/kernel/kernel_make/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/02/16/cpu/armv7_reg/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -193,7 +197,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          kernel make and menuconfig
+          ARMv7 寄存器
         </h1>
 
         <div class="post-meta">
@@ -203,7 +207,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
+              <time title="创建时间：2023-02-16 22:34:36" itemprop="dateCreated datePublished" datetime="2023-02-16T22:34:36+08:00">2023-02-16</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -211,7 +215,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
                 </span>
             </span>
 
@@ -233,43 +237,22 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>指定交叉工具和平台。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm defconfig</span><br><span class="line">make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm menuconfig</span><br></pre></td></tr></table></figure>
-
-<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><ul>
-<li>屏蔽编译信息</li>
+        <p><img src="/images/cpu/arm/armv7_reg.jpg" alt="img"></p>
+<h2 id="通用寄存器"><a href="#通用寄存器" class="headerlink" title="通用寄存器"></a>通用寄存器</h2><p>通用寄存器包括R0-R15，均为32位寄存器，可以分为3类：</p>
+<p><img src="/images/cpu/arm/armv7_reg.png" alt="img"></p>
+<p><strong>未分组寄存器(R0-R7)</strong></p>
+<p>在所有运行模式下，未分组寄存器都指向同一个物理寄存器。在中断或异常处理进行异常模式转换时，由于不同的处理器运行模式均使用相同的物理寄存器，所以可能造成寄存器中数据的破坏。</p>
+<p><strong>分组寄存器(R8-R14)</strong></p>
+<p>对于分组寄存器，他们每次所访问的物理寄存器都与当前的处理器运行模式相关。</p>
+<p>R13堆栈指针寄存器SP，保存堆栈的栈顶地址，用户也可以使用其他寄存器存放堆栈指针，但在Thumb指令集下，某些指令强制要求使用R13存放堆栈指针。</p>
+<p>R14链接寄存器LR（Link Register），保存调用子程序的返回地址。当执行子程序时，R14可得到R15（PC）的备份，执行完子程序后，又将R14的值复制回PC。</p>
+<p><strong>程序计数器PC（R15）</strong></p>
+<p>程序计数器（PC），在ARM状态下，位[1:0]为0，位[31:2]用于保存PC；在Thumb状态下,位[0]为0，位[31:1]用于保存PC。</p>
+<p>由于ARM体系结构采用了多级流水线技术，对于ARM指令集而言，PC总是指向当前指令的下两条指令的地址，即PC的值为当前指令的地址值加8个字节。</p>
+<h2 id="状态寄存器"><a href="#状态寄存器" class="headerlink" title="状态寄存器"></a>状态寄存器</h2><ul>
+<li>CPSR（Current Program Status Register）当前程序状态寄存器1个。</li>
+<li>SPSR（Saved Progarm Status Register）备份程序状态寄存器6个，用于异常发生时保存CPSR的值，异常退出时恢复CPSR。</li>
 </ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make &gt; /dev/null</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>使用<code>make -j&lt;n&gt;</code>参数加速编译</p>
-</li>
-<li><p>指定编译某些模块</p>
-</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make M=drivers/i2c/ modules</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>使用 verbose 模式，将每一步执行的命令都打印出来，并重定向到一个文件中去，这样以后可以方便地查找模块之间的依赖关系。</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make V=1 &gt; ~/bak.txt</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>使用 ccache 提高编译速度，使用 ccache时，需要更改源码树根目录下面的 Makefile 文件，在 CC 和 HOSTCC 变量的定义前添加 ccache。<a target="_blank" rel="noopener" href="http://ccache.samba.org/">ccache主页</a>。</li>
-</ul>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CC = ccache <span class="variable">$(CROSS_COMPILE)</span>gcc</span><br><span class="line">HOSTCC = ccache gcc</span><br></pre></td></tr></table></figure>
-
-<h2 id="编译文档"><a href="#编译文档" class="headerlink" title="编译文档"></a>编译文档</h2><p>使用下面的一些命令可以在 Documentation/DocBook/目录下，生成一些文档。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">make htmldocs //生成 HTML 文件</span><br><span class="line">make pdfdocs  //生成 PDF 文件</span><br><span class="line">make psdocs   //生成 Postscript 文件</span><br><span class="line">make mandocs  //生成 Kernel API 手册</span><br><span class="line">make installmandocs //将 Kernel API 手册页安装到 man 程序能够找到的目录中</span><br></pre></td></tr></table></figure>
-
-<h2 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h2><p>1.缺少libncurses5-dev</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make menuconfig requires the ncurses libraries.</span><br></pre></td></tr></table></figure>
-
-<p>2.没有安装u-boot-tools</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkimage command not found – U-Boot images will not be built</span><br></pre></td></tr></table></figure>
-
-<p>3.源文件编译生成的.o文件和模块目标文件xxx.o重名。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">module license &#x27;unspecified&#x27; taints kernel.</span><br><span class="line">Disabling lock debugging due to kernel taint</span><br></pre></td></tr></table></figure>
 
     </div>
 
@@ -278,6 +261,9 @@
     
 
       <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/arm/" rel="tag"># arm</a>
+          </div>
 
         
 
@@ -285,12 +271,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2022/09/04/kernel/input/" rel="prev" title="input 子系统">
-      <i class="fa fa-chevron-left"></i> input 子系统
+    <a href="/2023/02/16/kernel/kernel_make/" rel="prev" title="kernel make and menuconfig">
+      <i class="fa fa-chevron-left"></i> kernel make and menuconfig
     </a></div>
       <div class="post-nav-item">
-    <a href="/2022/09/04/kernel/i2c_tools/" rel="next" title="i2c-tools 使用">
-      i2c-tools 使用 <i class="fa fa-chevron-right"></i>
+    <a href="/2023/02/16/cpu/TrustZone/" rel="next" title="TrustZone">
+      TrustZone <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -351,7 +337,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91"><span class="nav-number">2.</span> <span class="nav-text">编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E6%96%87%E6%A1%A3"><span class="nav-number">3.</span> <span class="nav-text">编译文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%94%99%E8%AF%AF"><span class="nav-number">4.</span> <span class="nav-text">常见错误</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E7%94%A8%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-number">1.</span> <span class="nav-text">通用寄存器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8A%B6%E6%80%81%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-number">2.</span> <span class="nav-text">状态寄存器</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -364,7 +350,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">222</span>
+          <span class="site-state-item-count">225</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

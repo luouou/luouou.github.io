@@ -176,6 +176,603 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/net/ntp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/04/net/ntp/" class="post-title-link" itemprop="url">ntp</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>NTP是计算机系统中的时钟同步协议，是基于用户数据报协议（UDP），端口号是123。</p>
+<p>对于同步过程，NTP依赖于协调世界时（UTC），该时间是从分层系统中的各个客户端和服务器获得的。时钟同步的工作过程：</p>
+<ol>
+<li>客户端发送一个NTP报文给服务器，该报文带有它离开客户端时的时间戳T1。</li>
+<li>当NTP报文到达服务器时，服务器加上自己的时间戳T2。</li>
+<li>当NTP报文离开服务器时，服务器再加上自己的时间戳T3。</li>
+<li>当客户端接收到该响应报文时，客户端的本地时间为T4。</li>
+</ol>
+<p><img src="/images/net/ntp.png"></p>
+<p>如此客户端相对服务器的时间差为((T2-T1) + (T3-T4)) / 2，然后根据时间差来设定自己的时钟，使之与服务器的时钟同步。</p>
+<h2 id="报文格式"><a href="#报文格式" class="headerlink" title="报文格式"></a>报文格式</h2><p><strong>数据报文格式</strong></p>
+<p><img src="/images/net/ntp_package.png"></p>
+<table>
+<thead>
+<tr>
+<th>字段名</th>
+<th>长度(bit)</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Leap Indicator</td>
+<td>2</td>
+<td>闰秒提示：<br/>0: 无leap秒调整<br/>1: 一天的最后一分钟为61秒<br/>2: 一天的最后一分钟为59秒<br/>3:表示告警状态，时钟未被同步。</td>
+</tr>
+<tr>
+<td>Version Number</td>
+<td>3</td>
+<td>NTP的版本号，目前值为3。</td>
+</tr>
+<tr>
+<td>Mode</td>
+<td>3</td>
+<td>NTP的工作模式。不同值表示的含义如下：<br/>0：reserved，保留。<br/>1：symmetric active，主动对等体模式。<br/>2：symmetric passive，被动对等体模式。<br/>3：client，客户模式。<br/>4：server，服务器模式。<br/>5：broadcast，广播模式。<br/>6：reserved for NTP control messages，NTP控制报文。<br/>7：reserved for private use，内部使用预留。</td>
+</tr>
+<tr>
+<td>Stratum</td>
+<td>8</td>
+<td>时钟的层数，定义了时钟的准确度。层数为1的时钟准确度最高，从1到15依次递减。<br/>0：未指定或无效<br/>1：主服务器<br/>2 – 15：辅助服务器<br/>16：未同步<br/>17 –255：保留</td>
+</tr>
+<tr>
+<td>Poll</td>
+<td>8</td>
+<td>轮询时间（8位有符号整数），即两个连续NTP报文之间最小间隔时间(s)。</td>
+</tr>
+<tr>
+<td>Precision</td>
+<td>8</td>
+<td>本地时钟精度（8位有符号整数）</td>
+</tr>
+<tr>
+<td>Root Delay</td>
+<td>32</td>
+<td>到主参考时钟的总往返延迟时间。</td>
+</tr>
+<tr>
+<td>Root Dispersion</td>
+<td>32</td>
+<td>本地时钟相对于主参考时钟的最大误差。</td>
+</tr>
+<tr>
+<td>Reference Identifier</td>
+<td>32</td>
+<td>标识特定参考时钟。</td>
+</tr>
+<tr>
+<td>Reference Timestamp</td>
+<td>64</td>
+<td>参考时间戳，本地时钟最后一次被设定或更新的时间。如果值为0表示本地时钟从未被同步过。</td>
+</tr>
+<tr>
+<td>Originate Timestamp</td>
+<td>64</td>
+<td>原始时间戳，NTP报文离开源端时的本地时间。</td>
+</tr>
+<tr>
+<td>Receive Timestamp</td>
+<td>64</td>
+<td>接受时间戳，NTP报文到达目的端的本地时间。</td>
+</tr>
+<tr>
+<td>Transmit Timestamp</td>
+<td>64</td>
+<td>传送时间戳目的端应答报文离开服务器端的本地时间。</td>
+</tr>
+<tr>
+<td>Authenticator</td>
+<td>96</td>
+<td>（可选）验证信息。</td>
+</tr>
+</tbody></table>
+<p><strong>控制报文格式</strong></p>
+<p><img src="/images/net/ntp_packet.png"></p>
+<table>
+<thead>
+<tr>
+<th>字段名</th>
+<th>长度(bit)</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>2</td>
+<td>保留位。NTP本身不做处理。</td>
+</tr>
+<tr>
+<td>VN（Version Number）</td>
+<td>3</td>
+<td>NTP的版本号，目前值为3。</td>
+</tr>
+<tr>
+<td>6</td>
+<td>3</td>
+<td>表明是控制报文。</td>
+</tr>
+<tr>
+<td>REM</td>
+<td>3</td>
+<td>R：0表示命令，1表示响应。 E：0表示发送正常响应，1表示发送错误响应。 M：0表示最后一个分片，1表示其他。</td>
+</tr>
+<tr>
+<td>Op</td>
+<td>5</td>
+<td>操作码，表明命令的类型。</td>
+</tr>
+<tr>
+<td>Sequence</td>
+<td>16</td>
+<td>发送或接受到报文的顺序号。</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>16</td>
+<td>表明当前系统的状态。</td>
+</tr>
+<tr>
+<td>Association ID</td>
+<td>16</td>
+<td>连接标示。</td>
+</tr>
+<tr>
+<td>Offset</td>
+<td>16</td>
+<td>偏移量。</td>
+</tr>
+<tr>
+<td>Count</td>
+<td>16</td>
+<td>数据域的长度。</td>
+</tr>
+<tr>
+<td>Data</td>
+<td>最大468</td>
+<td>包括发送报文或接受报文中的数据信息。</td>
+</tr>
+<tr>
+<td>Padding</td>
+<td>16</td>
+<td>填充字段。</td>
+</tr>
+<tr>
+<td>Authenticator</td>
+<td>96</td>
+<td>（可选）验证信息。</td>
+</tr>
+</tbody></table>
+<hr>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/hankgo/p/15586190.html">https://www.cnblogs.com/hankgo/p/15586190.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiaotian_muzi/article/details/90718222">https://blog.csdn.net/xiaotian_muzi/article/details/90718222</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/tool/vim/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/04/tool/vim/" class="post-title-link" itemprop="url">vim插件与配置</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-04 20:23:47 / 修改时间：22:26:42" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/tool/" itemprop="url" rel="index"><span itemprop="name">tool</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br></pre></td><td class="code"><pre><span class="line">&quot; 设置当文件被改动时自动载入</span><br><span class="line">set autoread</span><br><span class="line"></span><br><span class="line">&quot;代码补全</span><br><span class="line">set completeopt=preview,menu</span><br><span class="line"></span><br><span class="line">&quot;允许插件  </span><br><span class="line">filetype plugin on</span><br><span class="line"></span><br><span class="line">&quot;共享剪贴板  </span><br><span class="line">set clipboard+=unnamed</span><br><span class="line"></span><br><span class="line">&quot;从不备份  </span><br><span class="line">set nobackup</span><br><span class="line"></span><br><span class="line">&quot;自动保存</span><br><span class="line">set autowrite</span><br><span class="line">set ruler                   &quot; 打开状态栏标尺</span><br><span class="line">set cursorline              &quot; 突出显示当前行</span><br><span class="line"></span><br><span class="line">&quot; 高亮光标所在的行列</span><br><span class="line">highlight CursorLine   cterm=NONE ctermbg=black ctermfg=NONE guibg=NONE guifg=NONE</span><br><span class="line">highlight CursorColumn cterm=NONE ctermbg=black ctermfg=NONE guibg=NONE guifg=NONE</span><br><span class="line"></span><br><span class="line">&quot; CursorLine 和 CursorColumn 分别表示当前所在的行列，cterm 表示为原生vim设置样式，设置为NONE表示可以自定义设置。ctermbg 设置终端vim的背景色；ctermfg 设置终端vim的前景色。guibg 和 guifg 分别是设置gvim的背景色和前景色</span><br><span class="line"></span><br><span class="line">set magic                   &quot; 设置魔术</span><br><span class="line">set guioptions-=T           &quot; 隐藏工具栏</span><br><span class="line">set guioptions-=m           &quot; 隐藏菜单栏</span><br><span class="line"></span><br><span class="line">&quot; 设置在状态行显示的信息</span><br><span class="line">&quot;set foldcolumn=0</span><br><span class="line">&quot;set foldmethod=indent</span><br><span class="line">&quot;set foldlevel=3</span><br><span class="line">&quot;set foldenable              &quot; 开始折叠</span><br><span class="line"></span><br><span class="line">&quot; 不要使用vi的键盘模式，而是vim自己的</span><br><span class="line">set nocompatible</span><br><span class="line"></span><br><span class="line">&quot; 语法高亮</span><br><span class="line">set syntax=on</span><br><span class="line"></span><br><span class="line">&quot; 配色方案</span><br><span class="line">&quot;&quot;colorscheme darkblue</span><br><span class="line"></span><br><span class="line">&quot; 去掉输入错误的提示声音</span><br><span class="line">set noeb</span><br><span class="line"></span><br><span class="line">&quot; 在处理未保存或只读文件的时候，弹出确认</span><br><span class="line">set confirm</span><br><span class="line"></span><br><span class="line">&quot; 自动缩进</span><br><span class="line">set autoindent</span><br><span class="line">set cindent</span><br><span class="line"></span><br><span class="line">&quot; Tab键的宽度</span><br><span class="line">set tabstop=2</span><br><span class="line"></span><br><span class="line">&quot; 统一缩进为4</span><br><span class="line">set softtabstop=2</span><br><span class="line">set shiftwidth=2</span><br><span class="line"></span><br><span class="line">&quot; 不要用空格代替制表符</span><br><span class="line">set noexpandtab</span><br><span class="line"></span><br><span class="line">&quot; 在行和段开始处使用制表符</span><br><span class="line">set smarttab</span><br><span class="line"></span><br><span class="line">&quot; 显示行号</span><br><span class="line">set number</span><br><span class="line"></span><br><span class="line">&quot; 历史记录数</span><br><span class="line">set history=1000</span><br><span class="line"></span><br><span class="line">&quot;禁止生成临时文件</span><br><span class="line">set nobackup</span><br><span class="line">set noswapfile</span><br><span class="line"></span><br><span class="line">&quot;搜索逐字符高亮</span><br><span class="line">set hlsearch</span><br><span class="line">set incsearch</span><br><span class="line"></span><br><span class="line">&quot;行内替换</span><br><span class="line">set gdefault</span><br><span class="line"></span><br><span class="line">&quot;编码设置</span><br><span class="line">set enc=utf-8</span><br><span class="line">set fencs=utf-8,GB18030,ucs-bom,default,latin1</span><br><span class="line"></span><br><span class="line">&quot;语言设置</span><br><span class="line">set langmenu=zh_CN.UTF-8</span><br><span class="line">set helplang=cn</span><br><span class="line"></span><br><span class="line">&quot; 总是显示状态行</span><br><span class="line">set laststatus=2</span><br><span class="line"></span><br><span class="line">&quot; 命令行（在状态行下）的高度，默认为1，这里是2</span><br><span class="line">set cmdheight=2</span><br><span class="line"></span><br><span class="line">&quot; 侦测文件类型</span><br><span class="line">filetype on</span><br><span class="line"></span><br><span class="line">&quot; 载入文件类型插件</span><br><span class="line">filetype plugin on</span><br><span class="line"></span><br><span class="line">&quot; 为特定文件类型载入相关缩进文件</span><br><span class="line">filetype indent on</span><br><span class="line"></span><br><span class="line">&quot; 保存全局变量</span><br><span class="line">set viminfo+=!</span><br><span class="line"></span><br><span class="line">&quot; 带有如下符号的单词不要被换行分割</span><br><span class="line">set iskeyword+=_,$,@,%,#,-</span><br><span class="line"></span><br><span class="line">&quot; 字符间插入的像素行数目</span><br><span class="line">set linespace=0</span><br><span class="line"></span><br><span class="line">&quot; 增强模式中的命令行自动完成操作</span><br><span class="line">set wildmenu</span><br><span class="line"></span><br><span class="line">&quot; 使回格键（backspace）正常处理indent, eol, start等</span><br><span class="line">set backspace=2</span><br><span class="line"></span><br><span class="line">&quot; 允许backspace和光标键跨越行边界</span><br><span class="line">set whichwrap+=&lt;,&gt;,h,l</span><br><span class="line"></span><br><span class="line">&quot; 可以在buffer的任何地方使用鼠标（类似office中在工作区双击鼠标定位）</span><br><span class="line">set mouse=a</span><br><span class="line">set selection=exclusive</span><br><span class="line">set selectmode=mouse,key</span><br><span class="line"></span><br><span class="line">&quot; 通过使用: commands命令，告诉我们文件的哪一行被改变过</span><br><span class="line">set report=0</span><br><span class="line"></span><br><span class="line">&quot; 在被分割的窗口间显示空白，便于阅读</span><br><span class="line">set fillchars=vert:\ ,stl:\ ,stlnc:\</span><br><span class="line"></span><br><span class="line">&quot; 高亮显示匹配的括号</span><br><span class="line">set showmatch</span><br><span class="line"></span><br><span class="line">&quot; 匹配括号高亮的时间（单位是十分之一秒）</span><br><span class="line">set matchtime=1</span><br><span class="line"></span><br><span class="line">&quot; 光标移动到buffer的顶部和底部时保持3行距离</span><br><span class="line">set scrolloff=3</span><br><span class="line"></span><br><span class="line">&quot; 为C程序提供自动缩进</span><br><span class="line">set smartindent</span><br><span class="line"></span><br><span class="line">&quot; 高亮显示普通txt文件（需要txt.vim脚本）</span><br><span class="line">au BufRead,BufNewFile *  setfiletype txt</span><br><span class="line"></span><br><span class="line">&quot;自动补全</span><br><span class="line">:inoremap ( ()<span class="tag">&lt;<span class="name">ESC</span>&gt;</span>i</span><br><span class="line">:inoremap &#123; &#123;&#125;<span class="tag">&lt;<span class="name">ESC</span>&gt;</span>i</span><br><span class="line">:inoremap [ []<span class="tag">&lt;<span class="name">ESC</span>&gt;</span>i</span><br><span class="line">:inoremap &quot; &quot;&quot;<span class="tag">&lt;<span class="name">ESC</span>&gt;</span>i</span><br><span class="line">:inoremap &#x27; &#x27;&#x27;<span class="tag">&lt;<span class="name">ESC</span>&gt;</span>i</span><br><span class="line"></span><br><span class="line">&quot; 按tab键依次选择</span><br><span class="line">set wildmenu</span><br><span class="line"></span><br><span class="line">&quot;配置规则</span><br><span class="line">set wildmode=longest,list,full</span><br><span class="line"></span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; cscope  设置</span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">:cs add cscope.out</span><br><span class="line"></span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; Tag List  设置</span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">nmap <span class="tag">&lt;<span class="name">F5</span>&gt;</span> :TlistToggle<span class="tag">&lt;<span class="name">CR</span>&gt;</span></span><br><span class="line"></span><br><span class="line">let Tlist_Ctags_Cmd=&quot;/usr/bin/ctags&quot;  &quot;ctags程序位置</span><br><span class="line">let Tlist_Inc_Winwidth=0        &quot;window width change off</span><br><span class="line">let Tlist_Auto_Open=0           &quot;vim 开始时window open=off</span><br><span class="line">let Tlist_Use_Left_Window=1     &quot;显示在左侧</span><br><span class="line">let Tlist_Show_One_File=1       &quot;不同时显示多个文件的tag，只显示当前文件的    </span><br><span class="line">let Tlist_Exit_OnlyWindow=1     &quot;如果taglist窗口是最后一个窗口，则退出vim   </span><br><span class="line">set ut=100</span><br><span class="line"></span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; NERDTree  设置</span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">nmap <span class="tag">&lt;<span class="name">F8</span>&gt;</span> :NERDTreeToggle<span class="tag">&lt;<span class="name">CR</span>&gt;</span></span><br><span class="line">let NERDTreeWinPos=&quot;right&quot;</span><br><span class="line"></span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; SrcExpl  设置</span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; // The switch of the Source Explorer </span><br><span class="line">nmap <span class="tag">&lt;<span class="name">F7</span>&gt;</span> :SrcExplToggle<span class="tag">&lt;<span class="name">CR</span>&gt;</span> </span><br><span class="line"></span><br><span class="line">&quot; // Set the height of Source Explorer window </span><br><span class="line">let g:SrcExpl_winHeight = 8 </span><br><span class="line"></span><br><span class="line">&quot; // Set 100 ms for refreshing the Source Explorer </span><br><span class="line">let g:SrcExpl_refreshTime = 100 </span><br><span class="line"></span><br><span class="line">&quot; // Set &quot;Enter&quot; key to jump into the exact definition context </span><br><span class="line">let g:SrcExpl_jumpKey = &quot;<span class="tag">&lt;<span class="name">ENTER</span>&gt;</span>&quot; </span><br><span class="line"></span><br><span class="line">&quot; // Set &quot;Space&quot; key for back from the definition context </span><br><span class="line">let g:SrcExpl_gobackKey = &quot;<span class="tag">&lt;<span class="name">SPACE</span>&gt;</span>&quot; </span><br><span class="line"></span><br><span class="line">&quot; // In order to avoid conflicts, the Source Explorer should know what plugins except</span><br><span class="line">&quot; // itself are using buffers. And you need add their buffer names into below list</span><br><span class="line">&quot; // according to the command &quot;:buffers!&quot;</span><br><span class="line">let g:SrcExpl_pluginList = [</span><br><span class="line">        \ &quot;__Tag_List__&quot;,</span><br><span class="line">        \ &quot;_NERD_tree_&quot;,</span><br><span class="line">        \ &quot;Source_Explorer&quot;</span><br><span class="line">    \ ]</span><br><span class="line"></span><br><span class="line">&quot; // The color schemes used by Source Explorer. There are five color schemes</span><br><span class="line">&quot; // supported for now - Red, Cyan, Green, Yellow and Magenta. Source Explorer</span><br><span class="line">&quot; // will pick up one of them randomly when initialization.</span><br><span class="line">let g:SrcExpl_colorSchemeList = [</span><br><span class="line">        \ &quot;Red&quot;,</span><br><span class="line">        \ &quot;Cyan&quot;,</span><br><span class="line">        \ &quot;Green&quot;,</span><br><span class="line">        \ &quot;Yellow&quot;,</span><br><span class="line">        \ &quot;Magenta&quot;</span><br><span class="line">    \ ]</span><br><span class="line"></span><br><span class="line">&quot; // Enable/Disable the local definition searching, and note that this is not </span><br><span class="line">&quot; // guaranteed to work, the Source Explorer doesn&#x27;t check the syntax for now. </span><br><span class="line">&quot; // It only searches for a match with the keyword according to command &#x27;gd&#x27; </span><br><span class="line">let g:SrcExpl_searchLocalDef = 1 </span><br><span class="line"></span><br><span class="line">&quot; // Workaround for Vim bug @https://goo.gl/TLPK4K as any plugins using autocmd for</span><br><span class="line">&quot; // BufReadPre might have conflicts with Source Explorer. e.g. YCM, Syntastic etc.</span><br><span class="line">let g:SrcExpl_nestedAutoCmd = 1</span><br><span class="line"></span><br><span class="line">&quot; // Do not let the Source Explorer update the tags file when opening </span><br><span class="line">let g:SrcExpl_isUpdateTags = 0 </span><br><span class="line"></span><br><span class="line">&quot; // Use &#x27;Exuberant Ctags&#x27; with &#x27;--sort=foldcase -R .&#x27; or &#x27;-L cscope.files&#x27; to </span><br><span class="line">&quot; // create/update the tags file </span><br><span class="line">let g:SrcExpl_updateTagsCmd = &quot;ctags --sort=foldcase -R .&quot; </span><br><span class="line"></span><br><span class="line">&quot; // Set &quot;<span class="tag">&lt;<span class="name">F12</span>&gt;</span>&quot; key for updating the tags file artificially </span><br><span class="line">let g:SrcExpl_updateTagsKey = &quot;<span class="tag">&lt;<span class="name">F12</span>&gt;</span>&quot; </span><br><span class="line"></span><br><span class="line">&quot; // Set &quot;<span class="tag">&lt;<span class="name">F3</span>&gt;</span>&quot; key for displaying the previous definition in the jump list </span><br><span class="line">let g:SrcExpl_prevDefKey = &quot;<span class="tag">&lt;<span class="name">F3</span>&gt;</span>&quot; </span><br><span class="line"></span><br><span class="line">&quot; // Set &quot;<span class="tag">&lt;<span class="name">F4</span>&gt;</span>&quot; key for displaying the next definition in the jump list </span><br><span class="line">let g:SrcExpl_nextDefKey = &quot;<span class="tag">&lt;<span class="name">F4</span>&gt;</span>&quot; </span><br><span class="line"></span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">&quot; Trinity  设置</span><br><span class="line">&quot;---------------------------------------------&quot;</span><br><span class="line">nmap <span class="tag">&lt;<span class="name">F6</span>&gt;</span>  :TrinityToggleAll<span class="tag">&lt;<span class="name">CR</span>&gt;</span> </span><br><span class="line"></span><br><span class="line">vmap <span class="tag">&lt;<span class="name">c-c</span>&gt;</span> &quot;+y</span><br></pre></td></tr></table></figure>
+
+<h2 id="插件"><a href="#插件" class="headerlink" title="插件"></a>插件</h2><h3 id="ctags"><a href="#ctags" class="headerlink" title="ctags"></a>ctags</h3><p>ctags 默认并不会提取所有标识符的tag标签，以下命令可以生成更加详细的tag文件</p>
+<blockquote>
+<p>ctags -R –c-kinds=+c+d+e+f+g+m+n+s+t+u+v –fields=+liaS –extra=+q –langmap=c:+.h.s.S –exclude=build/*</p>
+</blockquote>
+<p>可以在Vim尾行模式或Vim配置文件 .~/.vimrc 中通过以下命令显式地指定tag文件路径：<code>:set tags+=tags文件路径</code></p>
+<p><code>--list-kinds=c++</code> 可列出C++支持生成的标签类型的全量列表：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">c     类classes)</span><br><span class="line">d     宏定义(macro definitions)</span><br><span class="line">e     枚举变量(enumerators)</span><br><span class="line">f     函数定义(function definitions)</span><br><span class="line">g     枚举类型(enumeration names)</span><br><span class="line">l     局部变量(local variables)，默认不提取</span><br><span class="line">m     类、结构体、联合体(class, struct, and union members)</span><br><span class="line">n     命名空间(namespaces)</span><br><span class="line">p     函数原型(function prototypes)，默认不提取</span><br><span class="line">s     结构体类型(structure names)</span><br><span class="line">t     类型定义(typedefs)</span><br><span class="line">u     联合体类型(union names)</span><br><span class="line">v     变量定义(variable definitions)</span><br><span class="line">x     外部变量(external and forward variable declarations)，默认不提取</span><br></pre></td></tr></table></figure>
+
+<p>局部对象、函数声明、外部变量等类型默认不会生成标签，所以在上面的ctags命令中显式加上了这些类型，用于生成所有类型的标签。</p>
+<p><code>--list-maps</code> 查看默认情况下支持那些语言，每一种支持的语言支持的文件扩展名是什么。</p>
+<p><code>--list-kinds=c++</code> 查看c++语言可以识别哪些语法元素。</p>
+<p><code>--langmap=c++:+.hpp</code> 认定某种扩展名的文件为某种语法语言文件</p>
+<p><code>fields=+iaS</code> 表明ctags要求描述的信息</p>
+<ul>
+<li>i 表示如果有继承，要标明父类；</li>
+<li>a 表示如果是类的成员，要标明其访问权限</li>
+<li>S 表示如果是函数，则生成的tag文件要标识函数的原型</li>
+<li>K 表示要显示语法元素类型的全称；</li>
+<li>z 表示在显示语法元素的类型时，使用格式kind:type。</li>
+</ul>
+<p><code>extra=+q</code> 表示强制要求ctags对同一个语法元素 再 记一行(如果某个语法元素是类的一个成员，ctags默认会给其记录一行)，这样可以保证在Vim中多个同名函数可以通过路径不同来区分。</p>
+<p><code>--exclude=</code> 路径不能加./。</p>
+<p><code>Ctrl + ]</code> 转跳到光标所在函数定义处；<code>Ctrl + t</code>跳回；</p>
+<h3 id="cscope"><a href="#cscope" class="headerlink" title="cscope"></a>cscope</h3><blockquote>
+<p>cscope -Rbqk</p>
+</blockquote>
+<ul>
+<li>R : 对目录和子目录下所有文件都递归创建索引</li>
+<li>b : 生成数据库后不进入查询界面</li>
+<li>q : 建立cscope.in.out和cscope.po.out，可加快搜索速度</li>
+<li>k : 不在预定义的系统路径中搜索(如：/usr/include)</li>
+<li>i: 指定保存文件列表的文件名（cscope.files），可以使用”–“，表示由标准输入获得文件列表。</li>
+<li>I dir: 在-I选项指出的目录中查找头文件</li>
+<li>u: 扫描所有文件，重新生成交叉索引文件</li>
+<li>C: 搜索时忽略大小写</li>
+<li>P path: 在以相对路径表示的文件前加上的path，这样不用切换到数据库文件所在的目录也可以使用。</li>
+</ul>
+<p>在代码所在根目录下，用vim打开代码，导入索引文件：<code>:cs add cscope.out</code>就可以使用以下命令了：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">:cs find s &#123;name&#125; : 查找c语言符号，即查找函数名、宏、枚举值等出现的地方</span><br><span class="line">:cs find g &#123;name&#125; : 查找函数、宏、枚举等定义的位置，类似ctags所提供的功能</span><br><span class="line">:cs find c &#123;name&#125; : 找出使用name的地方</span><br><span class="line">:cs find t &#123;name&#125; : 找出name的字串</span><br><span class="line">:cs find e &#123;name&#125; : 查找egrep模式，相当于egrep功能，但查找速度快多了</span><br><span class="line">:cs find f &#123;name&#125; : 查找并打开文件，类似vim的find功能</span><br><span class="line">:cs find i &#123;name&#125; : 查找include此文件的文件</span><br><span class="line">:cs find d &#123;name&#125; : 查找调用本函数的函数</span><br></pre></td></tr></table></figure>
+
+<p>Cscope缺省只解析C文件(.c和.h)、lex文件(.l)和yacc文件(.y)，虽然它也可以支持C++以及Java，但它在扫描目录时会跳过C++及Java后缀的文件。如果你希望cscope解析C++或Java文件，需要把这些文件的名字和路径保存在一个名为cscope.files的文件。当cscope发现在当前目录中存在cscope.files时，就会为cscope.files中列出的所有文件生成索引数据库。通常我们使用 find 来生成cscope.files文件。</p>
+<h3 id="taglist"><a href="#taglist" class="headerlink" title="taglist"></a>taglist</h3><p><a target="_blank" rel="noopener" href="https://www.vim.org/scripts/script.php?script_id=273">https://www.vim.org/scripts/script.php?script_id=273</a></p>
+<p>在Vim命令行下运行”:Tlist”就可以打开Taglist窗口，再次运行”:Tlist”则关闭。左右窗口切换Ctrl+ww在taglist窗口中，还可以使用下面的快捷键：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;CR&gt;          跳到光标下tag所定义的位置，用鼠标双击此tag功能也一样</span><br><span class="line">o             在一个新打开的窗口中显示光标下tag</span><br><span class="line">&lt;Space&gt;       显示光标下tag的原型定义</span><br><span class="line">u             更新taglist窗口中的tag</span><br><span class="line">s             更改排序方式，在按名字排序和按出现顺序排序间切换</span><br><span class="line">x             taglist窗口放大和缩小，方便查看较长的tag</span><br><span class="line">+             打开一个折叠，同zo</span><br><span class="line">-             将tag折叠起来，同zc</span><br><span class="line">*             打开所有的折叠，同zR</span><br><span class="line">=             将所有tag折叠起来，同zM</span><br><span class="line">[[            跳到前一个文件</span><br><span class="line">]]            跳到后一个文件</span><br><span class="line">q             关闭taglist窗口</span><br><span class="line">&lt;F1&gt;          显示帮助</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&quot; Tag List  设置</span><br><span class="line">nmap <span class="tag">&lt;<span class="name">F5</span>&gt;</span> :TlistToggle<span class="tag">&lt;<span class="name">CR</span>&gt;</span></span><br><span class="line"></span><br><span class="line">let Tlist_Ctags_Cmd=&quot;/home/luoyou/home/usr/bin/ctags&quot;  &quot;ctags程序位置</span><br><span class="line">let Tlist_Inc_Winwidth=0     &quot;window width change off</span><br><span class="line">let Tlist_Auto_Open=0        &quot;vim 开始时window open=off</span><br><span class="line">let Tlist_Use_Left_Window=1  &quot;显示在左侧</span><br><span class="line">let Tlist_Show_One_File=1    &quot;不同时显示多个文件的tag，只显示当前文件的    </span><br><span class="line">let Tlist_Exit_OnlyWindow=1  &quot;如果taglist窗口是最后一个窗口，则退出vim   </span><br><span class="line">let Tlist_File_Fold_Auto_Close=1             &quot; 自动折叠</span><br><span class="line">set ut=100</span><br></pre></td></tr></table></figure>
+
+<h3 id="Trinity"><a href="#Trinity" class="headerlink" title="Trinity"></a>Trinity</h3><p><a target="_blank" rel="noopener" href="https://github.com/wenlongche/Trinity">https://github.com/wenlongche/Trinity</a></p>
+<h3 id="NERD-tree"><a href="#NERD-tree" class="headerlink" title="NERD tree"></a>NERD tree</h3><p>要用Trinity插件包里的NERD_tree.vim</p>
+<h3 id="SrcExpl"><a href="#SrcExpl" class="headerlink" title="SrcExpl"></a>SrcExpl</h3><p><a target="_blank" rel="noopener" href="https://www.vim.org/scripts/script.php?script_id=2179">https://www.vim.org/scripts/script.php?script_id=2179</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/hardware/RF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/04/hardware/RF/" class="post-title-link" itemprop="url">无线电</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="电磁波"><a href="#电磁波" class="headerlink" title="电磁波"></a>电磁波</h2><p>电磁波的波长和频率成正比（光速=波长×频率）。</p>
+<p><strong>频率越高，波长越短，越趋近于直线传播（绕射能力越差）。频率越高，在传播介质中的衰减也越大。</strong></p>
+<h2 id="天线"><a href="#天线" class="headerlink" title="天线"></a>天线</h2><p><strong>天线长度应与波长成正比，大约在1/10~1/4之间</strong>，当天线的长度是无线电信号波长的1/4时，天线的发射和接收转换效率最高。</p>
+<h2 id="射频"><a href="#射频" class="headerlink" title="射频"></a>射频</h2><p>射频（Radio Frequency）是指频率范围在300KHz~300GHz的高频电磁波。频率低于100kHz的电磁波会被地表吸收，不能形成有效的传输。频率高于100kHz的电磁波可以在空气中传播，并经大气层外缘的电离层反射，形成远距离传输能力。</p>
+<p>900MHz的GSM频段，1.9GHz的4G LTE频段，3.5GHz的5G频段。</p>
+<p>基本频带(Baseband)是指一段特殊的频率带宽，也就是频率范围在零频附近（从直流到几百KHz）的这段带宽的信号。</p>
+<p><img src="/images/hardware/RF/sem_module.webp" alt="img"></p>
+<p>射频芯片指的就是将无线电信号转换成一定的无线电信号波形， 并通过天线谐振发送出去的一个电子元器件，它包括功率放大器、低噪声放大器和天线开关。射频芯片架构包括接收通道和发射通道两大部分。</p>
+<h2 id="检波"><a href="#检波" class="headerlink" title="检波"></a>检波</h2><p>检波又称振幅解调，它的作用是从已调制的高频振荡中恢复出原来的调制信号。从频谱上看，检波就是将幅度调制波中的边带信号不失真地从载波频率附近搬移到零频率附近。</p>
+<p>在测试和测量应用中，射频功率检波器用于精密测量射频功率，以及用作频谱和网络分析仪中输入保护电路的一部分。在通信和医疗应用中，射频检波器用于监测和控制发射功率和天线回波损耗。</p>
+<h2 id="基带"><a href="#基带" class="headerlink" title="基带"></a>基带</h2><p>基带（Base Band）是频谱中心点在0Hz的信号，有人也把基带叫做“未调制信号”。</p>
+<p>基带芯片可以认为是包括调制解调器，但不止于调制解调器，还包括信道编解码、信源编解码，以及一些信令处理。</p>
+<h2 id="LPWAN"><a href="#LPWAN" class="headerlink" title="LPWAN"></a>LPWAN</h2><p><img src="/images/hardware/RF/v2-da2f5994249683a8d1f301d9c84e95fe_720w.jpg" alt="img"></p>
+<p><strong>LPWAN</strong> (Low Power Wide Area Network，低功耗广域网)，特点是低功耗和广覆盖。也叫做蜂窝物联网。目前市场上主要的LPWAN技术包括NB-IoT、eMTC、LORA。</p>
+<p><img src="/images/hardware/RF/b622410ef1194adb8b52409d4ec0df39.png" alt="img"></p>
+<p><img src="/images/hardware/RF/8b307fed446e4b9899ce10a248141c9e.png" alt="img"></p>
+<p><strong>IMSI</strong> 国际移动用户识别码，是区别移动用户的标识，储存在SIM卡中，可用于区别移动用户的有效信息，通过IMSI可反查运营商、归属地、手机号码等信息，在接入网络时会到运营商服务器中进行验证。格式：15位0-9的数字。</p>
+<p><strong>ICCID</strong> SIM卡卡号，是卡的标识，不作接入网络的鉴权认证，可在SIM卡卡后查询到。格式：大多为19或20位0-9的数字，亦存在6位/12位的情况。</p>
+<h2 id="NB-IoT"><a href="#NB-IoT" class="headerlink" title="NB-IoT"></a>NB-IoT</h2><p>NB-IoT（窄带物联网），Narrow Band Internet of Things。</p>
+<h2 id="ZigBee"><a href="#ZigBee" class="headerlink" title="ZigBee"></a>ZigBee</h2><p>ZigBee是基于IEEE802.15.4标准的低功耗局域网协议，可工作在2.4GHz(全球流行)、868MHz(欧洲流行)和915 MHz(美国流行)3个频段上,分别具有最高250kbit/s、20kbit/s和40kbit/s的传输速率，它的传输距离在10-75m的范围内。</p>
+<ul>
+<li><p>低功耗：在低耗电待机模式下，2节5号干电池可支持1个节点工作6-24个月，甚至更长。这是ZigBee的突出优势。相比之下蓝牙可以工作数周、WiFi可以工作数小时;</p>
+</li>
+<li><p>低成本：通过大幅简化协议是成本很低（不足蓝牙的1/10），降低了对通信控制器的要求，按预测分析，以8051的8位微控制器测算，全功能的主节点需要32KB代码，子功能节点少至4KB代码，而且ZigBee的协议专利免费;</p>
+</li>
+<li><p>低速率：ZigBee工作在250kbps的通讯速率，满足低速率传输数据的应用需求;</p>
+</li>
+<li><p>近距离：传输范围一般介于10～100m之间，在增加RF发射功率后，亦可增加到1-3km。这指的是相邻节点间的距离。如果通过路由和节点间通信的接力，传输距离将可以更远;</p>
+</li>
+<li><p>短时延：ZigBee的响应速度较快，一般从睡眠转入工作状态只需15ms，节点连接进入网络只需30ms，进一步节省了电能。相比较，蓝牙需要3-10s、WiFi需要3s;</p>
+</li>
+<li><p>高容量：ZigBee可采用星状、片状和网状网络结构，由一个主节点管理若干子节点，最多一个主节点可管理254个子节点;同时主节点还可由上一层网络节点管理，最多可组成65000个节点的大网;</p>
+</li>
+<li><p>高安全：ZigBee提供了三级安全模式，包括无安全设定、使用接入控制清单（ACL）防止非法获取数据以及采用高级加密标准（AES128）的对称密码，以灵活确定其安全属性;</p>
+</li>
+<li><p>免执照频段：采用直接序列扩频在工业科学医疗2.4GHz（全球）频段。</p>
+</li>
+</ul>
+<h2 id="Z-Wave"><a href="#Z-Wave" class="headerlink" title="Z-Wave"></a>Z-Wave</h2><p>Z-Wave是一种基于射频的、低成本、低功耗、高可靠、适于网络的短距离无线通信技术。工作频带为908.42MHz(美国)~868.42MHz(欧洲)，采用FSK(BFSK/GFSK)调制方式，数据传输速率可达40 kbps，信号的有效覆盖范围在室内是30m，室外可超过100m，适合于窄带宽应用场合。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/cpu/memory/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/04/cpu/memory/" class="post-title-link" itemprop="url">存储器</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-09-25 15:08:19" itemprop="dateModified" datetime="2022-09-25T15:08:19+08:00">2022-09-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="ROM"><a href="#ROM" class="headerlink" title="ROM"></a>ROM</h2><p>ROM(Read Only Memory)程序存储器，在掉电之后仍然可以保持数据，用于存储各种固化程序和数据。</p>
+<p><strong>PROM</strong> (Programmable ROM，可编程ROM)，写入时，烧录器通过高电压在芯片内永久地烧断或者建立内部连接（熔丝或反熔丝），因此只能一次编程。</p>
+<p><strong>EPROM</strong> (Erasable Programmable ROM，可擦去可编程ROM)，使用紫外线照射此类型的ROM可以抹去其中的数据。</p>
+<p><strong>EEPROM</strong> (Electrically Erasable Programmable ROM，电可擦去可编程ROM)，使用电来对其进行擦写，常用于电脑系统的BIOS。</p>
+<h2 id="RAM"><a href="#RAM" class="headerlink" title="RAM"></a>RAM</h2><p>RAM(Random Access Memory)随机访问存储器，存储单元的内容可按照需要随机取出或存入，且存取的速度与存储单元的位置无关。在掉电之后就丢失数据，主要用来存储程序中用到的变量。</p>
+<p><strong>DRAM</strong> (Dynamic RAM/DRAM)动态随机存储器，DRAM保留数据的时间很短，需要周期性地刷新。计算机内存就是DRAM的。</p>
+<p>DRAM利用MOS管的栅电容上的电荷来存储信息，存储单元存储的是0还是1取决于电容是否有电荷，有电荷代表1，无电荷代表0。由于栅极会漏电，所以每隔一定的时间就需要一个刷新机构给这些栅电容补充电荷，这个就叫动态刷新。刷新操作定期对电容进行检查，若电量大于满电量的1/2，则认为其代表1，并把电容充满电；若电量小于1/2，则认为其代表0，并把电容放电，以此来保持数据的连续性。由于它只使用一个MOS管来存信息，所以集成度可以很高，容量能够做的很大。</p>
+<p><strong>SRAM</strong> (Static Random-Access Memory)静态随机存取存储器，只要保持通电，里面储存的数据就可以一直保持，不需要动态刷新，对任何数据访问的时间都是固定的。需要与CPU时钟同步</p>
+<p>SRAM的优点是只要器件不掉电，存储内容就不丢失，工作速度快。缺点是集成度低、功耗大、价格高。CPU Cache就是这种。</p>
+<h2 id="Flash"><a href="#Flash" class="headerlink" title="Flash"></a>Flash</h2><p>Flash 存储器（FLASH EEPROM）又称闪存，快闪。它是EEPROM的一种。它结合了ROM和RAM的长处。不仅具备EEPROM的性能，还不会断电丢失数据同时可以快速读取数据。它于EEPROM的最大区别是，FLASH按扇区操作，而EEPROM按照字节操作。FLASH的电路结构较简单，同样容量占芯片面积较小，成本自然比EEPROM低，因此适合用于做程序存储器。</p>
+<p>flash是非易失存储器，可以对称为块的存储器单元块进行擦写和再编程。任何flash器件的写入操作只能在空或已擦除的单元内进行，所以在进行写入操作之前必须先执行擦除。擦除的过程就是把所有位都写为1的过程，以块为单位，块内的所有字节变为0xFF。</p>
+<h3 id="Nor-Flash"><a href="#Nor-Flash" class="headerlink" title="Nor Flash"></a>Nor Flash</h3><ul>
+<li>支持随机访问，具有XIP（eXecute In Place）特性，可以像普通ROM一样执行程序。</li>
+<li>存储的内容可以直接映射到 CPU 地址空间，不需要拷贝到 RAM 中即可被 CPU 访问。</li>
+<li>读操作快，但擦除和写操作慢。</li>
+<li>容量小，块大小范围：64~128KB。</li>
+<li>带有SRAM接口，有足够的地址引脚来寻址，可以很容易地存取其内部的每一个字节。</li>
+<li>最大擦写次数是十万次。</li>
+</ul>
+<p>Nor Flash根据数据传输的位数可以分为并行（Parallel，即地址线和数据线直接和处理器相连）和串行（SPI，即通过SPI接口和处理器相连）。早期Norflash的接口是parallel的形式，即把数据线和地址线并排与IC的管脚连接。但是后来发现不同容量的Norflash不能硬件上兼容（数据线和地址线的数量不一样），并且封装比较大，占用了较大的PCB板位置，后来逐渐被串行接口的SPI Norflash所取代，至于现在说起NOR flash都直接以SPI flash来代称。</p>
+<p>spi flash 接口定义：</p>
+<ul>
+<li>Standard SPI: CLK, /CS, DI, DO, /WP, /Hold</li>
+<li>Dual SPI: CLK, /CS, IO0, IO1, /WP, /Hold</li>
+<li>Quad SPI: CLK, /CS, IO0, IO1, IO2, IO3</li>
+</ul>
+<h3 id="Nand-Flash"><a href="#Nand-Flash" class="headerlink" title="Nand Flash"></a>Nand Flash</h3><ul>
+<li>使用串行接口传送控制、地址和数据信息。</li>
+<li>读比nor flash慢，擦除和写都快，读和写操作都采用512字节的块。</li>
+<li>容量大，块大小范围：8~64KB。</li>
+<li>每个块的最大擦写次数是一百万次。</li>
+<li>坏块是随机分布的，需要坏块处理。</li>
+</ul>
+<p><img src="/images/memory/nor_nand.jpg" alt="nor_nand"></p>
+<p>由于Flash固有的电器特性，在读写数据过程中会偶然产生1位或几位数据错误，即<strong>位反转</strong>。Nand Flash发生位反转的几率要远大于Nor Flash，应采用错误探测/错误更正(EDC/ECC)算法。</p>
+<h2 id="硬盘"><a href="#硬盘" class="headerlink" title="硬盘"></a>硬盘</h2><p>硬盘(Hard Disk Drive，HDD)靠磁性盘片记录二进制数据。</p>
+<p><img src="/images/memory/disk/hdd.jpg" alt="img"></p>
+<p>硬盘片的盘面上有一层涂得很薄的磁性材料。写入数据时，通电的磁头会形成磁场，在磁性材料层上留下一个一个小磁化区，每个被磁化的区域代表二进制的1。读取数据时，磁头扫过磁化区的时候能感受到微小的磁场变化。</p>
+<p>当磁盘旋转时，磁头若保持在一个位置上，则每个磁头都会在磁盘表面划出一个圆形轨迹，这些圆形轨迹就叫做磁道(Track)。划分分区时，分区大小必须以磁道为参考，一个分区必须包含一个或多个整数磁道，不能只占半个磁道。也就是说如果磁盘有两个磁道，最多只能分成2个分区。</p>
+<p>在有多个盘片构成的盘组中，由不同盘片的面，但处于同一半径圆的多个磁道组成的一个圆柱面(Cylinder)。</p>
+<p>磁盘上的每个磁道被等分为若干个弧段，这些弧段便是硬盘的扇区(Sector)。硬盘的第一个扇区，叫做引导扇区。磁盘上数据读写的最小单位。</p>
+<p>操作系统内核中的文件管理系统会将硬盘的扇区组合成<strong>簇</strong>(Data Cluster)，操作系统会记录文件所在簇的编号(文件数据分布在哪几个扇区)，方便查找并读写。</p>
+<p>机械硬盘通过磁头读取旋转的盘片来传输数据，而盘片的转速RPM(Round Per Minute，每分钟的转数)直接决定了硬盘读取和写入数据的速度。磁盘在写入数据时，会使用磁盘缓存暂时存储数据。</p>
+<h3 id="RAID"><a href="#RAID" class="headerlink" title="RAID"></a>RAID</h3><p>RAID(独立硬盘冗余阵列，Redundant Array of Independent Disks)，简称磁盘阵列。利用虚拟化存储技术把多个硬盘组合起来，成为一个或多个硬盘阵列组，目的为提升性能或数据冗余，或是两者同时提升。</p>
+<ul>
+<li><strong>RAID0</strong></li>
+</ul>
+<p>RAID0 是一种非常简单的的方式，它将多块磁盘组合在一起形成一个大容量的存储。当我们要写数据的时候，会将数据分为N份，以独立的方式实现N块磁盘的读写，那么这N份数据会同时并发的写到磁盘中，读写性能理论上是单块磁盘的N倍。</p>
+<p>但RAID0的问题是，它并不提供数据校验或冗余备份，因此一旦某块磁盘损坏了，数据就直接丢失，无法恢复了。因此RAID0就不可能用于高要求的业务中，但可以用在对可靠性要求不高，对读写性能要求高的场景中。</p>
+<ul>
+<li><strong>RAID1</strong></li>
+</ul>
+<p>RAID1 是磁盘阵列中单位成本最高的一种方式。因为它的原理是在往磁盘写数据的时候，将同一份数据无差别的写两份到磁盘，分别写到工作磁盘和镜像磁盘，对数据做了冗余备份，但它的实际空间使用率只有50%了，是一种比较昂贵的方案。</p>
+<ul>
+<li><strong>RAID3</strong></li>
+</ul>
+<p>RAID3的方式是：将数据按照RAID0的形式，分成多份同时写入多块磁盘，但是还会另外留出一块磁盘用于写奇偶校验码，一旦某一块磁盘坏掉了，就可以利用那块校验码磁盘去恢复数据。但是由于任何数据的写入都会要去更新这块磁盘，导致这块磁盘的读写是最频繁的，也就非常的容易损坏。</p>
+<ul>
+<li><strong>RAID5</strong></li>
+</ul>
+<p>RAID5对RAID3进行了改进，是一种存储性能、数据安全、存储成本兼顾的方案。</p>
+<p>在RAID5模式中，不再需要用单独的磁盘写校验码了。它把校验码信息分布到各个磁盘上。例如，总共有N块磁盘，那么会将要写入的数据分成N份，并发的写入到N块磁盘中，同时还将数据的校验码信息也写入到这N块磁盘中，数据与对应的校验码信息必须得分开存储在不同的磁盘上。一旦某一块磁盘损坏了，就可以用剩下的数据和对应的奇偶校验码信息去恢复损坏的数据。</p>
+<p><img src="/images/memory/disk/RAID5.jpg" alt="img"></p>
+<p>RAID5的方式，最少需要三块磁盘来组建磁盘阵列，允许最多同时坏一块磁盘。如果有两块磁盘同时损坏了，那数据就无法恢复了。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/cpu/pc/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -994,427 +1591,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/kernel/i2c_adapter/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/04/kernel/i2c_adapter/" class="post-title-link" itemprop="url">i2c 适配器</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="i2c-框架"><a href="#i2c-框架" class="headerlink" title="i2c 框架"></a>i2c 框架</h2><p><img src="/images/kernel/i2c/i2c-arch.png" alt="i2c体系结构"></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">├── algos           实现了一些i2c总线适配器的算法</span><br><span class="line">│   ├── i2c-algo-bit.c</span><br><span class="line">│   ├── i2c-algo-pca.c</span><br><span class="line">│   ├── i2c-algo-pcf.c</span><br><span class="line">│   ├── i2c-algo-pcf.h</span><br><span class="line">├── busses          包含了一些处理器的i2c控制器驱动</span><br><span class="line">│   ├── i2c-at91.c</span><br><span class="line">│   ├── i2c-exynos5.c</span><br><span class="line">│   ├── i2c-gpio.c</span><br><span class="line">│   ├── i2c-s3c2410.c</span><br><span class="line">│   ├── i2c-stm32.c</span><br><span class="line">├── chips            包含了一些特定的i2c设备驱动</span><br><span class="line">├── i2c-boardinfo.c</span><br><span class="line">├── i2c-core.c       实现了i2c核心的功能以及/proc/bus/i2c*接口</span><br><span class="line">├── i2c-dev.c        实现了i2c适配器设备文件的功能</span><br><span class="line">├── i2c-mux.c</span><br><span class="line">└── muxes</span><br><span class="line">    ├── i2c-arb-gpio-challenge.c</span><br><span class="line">    ├── i2c-demux-pinctrl.c</span><br><span class="line">    ├── i2c-mux-gpio.c</span><br><span class="line">    ├── i2c-mux-gpmux.c</span><br><span class="line">    ├── i2c-mux-ltc4306.c</span><br><span class="line">    ├── i2c-mux-mlxcpld.c</span><br><span class="line">    ├── i2c-mux-pca9541.c</span><br><span class="line">    ├── i2c-mux-pinctrl.c</span><br><span class="line">    ├── i2c-mux-reg.c</span><br></pre></td></tr></table></figure>
-
-<h2 id="i2c总线"><a href="#i2c总线" class="headerlink" title="i2c总线"></a>i2c总线</h2><p>I2C核心维护了i2c_bus结构体，提供了I2C总线驱动和设备驱动的注册、注销方法，维护了I2C总线的驱动、设备链表，实现了设备、驱动的匹配探测。代码实现在i2c-core.c中。</p>
-<p>i2c总线用于管理I2C设备和I2C驱动，维护一个设备链表和驱动链表，定义了设备和驱动的匹配规则和匹配成功后的行为。</p>
-<p><strong>注册i2c总线</strong></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">bus_type</span> <span class="title">i2c_bus_type</span> =</span> &#123;</span><br><span class="line">    .name       = <span class="string">&quot;i2c&quot;</span>,</span><br><span class="line">    .match      = i2c_device_match,</span><br><span class="line">    .probe      = i2c_device_probe,</span><br><span class="line">    .remove     = i2c_device_remove,</span><br><span class="line">    .shutdown   = i2c_device_shutdown,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">ret = bus_register(&amp;i2c_bus_type);</span><br></pre></td></tr></table></figure>
-
-<p>i2c_device_match()中，会调用 i2c_match_id()函数匹配板文件中定义的ID和i2c_driver 所支持的ID表。</p>
-<p>I2C总线由I2C适配器和适配器的通信方法组成。</p>
-<h2 id="i2c-adapter"><a href="#i2c-adapter" class="headerlink" title="i2c_adapter"></a>i2c_adapter</h2><p>i2c_adapter 对应与物理上的一个适配器，适配器就是cpu内部的i2c控制器，用来产生总线操作信号，此部分代码由具体的芯片厂商提供。<br>一个适配器上可以连接多个i2c设备，i2c_client都会依附于适配器上的。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">i2c_adapter</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">module</span> *<span class="title">owner</span>;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> id; <span class="comment">/* == is algo-&gt;id | hwdep.struct-&gt;id/</span></span><br><span class="line"><span class="comment">    unsigned int class;</span></span><br><span class="line"><span class="comment">    struct i2c_algorithm *algo; /* the algorithm to access the bus */</span></span><br><span class="line">    <span class="type">void</span> *algo_data;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> (*client_register)(<span class="keyword">struct</span> i2c_client *);</span><br><span class="line">    <span class="type">int</span> (*client_unregister)(<span class="keyword">struct</span> i2c_client *);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* data fields that are valid for all devices */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">semaphore</span> <span class="title">bus_lock</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">semaphore</span> <span class="title">clist_lock</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> timeout;</span><br><span class="line">    <span class="type">int</span> retries;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device</span> <span class="title">dev</span>;</span>  <span class="comment">/* the adapter device */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">class_device</span> <span class="title">class_dev</span>;</span> <span class="comment">/* the class device */</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> nr;  <span class="comment">// 总线号</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">clients</span>;</span>  <span class="comment">//连接的i2c设备</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">list</span>;</span></span><br><span class="line">    <span class="type">char</span> name[I2C_NAME_SIZE];</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">completion</span> <span class="title">dev_released</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">completion</span> <span class="title">class_dev_released</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p><strong>注册适配器</strong></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">i2c_imx_probe</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">imx_i2c_struct</span> *<span class="title">i2c_imx</span>;</span></span><br><span class="line">    <span class="type">int</span> irq;</span><br><span class="line">    <span class="type">int</span> ret;</span><br><span class="line"></span><br><span class="line">    irq = platform_get_irq(pdev, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> (irq &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        dev_err(&amp;pdev-&gt;dev, <span class="string">&quot;can&#x27;t get irq number\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> -ENOENT;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pdata = pdev-&gt;dev.platform_data;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Setup i2c_imx driver structure */</span></span><br><span class="line">    <span class="built_in">strcpy</span>(i2c_imx-&gt;adapter.name, pdev-&gt;name);</span><br><span class="line">    i2c_imx-&gt;adapter.owner      = THIS_MODULE;</span><br><span class="line">    i2c_imx-&gt;adapter.algo       = &amp;i2c_imx_algo;</span><br><span class="line">    i2c_imx-&gt;adapter.dev.parent = &amp;pdev-&gt;dev;</span><br><span class="line">    i2c_imx-&gt;adapter.nr         = pdev-&gt;id;</span><br><span class="line">    i2c_imx-&gt;irq    = irq;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Get I2C clock */</span></span><br><span class="line">    i2c_imx-&gt;clk = clk_get(&amp;pdev-&gt;dev, <span class="string">&quot;i2c_clk&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Request IRQ */</span></span><br><span class="line">    ret = request_irq(i2c_imx-&gt;irq, i2c_imx_isr, <span class="number">0</span>, pdev-&gt;name, i2c_imx);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Init queue */</span></span><br><span class="line">    init_waitqueue_head(&amp;i2c_imx-&gt;<span class="built_in">queue</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Set up adapter data */</span></span><br><span class="line">    i2c_set_adapdata(&amp;i2c_imx-&gt;adapter, i2c_imx);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Set up clock divider */</span></span><br><span class="line">    <span class="keyword">if</span> (pdata &amp;&amp; pdata-&gt;bitrate)</span><br><span class="line">        i2c_imx_set_clk(i2c_imx, pdata-&gt;bitrate);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        i2c_imx_set_clk(i2c_imx, IMX_I2C_BIT_RATE);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Set up chip registers to defaults */</span></span><br><span class="line">    writeb(<span class="number">0</span>, i2c_imx-&gt;base + IMX_I2C_I2CR);</span><br><span class="line">    writeb(<span class="number">0</span>, i2c_imx-&gt;base + IMX_I2C_I2SR);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Add I2C adapter */</span></span><br><span class="line">    ret = i2c_add_numbered_adapter(&amp;i2c_imx-&gt;adapter);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>先初始化i2c控制器的I/O地址、中断号等硬件资源，实例一个i2c_adapter对象，实现适配器的数据传输方法，如果总线号（nr成员）已经指定，则调用 i2c_add_numbered_adapter() 函数完成适配器的构建，否则使用i2c_add_adapter()动态生成总线号。</p>
-<h2 id="i2c-algorithm"><a href="#i2c-algorithm" class="headerlink" title="i2c_algorithm"></a>i2c_algorithm</h2><p>i2c_algorithm 对应i2c总线的数据通信算法，i2c适配器需要 i2c_algorithm 中提供的通信函数来实现对I2C总线上数据的发送和接收等操作。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">i2c_algorithm</span> &#123;</span></span><br><span class="line">    <span class="comment">/* 作为主设备时的发送函数 */</span></span><br><span class="line">    <span class="type">int</span> (*master_xfer)(<span class="keyword">struct</span> i2c_adapter *adap, <span class="keyword">struct</span> i2c_msg *msgs,</span><br><span class="line">               <span class="type">int</span> num);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 作为从设备时的发送函数 */</span></span><br><span class="line">    <span class="type">int</span> (*smbus_xfer) (<span class="keyword">struct</span> i2c_adapter *adap, u16 addr,</span><br><span class="line">               <span class="type">unsigned</span> <span class="type">short</span> flags, <span class="type">char</span> read_write,</span><br><span class="line">               u8 command, <span class="type">int</span> size, <span class="keyword">union</span> i2c_smbus_data *data);</span><br><span class="line"></span><br><span class="line">    u32 (*functionality) (<span class="keyword">struct</span> i2c_adapter *);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>i2c_algorithm 中的master_xfer()函数通过操作寄存器来完成i2c_msg数据的传输。functionality()函数返回支持的通信协议掩码，用来确定适配器支持那些传输协议。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">i2c_msg</span> &#123;</span> </span><br><span class="line">    __u16 addr; <span class="comment">/* slave address */</span></span><br><span class="line">    __u16 flags;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_M_RD        0x0001  <span class="comment">/* read data, from slave to master */</span></span></span><br><span class="line">                    <span class="comment">/* I2C_M_RD is guaranteed to be 0x0001! */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_M_TEN       0x0010  <span class="comment">/* this is a ten bit chip address */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_M_DMA_SAFE      0x0200  <span class="comment">/* the buffer of this message is DMA safe */</span></span></span><br><span class="line">                    <span class="comment">/* makes only sense in kernelspace */</span></span><br><span class="line">                    <span class="comment">/* userspace buffers are copied anyway */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_M_RECV_LEN      0x0400  <span class="comment">/* length will be first received byte */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_M_NO_RD_ACK     0x0800  <span class="comment">/* if I2C_FUNC_PROTOCOL_MANGLING */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_M_IGNORE_NAK    0x1000  <span class="comment">/* if I2C_FUNC_PROTOCOL_MANGLING */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_M_REV_DIR_ADDR  0x2000  <span class="comment">/* if I2C_FUNC_PROTOCOL_MANGLING */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_M_NOSTART       0x4000  <span class="comment">/* if I2C_FUNC_NOSTART */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_M_STOP      0x8000  <span class="comment">/* if I2C_FUNC_PROTOCOL_MANGLING */</span></span></span><br><span class="line">    __u16 len;      <span class="comment">/* msg length */</span></span><br><span class="line">    __u8 *buf;      <span class="comment">/* pointer to msg data */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">i2c_imx_xfer</span><span class="params">(<span class="keyword">struct</span> i2c_adapter *adapter,</span></span><br><span class="line"><span class="params">                        <span class="keyword">struct</span> i2c_msg *msgs, <span class="type">int</span> num)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> i, temp;</span><br><span class="line">    <span class="type">int</span> result;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">imx_i2c_struct</span> *<span class="title">i2c_imx</span> =</span> i2c_get_adapdata(adapter);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Start I2C transfer */</span></span><br><span class="line">    result = i2c_imx_start(i2c_imx);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* read/write data */</span></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; num; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (i) &#123;</span><br><span class="line">            temp = readb(i2c_imx-&gt;base + IMX_I2C_I2CR);</span><br><span class="line">            temp |= I2CR_RSTA;</span><br><span class="line">            writeb(temp, i2c_imx-&gt;base + IMX_I2C_I2CR);</span><br><span class="line">            result =  i2c_imx_bus_busy(i2c_imx, <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">/* write/read data */</span></span><br><span class="line">        <span class="keyword">if</span> (msgs[i].flags &amp; I2C_M_RD)</span><br><span class="line">            result = i2c_imx_read(i2c_imx, &amp;msgs[i]);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            result = i2c_imx_write(i2c_imx, &amp;msgs[i]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Stop I2C transfer */</span></span><br><span class="line">    i2c_imx_stop(i2c_imx);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> (result &lt; <span class="number">0</span>) ? result : num;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> u32 <span class="title function_">i2c_imx_func</span><span class="params">(<span class="keyword">struct</span> i2c_adapter *adapter)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> I2C_FUNC_I2C | I2C_FUNC_SMBUS_EMUL;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">i2c_algorithm</span> <span class="title">i2c_imx_algo</span> =</span> &#123;</span><br><span class="line">    .master_xfer   = i2c_imx_xfer,</span><br><span class="line">    .functionality = i2c_imx_func,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<h2 id="i2c-core-c"><a href="#i2c-core-c" class="headerlink" title="i2c-core.c"></a>i2c-core.c</h2><h3 id="i2c-add-adapter"><a href="#i2c-add-adapter" class="headerlink" title="i2c_add_adapter()"></a>i2c_add_adapter()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">i2c_add_adapter</span><span class="params">(<span class="keyword">struct</span> i2c_adapter *adapter)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device</span> *<span class="title">dev</span> =</span> &amp;adapter-&gt;dev;</span><br><span class="line">    <span class="type">int</span> id;</span><br><span class="line"></span><br><span class="line">    mutex_lock(&amp;core_lock);</span><br><span class="line">    id = idr_alloc(&amp;i2c_adapter_idr, adapter,</span><br><span class="line">               __i2c_first_dynamic_bus_num, <span class="number">0</span>, GFP_KERNEL);</span><br><span class="line">    mutex_unlock(&amp;core_lock);</span><br><span class="line">    adapter-&gt;nr = id;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> i2c_register_adapter(adapter);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">bus_type</span> <span class="title">i2c_bus_type</span> =</span> &#123;</span><br><span class="line">    .name       = <span class="string">&quot;i2c&quot;</span>,</span><br><span class="line">    .match      = i2c_device_match,</span><br><span class="line">    .probe      = i2c_device_probe,</span><br><span class="line">    .remove     = i2c_device_remove,</span><br><span class="line">    .shutdown   = i2c_device_shutdown,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">device_type</span> <span class="title">i2c_adapter_type</span> =</span> &#123;</span><br><span class="line">    .groups     = i2c_adapter_groups,</span><br><span class="line">    .release    = i2c_adapter_dev_release,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">i2c_register_adapter</span><span class="params">(<span class="keyword">struct</span> i2c_adapter *adap)</span></span><br><span class="line">&#123;</span><br><span class="line">    rt_mutex_init(&amp;adap-&gt;bus_lock);</span><br><span class="line">    rt_mutex_init(&amp;adap-&gt;mux_lock);</span><br><span class="line">    mutex_init(&amp;adap-&gt;userspace_clients_lock);</span><br><span class="line">    INIT_LIST_HEAD(&amp;adap-&gt;userspace_clients);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Set default timeout to 1 second if not already set */</span></span><br><span class="line">    <span class="keyword">if</span> (adap-&gt;timeout == <span class="number">0</span>)</span><br><span class="line">        adap-&gt;timeout = HZ;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* register soft irqs for Host Notify */</span></span><br><span class="line">    res = i2c_setup_host_notify_irq_domain(adap);</span><br><span class="line"></span><br><span class="line">    dev_set_name(&amp;adap-&gt;dev, <span class="string">&quot;i2c-%d&quot;</span>, adap-&gt;nr);</span><br><span class="line">    adap-&gt;dev.bus = &amp;i2c_bus_type;</span><br><span class="line">    adap-&gt;dev.type = &amp;i2c_adapter_type;</span><br><span class="line">    res = device_register(&amp;adap-&gt;dev);  <span class="comment">//创建设备结节</span></span><br><span class="line"></span><br><span class="line">    i2c_init_recovery(adap);</span><br><span class="line"></span><br><span class="line">    of_i2c_register_devices(adap);</span><br><span class="line">    i2c_acpi_register_devices(adap);</span><br><span class="line">    i2c_acpi_install_space_handler(adap);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (adap-&gt;nr &lt; __i2c_first_dynamic_bus_num)</span><br><span class="line">        i2c_scan_static_board_info(adap);</span><br><span class="line"></span><br><span class="line">    mutex_lock(&amp;core_lock);</span><br><span class="line">    bus_for_each_drv(&amp;i2c_bus_type, <span class="literal">NULL</span>, adap, __process_new_adapter);</span><br><span class="line">    mutex_unlock(&amp;core_lock);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __process_new_adapter(<span class="keyword">struct</span> device_driver *d, <span class="type">void</span> *data)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> i2c_do_add_adapter(to_i2c_driver(d), data);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">i2c_do_add_adapter</span><span class="params">(<span class="keyword">struct</span> i2c_driver *driver, <span class="keyword">struct</span> i2c_adapter *adap)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/* Detect supported devices on that bus, and instantiate them */</span></span><br><span class="line">    i2c_detect(adap, driver);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Let legacy drivers scan this bus for matching devices */</span></span><br><span class="line">    <span class="keyword">if</span> (driver-&gt;attach_adapter) &#123;</span><br><span class="line">        <span class="comment">/* We ignore the return code; if it fails, too bad */</span></span><br><span class="line">        driver-&gt;attach_adapter(adap);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>注册适配器时，会扫描并注册当前已经静态添加的i2c设备，同时遍历所有的i2c设备驱动，将匹配的驱动与自己附属的设备进行绑定。</p>
-<h3 id="i2c-detect"><a href="#i2c-detect" class="headerlink" title="i2c_detect()"></a>i2c_detect()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">i2c_detect</span><span class="params">(<span class="keyword">struct</span> i2c_adapter *adapter, <span class="keyword">struct</span> i2c_driver *driver)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">unsigned</span> <span class="type">short</span> *address_list;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">i2c_client</span> *<span class="title">temp_client</span>;</span></span><br><span class="line">    <span class="type">int</span> i, err = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> adap_id = i2c_adapter_id(adapter);</span><br><span class="line"></span><br><span class="line">    address_list = driver-&gt;address_list;</span><br><span class="line">    <span class="keyword">if</span> (!driver-&gt;detect || !address_list)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Set up a temporary client to help detect callback */</span></span><br><span class="line">    temp_client = kzalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> i2c_client), GFP_KERNEL);</span><br><span class="line">    temp_client-&gt;adapter = adapter;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Stop here if the classes do not match */</span></span><br><span class="line">    <span class="keyword">if</span> (!(adapter-&gt;class &amp; driver-&gt;class))</span><br><span class="line">        <span class="keyword">goto</span> exit_free;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Stop here if the bus doesn&#x27;t support probing */</span></span><br><span class="line">    <span class="keyword">if</span> (!i2c_check_functionality(adapter, I2C_FUNC_SMBUS_READ_BYTE)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (address_list[<span class="number">0</span>] == I2C_CLIENT_END)</span><br><span class="line">            <span class="keyword">goto</span> exit_free;</span><br><span class="line"></span><br><span class="line">        err = -EOPNOTSUPP;</span><br><span class="line">        <span class="keyword">goto</span> exit_free;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; address_list[i] != I2C_CLIENT_END; i += <span class="number">1</span>) &#123;</span><br><span class="line">        dev_dbg(&amp;adapter-&gt;dev, <span class="string">&quot;found normal entry for adapter %d, &quot;</span></span><br><span class="line">            <span class="string">&quot;addr 0x%02x\n&quot;</span>, adap_id, address_list[i]);</span><br><span class="line">        temp_client-&gt;addr = address_list[i];</span><br><span class="line">        i2c_detect_address(temp_client, driver);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"> exit_free:</span><br><span class="line">    kfree(temp_client);</span><br><span class="line">    <span class="keyword">return</span> err;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>构造一个临时的i2c设备，然后调用驱动的探测函数detect()，检查其设备地址，若设备名匹配，则将这个设备注册到内核。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">i2c_detect_address</span><span class="params">(<span class="keyword">struct</span> i2c_client *temp_client, <span class="keyword">struct</span> i2c_driver *driver)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">i2c_board_info</span> <span class="title">info</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">i2c_adapter</span> *<span class="title">adapter</span> =</span> temp_client-&gt;adapter;</span><br><span class="line">    <span class="type">int</span> addr = temp_client-&gt;addr;</span><br><span class="line">    <span class="type">int</span> err;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Make sure the address is valid */</span></span><br><span class="line">    err = i2c_check_addr_validity(addr);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Skip if already in use */</span></span><br><span class="line">    <span class="keyword">if</span> (i2c_check_addr_busy(adapter, addr))</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Make sure there is something at this address */</span></span><br><span class="line">    <span class="keyword">if</span> (!i2c_default_probe(adapter, addr))</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Finally call the custom detection function */</span></span><br><span class="line">    <span class="built_in">memset</span>(&amp;info, <span class="number">0</span>, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> i2c_board_info));</span><br><span class="line">    info.addr = addr;</span><br><span class="line">    err = driver-&gt;detect(temp_client, &amp;info);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Consistency check */</span></span><br><span class="line">    <span class="keyword">if</span> (info.type[<span class="number">0</span>] == <span class="string">&#x27;\0&#x27;</span>) &#123;</span><br><span class="line">        dev_err(&amp;adapter-&gt;dev, <span class="string">&quot;%s detection function provided &quot;</span></span><br><span class="line">            <span class="string">&quot;no name for 0x%x\n&quot;</span>, driver-&gt;driver.name, addr);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">struct</span> i2c_client *client;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Detection succeeded, instantiate the device */</span></span><br><span class="line">        dev_dbg(&amp;adapter-&gt;dev, <span class="string">&quot;Creating %s at 0x%02x\n&quot;</span>, info.type, info.addr);</span><br><span class="line">        client = i2c_new_device(adapter, &amp;info);</span><br><span class="line">        <span class="keyword">if</span> (client)</span><br><span class="line">            list_add_tail(&amp;client-&gt;detected, &amp;driver-&gt;clients);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            dev_err(&amp;adapter-&gt;dev, <span class="string">&quot;Failed creating %s at 0x%02x\n&quot;</span>, info.type, info.addr);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="i2c-transfer"><a href="#i2c-transfer" class="headerlink" title="i2c_transfer()"></a>i2c_transfer()</h3><p>i2c_transfer()函数用于进行i2c适配器和i2c设备之间的消息交互，i2c_master_send()函数和i2c_master_recv()函数内部会调用i2c_transfer()函数分别完成一条写消息和一条读消息。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">i2c_transfer</span><span class="params">(<span class="keyword">struct</span> i2c_adapter *adap, <span class="keyword">struct</span> i2c_msg *msgs, <span class="type">int</span> num)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (!adap-&gt;algo-&gt;master_xfer) &#123;</span><br><span class="line">        dev_dbg(&amp;adap-&gt;dev, <span class="string">&quot;I2C level transfers not supported\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> -EOPNOTSUPP;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    adap-&gt;algo-&gt;master_xfer(adap, msgs, num); <span class="comment">//调用适配器的算法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>i2c_transfer()函数通过i2c_adapter对应的i2c_algorithm中的master_xfer()函数来传输I2C数据。</p>
-<h2 id="i2c-dev-c"><a href="#i2c-dev-c" class="headerlink" title="i2c-dev.c"></a>i2c-dev.c</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">i2cdev_attach_adapter</span><span class="params">(<span class="keyword">struct</span> device *dev, <span class="type">void</span> *dummy)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">i2c_adapter</span> *<span class="title">adap</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">i2c_dev</span> *<span class="title">i2c_dev</span>;</span></span><br><span class="line">    <span class="type">int</span> res;</span><br><span class="line"></span><br><span class="line">    adap = to_i2c_adapter(dev);</span><br><span class="line">    i2c_dev = get_free_i2c_dev(adap);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* register this i2c device with the driver core */</span></span><br><span class="line">    i2c_dev-&gt;dev = device_create(i2c_dev_class, &amp;adap-&gt;dev,</span><br><span class="line">                     MKDEV(I2C_MAJOR, adap-&gt;nr), <span class="literal">NULL</span>,</span><br><span class="line">                     <span class="string">&quot;i2c-%d&quot;</span>, adap-&gt;nr);</span><br><span class="line"></span><br><span class="line">    res = device_create_file(i2c_dev-&gt;dev, &amp;dev_attr_name);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">i2cdev_fops</span> =</span> &#123;</span><br><span class="line">    .owner  = THIS_MODULE,</span><br><span class="line">    .llseek = no_llseek,</span><br><span class="line">    .read   = i2cdev_read,</span><br><span class="line">    .write  = i2cdev_write,</span><br><span class="line">    .unlocked_ioctl = i2cdev_ioctl,</span><br><span class="line">    .open   = i2cdev_open,</span><br><span class="line">    .release    = i2cdev_release,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">i2c_dev_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> res;</span><br><span class="line"></span><br><span class="line">    res = register_chrdev(I2C_MAJOR, <span class="string">&quot;i2c&quot;</span>, &amp;i2cdev_fops);</span><br><span class="line"></span><br><span class="line">    i2c_dev_class = class_create(THIS_MODULE, <span class="string">&quot;i2c-dev&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Keep track of adapters which will be added or removed later */</span></span><br><span class="line">    res = bus_register_notifier(&amp;i2c_bus_type, &amp;i2cdev_notifier);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Bind to already existing adapters right away */</span></span><br><span class="line">    i2c_for_each_dev(<span class="literal">NULL</span>, i2cdev_attach_adapter);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>实现了i2c适配器设备文件的功能，每一个i2c适配器都被分配一个设备。通过适配器访问设备时的主设备号都为 89，次设备号为 0～255。应用程序通过“i2c-%d”设备结点并使用文件操作接口 open()、write()、read()、ioctl()和 close()等来访问这个设备。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/kernel/i2c_tools/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/04/kernel/i2c_tools/" class="post-title-link" itemprop="url">i2c-tools 使用</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>下载地址：<a target="_blank" rel="noopener" href="https://mirrors.edge.kernel.org/pub/software/utils/i2c-tools/">https://mirrors.edge.kernel.org/pub/software/utils/i2c-tools/</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/kernel/kernel_make/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/04/kernel/kernel_make/" class="post-title-link" itemprop="url">kernel make and menuconfig</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>指定交叉工具和平台。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm defconfig</span><br><span class="line">make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm menuconfig</span><br></pre></td></tr></table></figure>
-
-<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><ul>
-<li>屏蔽编译信息</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make &gt; /dev/null</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>使用<code>make -j&lt;n&gt;</code>参数加速编译</p>
-</li>
-<li><p>指定编译某些模块</p>
-</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make M=drivers/i2c/ modules</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>使用 verbose 模式，将每一步执行的命令都打印出来，并重定向到一个文件中去，这样以后可以方便地查找模块之间的依赖关系。</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make V=1 &gt; ~/bak.txt</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>使用 ccache 提高编译速度，使用 ccache时，需要更改源码树根目录下面的 Makefile 文件，在 CC 和 HOSTCC 变量的定义前添加 ccache。<a target="_blank" rel="noopener" href="http://ccache.samba.org/">ccache主页</a>。</li>
-</ul>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CC = ccache <span class="variable">$(CROSS_COMPILE)</span>gcc</span><br><span class="line">HOSTCC = ccache gcc</span><br></pre></td></tr></table></figure>
-
-<h2 id="编译文档"><a href="#编译文档" class="headerlink" title="编译文档"></a>编译文档</h2><p>使用下面的一些命令可以在 Documentation/DocBook/目录下，生成一些文档。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">make htmldocs //生成 HTML 文件</span><br><span class="line">make pdfdocs  //生成 PDF 文件</span><br><span class="line">make psdocs   //生成 Postscript 文件</span><br><span class="line">make mandocs  //生成 Kernel API 手册</span><br><span class="line">make installmandocs //将 Kernel API 手册页安装到 man 程序能够找到的目录中</span><br></pre></td></tr></table></figure>
-
-<h2 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h2><p>1.缺少libncurses5-dev</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make menuconfig requires the ncurses libraries.</span><br></pre></td></tr></table></figure>
-
-<p>2.没有安装u-boot-tools</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkimage command not found – U-Boot images will not be built</span><br></pre></td></tr></table></figure>
-
-<p>3.源文件编译生成的.o文件和模块目标文件xxx.o重名。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">module license &#x27;unspecified&#x27; taints kernel.</span><br><span class="line">Disabling lock debugging due to kernel taint</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/kernel/input/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/04/kernel/input/" class="post-title-link" itemprop="url">input 子系统</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Linux 输入子系统由三部分组成：</p>
-<ul>
-<li><p>设备驱动层主要实现对硬件设备的读写访问，中断设置，并把硬件产生的事件通过核心层定义的的 API 上报给事件处理层。代码实现在 input.c。</p>
-</li>
-<li><p>核心层为事件处理层和设备驱动层提供接口 API，通知事件处理层对事件进行处理。具体实现代码在 drivers/input/input.c。input 核心层维护一个 input_device 链表和 input_handler 链表，还有一个 input_handler 数组。</p>
-</li>
-<li><p>事件处理层提供用户编程的接口（设备节点），并处理驱动层上报的数据处理。不同类型的输入设备都有相应的实现文件，如 evdev.c、mousedev.c、joydev.c。</p>
-</li>
-</ul>
-<p><img src="/images/kernel/input/input-arch.jpg" alt="img"></p>
-<h2 id="input-dev"><a href="#input-dev" class="headerlink" title="input_dev"></a>input_dev</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">input_dev</span> &#123;</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *name;<span class="comment">//设备名</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *phys;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *uniq;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">input_id</span> <span class="title">id</span>;</span>  <span class="comment">//与 handler 匹配</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 输入设备支持事件的位图*/</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> propbit[BITS_TO_LONGS(INPUT_PROP_CNT)];</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> evbit[BITS_TO_LONGS(EV_CNT)];   <span class="comment">// 所有事件</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> keybit[BITS_TO_LONGS(KEY_CNT)]; <span class="comment">// 按键事件</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> relbit[BITS_TO_LONGS(REL_CNT)]; <span class="comment">// 相对位移事件</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> absbit[BITS_TO_LONGS(ABS_CNT)]; <span class="comment">// 记录支持的绝对坐标的位图</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> mscbit[BITS_TO_LONGS(MSC_CNT)];</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> ledbit[BITS_TO_LONGS(LED_CNT)];</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> sndbit[BITS_TO_LONGS(SND_CNT)];</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> ffbit[BITS_TO_LONGS(FF_CNT)];</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> swbit[BITS_TO_LONGS(SW_CNT)];</span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> hint_events_per_packet;</span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> keycodemax;   <span class="comment">//支持的按键值的个数</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> keycodesize;  <span class="comment">//每个键值的字节数</span></span><br><span class="line">    <span class="type">void</span> *keycode;  <span class="comment">//存储按键值的数组首地址</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> (*setkeycode)(<span class="keyword">struct</span> input_dev *dev, <span class="type">int</span> scancode, <span class="type">int</span> keycode);</span><br><span class="line">    <span class="type">int</span> (*getkeycode)(<span class="keyword">struct</span> input_dev *dev, <span class="type">int</span> scancode, <span class="type">int</span> *keycode);</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ff_device</span> *<span class="title">ff</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> repeat_key;   <span class="comment">//最近一次按键值，用于连击</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timer_list</span> <span class="title">timer</span>;</span>   <span class="comment">//自动连击计时器</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> <span class="built_in">abs</span>[ABS_MAX + <span class="number">1</span>];</span><br><span class="line">    <span class="type">int</span> rep[REP_MAX + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">input_mt_slot</span> *<span class="title">mt</span>;</span></span><br><span class="line">    <span class="type">int</span> mtsize;</span><br><span class="line">    <span class="type">int</span> slot;</span><br><span class="line">    <span class="type">int</span> trkid;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">input_absinfo</span> *<span class="title">absinfo</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> key[BITS_TO_LONGS(KEY_CNT)];  <span class="comment">//反映当前按键状态的位图</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> led[BITS_TO_LONGS(LED_CNT)];  <span class="comment">//反映当前 led 状态的位图</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> snd[BITS_TO_LONGS(SND_CNT)];  <span class="comment">//反映当前 beep 状态的位图</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> sw[BITS_TO_LONGS(SW_CNT)];</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> absmax[ABS_MAX + <span class="number">1</span>];</span><br><span class="line">    <span class="type">int</span> absmin[ABS_MAX + <span class="number">1</span>];</span><br><span class="line">    <span class="type">int</span> absfuzz[ABS_MAX + <span class="number">1</span>];</span><br><span class="line">    <span class="type">int</span> absflat[ABS_MAX + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> (*open)(<span class="keyword">struct</span> input_dev *dev);   <span class="comment">//打开函数</span></span><br><span class="line">    <span class="type">void</span> (*close)(<span class="keyword">struct</span> input_dev *dev); <span class="comment">//关闭函数</span></span><br><span class="line">    <span class="type">int</span> (*flush)(<span class="keyword">struct</span> input_dev *dev, <span class="keyword">struct</span> file *file);  <span class="comment">//断开连接时刷新数据</span></span><br><span class="line">    <span class="type">int</span> (*event)(<span class="keyword">struct</span> input_dev *dev, <span class="type">unsigned</span> <span class="type">int</span> type, <span class="type">unsigned</span> <span class="type">int</span> code, <span class="type">int</span> value); </span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">input_handle</span> __<span class="title">rcu</span> *<span class="title">grab</span>;</span> <span class="comment">//当前占用该设备的 input_handle</span></span><br><span class="line"></span><br><span class="line">    <span class="type">spinlock_t</span> event_lock;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mutex</span> <span class="title">mutex</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> users;</span><br><span class="line">    <span class="type">int</span> going_away;</span><br><span class="line">    <span class="type">bool</span> sync;   <span class="comment">//最后一次同步后没有新的事件置 1</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device</span> <span class="title">dev</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">h_list</span>;</span>  </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">node</span>;</span> </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">input_id</span> &#123;</span></span><br><span class="line">    __u16 bustype;  <span class="comment">/*总线类型*/</span></span><br><span class="line">    __u16 vendor;   <span class="comment">/*生产商编号*/</span></span><br><span class="line">    __u16 product;  <span class="comment">/*产品编号*/</span></span><br><span class="line">    __u16 version;  <span class="comment">/* 版本号 */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>input_dev 结构体代表一个具体的硬件设备。node 是 input_dev 链表，包含所有注册了的 input_dev 设备。h_list 是 handle 链表，包含该设备相匹配的 input_handler 设备处理方法。input_dev 通过设置位图来标记设备具有什么功能。</p>
-<h3 id="注册-input-dev"><a href="#注册-input-dev" class="headerlink" title="注册 input_dev"></a>注册 input_dev</h3><ol>
-<li><p>实例化一个 input_dev 对象，创建一个硬件设备</p>
-</li>
-<li><p>配置 evbit 成员，设置支持的事件类型，<code>EV_SYN</code>表示支持所有的事件类型。可以使用 input_set_capability() 函数，input.h 里有事件 code 的定义</p>
-</li>
-<li><p>相关硬件初始化，中断初始化，定义中断处理程序</p>
-</li>
-<li><p>使用 input_register_device() 函数注册 input_dev</p>
-</li>
-<li><p>当有事件发生时，在处理函数里调用 input_report_key() 函数上报事件，然后使用 input_sync() 函数将收集的事件发给用户空间。</p>
-</li>
-</ol>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">input_dev</span> *<span class="title">input</span> =</span> input_allocate_device();</span><br><span class="line"></span><br><span class="line">input-&gt;name = pdev-&gt;name;</span><br><span class="line">input-&gt;phys = <span class="string">&quot;gpio-keys/input0&quot;</span>;</span><br><span class="line">input-&gt;dev.parent = &amp;pdev-&gt;dev;</span><br><span class="line"></span><br><span class="line">input-&gt;id.bustype = BUS_HOST;</span><br><span class="line">input-&gt;id.vendor = <span class="number">0x0001</span>;</span><br><span class="line">input-&gt;id.product = <span class="number">0x0001</span>;</span><br><span class="line">input-&gt;id.version = <span class="number">0x0100</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Enable auto repeat feature of Linux input subsystem */</span></span><br><span class="line"><span class="keyword">if</span> (pdata-&gt;rep)</span><br><span class="line">    __set_bit(EV_REP, input-&gt;evbit);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; pdata-&gt;nbuttons; i++) &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gpio_keys_button</span> *<span class="title">button</span> =</span> &amp;pdata-&gt;buttons[i];</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> type = button-&gt;type ?: EV_KEY;</span><br><span class="line"></span><br><span class="line">    input_set_capability(input, type, button-&gt;code);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">error = input_register_device(input);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* get current state of buttons */</span></span><br><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; pdata-&gt;nbuttons; i++)</span><br><span class="line">    gpio_keys_report_event(&amp;ddata-&gt;data[i]);</span><br><span class="line">input_sync(input);</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="input-register-device"><a href="#input-register-device" class="headerlink" title="input_register_device()"></a>input_register_device()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">input_register_device</span><span class="params">(<span class="keyword">struct</span> input_dev *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">input_devres</span> *<span class="title">devres</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">input_handler</span> *<span class="title">handler</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Every input device generates EV_SYN/SYN_REPORT events. */</span></span><br><span class="line">    __set_bit(EV_SYN, dev-&gt;evbit);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* KEY_RESERVED is not supposed to be transmitted to userspace. */</span></span><br><span class="line">    __clear_bit(KEY_RESERVED, dev-&gt;keybit);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Make sure that bitmasks not mentioned in dev-&gt;evbit are clean. */</span></span><br><span class="line">    input_cleanse_bitmasks(dev);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!dev-&gt;rep[REP_DELAY] &amp;&amp; !dev-&gt;rep[REP_PERIOD])</span><br><span class="line">        input_enable_softrepeat(dev, <span class="number">250</span>, <span class="number">33</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!dev-&gt;getkeycode)</span><br><span class="line">        dev-&gt;getkeycode = input_default_getkeycode;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!dev-&gt;setkeycode)</span><br><span class="line">        dev-&gt;setkeycode = input_default_setkeycode;</span><br><span class="line"></span><br><span class="line">    list_add_tail(&amp;dev-&gt;node, &amp;input_dev_list);</span><br><span class="line"></span><br><span class="line">    list_for_each_entry(handler, &amp;input_handler_list, node)</span><br><span class="line">        input_attach_handler(dev, handler);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>注册输入设备，把输入设备挂到输入设备链表 input_dev_list 中，遍历 input_handler_list 链表，如果找到 input_id 匹配的事件处理器，则调用其 connect() 函数。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">input_attach_handler</span><span class="params">(<span class="keyword">struct</span> input_dev *dev, <span class="keyword">struct</span> input_handler *handler)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">input_device_id</span> *<span class="title">id</span>;</span></span><br><span class="line">    <span class="type">int</span> error;</span><br><span class="line"></span><br><span class="line">    id = input_match_device(handler, dev);</span><br><span class="line">    <span class="keyword">if</span> (!id)</span><br><span class="line">        <span class="keyword">return</span> -ENODEV;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> handler-&gt;connect(handler, dev, id);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="input-event"><a href="#input-event" class="headerlink" title="input_event()"></a>input_event()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">input_sync</span><span class="params">(<span class="keyword">struct</span> input_dev *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">    input_event(dev, EV_SYN, SYN_REPORT, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">input_report_key</span><span class="params">(<span class="keyword">struct</span> input_dev *dev, <span class="type">unsigned</span> <span class="type">int</span> code, <span class="type">int</span> value)</span></span><br><span class="line">&#123;</span><br><span class="line">    input_event(dev, EV_KEY, code, !!value);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">input_event</span><span class="params">(<span class="keyword">struct</span> input_dev *dev, <span class="type">unsigned</span> <span class="type">int</span> type, <span class="type">unsigned</span> <span class="type">int</span> code, <span class="type">int</span> value)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line">    <span class="keyword">if</span> (is_event_supported(type, dev-&gt;evbit, EV_MAX)) &#123;</span><br><span class="line">        spin_lock_irqsave(&amp;dev-&gt;event_lock, flags);</span><br><span class="line">        add_input_randomness(type, code, value);</span><br><span class="line">        input_handle_event(dev, type, code, value);</span><br><span class="line">        spin_unlock_irqrestore(&amp;dev-&gt;event_lock, flags);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">input_handle_event</span><span class="params">(<span class="keyword">struct</span> input_dev *dev,</span></span><br><span class="line"><span class="params">                   <span class="type">unsigned</span> <span class="type">int</span> type, <span class="type">unsigned</span> <span class="type">int</span> code, <span class="type">int</span> value)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> disposition = INPUT_IGNORE_EVENT;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">switch</span> (type) &#123;</span><br><span class="line">        <span class="keyword">case</span> EV_KEY:</span><br><span class="line">            <span class="keyword">if</span> (is_event_supported(code, dev-&gt;keybit, KEY_MAX) &amp;&amp;</span><br><span class="line">                !!test_bit(code, dev-&gt;key) != value) &#123;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (value != <span class="number">2</span>) &#123;</span><br><span class="line">                    __change_bit(code, dev-&gt;key);</span><br><span class="line">                    <span class="keyword">if</span> (value)</span><br><span class="line">                        input_start_autorepeat(dev, code);</span><br><span class="line">                    <span class="keyword">else</span></span><br><span class="line">                        input_stop_autorepeat(dev);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                disposition = INPUT_PASS_TO_HANDLERS;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (disposition != INPUT_IGNORE_EVENT &amp;&amp; type != EV_SYN)</span><br><span class="line">        dev-&gt;sync = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((disposition &amp; INPUT_PASS_TO_DEVICE) &amp;&amp; dev-&gt;event)</span><br><span class="line">        dev-&gt;event(dev, type, code, value);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (disposition &amp; INPUT_PASS_TO_HANDLERS)</span><br><span class="line">        input_pass_event(dev, type, code, value);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">input_pass_event</span><span class="params">(<span class="keyword">struct</span> input_dev *dev,</span></span><br><span class="line"><span class="params">                 <span class="type">unsigned</span> <span class="type">int</span> type, <span class="type">unsigned</span> <span class="type">int</span> code, <span class="type">int</span> value)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">input_handler</span> *<span class="title">handler</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">input_handle</span> *<span class="title">handle</span>;</span></span><br><span class="line"></span><br><span class="line">    rcu_read_lock();</span><br><span class="line"></span><br><span class="line">    handle = rcu_dereference(dev-&gt;grab);</span><br><span class="line">    <span class="keyword">if</span> (handle)</span><br><span class="line">        handle-&gt;handler-&gt;event(handle, type, code, value);</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="type">bool</span> filtered = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">        list_for_each_entry_rcu(handle, &amp;dev-&gt;h_list, d_node) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!handle-&gt;open)</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">            handler = handle-&gt;handler;</span><br><span class="line">            <span class="keyword">if</span> (!handler-&gt;filter) &#123;</span><br><span class="line">                <span class="keyword">if</span> (filtered)</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">                handler-&gt;event(handle, type, code, value);</span><br><span class="line"></span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (handler-&gt;filter(handle, type, code, value))</span><br><span class="line">                filtered = <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    rcu_read_unlock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="input-set-capability"><a href="#input-set-capability" class="headerlink" title="input_set_capability()"></a>input_set_capability()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">input_set_capability</span><span class="params">(<span class="keyword">struct</span> input_dev *dev, <span class="type">unsigned</span> <span class="type">int</span> type, <span class="type">unsigned</span> <span class="type">int</span> code)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">switch</span> (type) &#123;</span><br><span class="line">    <span class="keyword">case</span> EV_KEY:</span><br><span class="line">        __set_bit(code, dev-&gt;keybit);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    ....</span><br><span class="line"></span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        printk(KERN_ERR</span><br><span class="line">            <span class="string">&quot;input_set_capability: unknown type %u (code %u)\n&quot;</span>,</span><br><span class="line">            type, code);</span><br><span class="line">        dump_stack();</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    __set_bit(type, dev-&gt;evbit);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="input-init"><a href="#input-init" class="headerlink" title="input_init()"></a>input_init()</h3><p>input_init() 完成设备的初始化。创建 proc 接口，<code>/proc/bus/input/devices</code>文件显示已经注册的输入设备；<code>/proc/bus/input/handlers</code>文件显示已注册事件处理函数。在/sys/class 下创建 input 类。创建字符设备，主设备号是 13，次设备号分布如下：</p>
-<ul>
-<li>joystick 游戏杆：0~16</li>
-<li>mouse 鼠标： 32~62</li>
-<li>mice 鼠标： 63</li>
-<li>事件设备： 64~95</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">input_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> err;</span><br><span class="line">    err = class_register(&amp;input_class);</span><br><span class="line"></span><br><span class="line">    err = input_proc_init();</span><br><span class="line"></span><br><span class="line">    err = register_chrdev_region(MKDEV(INPUT_MAJOR, <span class="number">0</span>), INPUT_MAX_CHAR_DEVICES, <span class="string">&quot;input&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="input-handler"><a href="#input-handler" class="headerlink" title="input_handler"></a>input_handler</h2><p>input_handler 结构体代表一种事件处理器，通过设置 input_device_id 中的位图来标记匹配的设备至少要满足什么功能。实现代码在evdev.c。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">input_handler</span> &#123;</span>                     </span><br><span class="line">    <span class="type">void</span> *private;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*处理设备驱动报告的事件*/</span></span><br><span class="line">    <span class="type">void</span> (*event)(<span class="keyword">struct</span> input_handle *handle, <span class="type">unsigned</span> <span class="type">int</span> type, <span class="type">unsigned</span> <span class="type">int</span> code, <span class="type">int</span> value);</span><br><span class="line">    <span class="type">bool</span> (*filter)(<span class="keyword">struct</span> input_handle *handle, <span class="type">unsigned</span> <span class="type">int</span> type, <span class="type">unsigned</span> <span class="type">int</span> code, <span class="type">int</span> value);</span><br><span class="line">    <span class="type">bool</span> (*match)(<span class="keyword">struct</span> input_handler *handler, <span class="keyword">struct</span> input_dev *dev);</span><br><span class="line">    <span class="type">int</span> (*connect)(<span class="keyword">struct</span> input_handler *handler, <span class="keyword">struct</span> input_dev *dev, </span><br><span class="line">        <span class="type">const</span> <span class="keyword">struct</span> input_device_id *id);</span><br><span class="line">    <span class="type">void</span> (*disconnect)(<span class="keyword">struct</span> input_handle *handle);</span><br><span class="line"></span><br><span class="line">    <span class="type">void</span> (*start)(<span class="keyword">struct</span> input_handle *handle);</span><br><span class="line"></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> *<span class="title">fops</span>;</span></span><br><span class="line">    <span class="type">int</span> minor;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *name;</span><br><span class="line"></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">input_device_id</span> *<span class="title">id_table</span>;</span> <span class="comment">//存放该 handler 所支持的设备 id 的表</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>  <span class="title">h_list</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>  <span class="title">node</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">input_device_id</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    <span class="type">kernel_ulong_t</span> flags;</span><br><span class="line"></span><br><span class="line">    __u16 bustype;</span><br><span class="line">    __u16 vendor;</span><br><span class="line">    __u16 product;</span><br><span class="line">    __u16 version;</span><br><span class="line"></span><br><span class="line">    <span class="type">kernel_ulong_t</span> evbit[INPUT_DEVICE_ID_EV_MAX / BITS_PER_LONG + <span class="number">1</span>];</span><br><span class="line">    <span class="type">kernel_ulong_t</span> keybit[INPUT_DEVICE_ID_KEY_MAX / BITS_PER_LONG + <span class="number">1</span>];</span><br><span class="line">    <span class="type">kernel_ulong_t</span> relbit[INPUT_DEVICE_ID_REL_MAX / BITS_PER_LONG + <span class="number">1</span>];</span><br><span class="line">    <span class="type">kernel_ulong_t</span> absbit[INPUT_DEVICE_ID_ABS_MAX / BITS_PER_LONG + <span class="number">1</span>];</span><br><span class="line">    <span class="type">kernel_ulong_t</span> mscbit[INPUT_DEVICE_ID_MSC_MAX / BITS_PER_LONG + <span class="number">1</span>];</span><br><span class="line">    <span class="type">kernel_ulong_t</span> ledbit[INPUT_DEVICE_ID_LED_MAX / BITS_PER_LONG + <span class="number">1</span>];</span><br><span class="line">    <span class="type">kernel_ulong_t</span> sndbit[INPUT_DEVICE_ID_SND_MAX / BITS_PER_LONG + <span class="number">1</span>];</span><br><span class="line">    <span class="type">kernel_ulong_t</span> ffbit[INPUT_DEVICE_ID_FF_MAX / BITS_PER_LONG + <span class="number">1</span>];</span><br><span class="line">    <span class="type">kernel_ulong_t</span> swbit[INPUT_DEVICE_ID_SW_MAX / BITS_PER_LONG + <span class="number">1</span>];</span><br><span class="line">    <span class="type">kernel_ulong_t</span> propbit[INPUT_DEVICE_ID_PROP_MAX / BITS_PER_LONG + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">    <span class="type">kernel_ulong_t</span> driver_info;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p><strong>注册 handler</strong></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">input_device_id</span> <span class="title">evdev_ids</span>[] =</span> &#123;</span><br><span class="line">    &#123; .driver_info = <span class="number">1</span> &#125;,   <span class="comment">/* Matches all devices */</span></span><br><span class="line">    &#123; &#125;,            <span class="comment">/* Terminating zero entry */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">input_handler</span> <span class="title">evdev_handler</span> =</span> &#123;</span><br><span class="line">    .event      = evdev_event,</span><br><span class="line">    .connect    = evdev_connect,</span><br><span class="line">    .disconnect = evdev_disconnect,</span><br><span class="line">    .fops       = &amp;evdev_fops,</span><br><span class="line">    .minor      = EVDEV_MINOR_BASE,</span><br><span class="line">    .name       = <span class="string">&quot;evdev&quot;</span>,</span><br><span class="line">    .id_table   = evdev_ids,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">evdev_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> input_register_handler(&amp;evdev_handler);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="input-register-handler"><a href="#input-register-handler" class="headerlink" title="input_register_handler()"></a>input_register_handler()</h3><p>注册事件处理器。把 handler 挂到 input_handler_list 链表中，并遍历 input_dev_list 链表，关联匹配的输入设备。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">input_register_handler</span><span class="params">(<span class="keyword">struct</span> input_handler *handler)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">input_dev</span> *<span class="title">dev</span>;</span></span><br><span class="line"></span><br><span class="line">    INIT_LIST_HEAD(&amp;handler-&gt;h_list);</span><br><span class="line"></span><br><span class="line">    list_add_tail(&amp;handler-&gt;node, &amp;input_handler_list);</span><br><span class="line"></span><br><span class="line">    list_for_each_entry(dev, &amp;input_dev_list, node)</span><br><span class="line">        input_attach_handler(dev, handler);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>匹配 input_dev 和 input_handler ，如果匹配成功，则调用 handler-&gt;connnect() 将 input_dev 和 input_handler 连接。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">input_attach_handler</span><span class="params">(<span class="keyword">struct</span> input_dev *dev, <span class="keyword">struct</span> input_handler *handler)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">input_device_id</span> *<span class="title">id</span>;</span></span><br><span class="line">    <span class="type">int</span> error;</span><br><span class="line"></span><br><span class="line">    id = input_match_device(handler, dev);</span><br><span class="line">    <span class="keyword">if</span> (!id)</span><br><span class="line">        <span class="keyword">return</span> -ENODEV;</span><br><span class="line"></span><br><span class="line">    error = handler-&gt;connect(handler, dev, id);</span><br><span class="line">    <span class="keyword">if</span> (error &amp;&amp; error != -ENODEV)</span><br><span class="line">        pr_err(<span class="string">&quot;failed to attach handler %s to device %s, error: %d\n&quot;</span>,</span><br><span class="line">               handler-&gt;name, kobject_name(&amp;dev-&gt;dev.kobj), error);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> error;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="input-match-device"><a href="#input-match-device" class="headerlink" title="input_match_device()"></a>input_match_device()</h3><p>input_match_device() 匹配 input_dev 和 input_handler 的 id 成员。如果 id-&gt;driver_info 设置了说明它匹配所有的 id，evdev 就是这样的。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="keyword">struct</span> input_device_id *<span class="title function_">input_match_device</span><span class="params">(<span class="keyword">struct</span> input_handler *handler,</span></span><br><span class="line"><span class="params">                            <span class="keyword">struct</span> input_dev *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">input_device_id</span> *<span class="title">id</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (id = handler-&gt;id_table; id-&gt;flags || id-&gt;driver_info; id++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!handler-&gt;match || handler-&gt;match(handler, dev)) &#123;</span><br><span class="line">            <span class="keyword">return</span> id;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="input-handle"><a href="#input-handle" class="headerlink" title="input_handle"></a>input_handle</h2><p>input_handle 结构体代表一个成功配对的 input_dev 和 input_handler。input_hande 没有一个全局的链表，它注册的时候将自己分别挂在了 input_device 和 input_handler 的 h_list 上了；同时，input_handle 结构体成员 dev 关联到 input_dev 结构，handler 关联到 input_handler 结构。</p>
-<p>当注册一个 input_device 的时候，会遍历 input_hanlder 链表，查看是否匹配，如果匹配，就会创建一个 input_hanle 连接器，然后分别存放到对应的 input_dev 和 input_handler 中的 input_handle 链表中，注册 input_handler 的时候也是同理。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">input_handle</span> &#123;</span>                                                                                             </span><br><span class="line">    <span class="type">void</span> *private;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> open;  <span class="comment">//设备打开次数</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *name;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">input_dev</span> *<span class="title">dev</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">input_handler</span> *<span class="title">handler</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>  <span class="title">d_node</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>  <span class="title">h_node</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<h3 id="input-register-handle"><a href="#input-register-handle" class="headerlink" title="input_register_handle()"></a>input_register_handle()</h3><p>将自己添加到 input_dev.h_list 链表和 input_handler.h_list 链表中，如果事件处理器定义了 start 函数，则调用它。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">input_register_handle</span><span class="params">(<span class="keyword">struct</span> input_handle *handle)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">input_handler</span> *<span class="title">handler</span> =</span> handle-&gt;handler;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">input_dev</span> *<span class="title">dev</span> =</span> handle-&gt;dev;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (handler-&gt;filter)</span><br><span class="line">        list_add_rcu(&amp;handle-&gt;d_node, &amp;dev-&gt;h_list);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        list_add_tail_rcu(&amp;handle-&gt;d_node, &amp;dev-&gt;h_list);</span><br><span class="line"></span><br><span class="line">    list_add_tail_rcu(&amp;handle-&gt;h_node, &amp;handler-&gt;h_list);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (handler-&gt;start)</span><br><span class="line">        handler-&gt;start(handle);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="connect"><a href="#connect" class="headerlink" title="connect()"></a>connect()</h3><p>每个 input_handler 都会实现相应的 connect 方法。里面会调用 input_register_handle() 注册一个 input_handle，并生成设备节点。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">evdev_connect</span><span class="params">(<span class="keyword">struct</span> input_handler *handler, <span class="keyword">struct</span> input_dev *dev,</span></span><br><span class="line"><span class="params">             <span class="type">const</span> <span class="keyword">struct</span> input_device_id *id)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">evdev</span> *<span class="title">evdev</span>;</span></span><br><span class="line">    <span class="type">int</span> minor;</span><br><span class="line">    <span class="type">int</span> error;</span><br><span class="line"></span><br><span class="line">    evdev = kzalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> evdev), GFP_KERNEL);</span><br><span class="line"></span><br><span class="line">    INIT_LIST_HEAD(&amp;evdev-&gt;client_list);</span><br><span class="line">    spin_lock_init(&amp;evdev-&gt;client_lock);</span><br><span class="line">    mutex_init(&amp;evdev-&gt;mutex);</span><br><span class="line">    init_waitqueue_head(&amp;evdev-&gt;wait);</span><br><span class="line"></span><br><span class="line">    dev_set_name(&amp;evdev-&gt;dev, <span class="string">&quot;event%d&quot;</span>, minor);</span><br><span class="line">    evdev-&gt;exist = <span class="number">1</span>;</span><br><span class="line">    evdev-&gt;minor = minor;</span><br><span class="line"></span><br><span class="line">    evdev-&gt;handle.dev = input_get_device(dev);</span><br><span class="line">    evdev-&gt;handle.name = dev_name(&amp;evdev-&gt;dev);</span><br><span class="line">    evdev-&gt;handle.handler = handler;</span><br><span class="line">    evdev-&gt;handle.private = evdev;</span><br><span class="line"></span><br><span class="line">    evdev-&gt;dev.devt = MKDEV(INPUT_MAJOR, EVDEV_MINOR_BASE + minor);</span><br><span class="line">    evdev-&gt;dev.class = &amp;input_class;</span><br><span class="line">    evdev-&gt;dev.parent = &amp;dev-&gt;dev;</span><br><span class="line">    evdev-&gt;dev.release = evdev_free;</span><br><span class="line">    device_initialize(&amp;evdev-&gt;dev);</span><br><span class="line"></span><br><span class="line">    error = input_register_handle(&amp;evdev-&gt;handle);</span><br><span class="line"></span><br><span class="line">    error = evdev_install_chrdev(evdev);</span><br><span class="line">    error = device_add(&amp;evdev-&gt;dev);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="read"><a href="#read" class="headerlink" title="read()"></a>read()</h3><p>当应用层调用 read 函数时，将调用到事件处理器的 evdev_read() 函数，若当前无事件发生就会进入了休眠状态。当驱动层上报事件时，调用 input_event() 函数，最终会引起事件处理器的 evdev_event() 函数调用，唤醒休眠，将事件信息读出到应用层。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">evdev_read</span><span class="params">(<span class="keyword">struct</span> file *file, <span class="type">char</span> __user *buffer,</span></span><br><span class="line"><span class="params">              <span class="type">size_t</span> count, <span class="type">loff_t</span> *ppos)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">evdev_client</span> *<span class="title">client</span> =</span> file-&gt;private_data;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">evdev</span> *<span class="title">evdev</span> =</span> client-&gt;evdev;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">input_event</span> <span class="title">event</span>;</span></span><br><span class="line">    <span class="type">int</span> retval;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (client-&gt;head == client-&gt;tail &amp;&amp; evdev-&gt;exist &amp;&amp;</span><br><span class="line">        (file-&gt;f_flags &amp; O_NONBLOCK))</span><br><span class="line">        <span class="keyword">return</span> -EAGAIN;</span><br><span class="line"></span><br><span class="line">    retval = wait_event_interruptible(evdev-&gt;wait,</span><br><span class="line">        client-&gt;head != client-&gt;tail || !evdev-&gt;exist);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (retval + input_event_size() &lt;= count &amp;&amp;</span><br><span class="line">           evdev_fetch_next_event(client, &amp;event)) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (input_event_to_user(buffer + retval, &amp;event))</span><br><span class="line">            <span class="keyword">return</span> -EFAULT;</span><br><span class="line"></span><br><span class="line">        retval += input_event_size();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> retval;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="input-event-1"><a href="#input-event-1" class="headerlink" title="input_event"></a>input_event</h2><p>input 产生的事件用 struct input_event 表示，应用层只要调 read() 函数读/dev/input/下相应设备节点，从而获取到 input_event 信息。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">input_event</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> <span class="title">time</span>;</span> <span class="comment">//事件发生的时间</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> type; <span class="comment">//事件的类型</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> code; <span class="comment">//事件的代码</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> value;  <span class="comment">//事件的值</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1484,7 +1660,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">222</span>
+          <span class="site-state-item-count">225</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

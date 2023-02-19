@@ -176,6 +176,402 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/21/c/process/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/08/21/c/process/" class="post-title-link" itemprop="url">linux process in user</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-08-21 09:49:47" itemprop="dateCreated datePublished" datetime="2022-08-21T09:49:47+08:00">2022-08-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>进程是系统进行资源分配和调度的单位。从系统的角度看是通过进程控制块来描述的，进程控制块包含了进程的描述信息、控制信息以及资源信息。进程控制块中的每一项都是一个 task_struct 结构，在 include/linux/sched.h中定义的。</p>
+<ul>
+<li>0号进程是idle，系统创建的一个进程，运行在内核态，完成加载系统后，演变为进程调度scheduler。</li>
+<li>1号进程是init，所有用户进程的父进程。</li>
+<li>2号进程是kthreadd，所有kernel thread的父进程，由idle通过kernel_thread创建，并始终运行在内核空间, 负责所有内核线程的调度和管理。</li>
+</ul>
+<p>进程根据它的生命周期可以划分成 3 种状态：</p>
+<ul>
+<li>执行态:该进程正在运行，即进程正在占用 CPU。</li>
+<li>就绪态:进程已经具备执行的一切条件，正在等待分配 CPU 的处理时间片。</li>
+<li>等待态:进程不能使用 CPU，若等待事件发生(等待的资源分配到)则可将其唤醒。</li>
+</ul>
+<p><img src="/images/linux/process/status.jpeg" alt="进程状态转换"></p>
+<h2 id="进程空间"><a href="#进程空间" class="headerlink" title="进程空间"></a>进程空间</h2><p><img src="/images/linux/process/mem.jpeg" alt="进程空间"></p>
+<ul>
+<li><p>未初始化数据段(.bss)：Block Storage Start，存放未初始化或初始化为0的全局变量，未初始化的静态变量。bss段的变量只占用运行时的内存空间，而不占用文件空间。在程序开始执行之前，内核将此段初始化为0。.bss段占据的大小存放在ELF文件格式中的段表(Section Table)中，段表存放了各个段的各种信息，比如段的名字、段的类型、段在elf文件中的偏移、段的大小等信息。同时符号存放在符号表.symtab中。</p>
+</li>
+<li><p>初始化数据段(.data)：存放初始化非0的全局变量，初始化的静态变量。既占用运行时的内存空间，又占用文件空间。</p>
+</li>
+<li><p>代码段：只读，包含程序代码（.init和.text）和只读数据（.rodata），存储机器码序列、全局常量、代码、字符串常量。</p>
+</li>
+<li><p>栈：从高地址往低地址向下增长，存放局部变量、局部常量、函数参数、返回值、函数调用时返回地址、调用者的环境信息。</p>
+</li>
+<li><p>堆：从低地址往高低至增长，动态分配的内存。</p>
+</li>
+</ul>
+<p>可以用<code>cat /proc/self/maps</code>查看程序运行时空间的分配情况，每个区间都有4个属性：</p>
+<ul>
+<li>r  表示可以读取;</li>
+<li>w  表示可以修改;</li>
+<li>x  表示可以执行;</li>
+<li>p/s 表示是否为共享内存;</li>
+</ul>
+<p><code>size</code>命令可以查看可执行文件的正文段、数据段和 b s s段的长度(单位:字节)。</p>
+<p>数据段和代码段分离，数据和指令被映射到两个虚拟内存区域，数据段对进程来说可读写，代码段是只读，这样可以防止程序的指令被改写。现代CPU缓存一般被设计成数据缓存和指令缓存分离，分开对CPU缓存命中率有好处。代码段是可以共享的，数据段是私有的，当运行多个程序的副本时，只需要保存一份代码段。</p>
+<p>栈容易溢出是因为栈内存有限，递归次数多了，局部数据占用的内存直到整个递归结束才会被释放，很容易就导致栈溢出。</p>
+<h2 id="pid"><a href="#pid" class="headerlink" title="pid"></a>pid</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpid</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getppid</span><span class="params">(<span class="type">void</span>)</span></span><br></pre></td></tr></table></figure>
+
+<p>getpid返回调用进程的进程号，Linux 内核限制进程号&lt;= 32767。任何进程都可使用符号链接/proc/self 来访问其自己的/proc/pid/ 目录。</p>
+<p>getppid返回目前进程的父进程的进程号。可通过查看/proc/pid/status 的PPid字段，可以获知每个进程的父进程。</p>
+<h2 id="fork"><a href="#fork" class="headerlink" title="fork()"></a>fork()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">fork</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">vfork</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>fork创建的新进程被称为子进程。该函数被调用一次，但返回两次，可通过返回值来区分父、子进程，在父进程中返回新创建子进程的进程pid，而在子进程中则返回 0，子进程可调用getpid()以获取自身的进程 ID，调用getppid()以获取父进程ID。</p>
+<p>子进程从父进程处继承了整个进程的地址空间,包括进程上下文、代码段、进程堆栈、内存信息、打开的文件描述符、信号控制设定、进程优先级、进程组号、当前工作目录、根目录、资源限制、环境变量、标准IO的缓存数据和控制终端等，而子进程所独有的只有它的进程号、资源使用和计时器等。这两个进程将执行相同的程序文本段，但却各自拥有不同的栈段、数据段以及堆段拷贝。子进程的栈、数据以及栈段开始时是对父进程内存相应各部分的完全复制，每个进程均可修改各自的栈数据、以及堆段中的变量，而并不影响另一进程。子进程的tms_utime、tms_stime、tms_cutime以及tms_ustime设置为0，子进程不继承父进程设置的锁。</p>
+<p>vfork用于创建一个新进程，但并不将父进程的地址空间完全复制到子进程中，因为子进程会立即调用exec或exit，不会存访该地址空间。不过在子进程调用exec或exit之前，它在父进程的空间中运行。vfork保证子进程先运行，在它调用exec或exit之后父进程才可能被调度运行(如果调用这两个函数之前子进程依赖于父进程，会导致死锁)。</p>
+<p>当子进程退出时，其父进程没有调用 wait() 系统调用回收他的进程描述符信息，该进程就会继续停留在系统的进程表中，占用内核资源，称为<strong>僵尸进程</strong>。预防僵尸进程的方法:</p>
+<ul>
+<li>父进程注册<code>signal(SIGCHLD, SIG_IGN)</code>通知内核父进程忽略SIGCHLD信号，由内核回收。</li>
+<li>父进程调用 wait()/waitpid() 函数等待子进程结束</li>
+<li>父进程用signal注册信号处理函数，在信号处理函数中调用 wait()/waitpid() 函数等待子进程退出。</li>
+<li>连续调用两次fork，使紧跟的子进程退出，其孙子进程成为一个孤儿进程，交给init进程托管。</li>
+</ul>
+<h2 id="exit"><a href="#exit" class="headerlink" title="exit()"></a>exit()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> _exit(<span class="type">int</span> status);</span><br><span class="line"><span class="type">void</span> <span class="title function_">exit</span><span class="params">(<span class="type">int</span> status)</span></span><br></pre></td></tr></table></figure>
+
+<p>终止进程的，清除包括 PCB 在内的各种数据结构。区别在于 exit()函数会清理 I/O 缓冲，检查文件的打开情况，把文件缓冲区中的内容写回文件。</p>
+<h2 id="atexit"><a href="#atexit" class="headerlink" title="atexit()"></a>atexit()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">atexit</span><span class="params">(<span class="type">void</span> (*function)(<span class="type">void</span>))</span>;</span><br></pre></td></tr></table></figure>
+
+<p>在进程终止后，以登记的相反顺序调用注册的终止处理函数。</p>
+<h2 id="abort"><a href="#abort" class="headerlink" title="abort()"></a>abort()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">abort</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>abort()可以产生SIGABRT信号，当进程发生越界访问或除0时。</p>
+<h2 id="wait-waitpid"><a href="#wait-waitpid" class="headerlink" title="wait() waitpid()"></a>wait() waitpid()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/wait.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">wait</span><span class="params">(<span class="type">int</span> *status)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">waitpid</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">int</span> *status, <span class="type">int</span> options)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>wait()使其调用者阻塞，直到一个子进程终止，并返回其进程号,如果该父进程没有子进程或者他的子进程已经结束，则立即返回。</p>
+<p>waitpid的pid参数：</p>
+<ul>
+<li><code>&gt;0</code>  只等待进程ID等于pid 的子进程，只要子进程还没结束，就会一直等下去；</li>
+<li><code>-1</code>  等待任何一个子进程退出，和wait()一样；</li>
+<li><code>=0</code>  等待其组ID相同的任一子进程；</li>
+<li><code>&lt;-1</code> 等待其组ID等于pid的绝对值的任一子进程；</li>
+</ul>
+<p>waitpid的options参数：</p>
+<ul>
+<li>WNOHANG   若由pid指定的子进程不立即可用，则不阻塞并返回0；</li>
+<li>WUNTRACED 若实现某支持作业控制，则由pid指定的任一子进程状态已暂停，且其状态自暂停以来还未报告过，则返回其状态；</li>
+<li>0 同wait阻塞父进程，等待子进程退出；</li>
+</ul>
+<p>如果不关心终止状态，可将该status参数指定为NULL，可用宏检查status的状态。</p>
+<p><img src="/images/linux/process/wait_status.png" alt="wait_status"></p>
+<p>如果一个进程希望等待一个子进程终止，则它必须调用wait函数。如果一个进程要等待其父进程终止，则可使用下列形式的循环:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span>(getppid() != <span class="number">1</span>)</span><br><span class="line">    sleep(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="execl"><a href="#execl" class="headerlink" title="execl()"></a>execl()</h2><p>exec函数并不创建新进程，只是用另一个新程序替换了当前进程的正文、数据、堆和栈段，且两个进程的PID相同。例如：在shell命令行执行ps命令，实际上是shell进程调用fork复制一个新的子进程，在利用exec系统调用将新产生的子进程完全替换成ps进程。exec系列函数底层其实都是通过调用execve函数实现的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="type">char</span> **environ;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">execl</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">const</span> <span class="type">char</span> *arg, ... (<span class="type">char</span> *)<span class="literal">NULL</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execlp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">const</span> <span class="type">char</span> *arg, ... (<span class="type">char</span> *)<span class="literal">NULL</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execle</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">const</span> <span class="type">char</span> *arg, ... (<span class="type">char</span> *)<span class="literal">NULL</span>, <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">char</span> *<span class="type">const</span> argv[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execvp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">char</span> *<span class="type">const</span> argv[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execvpe</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">char</span> *<span class="type">const</span> argv[], <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execve</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">char</span> *<span class="type">const</span> argv[], <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>带 l 的exec函数表示命令的参数以可变参数的形式给出，且以一个NULL结束。</li>
+<li>带 p 的exec函数表示第一个参数只要是进程名即可，它会在环境变量当中查找命令。</li>
+<li>带 v 的exec函数表示命令的参数以字符串数组形式给出，且最后一个元素也必须是NULL。</li>
+<li>带 e 的exec函数表示将envp数组的内容作为环境变量传递给替换的进程。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> *<span class="type">const</span> envp[] = &#123;<span class="string">&quot;AA=11&quot;</span>, <span class="string">&quot;BB=22&quot;</span>, (<span class="type">char</span> *)<span class="literal">NULL</span>&#125;;</span><br><span class="line">    execle(<span class="string">&quot;./hello&quot;</span>, <span class="string">&quot;hello&quot;</span>, (<span class="type">char</span> *)<span class="literal">NULL</span>, envp);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">char</span> **environ;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[], <span class="type">char</span> *envp[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span>(*envp != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="built_in">puts</span>(*(envp++));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i=<span class="number">0</span> ; environ[i] != <span class="literal">NULL</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">puts</span>(environ[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="system"><a href="#system" class="headerlink" title="system()"></a>system()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">system</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *command)</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="进程时间"><a href="#进程时间" class="headerlink" title="进程时间"></a>进程时间</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/times.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tms</span> &#123;</span></span><br><span class="line">   <span class="type">clock_t</span> tms_utime;  <span class="comment">/* user time */</span></span><br><span class="line">   <span class="type">clock_t</span> tms_stime;  <span class="comment">/* system time */</span></span><br><span class="line">   <span class="type">clock_t</span> tms_cutime; <span class="comment">/* user time of children */</span></span><br><span class="line">   <span class="type">clock_t</span> tms_cstime; <span class="comment">/* system time of children */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">clock_t</span> <span class="title function_">times</span><span class="params">(<span class="keyword">struct</span> tms *buf)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>获取进程的系统CPU时间和用户CPU时间，返回当时的系统时钟计数。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/tool/shell-if/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/08/13/tool/shell-if/" class="post-title-link" itemprop="url">shell if 条件判断</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-08-13 21:56:51" itemprop="dateCreated datePublished" datetime="2022-08-13T21:56:51+08:00">2022-08-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/shell/" itemprop="url" rel="index"><span itemprop="name">shell</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if [ command ]; then</span><br><span class="line"></span><br><span class="line">elif [ command ]; then</span><br><span class="line"></span><br><span class="line">else</span><br><span class="line"></span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<p><em>注意</em>：</p>
+<p>1、[ ]表示条件测试，要注意在’[‘后面和’]’前面都必须要有空格。</p>
+<p>2、在shell中，then和fi是分开的语句。如果要在同一行里面输入，则需要用分号将他们隔开。</p>
+<p>3、if判断中对于变量的处理，需要加引号，以免一些不必要的错误。没有加双引号会在一些含空格等的字符串变量判断的时候产生错误。比如<code>[ -n &quot;$var&quot; ]</code>，如果var为空会出错。</p>
+<p>4、不支持浮点值。</p>
+<p>5、如果只单独使用&gt;或者&lt;号，系统会认为是输出或者输入重定向，虽然结果显示正确，但是其实是错误的，因此要对这些符号进行转义。</p>
+<p>6、运行if语句中的命令所产生的错误信息默认仍然出现在脚本的输出结果中。</p>
+<p>7、使用-z或者-n来检查长度的时候，没有定义的变量也为0。</p>
+<p>8、空变量和没有初始化的变量可能会对shell脚本测试产生灾难性的影响，因此在不确定变量的内容的时候，在测试前使用-n或者-z测试一下。</p>
+<p>9、? 变量包含了之前执行命令的退出状态（最近完成的前台进程），可以用于检测退出状态。</p>
+<h2 id="文件-目录判断"><a href="#文件-目录判断" class="headerlink" title="文件/目录判断"></a>文件/目录判断</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[ -b FILE ] 如果 FILE 存在且是一个块特殊文件则为真。</span><br><span class="line">[ -c FILE ] 如果 FILE 存在且是一个字特殊文件则为真。</span><br><span class="line">[ -d DIR ]  如果 FILE 存在且是一个目录则为真。</span><br><span class="line">[ -e FILE ] 如果 FILE 存在则为真。</span><br><span class="line">[ -f FILE ] 如果 FILE 存在且是一个普通文件则为真。</span><br><span class="line">[ -g FILE ] 如果 FILE 存在且已经设置了SGID则为真。</span><br><span class="line">[ -k FILE ] 如果 FILE 存在且已经设置了粘制位则为真。</span><br><span class="line">[ -p FILE ] 如果 FILE 存在且是一个名字管道(F如果O)则为真。</span><br><span class="line">[ -r FILE ] 如果 FILE 存在且是可读的则为真。</span><br><span class="line">[ -s FILE ] 如果 FILE 存在且大小不为0则为真。</span><br><span class="line">[ -t FD ]   如果文件描述符 FD 打开且指向一个终端则为真。</span><br><span class="line">[ -u FILE ] 如果 FILE 存在且设置了SUID (set user ID)则为真。</span><br><span class="line">[ -w FILE ] 如果 FILE存在且是可写的则为真。</span><br><span class="line">[ -x FILE ] 如果 FILE 存在且是可执行的则为真。</span><br><span class="line">[ -O FILE ] 如果 FILE 存在且属有效用户ID则为真。</span><br><span class="line">[ -G FILE ] 如果 FILE 存在且属有效用户组则为真。</span><br><span class="line">[ -L FILE ] 如果 FILE 存在且是一个符号连接则为真。</span><br><span class="line">[ -N FILE ] 如果 FILE 存在 and has been mod如果ied since it was last read则为真。</span><br><span class="line">[ -S FILE ] 如果 FILE 存在且是一个套接字则为真。</span><br><span class="line">[ FILE1 -nt FILE2 ] 如果 FILE1 比 FILE2 新，则为真。</span><br><span class="line">[ FILE1 -ot FILE2 ] 如果 FILE1 比 FILE2 要老, 或者 FILE2 存在且 FILE1 不存在则为真。</span><br><span class="line">[ FILE1 -ef FILE2 ] 如果 FILE1 和 FILE2 指向相同的设备和节点号则为真。</span><br></pre></td></tr></table></figure>
+
+<h2 id="字符串判断"><a href="#字符串判断" class="headerlink" title="字符串判断"></a>字符串判断</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[ -z STRING ] 判断是否为空</span><br><span class="line">[ -n STRING ] 判断是否为非空</span><br><span class="line">[ STRING1 ]　 如果字符串不为空则为真</span><br><span class="line">[ STRING1 = STRING2 ]  如果两个字符串相同则为真</span><br><span class="line">[ STRING1 == STRING2 ] 如果两个字符串相同则返回为真</span><br><span class="line">[ STRING1 != STRING2 ] 如果字符串不相同则为真</span><br><span class="line">[ STRING1 &lt; STRING2 ]  如果 “STRING1”字典排序在“STRING2”前面则返回为真。</span><br><span class="line">[ STRING1 &gt; STRING2 ]  如果 “STRING1”字典排序在“STRING2”后面则返回为真。</span><br></pre></td></tr></table></figure>
+
+<p><strong>比较两个字符串是否相等的办法</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if [ &quot;$test&quot;x = &quot;test&quot;x ]; then</span><br><span class="line"></span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>使用单个等号，等号两边各有一个空格。</li>
+<li>注意到”$test”x最后的x，这是特意安排的，因为当$test为空的时候，上面的表达式就变成了x = testx，显然是不相等的。而如果没有这个x，表达式就会报错：”[: =: unary operator expected”。</li>
+</ol>
+<p><strong>==的功能在<code>[[]]</code>和<code>[]</code>中的行为是不同的</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[[ \$a == z* ]]      # 如果$a以&quot;z&quot;开头(模式匹配)那么将为true</span><br><span class="line">[[ \$a == &quot;z*&quot; ]]    # 如果$a等于z*(字符匹配),那么结果为true</span><br><span class="line">[ \$a == z* ]        # File globbing 和word splitting将会发生</span><br><span class="line">[ &quot;\$a&quot; == &quot;z&quot; ]     # 如果$a等于z(字符匹配),那么结果为true</span><br></pre></td></tr></table></figure>
+
+<h2 id="数值判断"><a href="#数值判断" class="headerlink" title="数值判断"></a>数值判断</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">INT1 -eq INT2           INT1和INT2两数相等为真</span><br><span class="line">INT1 -ne INT2           INT1和INT2两数不等为真</span><br><span class="line">INT1 -gt INT2           INT1大于INT1为真</span><br><span class="line">INT1 -ge INT2           INT1大于等于INT2为真</span><br><span class="line">INT1 -lt INT2           INT1小于INT2为真</span><br><span class="line">INT1 -le INT2           INT1小于等于INT2为真</span><br></pre></td></tr></table></figure>
+
+<h2 id="逻辑判断"><a href="#逻辑判断" class="headerlink" title="逻辑判断"></a>逻辑判断</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ ! EXPR ]         逻辑非，如果 EXPR 是false则返回为真。</span><br><span class="line">[ EXPR1 -a EXPR2 ] 逻辑与，如果 EXPR1 and EXPR2 全真则返回为真。</span><br><span class="line">[ EXPR1 -o EXPR2 ] 逻辑或，如果 EXPR1 或者 EXPR2 为真则返回为真。</span><br><span class="line">[ ] || [ ]         用OR来合并两个条件</span><br><span class="line">[ ] &amp;&amp; [ ]         用AND来合并两个条件</span><br></pre></td></tr></table></figure>
+
+<h2 id="其他判断"><a href="#其他判断" class="headerlink" title="其他判断"></a>其他判断</h2><p>[ -t FD ] 如果文件描述符 FD （默认值为1）打开且指向一个终端则返回为真<br>[ -o optionname ] 如果shell选项optionname开启则返回为真</p>
+<h2 id="IF高级特性"><a href="#IF高级特性" class="headerlink" title="IF高级特性"></a>IF高级特性</h2><p>双圆括号<code>(( ))</code>：表示数学表达式，比判断命令提供更多的数学符号，而且在双圆括号里面的’&gt;’,’&lt;’号不需要转义。</p>
+<p>双方括号<code>[[ ]]</code>：表示高级字符串处理函数，使用标准的字符串比较，还可以使用匹配模式，从而定义与字符串相匹配的正则表达式。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/c/daemon/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/08/13/c/daemon/" class="post-title-link" itemprop="url">daemon process</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-08-13 21:56:50" itemprop="dateCreated datePublished" datetime="2022-08-13T21:56:50+08:00">2022-08-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>每一个系统与用户进行交流的界面称为终端，每一个从此终端开始运行的进程都会依附于这个终端，这个终端就称为这些进程的控制终端，当控制终端被关闭时，相应的进程都会自动关闭。</p>
+<p>守护进程(daemon)是一种在系统引导装入时起动，在系统关闭时终止，不会受到用户、终端或者其他的变化而影响，在后台运行没有控制终端的进程。</p>
+<h2 id="进程组"><a href="#进程组" class="headerlink" title="进程组"></a>进程组</h2><p>进程组是一个或多个进程的集合。进程组由进程组 ID 来惟一标识。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">setpgid</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">pid_t</span> pgid)</span>;</span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpgid</span><span class="params">(<span class="type">pid_t</span> pid)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpgrp</span><span class="params">(<span class="type">void</span>)</span>;                 <span class="comment">/* POSIX.1 version */</span></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpgrp</span><span class="params">(<span class="type">pid_t</span> pid)</span>;            <span class="comment">/* BSD version */</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">setpgrp</span><span class="params">(<span class="type">void</span>)</span>;                   <span class="comment">/* System V version */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">setpgrp</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">pid_t</span> pgid)</span>;  <span class="comment">/* BSD version */</span></span><br></pre></td></tr></table></figure>
+
+<p>setpgid()将pid进程的进程组ID设置为pgid。如果pid和pgid相等，则由pid指定的进程变成进程组组长，如果pid是0，则使用调用者的进程ID，如果pgid是0，则由pid指定的进程ID被用作为进程组ID。</p>
+<h2 id="会话"><a href="#会话" class="headerlink" title="会话"></a>会话</h2><p>会话是一个或多个进程组的集合，一个会话开始于用户登录，终止于用户退出，在此期间该用户运行的所有进程都属于这个会话。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">setsid</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>setsid()函数能够使进程完全独立出来，从而脱离其他进程的控制：</p>
+<ul>
+<li>让进程摆脱原会话的控制。</li>
+<li>让进程摆脱原进程组的控制。</li>
+<li>让进程摆脱原控制终端的控制。</li>
+</ul>
+<h2 id="守护进程"><a href="#守护进程" class="headerlink" title="守护进程"></a>守护进程</h2><ol>
+<li><p>首先fork一个子进程，然后让父进程exit。这样做实现了下面几点：(a)如果精灵进程是由一条shell命令起动的，那么父进程终止使得shell认为这条命令已经执行完成。(b)进程继承了父进程的进程组ID，其进程ID则是新分配的，这就保证了子进程不是一个进程组的首进程，这是setsid()调用的前提条件。</p>
+</li>
+<li><p>调用setsid()以创建一个新对话期，使调用进程：(a)成为新对话期的首进程，(b)成为一个新进程组的首进程，(c)没有控制终端。</p>
+</li>
+<li><p>将当前工作目录更改为/目录，保证工作目录所在的文件系统不能被卸载。</p>
+</li>
+<li><p>将文件权限掩码设置为0，方便进程操作文件。</p>
+</li>
+<li><p>关闭不再需要的文件描述符，从父进程那里继承打开了的文件，可能永远不会被守护进程读或写，但一样消耗系统资源，而且可能导致所在的文件系统无法被卸载。</p>
+</li>
+</ol>
+<p>守护进程没有控制终端，所以不能将错误信息输出到控制终端，可以使用syslog服务将程序中的出错信息输入到系统日志文件/var/log/syslog。</p>
+<h2 id="syslog"><a href="#syslog" class="headerlink" title="syslog"></a>syslog</h2><p>syslog是linux中的系统日志管理服务，通过守护进程syslogd来维护，该守护进程在启动时会读配置文件/etc/syslog.conf，该文件决定了不同种类的消息会发送向何处。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;syslog.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">openlog</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *ident, <span class="type">int</span> option, <span class="type">int</span> facility)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">syslog</span><span class="params">(<span class="type">int</span> priority, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">closelog</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>openlog用于打开系统日志服务的一个连接。ident参数定义消息的标签字符串，option参数：</p>
+<ul>
+<li>LOG_CONS  如果消息无法送到系统日志服务，则直接输出到系统控制终端</li>
+<li>LOG_NDELAY  立即打开系统日志服务的连接。在正常情况下，直接发送到第一条消息时才打开连接</li>
+<li>LOG_PERROR  将日志消息发送给 s y s l o g和stderr。</li>
+<li>LOG_PID  消息中包含进程的PID</li>
+</ul>
+<p>facility参数指定程序发送的消息类型：</p>
+<ul>
+<li>LOG_AUTHPRIV  安全/授权信息</li>
+<li>LOG_CRON  时间守护进程(cron 及 at)函数传入值</li>
+<li>LOG_DAEMON  其他系统守护进程</li>
+<li>LOG_KERN  内核信息</li>
+<li>LOG_LOCAL[0~7]  保留</li>
+<li>LOG_LPR  行打印机子系统</li>
+<li>LOG_MAIL  邮件子系统</li>
+<li>LOG_NEWS  新闻子系统</li>
+<li>LOG_SYSLOG  syslogd 内部所产生的信息</li>
+<li>LOG_USER  一般使用者等级信息</li>
+<li>LOG_UUCP  UUCP 子系统</li>
+</ul>
+<p>syslog是用于向日志文件中写入消息，format参数规定消息输出格式等。priority参数指定消息等级：</p>
+<ul>
+<li>LOG_EMERG  紧急(系统不可使用)</li>
+<li>LOG_ALERT  需要立即采取措施</li>
+<li>LOG_CRIT  重要情况</li>
+<li>LOG_ERR  错误消息</li>
+<li>LOG_WARNING  警告消息</li>
+<li>LOG_NOTICE  正常情况,但也是重要情况</li>
+<li>LOG_INFO  信息消息</li>
+<li>LOG_DEBUG  调试信息</li>
+</ul>
+<p>closelog是用于关闭系统日志服务的连接。</p>
+<h2 id="例程"><a href="#例程" class="headerlink" title="例程"></a>例程</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> i;</span><br><span class="line"><span class="type">pid_t</span> pid = fork();</span><br><span class="line"><span class="keyword">if</span> (pid == <span class="number">-1</span>) &#123;</span><br><span class="line">    perror(<span class="string">&quot;fork&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (pid &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 打开系统日志服务 */</span></span><br><span class="line">openlog(<span class="string">&quot;daemon_syslog&quot;</span>, LOG_PID, LOG_DAEMON);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*创建新的会话组*/</span></span><br><span class="line"><span class="type">int</span> ret = setsid();</span><br><span class="line"><span class="keyword">if</span> (ret &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    syslog(LOG_ERR, <span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;setsid&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ret = chdir(<span class="string">&quot;/&quot;</span>);</span><br><span class="line"><span class="keyword">if</span> (ret &lt; <span class="number">0</span>) &#123;</span><br><span class="line">    syslog(LOG_ERR, <span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;chdir&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">umask(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*关闭父进程的文件描述符*/</span></span><br><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; getdtablesize(); ++i) &#123;</span><br><span class="line">    close(i);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">syslog(LOG_INFO, <span class="string">&quot;daemon init\n&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/c/fileio/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1473,339 +1869,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/net/tcpdump/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/26/net/tcpdump/" class="post-title-link" itemprop="url">tcpdump 使用指南</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-06-26 17:51:09 / 修改时间：18:44:41" itemprop="dateCreated datePublished" datetime="2022-06-26T17:51:09+08:00">2022-06-26</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">tcpdump [ -AdDeflLnNOpqRStuUvxX ] [ -c count ]</span><br><span class="line">           [ -C file_size ] [ -F file ]</span><br><span class="line">           [ -i interface ] [ -m module ] [ -M secret ]</span><br><span class="line">           [ -r file ] [ -s snaplen ] [ -T type ] [ -w file ]</span><br><span class="line">           [ -W filecount ]</span><br><span class="line">           [ -E spi@ipaddr algo:secret,...  ]</span><br><span class="line">           [ -y datalinktype ] [ -Z user ]</span><br><span class="line">           [ expression ]</span><br></pre></td></tr></table></figure>
-
-<h2 id="选项"><a href="#选项" class="headerlink" title="选项"></a>选项</h2><p><img src="/images/net/tcpdump.png"></p>
-<h2 id="表达式"><a href="#表达式" class="headerlink" title="表达式"></a>表达式</h2><p>可以使用表达式过滤指定类型的流量，有三种主要的表达式类型：</p>
-<ul>
-<li>类型（type）选项包含：host, net, port, portrange</li>
-<li>方向（dir）选项包含：src, dst, src or dst</li>
-<li>协议（proto）选项包含：tcp, udp, icmp, ip, ip6, arp, rarp,ether,wlan, fddi, tr, decnet</li>
-</ul>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p><strong>捕获所有流量</strong></p>
-<pre><code>tcpdump -i any
-</code></pre>
-<p><strong>指定网卡接口</strong></p>
-<pre><code>tcpdump -i eth0
-</code></pre>
-<p><strong>基于IP地址过滤</strong></p>
-<pre><code>tcpdump host 192.168.10.100
-</code></pre>
-<p><strong>查看包中的内容时，使用hex格式输出</strong></p>
-<pre><code>tcpdump -nnvXSs 0 -c1 icmp
-</code></pre>
-<p><strong>使用源和目的地址过滤</strong></p>
-<pre><code>tcpdump src 2.3.4.6
-tcpdump dst 3.4.5.6
-</code></pre>
-<p><strong>基于网段进行过滤</strong></p>
-<pre><code>tcpdump net 192.168.10.0/24
-</code></pre>
-<p><strong>基于端口进行过滤</strong></p>
-<pre><code>tcpdump port 8088
-</code></pre>
-<p><strong>过滤指定协议</strong></p>
-<pre><code>tcpdump icmp
-</code></pre>
-<p><strong>只显示IPV6流量</strong></p>
-<pre><code>tcpdump ip6
-</code></pre>
-<p><strong>使用端口范围过滤</strong></p>
-<pre><code>tcpdump portrange 21-23
-</code></pre>
-<p><strong>基于包的大小过滤流量</strong></p>
-<pre><code>tcpdump less 32
-tcpdump greater 64
-tcpdump &lt;=128
-</code></pre>
-<p><strong>过滤广播/多播数据包</strong></p>
-<pre><code>tcpdump ip broadcast
-tcpdump ip multicast
-</code></pre>
-<p><strong>将捕获的内容写入文件</strong></p>
-<pre><code>tcpdump port 8080 -w capturefile.pcap
-</code></pre>
-<p><strong>使用tcpdump加载之前保存的文件进行分析</strong></p>
-<pre><code>tcpdump -r capturefile.pcap
-</code></pre>
-<p><strong>设置不解析域名提升速度</strong></p>
-<ul>
-<li><code>-n</code>：不把ip转化成域名，直接显示 ip，避免执行 DNS lookups 的过程，速度会快很多</li>
-<li><code>-nn</code>：不把协议和端口号转化成名字，速度也会快很多。</li>
-<li><code>-N</code>：不打印出host 的域名部分.。比如,，如果设置了此选现，tcpdump 将会打印’nic’ 而不是 ‘nic.ddn.mil’.</li>
-</ul>
-<p><strong>控制详细内容的输出</strong></p>
-<ul>
-<li><code>-v</code>：产生详细的输出. 比如包的TTL，id标识，数据包长度，以及IP包的一些选项。同时它还会打开一些附加的包完整性检测，比如对IP或ICMP包头部的校验和。</li>
-<li><code>-vv</code>：产生比-v更详细的输出. 比如NFS回应包中的附加域将会被打印, SMB数据包也会被完全解码。（摘自网络，目前我还未使用过）</li>
-<li><code>-vvv</code>：产生比-vv更详细的输出。比如 telent 时所使用的SB, SE 选项将会被打印, 如果telnet同时使用的是图形界面，其相应的图形选项将会以16进制的方式打印出来（摘自网络，目前我还未使用过）</li>
-</ul>
-<p><strong>控制时间的显示</strong></p>
-<ul>
-<li><code>-t</code>：在每行的输出中不输出时间</li>
-<li><code>-tt</code>：在每行的输出中会输出时间戳</li>
-<li><code>-ttt</code>：输出每两行打印的时间间隔(以毫秒为单位)</li>
-<li><code>-tttt</code>：在每行打印的时间戳之前添加日期的打印（此种选项，输出的时间最直观）</li>
-</ul>
-<p><strong>显示数据包的头部</strong></p>
-<ul>
-<li><code>-x</code>：以16进制的形式打印每个包的头部数据（但不包括数据链路层的头部）</li>
-<li><code>-xx</code>：以16进制的形式打印每个包的头部数据（包括数据链路层的头部）</li>
-<li><code>-X</code>：以16进制和 ASCII码形式打印出每个包的数据(但不包括连接层的头部)，这在分析一些新协议的数据包很方便。</li>
-<li><code>-XX</code>：以16进制和 ASCII码形式打印出每个包的数据(包括连接层的头部)，这在分析一些新协议的数据包很方便。</li>
-</ul>
-<p><strong>对输出内容进行控制的参数</strong></p>
-<ul>
-<li><code>-D</code> : 显示所有可用网络接口的列表</li>
-<li><code>-e</code> : 每行的打印输出中将包括数据包的数据链路层头部信息</li>
-<li><code>-E</code> : 揭秘IPSEC数据</li>
-<li><code>-L</code> ：列出指定网络接口所支持的数据链路层的类型后退出</li>
-<li><code>-Z</code>：后接用户名，在抓包时会受到权限的限制。如果以root用户启动tcpdump，tcpdump将会有超级用户权限。</li>
-<li><code>-d</code>：打印出易读的包匹配码</li>
-<li><code>-dd</code>：以C语言的形式打印出包匹配码.</li>
-<li><code>-ddd</code>：以十进制数的形式打印出包匹配码</li>
-</ul>
-<h2 id="过滤规则组合"><a href="#过滤规则组合" class="headerlink" title="过滤规则组合"></a>过滤规则组合</h2><ul>
-<li>and：所有的条件都需要满足，也可以表示为 <code>&amp;&amp;</code></li>
-<li>or：只要有一个条件满足就可以，也可以表示为 <code>||</code></li>
-<li>not：取反，也可以使用 <code>!</code></li>
-</ul>
-<p>当你在使用多个过滤器进行组合时，有可能需要用到括号，而括号在 shell 中是特殊符号，因为你需要使用引号将其包含。例子如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump &#x27;src 10.0.2.4 and (dst port 8090 or 22)&#x27;</span><br></pre></td></tr></table></figure>
-
-<p>而在单个过滤器里，常常会判断一条件是否成立，这时候，就要使用下面两个符号</p>
-<ul>
-<li><code>=</code>：判断二者相等</li>
-<li><code>==</code>：判断二者相等</li>
-<li><code>!=</code>：判断二者不相等</li>
-</ul>
-<p>当你使用这两个符号时，tcpdump 还提供了一些关键字的接口来方便我们进行判断，比如</p>
-<ul>
-<li>if：表示网卡接口名、</li>
-<li>proc：表示进程名</li>
-<li>pid：表示进程 id</li>
-<li>svc：表示 service class</li>
-<li>dir：表示方向，in 和 out</li>
-<li>eproc：表示 effective process name</li>
-<li>epid：表示 effective process ID</li>
-</ul>
-<p>比如我现在要过滤来自进程名为 ntp 发出的流经 eth0 网卡的数据包，或者不流经 eth0 的入方向数据包，可以这样子写</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump &quot;( if=eth0 and proc=ntp ) || (if != en0 and dir=in)&quot;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wongbingming/p/13212306.html">https://www.cnblogs.com/wongbingming/p/13212306.html</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/cmd/wc/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/26/cmd/wc/" class="post-title-link" itemprop="url">wc</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-06-26 15:56:04 / 修改时间：15:59:10" itemprop="dateCreated datePublished" datetime="2022-06-26T15:56:04+08:00">2022-06-26</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cmd/" itemprop="url" rel="index"><span itemprop="name">cmd</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>wc命令统计指定文件中的字节数、字数、行数，并将统计结果显示输出。利用wc指令我们可以计算文件的Byte数、字数或是列数，若不指定文件名称，或是所给予的文件名为“-”，则wc指令会从标准输入设备读取数据。wc同时也给出所指定文件的总统计数。</p>
-<h2 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wc(选项)(参数)</span><br><span class="line">wc [选项]... [文件]...</span><br><span class="line">wc [选项]... --files0-from=F</span><br></pre></td></tr></table></figure>
-
-<h2 id="选项"><a href="#选项" class="headerlink" title="选项"></a>选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-c # 统计字节数，或--bytes或——chars：只显示Bytes数；。</span><br><span class="line">-l # 统计行数，或——lines：只显示列数；。</span><br><span class="line">-m # 统计字符数。这个标志不能与 -c 标志一起使用。</span><br><span class="line">-w # 统计字数，或——words：只显示字数。一个字被定义为由空白、跳格或换行字符分隔的字符串。</span><br><span class="line">-L # 打印最长行的长度。</span><br><span class="line">-help     # 显示帮助信息</span><br><span class="line">--version # 显示版本信息</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/cmd/watch/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/26/cmd/watch/" class="post-title-link" itemprop="url">watch</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-06-26 15:56:04 / 修改时间：15:59:10" itemprop="dateCreated datePublished" datetime="2022-06-26T15:56:04+08:00">2022-06-26</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cmd/" itemprop="url" rel="index"><span itemprop="name">cmd</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>watch - execute a program periodically, showing output fullscreen，以周期性的方式执行给定的指令，指令输出以全屏方式显示。</p>
-<p>watch可以帮你监测一个命令的运行结果。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch [options] command</span><br></pre></td></tr></table></figure>
-
-<h3 id="选项"><a href="#选项" class="headerlink" title="选项"></a>选项</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-n # 或--interval  watch缺省每2秒运行一下程序，可以用-n或-interval来指定间隔的时间。</span><br><span class="line">-d # 或--differences  用-d或--differences 选项watch 会高亮显示变化的区域。 而-d=cumulative选项会把变动过的地方(不管最近的那次有没有变动)都高亮显示出来。</span><br><span class="line">-t # 或-no-title  会关闭watch命令在顶部的时间间隔,命令，当前时间的输出。</span><br><span class="line">-h, --help # 查看帮助文档</span><br></pre></td></tr></table></figure>
-
-<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">watch -n 1 -d netstat -ant       # 命令：每隔一秒高亮显示网络链接数的变化情况</span><br><span class="line">watch -n 1 -d &#x27;pstree|grep http&#x27; # 每隔一秒高亮显示http链接数的变化情况。 后面接的命令若带有管道符，需要加&#x27;&#x27;将命令区域归整。</span><br><span class="line">watch &#x27;netstat -an | grep:21 | \ grep&lt;模拟攻击客户机的IP&gt;| wc -l&#x27; # 实时查看模拟攻击客户机建立起来的连接数</span><br><span class="line">watch -d &#x27;ls -l|grep scf&#x27;       # 监测当前目录中 scf&#x27; 的文件的变化</span><br><span class="line">watch -n 10 &#x27;cat /proc/loadavg&#x27; # 10秒一次输出系统的平均负载</span><br><span class="line">watch uptime</span><br><span class="line">watch -t uptime</span><br><span class="line">watch -d -n 1 netstat -ntlp</span><br><span class="line">watch -d &#x27;ls -l | fgrep goface&#x27;     # 监测goface的文件</span><br><span class="line">watch -t -differences=cumulative uptime</span><br><span class="line">watch -n 60 from            # 监控mail</span><br><span class="line">watch -n 1 &quot;df -i;df&quot;       # 监测磁盘inode和block数目变化情况</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1875,7 +1938,7 @@ tcpdump ip multicast
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">222</span>
+          <span class="site-state-item-count">225</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

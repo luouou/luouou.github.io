@@ -176,6 +176,307 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/string/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/c/string/" class="post-title-link" itemprop="url">string functions</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="strcpy"><a href="#strcpy" class="headerlink" title="strcpy"></a>strcpy</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span>* <span class="title function_">strcpy</span><span class="params">(<span class="type">char</span>* des, <span class="type">const</span> <span class="type">char</span>* src)</span></span><br><span class="line">&#123;</span><br><span class="line">    assert((des!=<span class="literal">NULL</span>) &amp;&amp; (src!=<span class="literal">NULL</span>)); </span><br><span class="line">    <span class="type">char</span> *address = des;  </span><br><span class="line">    <span class="keyword">while</span>((*des++ = *src++) != <span class="string">&#x27;\0&#x27;</span>)  </span><br><span class="line">        ;  </span><br><span class="line">    <span class="keyword">return</span> address;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>源指针所指的字符串内容是不能修改的，因此应该声明为 const 类型。</li>
+<li>要判断源指针和目的指针为空的情况，这里使用<code>assert</code>。</li>
+<li>要用一个临时变量保存目的串的首地址，最后返回这个首地址。</li>
+<li>函数返回 char* 的目的是为了支持链式表达式，即strcpy可以作为其他函数的实参。</li>
+</ul>
+<h3 id="strcat"><a href="#strcat" class="headerlink" title="strcat"></a>strcat</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span>* <span class="title function_">strcat</span><span class="params">(<span class="type">char</span>* des, <span class="type">const</span> <span class="type">char</span>* src)</span>   <span class="comment">// const表明为输入参数 </span></span><br><span class="line">&#123;  </span><br><span class="line">    assert((des!=<span class="literal">NULL</span>) &amp;&amp; (src!=<span class="literal">NULL</span>));</span><br><span class="line">    <span class="type">char</span>* address = des;</span><br><span class="line">    <span class="keyword">while</span>(*des != <span class="string">&#x27;\0&#x27;</span>)  <span class="comment">// 移动到字符串末尾</span></span><br><span class="line">        ++des;</span><br><span class="line">    <span class="keyword">while</span>(*des++ = *src++)</span><br><span class="line">        ;</span><br><span class="line">    <span class="keyword">return</span> address;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="strcmp"><a href="#strcmp" class="headerlink" title="strcmp"></a>strcmp</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">strcmp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *s1,<span class="type">const</span> <span class="type">char</span> *s2)</span></span><br><span class="line">&#123;</span><br><span class="line">    assert((s1!=<span class="literal">NULL</span>) &amp;&amp; (s2!=<span class="literal">NULL</span>));</span><br><span class="line">    <span class="keyword">while</span>(*s1 == *s2)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(*s1 == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">         </span><br><span class="line">        ++s1;</span><br><span class="line">        ++s2;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> *s1 - *s2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>若s1==s2，返回零；</li>
+<li>若s1&gt;s2，返回正数；</li>
+<li>若s1&lt;s2，返回负数。</li>
+</ul>
+<p>两个字符串自左向右逐个字符相比（按ASCII值大小相比较），直到出现不同的字符或遇\0为止。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/iniparser/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/c/iniparser/" class="post-title-link" itemprop="url">iniparser 开源库</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:28:24" itemprop="dateModified" datetime="2022-06-08T17:28:24+08:00">2022-06-08</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>iniparser是针对INI文件的解析器。</p>
+<h2 id="ini文件"><a href="#ini文件" class="headerlink" title="ini文件"></a>ini文件</h2><p>ini文件的最基本组成单元就是key，每个key都有一个name和对应的value：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">;注释以分号开头</span></span><br><span class="line"><span class="attr">name</span>=value <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>多个Key可以被归类为一组，即section。组名定义要独立一行，并用中括号括起来：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[section]</span></span><br><span class="line"><span class="attr">name</span>=value12</span><br></pre></td></tr></table></figure>
+
+<p>在section声明下的keys都会和该section关联起来。一个section的作用域会在下一个section声明的地方结束，如果没有下一个section的声明，那么该section的结束地方就是该文件末尾，section是不可以嵌套的。定位一个key是用section:key来表示的，所以不同section下的key的名称是可以相同的。</p>
+<p>iniparser库处理名称的时候，会统一换成小写，所以section和key的命名是大小写无关的。</p>
+<h2 id="API"><a href="#API" class="headerlink" title="API"></a>API</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;iniparser.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_getnsec</span><span class="params">(dictionary * d)</span>;  </span><br><span class="line"><span class="comment">//获取dictionary对象的section个数</span></span><br><span class="line"> </span><br><span class="line"><span class="type">char</span> * <span class="title function_">iniparser_getsecname</span><span class="params">(dictionary * d, <span class="type">int</span> n)</span>; </span><br><span class="line"><span class="comment">//获取dictionary对象的第n个section的名字</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">iniparser_dump_ini</span><span class="params">(dictionary * d, FILE * f)</span>;  </span><br><span class="line"><span class="comment">//保存dictionary对象到file</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">iniparser_dumpsection_ini</span><span class="params">(dictionary * d, <span class="type">char</span> * s, FILE * f)</span>; </span><br><span class="line"><span class="comment">//保存dictionary对象一个section到file</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">iniparser_dump</span><span class="params">(dictionary * d, FILE * f)</span>;  </span><br><span class="line"><span class="comment">//保存dictionary对象到file</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_getsecnkeys</span><span class="params">(dictionary * d, <span class="type">char</span> * s)</span>;    </span><br><span class="line"><span class="comment">//获取dictionary对象某个section下的key个数</span></span><br><span class="line"> </span><br><span class="line"><span class="type">char</span> ** <span class="title function_">iniparser_getseckeys</span><span class="params">(dictionary * d, <span class="type">char</span> * s)</span>; </span><br><span class="line"><span class="comment">//获取dictionary对象某个section下所有的key</span></span><br><span class="line"> </span><br><span class="line"><span class="type">char</span> * <span class="title function_">iniparser_getstring</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">char</span> * def)</span>;   </span><br><span class="line"><span class="comment">//返回dictionary对象的section:key对应的字串值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_getint</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">int</span> notfound)</span>;   </span><br><span class="line"><span class="comment">//返回idictionary对象的section:key对应的整形值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">double</span> <span class="title function_">iniparser_getdouble</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">double</span> notfound)</span>;  </span><br><span class="line"><span class="comment">//返回dictionary对象的section:key对应的双浮点值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_getboolean</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">int</span> notfound)</span>;   </span><br><span class="line"><span class="comment">//返回dictionary对象的section:key对应的布尔值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_set</span><span class="params">(dictionary * ini, <span class="type">const</span> <span class="type">char</span> * entry, <span class="type">const</span> <span class="type">char</span> * val)</span>;  </span><br><span class="line"><span class="comment">//设置dictionary对象的某个section:key的值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">iniparser_unset</span><span class="params">(dictionary * ini, <span class="type">const</span> <span class="type">char</span> * entry)</span>; </span><br><span class="line"><span class="comment">//删除dictionary对象中某个section:key</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_find_entry</span><span class="params">(dictionary * ini, <span class="type">const</span> <span class="type">char</span> * entry)</span> ;    </span><br><span class="line"><span class="comment">//判断dictionary对象中是否存在某个section:key</span></span><br><span class="line"> </span><br><span class="line">dictionary * <span class="title function_">iniparser_load</span><span class="params">(<span class="type">const</span> <span class="type">char</span> * ininame)</span>;  </span><br><span class="line"><span class="comment">//解析dictionary对象并返回(分配内存)dictionary对象</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">iniparser_freedict</span><span class="params">(dictionary * d)</span>;    </span><br><span class="line"><span class="comment">//释放dictionary对象(内存)</span></span><br><span class="line"> </span><br><span class="line"><span class="type">unsigned</span> <span class="title function_">dictionary_hash</span><span class="params">(<span class="type">const</span> <span class="type">char</span> * key)</span>; </span><br><span class="line"><span class="comment">//计算关键词的hash值</span></span><br><span class="line"> </span><br><span class="line">dictionary * <span class="title function_">dictionary_new</span><span class="params">(<span class="type">int</span> size)</span>;  </span><br><span class="line"><span class="comment">//创建dictionary对象</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">dictionary_del</span><span class="params">(dictionary * vd)</span>;   </span><br><span class="line"><span class="comment">//删除dictionary对象</span></span><br><span class="line"> </span><br><span class="line"><span class="type">char</span> * <span class="title function_">dictionary_get</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">char</span> * def)</span>;    </span><br><span class="line"><span class="comment">//获取dictionary对象的key值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">dictionary_set</span><span class="params">(dictionary * vd, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">const</span> <span class="type">char</span> * val)</span>;    </span><br><span class="line"><span class="comment">//设置dictionary对象的key值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">dictionary_unset</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key)</span>;    </span><br><span class="line"><span class="comment">//删除dictionary对象的key值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">dictionary_dump</span><span class="params">(dictionary * d, FILE * out)</span>;   </span><br><span class="line"><span class="comment">//保存dictionary对象</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[tcp]</span></span><br><span class="line"><span class="comment">;for tcp communication</span></span><br><span class="line"> </span><br><span class="line"><span class="attr">port</span> = <span class="number">8000</span><span class="comment">;</span></span><br><span class="line"><span class="attr">ip</span> = <span class="number">127.0</span>.<span class="number">0.1</span><span class="comment">;</span></span><br><span class="line"><span class="attr">family</span> = AF_INET<span class="comment">;</span></span><br><span class="line"> </span><br><span class="line"><span class="section">[serial port]</span></span><br><span class="line"><span class="comment">;for serial port communication</span></span><br><span class="line"> </span><br><span class="line"><span class="attr">speed</span> = <span class="number">9600</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;iniparser.h&quot;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    dictionary *ini;</span><br><span class="line">    <span class="type">int</span> n = <span class="number">0</span>;</span><br><span class="line">    <span class="type">char</span> *str;</span><br><span class="line"></span><br><span class="line">    ini = iniparser_load(<span class="string">&quot;example.ini&quot;</span>);<span class="comment">//parser the file</span></span><br><span class="line">    <span class="keyword">if</span>(ini == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>,<span class="string">&quot;can not open %s&quot;</span>,<span class="string">&quot;example.ini&quot;</span>);</span><br><span class="line">        <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;dictionary obj:\n&quot;</span>);</span><br><span class="line">    iniparser_dump(ini,<span class="built_in">stderr</span>);<span class="comment">//save ini to stderr</span></span><br><span class="line"> </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n%s:\n&quot;</span>,iniparser_getsecname(ini,<span class="number">0</span>));<span class="comment">//get section name</span></span><br><span class="line"></span><br><span class="line">    n = iniparser_getint(ini,<span class="string">&quot;tcp:port&quot;</span>,<span class="number">-1</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;port : %d\n&quot;</span>,n);</span><br><span class="line"></span><br><span class="line">    str = iniparser_getstring(ini,<span class="string">&quot;tcp:ip&quot;</span>,<span class="string">&quot;null&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;ip : %s\n&quot;</span>,str);</span><br><span class="line"></span><br><span class="line">    str = iniparser_getstring(ini,<span class="string">&quot;tcp:family&quot;</span>,<span class="string">&quot;null&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;family : %s\n&quot;</span>,str);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n%s:\n&quot;</span>,iniparser_getsecname(ini,<span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    n = iniparser_getint(ini,<span class="string">&quot;serial port:speed&quot;</span>,<span class="number">-1</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;speed : %d\n&quot;</span>,n);</span><br><span class="line"></span><br><span class="line">    iniparser_freedict(ini);<span class="comment">//free dirctionary obj</span></span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/linux/sysconf/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/linux/sysconf/" class="post-title-link" itemprop="url">linux sys conf function</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="passwd文件"><a href="#passwd文件" class="headerlink" title="passwd文件"></a>passwd文件</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">passwd</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="type">char</span> *pw_name;        <span class="comment">/* Username*/</span></span><br><span class="line">  <span class="type">char</span> *pw_passwd;      <span class="comment">/* Hashed passphrase, if shadow database</span></span><br><span class="line"><span class="comment">                                   not in use (see shadow.h).  */</span></span><br><span class="line">  <span class="type">__uid_t</span> pw_uid;       <span class="comment">/* User ID.  */</span></span><br><span class="line">  <span class="type">__gid_t</span> pw_gid;       <span class="comment">/* Group ID.  */</span></span><br><span class="line">  <span class="type">char</span> *pw_gecos;       <span class="comment">/* Real name.  */</span></span><br><span class="line">  <span class="type">char</span> *pw_dir;         <span class="comment">/* Home directory.  */</span></span><br><span class="line">  <span class="type">char</span> *pw_shell;       <span class="comment">/* Shell program.  */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>口令文件在/etc/passwd，格式为：用户名:加密口令：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pwd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> passwd *<span class="title function_">getpwnam</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"><span class="keyword">struct</span> passwd *<span class="title function_">getpwuid</span><span class="params">(<span class="type">uid_t</span> uid)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getpwnam_r</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name, <span class="keyword">struct</span> passwd *pwd, <span class="type">char</span> *buf, </span></span><br><span class="line"><span class="params">    <span class="type">size_t</span> buflen, <span class="keyword">struct</span> passwd **result)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">getpwuid_r</span><span class="params">(<span class="type">uid_t</span> uid, <span class="keyword">struct</span> passwd *pwd, <span class="type">char</span> *buf, </span></span><br><span class="line"><span class="params">    <span class="type">size_t</span> buflen, <span class="keyword">struct</span> passwd **result)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>根据用户名或UID来获取口令信息。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pwd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> passwd *<span class="title function_">getpwent</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setpwent</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">endpwent</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>getpwent可以查看整个口令文件，它返回一个passwd指针，并找到下一个记录，若出错或到达文件尾端则为返回NULL。setpwent定位到文件开始处，endpwent则关闭这些文件。</p>
+<h2 id="组文件"><a href="#组文件" class="headerlink" title="组文件"></a>组文件</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">group</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">char</span> *gr_name;      <span class="comment">/* Group name.  */</span></span><br><span class="line">    <span class="type">char</span> *gr_passwd;        <span class="comment">/* Password.    */</span></span><br><span class="line">    <span class="type">__gid_t</span> gr_gid;     <span class="comment">/* Group ID.    */</span></span><br><span class="line">    <span class="type">char</span> **gr_mem;      <span class="comment">/* Member list. */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;grp.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> group *<span class="title function_">getgrnam</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"><span class="keyword">struct</span> group *<span class="title function_">getgrgid</span><span class="params">(<span class="type">gid_t</span> gid)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getgrnam_r</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name, <span class="keyword">struct</span> group *grp,</span></span><br><span class="line"><span class="params">         <span class="type">char</span> *buf, <span class="type">size_t</span> buflen, <span class="keyword">struct</span> group **result)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">getgrgid_r</span><span class="params">(<span class="type">gid_t</span> gid, <span class="keyword">struct</span> group *grp,</span></span><br><span class="line"><span class="params">         <span class="type">char</span> *buf, <span class="type">size_t</span> buflen, <span class="keyword">struct</span> group **result)</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;grp.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> group *<span class="title function_">getgrent</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setgrent</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">endgrent</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/linux/sysctl/get_sys_data.png" alt="get_sys_data"></p>
+<h2 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h2><p>对环境变量进行操作，影响的是当前进程及其后生成的子进程的环境，不会影响父进程的环境</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">char</span> *<span class="title function_">getenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">putenv</span><span class="params">(<span class="type">char</span> *<span class="built_in">string</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">setenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name, <span class="type">const</span> <span class="type">char</span> *value, <span class="type">int</span> overwrite)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">unsetenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>getenv从环境中取一个环境变量的值，返回一个指向name关联的value字符串指针。</p>
+<p>putenv取形式为name=value的字符串，将其放到环境变量中。如果name已经存在，则先删除其原来的定义。</p>
+<p>setenv将name设置为value。如果name已存在，那么若overwrite非0，则首先删除其现存的定义;若overwrite为0，则不设置也不出错。</p>
+<p>unsetenv删除name的定义，即使不存在也不出错。</p>
+<h2 id="资源限制"><a href="#资源限制" class="headerlink" title="资源限制"></a>资源限制</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/time.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/resource.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">rlimit</span></span></span><br><span class="line"><span class="class">&#123;</span>   </span><br><span class="line">    <span class="type">rlim_t</span> rlim_cur;  <span class="comment">/* The current (soft) limit.  */</span></span><br><span class="line">    <span class="type">rlim_t</span> rlim_max;  <span class="comment">/* The hard limit.  */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getrlimit</span><span class="params">(<span class="type">int</span> resource, <span class="keyword">struct</span> rlimit *rlim)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">setrlimit</span><span class="params">(<span class="type">int</span> resource, <span class="type">const</span> <span class="keyword">struct</span> rlimit *rlim)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>更改资源限制时,须遵循下列三条规则:</p>
+<ul>
+<li>任何一个进程都可将一个软限制更改为小于或等于硬限制。</li>
+<li>任何一个进程都可降低硬限制值，但它必须大于或等于软限制值。这种降低对普通用户而言不可逆反。</li>
+<li>只有超级用户可以提高硬限制。</li>
+</ul>
+<p>一个无限量的限制由常数RLIM_INFINITY指定。resource参数取下列值之一:</p>
+<ul>
+<li>RLIMIT_CORE   core文件的最大字节数，若其值为0则阻止创建core文件。</li>
+<li>RLIMIT_CPU    CPU时间的最大量值(秒)，当超过此软限制时，向该进程发送SIGXCPU信号。</li>
+<li>RLIMIT_DATA   数据段的最大字节长度。这是初始化数据、非初始化数据以及堆的总和。</li>
+<li>RLIMIT_FSIZE  可以创建的文件的最大字节长度。超过时，向该进程发送SIGXFSZ信号。</li>
+<li>RLIMIT_MEMLOCK    锁定在存储器地址空间。</li>
+<li>RLIMIT_NOFILE 每个进程能打开的最多文件数。</li>
+<li>RLIMIT_NPROC  每个实际用户ID所拥有的最大子进程数。</li>
+<li>RLIMIT_OFILE  与SVR4的RLIMIT_NOFILE相同。</li>
+<li>RLIMIT_RSS    最大驻内存集字节长度(RSS)。如果物理存储器不够，内核将从进程处取回超过的部分。</li>
+<li>RLIMIT_STACK  栈的最大字节长度。</li>
+<li>RLIMIT_VMEM   可映照地址空间的最大字节长度。</li>
+</ul>
+<h2 id="sysconf"><a href="#sysconf" class="headerlink" title="sysconf"></a>sysconf</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">long</span> <span class="title function_">sysconf</span><span class="params">(<span class="type">int</span> name)</span>;</span><br><span class="line"><span class="type">long</span> <span class="title function_">fpathconf</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span> name)</span>;</span><br><span class="line"><span class="type">long</span> <span class="title function_">pathconf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">int</span> name)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>以_SC_开始的常数用作为sysconf的参数，而以_PC_开始的常数则作为pathconf或fpathconf的参数。</p>
+<p>对于pathconf的参数pathname,fpathconf的参数filedes有很多限制:</p>
+<ol>
+<li>_PC_MAX_CANON,_PC_MAX_INPUT以及_PC_VDISABLE所涉及的文件必须是终端文件。</li>
+<li>_PC_LINK_MAX所涉及的文件可以是文件或目录。如果是目录，则返回值用于目录本身。</li>
+<li>_PC_NAME_MAX和_PC_NO_TRUNC所涉及的文件必须是目录，返回值用于该目录中的文件名。</li>
+<li>_PC_PATH_MAX涉及的必须是目录。当所指定的目录是工作目录时，返回值是相对路径名的最大长度。</li>
+<li>_PC_PIPE_BUF所涉及的文件必须是管道、FIFO或目录。在管道或FIFO情况下，返回值是对所涉及的管道或FIFO的限制值。对于目录返回值是对在该目录中创建的任一FIFO的限制值。</li>
+<li>_PC_CHOWN_RESTRICTED必须是文件或目录。如果是目录则返回指明此选择项是否适用于该目录中的文件。</li>
+<li>对于_SC_JOB_CONTROL、SC_SAVED_IDS、PC_CHOWN_RESTRICTED、PC_VDISABLE和_PC_NO_TRUNC的返回值若为-1(不改变errno),则表示不支持此功能。</li>
+</ol>
+<p><img src="/images/linux/sysctl/sysconf_name.png" alt="sysconf_name"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/filedir/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1311,422 +1612,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/uml/uml_sequence/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/code/uml/uml_sequence/" class="post-title-link" itemprop="url">UML Sequence diagram</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-26 15:57:54" itemprop="dateModified" datetime="2022-06-26T15:57:54+08:00">2022-06-26</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/UML/" itemprop="url" rel="index"><span itemprop="name">UML</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>uml</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/06/07/code/uml/uml_sequence/">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/tool/beyond_compare/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/tool/beyond_compare/" class="post-title-link" itemprop="url">beyond compare</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/tool/" itemprop="url" rel="index"><span itemprop="name">tool</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="破解"><a href="#破解" class="headerlink" title="破解"></a>破解</h2><ul>
-<li><p>删除C:\Users\xxx\AppData\Roaming\Scooter Software\Beyond Compare 4\文件夹下的所有文件。</p>
-</li>
-<li><p>修改C:\Users\xxx\AppData\Roaming\Scooter Software\Beyond Compare 4\BCstate.xml配置文件，删除<code>TCheckForUpdatesState</code>字段之间的内容。</p>
-</li>
-<li><p>删除安装目录下的BCUnrar.dll文件。</p>
-</li>
-</ul>
-<p><strong>密钥</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">--- BEGIN LICENSE KEY ---</span><br><span class="line">6TTCoWi2N0Pv+o2HGfqUpZfuaMhtf2zX0u1OuNeqTYkKKWh-CKwBWkPUG</span><br><span class="line">3+CiAQ2q4MNPbf0t8+gmPdo+Vyw64aU-zuQQt9d7Q6EcJ+T42by0E+kxf</span><br><span class="line">+q3QLs40H+RD3h5OLjFGpxClodRnTCNoAM39xsWm2aHZI0Z9KdXzLo1fo</span><br><span class="line">1OdNlaptoK17SsxNK-7JUtTztLwBM8BUwWA24ghoeLhFq39FMP+pcdU7R</span><br><span class="line">ttFJoosVk3d-DRrDH0EARo6GXWEeeUgnyjdWKv5ElwrHWw2HMpfFq9VRf</span><br><span class="line">MqcJV00ePAUB4MT3zPE43Tu0BDt-WXYSpUqf7AjaWnBC7MpNfdkS0mWXk</span><br><span class="line">--- END LICENSE KEY -----</span><br></pre></td></tr></table></figure>
-
-<hr>
-<p><a target="_blank" rel="noopener" href="https://www.beyondcompare.cc/jiqiao/">https://www.beyondcompare.cc/jiqiao/</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/sql/sqlite-api/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/sql/sqlite-api/" class="post-title-link" itemprop="url">sqlite c++ api</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:43:01" itemprop="dateModified" datetime="2022-06-08T20:43:01+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/sqlite/" itemprop="url" rel="index"><span itemprop="name">sqlite</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="执行语句"><a href="#执行语句" class="headerlink" title="执行语句"></a>执行语句</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">sqlite3_open</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">  <span class="type">const</span> <span class="type">char</span> *filename,   <span class="comment">/* Database filename (UTF-8) */</span></span></span></span><br><span class="line"><span class="params"><span class="function">  sqlite3 **ppDb          <span class="comment">/* OUT: SQLite db handle */</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sqlite3_close</span><span class="params">(sqlite3*)</span></span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sqlite3_exec</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">  sqlite3*,                                  <span class="comment">/* An open database */</span></span></span></span><br><span class="line"><span class="params"><span class="function">  <span class="type">const</span> <span class="type">char</span> *sql,                           <span class="comment">/* SQL to be evaluated */</span></span></span></span><br><span class="line"><span class="params"><span class="function">  <span class="type">int</span> (*callback)(<span class="type">void</span>*,<span class="type">int</span>,<span class="type">char</span>**,<span class="type">char</span>**),  <span class="comment">/* Callback function */</span></span></span></span><br><span class="line"><span class="params"><span class="function">  <span class="type">void</span> *,                                    <span class="comment">/* 1st argument to callback */</span></span></span></span><br><span class="line"><span class="params"><span class="function">  <span class="type">char</span> **errmsg                              <span class="comment">/* Error msg written here */</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">callback</span><span class="params">(<span class="type">void</span> *data, <span class="type">int</span> argc, <span class="type">char</span> **argv, <span class="type">char</span> **colName)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   <span class="built_in">printf</span>(<span class="string">&quot;%s:\n&quot;</span>, (<span class="type">const</span> <span class="type">char</span>*)data);</span><br><span class="line">   <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; argc; i++) &#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">&quot;%s = %s\n&quot;</span>, colName[i], argv[i] ? argv[i] : <span class="string">&quot;NULL&quot;</span>);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    sqlite3 *db = <span class="literal">nullptr</span>;</span><br><span class="line">    <span class="type">int</span> ret = <span class="built_in">sqlite3_open</span>(argv[<span class="number">1</span>], &amp;db);</span><br><span class="line">    <span class="keyword">if</span> (ret || db == <span class="literal">nullptr</span>) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;db open fail.&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *errmsg = <span class="literal">nullptr</span>;</span><br><span class="line">    ret = <span class="built_in">sqlite3_exec</span>(db, argv[<span class="number">2</span>], callback, (<span class="type">void</span> *)<span class="string">&quot;callback&quot;</span>, &amp;errmsg);</span><br><span class="line">    <span class="keyword">if</span> (ret != SQLITE_OK) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;sql exec fail.&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="built_in">sqlite3_free</span>(errmsg);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">sqlite3_close</span>(db);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">sqlite3_backup *<span class="title">sqlite3_backup_init</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">  sqlite3 *pDest,                        <span class="comment">/* Destination database handle */</span></span></span></span><br><span class="line"><span class="params"><span class="function">  <span class="type">const</span> <span class="type">char</span> *zDestName,                 <span class="comment">/* Destination database name */</span></span></span></span><br><span class="line"><span class="params"><span class="function">  sqlite3 *pSource,                      <span class="comment">/* Source database handle */</span></span></span></span><br><span class="line"><span class="params"><span class="function">  <span class="type">const</span> <span class="type">char</span> *zSourceName                <span class="comment">/* Source database name */</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sqlite3_backup_step</span><span class="params">(sqlite3_backup *p, <span class="type">int</span> nPage)</span></span>;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sqlite3_backup_finish</span><span class="params">(sqlite3_backup *p)</span></span>;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sqlite3_backup_remaining</span><span class="params">(sqlite3_backup *p)</span></span>;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sqlite3_backup_pagecount</span><span class="params">(sqlite3_backup *p)</span></span>;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">sqlite3 *db = <span class="literal">NULL</span>;</span><br><span class="line"><span class="type">int</span> ret = <span class="built_in">sqlite3_open</span>(argv[<span class="number">1</span>], &amp;db);</span><br><span class="line"><span class="keyword">if</span> (ret || db == <span class="literal">NULL</span>) &#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;db open fail.&quot;</span> &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">sqlite3 *backupDb = <span class="literal">NULL</span>;</span><br><span class="line">ret = <span class="built_in">sqlite3_open</span>(argv[<span class="number">2</span>], &amp;backupDb);</span><br><span class="line"><span class="keyword">if</span> (ret || backupDb == <span class="literal">NULL</span>) &#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;backup db open fail.&quot;</span> &lt;&lt; endl;</span><br><span class="line">    <span class="built_in">sqlite3_close</span>(db);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">sqlite3_backup *pbak = <span class="built_in">sqlite3_backup_init</span>(backupDb, <span class="string">&quot;main&quot;</span>, db, <span class="string">&quot;main&quot;</span>);</span><br><span class="line"><span class="keyword">if</span> (pbak == <span class="literal">NULL</span>) &#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;backup init fail &quot;</span> &lt;&lt; <span class="built_in">sqlite3_errcode</span>(backupDb) &lt;&lt; endl;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    (<span class="type">void</span>)<span class="built_in">sqlite3_backup_step</span>(pbak, <span class="number">-1</span>);</span><br><span class="line">    ret = <span class="built_in">sqlite3_backup_finish</span>(pbak);</span><br><span class="line">    <span class="keyword">if</span> (ret != SQLITE_OK) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;backup db fail.&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">sqlite3_close</span>(db);</span><br><span class="line"><span class="built_in">sqlite3_close</span>(backupDb);</span><br></pre></td></tr></table></figure>
-
-<h2 id="错误码"><a href="#错误码" class="headerlink" title="错误码"></a>错误码</h2><table>
-<thead>
-<tr>
-<th align="left">宏</th>
-<th align="center">值</th>
-<th align="left">含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">SQLITE_OK</td>
-<td align="center">0</td>
-<td align="left">返回成功</td>
-</tr>
-<tr>
-<td align="left">SQLITE_ERROR</td>
-<td align="center">1</td>
-<td align="left">SQL错误或数据库不存在</td>
-</tr>
-<tr>
-<td align="left">SQLITE_INTERNAL</td>
-<td align="center">2</td>
-<td align="left">SQLite内部逻辑错误</td>
-</tr>
-<tr>
-<td align="left">SQLITE_PERM</td>
-<td align="center">3</td>
-<td align="left">拒绝访问</td>
-</tr>
-<tr>
-<td align="left">SQLITE_ABORT</td>
-<td align="center">4</td>
-<td align="left">回调函数请求中止</td>
-</tr>
-<tr>
-<td align="left">SQLITE_BUSY</td>
-<td align="center">5</td>
-<td align="left">数据库文件被锁</td>
-</tr>
-<tr>
-<td align="left">SQLITE_LOCKED</td>
-<td align="center">6</td>
-<td align="left">数据库中的一个表被锁</td>
-</tr>
-<tr>
-<td align="left">SQLITE_NOMEM</td>
-<td align="center">7</td>
-<td align="left">malloc()分配内存失败</td>
-</tr>
-<tr>
-<td align="left">SQLITE_READONLY</td>
-<td align="center">8</td>
-<td align="left">试图对只读数据库进行写操作</td>
-</tr>
-<tr>
-<td align="left">SQLITE_INTERRUPT</td>
-<td align="center">9</td>
-<td align="left">操作被sqlie3_interrupt()中止</td>
-</tr>
-<tr>
-<td align="left">SQLITE_IOERR</td>
-<td align="center">10</td>
-<td align="left">磁盘I/O发生错误</td>
-</tr>
-<tr>
-<td align="left">SQLITE_CORRUPT</td>
-<td align="center">11</td>
-<td align="left">数据库磁盘映像格式不正确</td>
-</tr>
-<tr>
-<td align="left">SQLITE_NOTFOUND</td>
-<td align="center">12</td>
-<td align="left">(Internal Only)表或记录不存在 未知操作码在sqlite3_file_control()</td>
-</tr>
-<tr>
-<td align="left">SQLITE_FULL</td>
-<td align="center">13</td>
-<td align="left">插入失败，数据库已满</td>
-</tr>
-<tr>
-<td align="left">SQLITE_CANTOPEN</td>
-<td align="center">14</td>
-<td align="left">不能打开数据库文件</td>
-</tr>
-<tr>
-<td align="left">SQLITE_PROTOCOL</td>
-<td align="center">15</td>
-<td align="left">数据库锁定协议错误</td>
-</tr>
-<tr>
-<td align="left">SQLITE_EMPTY</td>
-<td align="center">16</td>
-<td align="left">(Internal Only)数据库为空</td>
-</tr>
-<tr>
-<td align="left">SQLITE_SCHEMA</td>
-<td align="center">17</td>
-<td align="left">数据库模式改变</td>
-</tr>
-<tr>
-<td align="left">SQLITE_TOOBIG</td>
-<td align="center">18</td>
-<td align="left">单行数据过多(字符串或BLOB超过大小限制)</td>
-</tr>
-<tr>
-<td align="left">SQLITE_CONSTRAINT</td>
-<td align="center">19</td>
-<td align="left">由于约束冲突而中止</td>
-</tr>
-<tr>
-<td align="left">SQLITE_MISMATCH</td>
-<td align="center">20</td>
-<td align="left">数据类型不匹配</td>
-</tr>
-<tr>
-<td align="left">SQLITE_MISUSE</td>
-<td align="center">21</td>
-<td align="left">数据库错误使用</td>
-</tr>
-<tr>
-<td align="left">SQLITE_NOLFS</td>
-<td align="center">22</td>
-<td align="left">使用主机操作系统不支持的特性</td>
-</tr>
-<tr>
-<td align="left">SQLITE_AUTH</td>
-<td align="center">23</td>
-<td align="left">非法授权</td>
-</tr>
-<tr>
-<td align="left">SQLITE_FORMAT</td>
-<td align="center">24</td>
-<td align="left">辅助数据库格式错误</td>
-</tr>
-<tr>
-<td align="left">SQLITE_RANGE</td>
-<td align="center">25</td>
-<td align="left">sqlite_bind第二个参数超出范围</td>
-</tr>
-<tr>
-<td align="left">SQLITE_NOTADB</td>
-<td align="center">26</td>
-<td align="left">打开的不是一个数据库文件</td>
-</tr>
-<tr>
-<td align="left">SQLITE_NOTICE</td>
-<td align="center">27</td>
-<td align="left">来自sqlite3_log()的通知</td>
-</tr>
-<tr>
-<td align="left">SQLITE_WARNING</td>
-<td align="center">28</td>
-<td align="left">来自sqlite3_log()的警告</td>
-</tr>
-<tr>
-<td align="left">SQLITE_ROW</td>
-<td align="center">100</td>
-<td align="left">sqlite_step() 有另一行准备就绪</td>
-</tr>
-<tr>
-<td align="left">SQLITE_DONE</td>
-<td align="center">101</td>
-<td align="left">sqlite_step() 执行完成</td>
-</tr>
-</tbody></table>
-<hr>
-<p><a target="_blank" rel="noopener" href="https://sqlite.org/c3ref/funclist.html">https://sqlite.org/c3ref/funclist.html</a></p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/endv/p/12228344.html">https://www.cnblogs.com/endv/p/12228344.html</a></p>
-<p><a target="_blank" rel="noopener" href="https://sqlite.org/c3ref/backup_finish.html#sqlite3backupfinish">https://sqlite.org/c3ref/backup_finish.html#sqlite3backupfinish</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1796,7 +1681,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">222</span>
+          <span class="site-state-item-count">225</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

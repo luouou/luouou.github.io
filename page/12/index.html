@@ -176,6 +176,300 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/timer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/kernel/timer/" class="post-title-link" itemprop="url">linux kernel timer</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="timer"><a href="#timer" class="headerlink" title="timer"></a>timer</h2><p>HZ 变量表示系统时钟频率，范围50-1200，默认1000。当时钟中断发生时，内核内部计数器的値就会加1，内部计数器由全局变量 jiffies 来表示。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timer_list</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">entry</span>;</span> <span class="comment">/*定时器列表*/</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> expires; <span class="comment">/*定时器到期时间*/</span></span><br><span class="line">    <span class="type">void</span> (*function)(<span class="type">unsigned</span> <span class="type">long</span>); <span class="comment">/* 定时器处理函数*/</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> data; <span class="comment">/*作为参数被传入定时器处理函数*/</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timer_base_s</span> *<span class="title">base</span>;</span></span><br><span class="line">    <span class="type">int</span> slack;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/*初始化定时器*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">init_timer</span><span class="params">(<span class="keyword">struct</span> timer_list * timer)</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TIMER_INITIALIZER(_function, _expires, _data) &#123;     \</span></span><br><span class="line"><span class="meta">        .entry = &#123; .prev = TIMER_ENTRY_STATIC &#125;,    \</span></span><br><span class="line"><span class="meta">        .function = (_function),            \</span></span><br><span class="line"><span class="meta">        .expires = (_expires),              \</span></span><br><span class="line"><span class="meta">        .data = (_data),                \</span></span><br><span class="line"><span class="meta">        .base = &amp;boot_tvec_bases,           \</span></span><br><span class="line"><span class="meta">        .slack = -1,                    \</span></span><br><span class="line"><span class="meta">        __TIMER_LOCKDEP_MAP_INITIALIZER(        \</span></span><br><span class="line"><span class="meta">            __FILE__ <span class="string">&quot;:&quot;</span> __stringify(__LINE__)) \</span></span><br><span class="line"><span class="meta">    &#125;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEFINE_TIMER(_name, _function, _expires, _data)     \</span></span><br><span class="line"><span class="meta">    struct timer_list _name =               \</span></span><br><span class="line"><span class="meta">        TIMER_INITIALIZER(_function, _expires, _data)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/*注册内核定时器，将定时器加入到内核动态定时器链表中*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">add_timer</span><span class="params">(<span class="keyword">struct</span> timer_list * timer)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*删除定时器*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">del_timer</span><span class="params">(<span class="keyword">struct</span> timer_list * timer)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*重装载定时器*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">mod_timer</span><span class="params">(<span class="keyword">struct</span> timer_list *timer, <span class="type">unsigned</span> <span class="type">long</span> expires)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>内核定时器注册的处理函数只会执行一次，所以执行完后要重装载定时器，使其循环执行。</p>
+<p>定时器的到期时间是在目前 jiffies 的基础是加一个时延，若为Hz，则表示延迟 1s。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">long</span> <span class="title function_">msecs_to_jiffies</span><span class="params">(<span class="type">const</span> <span class="type">unsigned</span> <span class="type">int</span> ms)</span>;</span><br><span class="line"><span class="type">unsigned</span> <span class="type">long</span> <span class="title function_">usecs_to_jiffies</span><span class="params">(<span class="type">const</span> <span class="type">unsigned</span> <span class="type">int</span> us)</span>;</span><br><span class="line"><span class="type">unsigned</span> <span class="type">long</span> <span class="title function_">timespec_to_jiffies</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> timespec *value)</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="内核延时"><a href="#内核延时" class="headerlink" title="内核延时"></a>内核延时</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">ndelay</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> nsecs)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">udelay</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> usecs)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">mdelay</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> msecs)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这三种延时是根据CPU频率进行一定次数循环的忙等待。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">msleep</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> millisecs)</span>;</span><br><span class="line"><span class="type">unsigned</span> <span class="type">long</span> <span class="title function_">msleep_interruptible</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> millisecs)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">ssleep</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> seconds)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>进程睡眠指定的时间，其中msleep()、ssleep()不能被打断。msleep_interruptible()可被打断。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/poll/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/kernel/poll/" class="post-title-link" itemprop="url">poll</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="poll"><a href="#poll" class="headerlink" title="poll"></a>poll</h2><p>使用非阻塞 I/O的应用程序通常会使用 select()和 poll()查询是否可对设备进行无阻塞的访问。应用层调用select()最终会引发设备驱动中的 poll()函数被执行。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="title function_">int</span> <span class="params">(*poll)</span> <span class="params">(<span class="keyword">struct</span> file *, <span class="keyword">struct</span> poll_table *)</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLIN      0x0001</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLPRI     0x0002</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLOUT     0x0004</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLERR     0x0008</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLHUP     0x0010</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLNVAL    0x0020</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLRDNORM  0x0040</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLRDBAND  0x0080</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLWRNORM  0x0100</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLWRBAND  0x0200</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLMSG     0x0400</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLREMOVE  0x1000</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> POLLRDHUP       0x2000</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">poll_wait</span><span class="params">(<span class="keyword">struct</span> file * filp, <span class="type">wait_queue_head_t</span> * wait_address, poll_table *p)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>驱动要实现poll函数，主要工作为：对可能引起设备文件状态变化的等待队列调用 poll_wait()函数，将对应的等待队列头添加到 poll_table中，poll_wait()并不会引起阻塞。返回表示是否能对设备进行无阻塞读、写访问的掩码。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">xxx_poll</span><span class="params">(<span class="keyword">struct</span> file *filp, <span class="keyword">struct</span> poll_table_struct *wait)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> mask = <span class="number">0</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">xxx_object</span> *<span class="title">dev</span> =</span> filp-&gt;private_data;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    poll_wait(filp, &amp;dev-&gt;read_wait, wait);</span><br><span class="line">    poll_wait(filp, &amp;dev-&gt;write_wait, wait);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (...) <span class="comment">//可读 </span></span><br><span class="line">    &#123;</span><br><span class="line">        mask |= POLLIN | POLLRDNORM; <span class="comment">/*数据可获得*/</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (...) <span class="comment">//可写 </span></span><br><span class="line">    &#123;</span><br><span class="line">        mask |= POLLOUT | POLLWRNORM; <span class="comment">/*数据可写入*/</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> mask;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/select.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*清除一个文件描述符集*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_ZERO</span><span class="params">(fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*将一个文件描述符从文件描述符集中清除*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_CLR</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*将一个文件描述符加入文件描述符集*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_SET</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*判断文件描述符是否被置位*/</span></span><br><span class="line"><span class="type">int</span>  <span class="title function_">FD_ISSET</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">select</span><span class="params">(<span class="type">int</span> nfds, fd_set *readfds, fd_set *writefds,</span></span><br><span class="line"><span class="params">                  fd_set *exceptfds, <span class="keyword">struct</span> timeval *timeout)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>readfds、writefds、exceptfds 分别是被 select()监视的读、写和异常处理的文件描述符集合，numfds 参数是要检查的最高的文件描述符加1，timeout 参数是超时时间。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/platform/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/kernel/platform/" class="post-title-link" itemprop="url">platform bus</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>platform 是一种虚拟的总线，负责绑定设备和驱动，在系统每注册一个设备的时候，会寻找与之匹配的驱动；相反的，在系统每注册一个驱动的时候，会寻找与之匹配的设备，而匹配由总线完成。</p>
+<p>platform 使设备被挂接在一个总线上，在 BSP 中定义 platform 设备和设备使用的资源、设备的具体配置信息，而在驱动中只需要通过 API 去获取资源和数据，做到了板级代码和驱动代码的分离，使得驱动具有更好的可扩展性和跨平台性。</p>
+<h2 id="platform-device"><a href="#platform-device" class="headerlink" title="platform_device"></a>platform_device</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">platform_device</span> &#123;</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *name;  </span><br><span class="line">    <span class="type">int</span>  id;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device</span> <span class="title">dev</span>;</span></span><br><span class="line">    u32  num_resources;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">resource</span> *<span class="title">resource</span>;</span></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">platform_device_id</span> *<span class="title">id_entry</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mfd_cell</span> *<span class="title">mfd_cell</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">pdev_archdata</span> <span class="title">archdata</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>一般在bsp板文件中定义了平台资源的对应的全部platform_device， 并包含在一个数组中，然后通过 platform_add_devices()函数统一注册。当然也可以自己单独实现:</p>
+<ol>
+<li>实例一个 platform_device 结构体。</li>
+<li>初始化设备名、id等成员。</li>
+<li>创建一个资源数组，并赋值给 platform_device 对象。</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">platform_device</span> <span class="title">hello_device</span>=</span></span><br><span class="line">&#123;</span><br><span class="line">    .name = <span class="string">&quot;hello_platform&quot;</span>,</span><br><span class="line">    .id = <span class="number">-1</span>,</span><br><span class="line">    .resource = hello_resource,</span><br><span class="line">    .num_resources = ARRAY_SIZE(hello_resource),</span><br><span class="line">    .dev = </span><br><span class="line">    &#123;</span><br><span class="line">        .platform_data = &amp;plat_data,</span><br><span class="line">        .release = hello_release,</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">hello_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    platform_device_register(&amp;hello_device);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">hello_exit</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    platform_device_unregister(&amp;hello_device);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>platform_device 结构体的 platform_data 成员用来存放设备自定义的私有数据，驱动中可通过设备指针来获取。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">hello_probe</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">xxx_plat_data</span> *<span class="title">pdata</span> =</span> pdev-&gt;dev.platform_data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="注册platform-device"><a href="#注册platform-device" class="headerlink" title="注册platform_device"></a>注册platform_device</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">platform_device_register</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">    device_initialize(&amp;pdev-&gt;dev);</span><br><span class="line">    <span class="keyword">return</span> platform_device_add(pdev);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">platform_device_add</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (!pdev-&gt;dev.parent)</span><br><span class="line">        pdev-&gt;dev.parent = &amp;platform_bus;</span><br><span class="line"></span><br><span class="line">    pdev-&gt;dev.bus = &amp;platform_bus_type;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; pdev-&gt;num_resources; i++) &#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">resource</span> *<span class="title">p</span>, *<span class="title">r</span> =</span> &amp;pdev-&gt;resource[i];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (r-&gt;name == <span class="literal">NULL</span>)</span><br><span class="line">            r-&gt;name = dev_name(&amp;pdev-&gt;dev);</span><br><span class="line"></span><br><span class="line">        p = r-&gt;parent;</span><br><span class="line">        <span class="keyword">if</span> (!p) &#123;</span><br><span class="line">            <span class="keyword">if</span> (resource_type(r) == IORESOURCE_MEM)</span><br><span class="line">                p = &amp;iomem_resource;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (resource_type(r) == IORESOURCE_IO)</span><br><span class="line">                p = &amp;ioport_resource;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    device_add(&amp;pdev-&gt;dev);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">device_add</span><span class="params">(<span class="keyword">struct</span> device *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">    dev = get_device(dev);</span><br><span class="line">    bus_add_device(dev);</span><br><span class="line">    bus_probe_device(dev);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">bus_probe_device</span><span class="params">(<span class="keyword">struct</span> device *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (bus &amp;&amp; bus-&gt;p-&gt;drivers_autoprobe) &#123;</span><br><span class="line">        ret = device_attach(dev);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">device_attach</span><span class="params">(<span class="keyword">struct</span> device *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (dev-&gt;driver) &#123;</span><br><span class="line">        klist_node_attached(&amp;dev-&gt;p-&gt;knode_driver);</span><br><span class="line"></span><br><span class="line">        ret = device_bind_driver(dev);</span><br><span class="line"></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        ret = bus_for_each_drv(dev-&gt;bus, <span class="literal">NULL</span>, dev, __device_attach);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __device_attach(<span class="keyword">struct</span> device_driver *drv, <span class="type">void</span> *data)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device</span> *<span class="title">dev</span> =</span> data;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!driver_match_device(drv, dev))</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> driver_probe_device(drv, dev);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> <span class="title function_">driver_match_device</span><span class="params">(<span class="keyword">struct</span> device_driver *drv,</span></span><br><span class="line"><span class="params">                      <span class="keyword">struct</span> device *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> drv-&gt;bus-&gt;match ? drv-&gt;bus-&gt;match(dev, drv) : <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注册 platform_device 后，会遍历 platform_bus 中的 platform_driver，根据 platform_bus 的 match() 函数规则来匹配相应的平台驱动。</p>
+<h2 id="platform-driver"><a href="#platform-driver" class="headerlink" title="platform_driver"></a>platform_driver</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">platform_driver</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> (*probe)(<span class="keyword">struct</span> platform_device *);</span><br><span class="line">    <span class="type">int</span> (*remove)(<span class="keyword">struct</span> platform_device *);</span><br><span class="line">    <span class="type">void</span> (*shutdown)(<span class="keyword">struct</span> platform_device *);</span><br><span class="line">    <span class="type">int</span> (*suspend)(<span class="keyword">struct</span> platform_device *, <span class="type">pm_message_t</span> state);</span><br><span class="line">    <span class="type">int</span> (*resume)(<span class="keyword">struct</span> platform_device *);</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_driver</span> <span class="title">driver</span>;</span></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">platform_device_id</span> *<span class="title">id_table</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>probe() 在总线匹配成功后调用</li>
+<li>remove() 在移除驱动或设备时调用</li>
+</ul>
+<h2 id="注册platform-driver"><a href="#注册platform-driver" class="headerlink" title="注册platform_driver"></a>注册platform_driver</h2><p>先实例一个 platform_driver 结构体，然后实现其成员函数，最后通过 platform_driver_register() 函数注册到platform总线。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">platform_driver_register</span><span class="params">(<span class="keyword">struct</span> platform_driver *drv)</span></span><br><span class="line">&#123;</span><br><span class="line">    drv-&gt;driver.bus = &amp;platform_bus_type;</span><br><span class="line">    <span class="keyword">if</span> (drv-&gt;probe)</span><br><span class="line">        drv-&gt;driver.probe = platform_drv_probe;</span><br><span class="line">    <span class="keyword">if</span> (drv-&gt;remove)</span><br><span class="line">        drv-&gt;driver.remove = platform_drv_remove;</span><br><span class="line">    <span class="keyword">if</span> (drv-&gt;shutdown)</span><br><span class="line">        drv-&gt;driver.shutdown = platform_drv_shutdown;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> driver_register(&amp;drv-&gt;driver);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">driver_register</span><span class="params">(<span class="keyword">struct</span> device_driver *drv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_driver</span> *<span class="title">other</span>;</span></span><br><span class="line"></span><br><span class="line">    other = driver_find(drv-&gt;name, drv-&gt;bus);</span><br><span class="line">    <span class="keyword">if</span> (other) &#123;</span><br><span class="line">        put_driver(other);</span><br><span class="line">        printk(KERN_ERR <span class="string">&quot;Error: Driver &#x27;%s&#x27; is already registered, &quot;</span></span><br><span class="line">            <span class="string">&quot;aborting...\n&quot;</span>, drv-&gt;name);</span><br><span class="line">        <span class="keyword">return</span> -EBUSY;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    bus_add_driver(drv);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">bus_add_driver</span><span class="params">(<span class="keyword">struct</span> device_driver *drv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (drv-&gt;bus-&gt;p-&gt;drivers_autoprobe) &#123;</span><br><span class="line">        error = driver_attach(drv);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">driver_attach</span><span class="params">(<span class="keyword">struct</span> device_driver *drv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> bus_for_each_dev(drv-&gt;bus, <span class="literal">NULL</span>, drv, __driver_attach);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __driver_attach(<span class="keyword">struct</span> device *dev, <span class="type">void</span> *data)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">device_driver</span> *<span class="title">drv</span> =</span> data;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!driver_match_device(drv, dev))</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> <span class="title function_">driver_match_device</span><span class="params">(<span class="keyword">struct</span> device_driver *drv,</span></span><br><span class="line"><span class="params">                      <span class="keyword">struct</span> device *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> drv-&gt;bus-&gt;match ? drv-&gt;bus-&gt;match(dev, drv) : <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注册 platform_driver 后，会遍历 platform_bus 中的 platform_device ，根据 platform_bus 的 match() 函数规则来匹配相应的平台设备。</p>
+<h2 id="platform-总线"><a href="#platform-总线" class="headerlink" title="platform 总线"></a>platform 总线</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">bus_type</span> <span class="title">platform_bus_type</span> =</span> &#123;</span><br><span class="line">    .name  = <span class="string">&quot;platform&quot;</span>,</span><br><span class="line">    .dev_attrs = platform_dev_attrs,</span><br><span class="line">    .match  = platform_match,</span><br><span class="line">    .uevent  = platform_uevent,</span><br><span class="line">    .pm  = &amp;platform_dev_pm_ops,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">kernel_ulong_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">platform_device_id</span> &#123;</span></span><br><span class="line">    <span class="type">char</span> name[PLATFORM_NAME_SIZE];</span><br><span class="line">    <span class="type">kernel_ulong_t</span> driver_data;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>match()成员函数确定了 platform_device 和 platform_driver 之间的匹配规则，有4种匹配规则：</p>
+<ul>
+<li>设备树匹配</li>
+<li>ACPI风格的匹配</li>
+<li>匹配ID表，即platform_device设备名是否出现在platform_driver的ID表内</li>
+<li>比较设备名和驱动名</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">platform_match</span><span class="params">(<span class="keyword">struct</span> device *dev, <span class="keyword">struct</span> device_driver *drv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">platform_device</span> *<span class="title">pdev</span> =</span> to_platform_device(dev);</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">platform_driver</span> *<span class="title">pdrv</span> =</span> to_platform_driver(drv);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* When driver_override is set, only bind to the matching driver */</span></span><br><span class="line">    <span class="keyword">if</span> (pdev-&gt;driver_override)</span><br><span class="line">        <span class="keyword">return</span> !<span class="built_in">strcmp</span>(pdev-&gt;driver_override, drv-&gt;name);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Attempt an OF style match first */</span></span><br><span class="line">    <span class="keyword">if</span> (of_driver_match_device(dev, drv))</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Then try ACPI style match */</span></span><br><span class="line">    <span class="keyword">if</span> (acpi_driver_match_device(dev, drv))</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Then try to match against the id table */</span></span><br><span class="line">    <span class="keyword">if</span> (pdrv-&gt;id_table)</span><br><span class="line">        <span class="keyword">return</span> platform_match_id(pdrv-&gt;id_table, pdev) != <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* fall-back to driver name match */</span></span><br><span class="line">    <span class="keyword">return</span> (<span class="built_in">strcmp</span>(pdev-&gt;name, drv-&gt;name) == <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="platform-设备资源"><a href="#platform-设备资源" class="headerlink" title="platform 设备资源"></a>platform 设备资源</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">resource</span> &#123;</span></span><br><span class="line">    <span class="type">resource_size_t</span> start;  <span class="comment">/* 资源的起始物理地址 */</span></span><br><span class="line">    <span class="type">resource_size_t</span> end;    <span class="comment">/* 资源的结束物理地址 */</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *name;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> flags;    <span class="comment">/* 资源的类型 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">resource</span> *<span class="title">parent</span>, *<span class="title">sibling</span>, *<span class="title">child</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> resource *<span class="title function_">platform_get_resource</span><span class="params">(<span class="keyword">struct</span> platform_device *dev, <span class="type">unsigned</span> <span class="type">int</span> type, <span class="type">unsigned</span> <span class="type">int</span> num)</span></span><br></pre></td></tr></table></figure>
+
+<p>资源类型flags取値：</p>
+<ul>
+<li>IORESOURCE_IO</li>
+<li>IORESOURCE_MEM  platform_device 占据的内存</li>
+<li>IORESOURCE_IRQ  platform_device 使用的中断号</li>
+<li>IORESOURCE_DMA</li>
+</ul>
+<p>当 flags 为 IORESOURCE_MEM 时，start、end 分别表示该 platform_device 占据的内存的开始地址和结束地址;<br>当 flags 为 IORESOURCE_IRQ 时，start、end 分别表示该 platform_device 使用的中断号的开始值和结束值，如果只使用了 1 个中断号，开始和结束值相同。</p>
+<p>在驱动中通过 platform_get_resource()函数获取设备资源，例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">resource</span> <span class="title">dm9000_resource</span>[] =</span> &#123;</span><br><span class="line">    [<span class="number">0</span>] = &#123;</span><br><span class="line">        .start = <span class="number">0x18000000</span>,</span><br><span class="line">        .end = <span class="number">0x18000000</span> + <span class="number">3</span>,</span><br><span class="line">        .flags = IORESOURCE_MEM</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    [<span class="number">1</span>] = &#123;</span><br><span class="line">        .start = <span class="number">0x18000000</span> + <span class="number">0x4</span>,</span><br><span class="line">        .end = <span class="number">0x18000000</span> + <span class="number">0x7</span>,</span><br><span class="line">        .flags = IORESOURCE_MEM</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    [<span class="number">2</span>] = &#123;</span><br><span class="line">        .start = IRQ_EINT(<span class="number">7</span>),</span><br><span class="line">        .end = IRQ_EINT(<span class="number">7</span>),</span><br><span class="line">        .flags = IORESOURCE_IRQ,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">db-&gt;addr_res = platform_get_resource(pdev, IORESOURCE_MEM, <span class="number">0</span>);</span><br><span class="line">db-&gt;data_res = platform_get_resource(pdev, IORESOURCE_MEM, <span class="number">1</span>);</span><br><span class="line">db-&gt;irq_res = platform_get_resource(pdev, IORESOURCE_IRQ, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/irq/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1150,307 +1444,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/string/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/c/string/" class="post-title-link" itemprop="url">string functions</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="strcpy"><a href="#strcpy" class="headerlink" title="strcpy"></a>strcpy</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span>* <span class="title function_">strcpy</span><span class="params">(<span class="type">char</span>* des, <span class="type">const</span> <span class="type">char</span>* src)</span></span><br><span class="line">&#123;</span><br><span class="line">    assert((des!=<span class="literal">NULL</span>) &amp;&amp; (src!=<span class="literal">NULL</span>)); </span><br><span class="line">    <span class="type">char</span> *address = des;  </span><br><span class="line">    <span class="keyword">while</span>((*des++ = *src++) != <span class="string">&#x27;\0&#x27;</span>)  </span><br><span class="line">        ;  </span><br><span class="line">    <span class="keyword">return</span> address;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>源指针所指的字符串内容是不能修改的，因此应该声明为 const 类型。</li>
-<li>要判断源指针和目的指针为空的情况，这里使用<code>assert</code>。</li>
-<li>要用一个临时变量保存目的串的首地址，最后返回这个首地址。</li>
-<li>函数返回 char* 的目的是为了支持链式表达式，即strcpy可以作为其他函数的实参。</li>
-</ul>
-<h3 id="strcat"><a href="#strcat" class="headerlink" title="strcat"></a>strcat</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span>* <span class="title function_">strcat</span><span class="params">(<span class="type">char</span>* des, <span class="type">const</span> <span class="type">char</span>* src)</span>   <span class="comment">// const表明为输入参数 </span></span><br><span class="line">&#123;  </span><br><span class="line">    assert((des!=<span class="literal">NULL</span>) &amp;&amp; (src!=<span class="literal">NULL</span>));</span><br><span class="line">    <span class="type">char</span>* address = des;</span><br><span class="line">    <span class="keyword">while</span>(*des != <span class="string">&#x27;\0&#x27;</span>)  <span class="comment">// 移动到字符串末尾</span></span><br><span class="line">        ++des;</span><br><span class="line">    <span class="keyword">while</span>(*des++ = *src++)</span><br><span class="line">        ;</span><br><span class="line">    <span class="keyword">return</span> address;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="strcmp"><a href="#strcmp" class="headerlink" title="strcmp"></a>strcmp</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">strcmp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *s1,<span class="type">const</span> <span class="type">char</span> *s2)</span></span><br><span class="line">&#123;</span><br><span class="line">    assert((s1!=<span class="literal">NULL</span>) &amp;&amp; (s2!=<span class="literal">NULL</span>));</span><br><span class="line">    <span class="keyword">while</span>(*s1 == *s2)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(*s1 == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">         </span><br><span class="line">        ++s1;</span><br><span class="line">        ++s2;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> *s1 - *s2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>若s1==s2，返回零；</li>
-<li>若s1&gt;s2，返回正数；</li>
-<li>若s1&lt;s2，返回负数。</li>
-</ul>
-<p>两个字符串自左向右逐个字符相比（按ASCII值大小相比较），直到出现不同的字符或遇\0为止。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/c/iniparser/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/c/iniparser/" class="post-title-link" itemprop="url">iniparser 开源库</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:28:24" itemprop="dateModified" datetime="2022-06-08T17:28:24+08:00">2022-06-08</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>iniparser是针对INI文件的解析器。</p>
-<h2 id="ini文件"><a href="#ini文件" class="headerlink" title="ini文件"></a>ini文件</h2><p>ini文件的最基本组成单元就是key，每个key都有一个name和对应的value：</p>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">;注释以分号开头</span></span><br><span class="line"><span class="attr">name</span>=value <span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<p>多个Key可以被归类为一组，即section。组名定义要独立一行，并用中括号括起来：</p>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[section]</span></span><br><span class="line"><span class="attr">name</span>=value12</span><br></pre></td></tr></table></figure>
-
-<p>在section声明下的keys都会和该section关联起来。一个section的作用域会在下一个section声明的地方结束，如果没有下一个section的声明，那么该section的结束地方就是该文件末尾，section是不可以嵌套的。定位一个key是用section:key来表示的，所以不同section下的key的名称是可以相同的。</p>
-<p>iniparser库处理名称的时候，会统一换成小写，所以section和key的命名是大小写无关的。</p>
-<h2 id="API"><a href="#API" class="headerlink" title="API"></a>API</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;iniparser.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_getnsec</span><span class="params">(dictionary * d)</span>;  </span><br><span class="line"><span class="comment">//获取dictionary对象的section个数</span></span><br><span class="line"> </span><br><span class="line"><span class="type">char</span> * <span class="title function_">iniparser_getsecname</span><span class="params">(dictionary * d, <span class="type">int</span> n)</span>; </span><br><span class="line"><span class="comment">//获取dictionary对象的第n个section的名字</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">iniparser_dump_ini</span><span class="params">(dictionary * d, FILE * f)</span>;  </span><br><span class="line"><span class="comment">//保存dictionary对象到file</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">iniparser_dumpsection_ini</span><span class="params">(dictionary * d, <span class="type">char</span> * s, FILE * f)</span>; </span><br><span class="line"><span class="comment">//保存dictionary对象一个section到file</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">iniparser_dump</span><span class="params">(dictionary * d, FILE * f)</span>;  </span><br><span class="line"><span class="comment">//保存dictionary对象到file</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_getsecnkeys</span><span class="params">(dictionary * d, <span class="type">char</span> * s)</span>;    </span><br><span class="line"><span class="comment">//获取dictionary对象某个section下的key个数</span></span><br><span class="line"> </span><br><span class="line"><span class="type">char</span> ** <span class="title function_">iniparser_getseckeys</span><span class="params">(dictionary * d, <span class="type">char</span> * s)</span>; </span><br><span class="line"><span class="comment">//获取dictionary对象某个section下所有的key</span></span><br><span class="line"> </span><br><span class="line"><span class="type">char</span> * <span class="title function_">iniparser_getstring</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">char</span> * def)</span>;   </span><br><span class="line"><span class="comment">//返回dictionary对象的section:key对应的字串值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_getint</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">int</span> notfound)</span>;   </span><br><span class="line"><span class="comment">//返回idictionary对象的section:key对应的整形值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">double</span> <span class="title function_">iniparser_getdouble</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">double</span> notfound)</span>;  </span><br><span class="line"><span class="comment">//返回dictionary对象的section:key对应的双浮点值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_getboolean</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">int</span> notfound)</span>;   </span><br><span class="line"><span class="comment">//返回dictionary对象的section:key对应的布尔值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_set</span><span class="params">(dictionary * ini, <span class="type">const</span> <span class="type">char</span> * entry, <span class="type">const</span> <span class="type">char</span> * val)</span>;  </span><br><span class="line"><span class="comment">//设置dictionary对象的某个section:key的值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">iniparser_unset</span><span class="params">(dictionary * ini, <span class="type">const</span> <span class="type">char</span> * entry)</span>; </span><br><span class="line"><span class="comment">//删除dictionary对象中某个section:key</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">iniparser_find_entry</span><span class="params">(dictionary * ini, <span class="type">const</span> <span class="type">char</span> * entry)</span> ;    </span><br><span class="line"><span class="comment">//判断dictionary对象中是否存在某个section:key</span></span><br><span class="line"> </span><br><span class="line">dictionary * <span class="title function_">iniparser_load</span><span class="params">(<span class="type">const</span> <span class="type">char</span> * ininame)</span>;  </span><br><span class="line"><span class="comment">//解析dictionary对象并返回(分配内存)dictionary对象</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">iniparser_freedict</span><span class="params">(dictionary * d)</span>;    </span><br><span class="line"><span class="comment">//释放dictionary对象(内存)</span></span><br><span class="line"> </span><br><span class="line"><span class="type">unsigned</span> <span class="title function_">dictionary_hash</span><span class="params">(<span class="type">const</span> <span class="type">char</span> * key)</span>; </span><br><span class="line"><span class="comment">//计算关键词的hash值</span></span><br><span class="line"> </span><br><span class="line">dictionary * <span class="title function_">dictionary_new</span><span class="params">(<span class="type">int</span> size)</span>;  </span><br><span class="line"><span class="comment">//创建dictionary对象</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">dictionary_del</span><span class="params">(dictionary * vd)</span>;   </span><br><span class="line"><span class="comment">//删除dictionary对象</span></span><br><span class="line"> </span><br><span class="line"><span class="type">char</span> * <span class="title function_">dictionary_get</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">char</span> * def)</span>;    </span><br><span class="line"><span class="comment">//获取dictionary对象的key值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">dictionary_set</span><span class="params">(dictionary * vd, <span class="type">const</span> <span class="type">char</span> * key, <span class="type">const</span> <span class="type">char</span> * val)</span>;    </span><br><span class="line"><span class="comment">//设置dictionary对象的key值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">dictionary_unset</span><span class="params">(dictionary * d, <span class="type">const</span> <span class="type">char</span> * key)</span>;    </span><br><span class="line"><span class="comment">//删除dictionary对象的key值</span></span><br><span class="line"> </span><br><span class="line"><span class="type">void</span> <span class="title function_">dictionary_dump</span><span class="params">(dictionary * d, FILE * out)</span>;   </span><br><span class="line"><span class="comment">//保存dictionary对象</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[tcp]</span></span><br><span class="line"><span class="comment">;for tcp communication</span></span><br><span class="line"> </span><br><span class="line"><span class="attr">port</span> = <span class="number">8000</span><span class="comment">;</span></span><br><span class="line"><span class="attr">ip</span> = <span class="number">127.0</span>.<span class="number">0.1</span><span class="comment">;</span></span><br><span class="line"><span class="attr">family</span> = AF_INET<span class="comment">;</span></span><br><span class="line"> </span><br><span class="line"><span class="section">[serial port]</span></span><br><span class="line"><span class="comment">;for serial port communication</span></span><br><span class="line"> </span><br><span class="line"><span class="attr">speed</span> = <span class="number">9600</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;iniparser.h&quot;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    dictionary *ini;</span><br><span class="line">    <span class="type">int</span> n = <span class="number">0</span>;</span><br><span class="line">    <span class="type">char</span> *str;</span><br><span class="line"></span><br><span class="line">    ini = iniparser_load(<span class="string">&quot;example.ini&quot;</span>);<span class="comment">//parser the file</span></span><br><span class="line">    <span class="keyword">if</span>(ini == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>,<span class="string">&quot;can not open %s&quot;</span>,<span class="string">&quot;example.ini&quot;</span>);</span><br><span class="line">        <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;dictionary obj:\n&quot;</span>);</span><br><span class="line">    iniparser_dump(ini,<span class="built_in">stderr</span>);<span class="comment">//save ini to stderr</span></span><br><span class="line"> </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n%s:\n&quot;</span>,iniparser_getsecname(ini,<span class="number">0</span>));<span class="comment">//get section name</span></span><br><span class="line"></span><br><span class="line">    n = iniparser_getint(ini,<span class="string">&quot;tcp:port&quot;</span>,<span class="number">-1</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;port : %d\n&quot;</span>,n);</span><br><span class="line"></span><br><span class="line">    str = iniparser_getstring(ini,<span class="string">&quot;tcp:ip&quot;</span>,<span class="string">&quot;null&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;ip : %s\n&quot;</span>,str);</span><br><span class="line"></span><br><span class="line">    str = iniparser_getstring(ini,<span class="string">&quot;tcp:family&quot;</span>,<span class="string">&quot;null&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;family : %s\n&quot;</span>,str);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n%s:\n&quot;</span>,iniparser_getsecname(ini,<span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    n = iniparser_getint(ini,<span class="string">&quot;serial port:speed&quot;</span>,<span class="number">-1</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;speed : %d\n&quot;</span>,n);</span><br><span class="line"></span><br><span class="line">    iniparser_freedict(ini);<span class="comment">//free dirctionary obj</span></span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/linux/sysconf/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/linux/sysconf/" class="post-title-link" itemprop="url">linux sys conf function</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 20:18:38" itemprop="dateModified" datetime="2022-06-08T20:18:38+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="passwd文件"><a href="#passwd文件" class="headerlink" title="passwd文件"></a>passwd文件</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">passwd</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="type">char</span> *pw_name;        <span class="comment">/* Username*/</span></span><br><span class="line">  <span class="type">char</span> *pw_passwd;      <span class="comment">/* Hashed passphrase, if shadow database</span></span><br><span class="line"><span class="comment">                                   not in use (see shadow.h).  */</span></span><br><span class="line">  <span class="type">__uid_t</span> pw_uid;       <span class="comment">/* User ID.  */</span></span><br><span class="line">  <span class="type">__gid_t</span> pw_gid;       <span class="comment">/* Group ID.  */</span></span><br><span class="line">  <span class="type">char</span> *pw_gecos;       <span class="comment">/* Real name.  */</span></span><br><span class="line">  <span class="type">char</span> *pw_dir;         <span class="comment">/* Home directory.  */</span></span><br><span class="line">  <span class="type">char</span> *pw_shell;       <span class="comment">/* Shell program.  */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>口令文件在/etc/passwd，格式为：用户名:加密口令：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pwd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> passwd *<span class="title function_">getpwnam</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"><span class="keyword">struct</span> passwd *<span class="title function_">getpwuid</span><span class="params">(<span class="type">uid_t</span> uid)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getpwnam_r</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name, <span class="keyword">struct</span> passwd *pwd, <span class="type">char</span> *buf, </span></span><br><span class="line"><span class="params">    <span class="type">size_t</span> buflen, <span class="keyword">struct</span> passwd **result)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">getpwuid_r</span><span class="params">(<span class="type">uid_t</span> uid, <span class="keyword">struct</span> passwd *pwd, <span class="type">char</span> *buf, </span></span><br><span class="line"><span class="params">    <span class="type">size_t</span> buflen, <span class="keyword">struct</span> passwd **result)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>根据用户名或UID来获取口令信息。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pwd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> passwd *<span class="title function_">getpwent</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setpwent</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">endpwent</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>getpwent可以查看整个口令文件，它返回一个passwd指针，并找到下一个记录，若出错或到达文件尾端则为返回NULL。setpwent定位到文件开始处，endpwent则关闭这些文件。</p>
-<h2 id="组文件"><a href="#组文件" class="headerlink" title="组文件"></a>组文件</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">group</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">char</span> *gr_name;      <span class="comment">/* Group name.  */</span></span><br><span class="line">    <span class="type">char</span> *gr_passwd;        <span class="comment">/* Password.    */</span></span><br><span class="line">    <span class="type">__gid_t</span> gr_gid;     <span class="comment">/* Group ID.    */</span></span><br><span class="line">    <span class="type">char</span> **gr_mem;      <span class="comment">/* Member list. */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;grp.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> group *<span class="title function_">getgrnam</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"><span class="keyword">struct</span> group *<span class="title function_">getgrgid</span><span class="params">(<span class="type">gid_t</span> gid)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getgrnam_r</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name, <span class="keyword">struct</span> group *grp,</span></span><br><span class="line"><span class="params">         <span class="type">char</span> *buf, <span class="type">size_t</span> buflen, <span class="keyword">struct</span> group **result)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">getgrgid_r</span><span class="params">(<span class="type">gid_t</span> gid, <span class="keyword">struct</span> group *grp,</span></span><br><span class="line"><span class="params">         <span class="type">char</span> *buf, <span class="type">size_t</span> buflen, <span class="keyword">struct</span> group **result)</span>;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;grp.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> group *<span class="title function_">getgrent</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setgrent</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">endgrent</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/linux/sysctl/get_sys_data.png" alt="get_sys_data"></p>
-<h2 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h2><p>对环境变量进行操作，影响的是当前进程及其后生成的子进程的环境，不会影响父进程的环境</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">char</span> *<span class="title function_">getenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">putenv</span><span class="params">(<span class="type">char</span> *<span class="built_in">string</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">setenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name, <span class="type">const</span> <span class="type">char</span> *value, <span class="type">int</span> overwrite)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">unsetenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>getenv从环境中取一个环境变量的值，返回一个指向name关联的value字符串指针。</p>
-<p>putenv取形式为name=value的字符串，将其放到环境变量中。如果name已经存在，则先删除其原来的定义。</p>
-<p>setenv将name设置为value。如果name已存在，那么若overwrite非0，则首先删除其现存的定义;若overwrite为0，则不设置也不出错。</p>
-<p>unsetenv删除name的定义，即使不存在也不出错。</p>
-<h2 id="资源限制"><a href="#资源限制" class="headerlink" title="资源限制"></a>资源限制</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/time.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/resource.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">rlimit</span></span></span><br><span class="line"><span class="class">&#123;</span>   </span><br><span class="line">    <span class="type">rlim_t</span> rlim_cur;  <span class="comment">/* The current (soft) limit.  */</span></span><br><span class="line">    <span class="type">rlim_t</span> rlim_max;  <span class="comment">/* The hard limit.  */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getrlimit</span><span class="params">(<span class="type">int</span> resource, <span class="keyword">struct</span> rlimit *rlim)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">setrlimit</span><span class="params">(<span class="type">int</span> resource, <span class="type">const</span> <span class="keyword">struct</span> rlimit *rlim)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>更改资源限制时,须遵循下列三条规则:</p>
-<ul>
-<li>任何一个进程都可将一个软限制更改为小于或等于硬限制。</li>
-<li>任何一个进程都可降低硬限制值，但它必须大于或等于软限制值。这种降低对普通用户而言不可逆反。</li>
-<li>只有超级用户可以提高硬限制。</li>
-</ul>
-<p>一个无限量的限制由常数RLIM_INFINITY指定。resource参数取下列值之一:</p>
-<ul>
-<li>RLIMIT_CORE   core文件的最大字节数，若其值为0则阻止创建core文件。</li>
-<li>RLIMIT_CPU    CPU时间的最大量值(秒)，当超过此软限制时，向该进程发送SIGXCPU信号。</li>
-<li>RLIMIT_DATA   数据段的最大字节长度。这是初始化数据、非初始化数据以及堆的总和。</li>
-<li>RLIMIT_FSIZE  可以创建的文件的最大字节长度。超过时，向该进程发送SIGXFSZ信号。</li>
-<li>RLIMIT_MEMLOCK    锁定在存储器地址空间。</li>
-<li>RLIMIT_NOFILE 每个进程能打开的最多文件数。</li>
-<li>RLIMIT_NPROC  每个实际用户ID所拥有的最大子进程数。</li>
-<li>RLIMIT_OFILE  与SVR4的RLIMIT_NOFILE相同。</li>
-<li>RLIMIT_RSS    最大驻内存集字节长度(RSS)。如果物理存储器不够，内核将从进程处取回超过的部分。</li>
-<li>RLIMIT_STACK  栈的最大字节长度。</li>
-<li>RLIMIT_VMEM   可映照地址空间的最大字节长度。</li>
-</ul>
-<h2 id="sysconf"><a href="#sysconf" class="headerlink" title="sysconf"></a>sysconf</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">long</span> <span class="title function_">sysconf</span><span class="params">(<span class="type">int</span> name)</span>;</span><br><span class="line"><span class="type">long</span> <span class="title function_">fpathconf</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span> name)</span>;</span><br><span class="line"><span class="type">long</span> <span class="title function_">pathconf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">int</span> name)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>以_SC_开始的常数用作为sysconf的参数，而以_PC_开始的常数则作为pathconf或fpathconf的参数。</p>
-<p>对于pathconf的参数pathname,fpathconf的参数filedes有很多限制:</p>
-<ol>
-<li>_PC_MAX_CANON,_PC_MAX_INPUT以及_PC_VDISABLE所涉及的文件必须是终端文件。</li>
-<li>_PC_LINK_MAX所涉及的文件可以是文件或目录。如果是目录，则返回值用于目录本身。</li>
-<li>_PC_NAME_MAX和_PC_NO_TRUNC所涉及的文件必须是目录，返回值用于该目录中的文件名。</li>
-<li>_PC_PATH_MAX涉及的必须是目录。当所指定的目录是工作目录时，返回值是相对路径名的最大长度。</li>
-<li>_PC_PIPE_BUF所涉及的文件必须是管道、FIFO或目录。在管道或FIFO情况下，返回值是对所涉及的管道或FIFO的限制值。对于目录返回值是对在该目录中创建的任一FIFO的限制值。</li>
-<li>_PC_CHOWN_RESTRICTED必须是文件或目录。如果是目录则返回指明此选择项是否适用于该目录中的文件。</li>
-<li>对于_SC_JOB_CONTROL、SC_SAVED_IDS、PC_CHOWN_RESTRICTED、PC_VDISABLE和_PC_NO_TRUNC的返回值若为-1(不改变errno),则表示不支持此功能。</li>
-</ol>
-<p><img src="/images/linux/sysctl/sysconf_name.png" alt="sysconf_name"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1520,7 +1513,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">222</span>
+          <span class="site-state-item-count">225</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
