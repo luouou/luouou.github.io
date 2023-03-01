@@ -176,6 +176,252 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/Singleton/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/design-patterns/Singleton/" class="post-title-link" itemprop="url">单例模式</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h2><p>单例模式（Singleton Pattern）确保在一个系统中只允许一个类的一个实例，定义一个getInstance()获取实例的静态方法来返回其所属类的一个相同实例，此方法必须是获取单例对象的唯一方式。</p>
+<p><img src="/images/code/design-pattern/Singleton.jpg" alt="单例"></p>
+<ul>
+<li>单例的构造析构函数必须对外隐藏，不能为public属性。</li>
+<li>禁用拷贝构造和赋値运算符。</li>
+<li>在多线程下要避免多次创建单例对象。</li>
+</ul>
+<h2 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">static</span> std::mutex mutex_;</span><br><span class="line">    <span class="built_in">Singleton</span>(<span class="type">const</span> Singleton &amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    Singleton &amp;<span class="keyword">operator</span>= (<span class="type">const</span> Singleton &amp;) = <span class="keyword">delete</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="built_in">Singleton</span>() = <span class="keyword">default</span>;</span><br><span class="line">    ~<span class="built_in">Singleton</span>() = <span class="keyword">default</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton <span class="title">GetInstance</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="function">std::lock_guard&lt;std::mutex&gt; <span class="title">lock</span><span class="params">(mutex_)</span></span>;</span><br><span class="line">        <span class="type">static</span> Singleton ins &#123;&#125;;</span><br><span class="line">        <span class="keyword">return</span> ins;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><p>单例类提供了对唯一实例的受控访问，在系统内存中只存在一个对象，所以可以节约系统资源。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/design-patterns/c-object/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/design-patterns/c-object/" class="post-title-link" itemprop="url">c语言实现面向对象</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>面向对象语言有三个最重要的特点，即继承、封装、多态，其中类可以用结构体实现。</p>
+<h2 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h2><p>把基类结构体作为派生类结构体的第一个成员，这样就可以对基类进行访问与强转。 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">parent</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">int</span> data_parent;</span><br><span class="line"> </span><br><span class="line">&#125;Parent;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">Child</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">parent</span> <span class="title">parent</span>;</span></span><br><span class="line">    <span class="type">int</span> data_child;</span><br><span class="line"> </span><br><span class="line">&#125;Child;</span><br></pre></td></tr></table></figure>
+
+<h2 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h2><p>封装的意义在于函数和数据是绑在一起的，其中将该对象结构体指针作为函数的参数，相当于类的this指针，这样就可以遍历类中的所有函数和成员。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">Data</span>;</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">typedef</span>  <span class="title function_">void</span> <span class="params">(*func)</span><span class="params">(<span class="keyword">struct</span> _Data* pData)</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">Data</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">int</span> value;</span><br><span class="line">    func pfunc;</span><br><span class="line">&#125;Data;</span><br></pre></td></tr></table></figure>
+
+<h2 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h2><p>多态就是实现同一接口处理不同的事情，可以用函数指针来实现，通过给函数指针赋于不同的値。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">Play</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">void</span>* pData;</span><br><span class="line">    <span class="type">void</span> (*start_play)(<span class="keyword">struct</span> _Play* pPlay);</span><br><span class="line">&#125;Play;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/code/uml/uml_class/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/code/uml/uml_class/" class="post-title-link" itemprop="url">UML class diagram</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-26 15:57:54" itemprop="dateModified" datetime="2022-06-26T15:57:54+08:00">2022-06-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/UML/" itemprop="url" rel="index"><span itemprop="name">UML</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>uml</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/06/07/code/uml/uml_class/">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/algo/find/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1257,93 +1503,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/module_make/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/kernel/module_make/" class="post-title-link" itemprop="url">make module</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>编译一个模块需要内核源码（已经编译过的）和当前模块的Makefile文件。</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$(info KERNELRELEASE: <span class="variable">$(KERNELRELEASE)</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ifeq</span> (<span class="variable">$(KERNELRELEASE)</span>,)</span><br><span class="line">KERNEL_DIR ?= /lib/modules/<span class="variable">$(<span class="built_in">shell</span> uname -r)</span>/build</span><br><span class="line"></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">	obj-m += hello.o</span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"></span><br><span class="line"><span class="section">all:</span></span><br><span class="line">	<span class="variable">$(MAKE)</span> -C <span class="variable">$(KERNEL_DIR)</span> M=<span class="variable">$(PWD)</span> modules</span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	@find ./ \</span><br><span class="line">		\( -name &#x27;*.[oas]&#x27; -o -name &#x27;.*.cmd&#x27; -o -name &#x27;*.symvers&#x27;\</span><br><span class="line">		-o -name &#x27;.*.d&#x27; -o -name &#x27;.*.tmp&#x27; -o -name &#x27;*.mod.c&#x27; \</span><br><span class="line">		-o -name &#x27;*.symtypes&#x27; -o -name &#x27;modules.order&#x27; \</span><br><span class="line">		-o -name modules.builtin -o -name &#x27;.tmp_*.o.*&#x27; \</span><br><span class="line">		-o -name &#x27;*.gcno&#x27; -o -name tags -o -name &#x27;.tags*&#x27; \</span><br><span class="line">		 \) -type f -print | xargs rm -f</span><br><span class="line"></span><br><span class="line">	@find ./ \</span><br><span class="line">		\( -name .tmp_versions \) -type d -print | xargs rm -rf</span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="keyword">.PHONY</span>: clean all</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<ol>
-<li>先判断<code>KERNELRELEASE</code>环境变量是否为空，该变量的値在进入内核源码目录后，会设置为内核版本号。</li>
-<li>执行<code>-C $(KERNEL_DIR)</code>选项，进入内核源码目录。</li>
-<li>根据选项<code>M=$(PWD)</code>，编译器会回到模块当前目录，再次执行Makefile文件，此时<code>KERNELRELEASE</code>环境变量已经有値了，生成hello.o中间文件。</li>
-<li>运行MODPOST程序，生成hello.mod.c文件。</li>
-<li>最后链接生成hello.ko。</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">KERNELRELEASE: </span><br><span class="line">make -C /lib/modules/4.10.0-38-generic/build M=/home/luo_u/CodeHub/dev/test modules</span><br><span class="line">make[1]: Entering directory &#x27;/usr/src/linux-headers-4.10.0-38-generic&#x27;</span><br><span class="line">KERNELRELEASE: 4.10.0-38-generic</span><br><span class="line">  CC [M]  /home/luo_u/CodeHub/dev/test/hello.o</span><br><span class="line">  Building modules, stage 2.</span><br><span class="line">KERNELRELEASE: 4.10.0-38-generic</span><br><span class="line">  MODPOST 1 modules</span><br><span class="line">  CC      /home/luo_u/CodeHub/dev/test/hello.mod.o</span><br><span class="line">  LD [M]  /home/luo_u/CodeHub/dev/test/hello.ko</span><br><span class="line">make[1]: Leaving directory &#x27;/usr/src/linux-headers-4.10.0-38-generic&#x27;</span><br></pre></td></tr></table></figure>
-
-<p>加载模块，后在/sys/module/hello/目录和/proc/modules文件就可以看到模块信息了。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">lsmod | grep hello</span></span><br><span class="line">hello                  16384  0</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">cat</span> /proc/modules | grep hello</span></span><br><span class="line">hello 16384 0 - Live 0x0000000000000000 (OE)</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">ls</span> /sys/module/hello/</span></span><br><span class="line">coresize  holders  initsize  initstate  notes  refcnt  sections  srcversion  taint  uevent</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/kernel_arch/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1651,224 +1810,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/lcd/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/lcd/" class="post-title-link" itemprop="url">液晶显示器原理</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="LCD"><a href="#LCD" class="headerlink" title="LCD"></a>LCD</h3><p>液晶（Liquid Crystal）是一种介于液态与结晶态之间的一种物质状态的高分子材料。液晶具有双折射性，使得能对偏振光选择性透过。</p>
-<p>LCD是英文Liquid Crystal Display 的简称，指的是液晶显示屏。主要有TFT、UFB、TFD、STN等几种类型。其构造包括塑料球、玻璃球、边框胶、玻璃基板、上偏光片、定向层、液晶、导电ITO图案、导通点、IPO电极和下偏光片。</p>
-<p><img src="/images/lcd/LCD-struct.jpeg" alt="TN"></p>
-<p>两块偏光板相互垂直时光线就完全无法通过，液晶显示器就是在上下两片栅栏之间互垂直的偏光板之间充满液晶，利用电场控制液晶分子产生扭曲，从而对穿越其中的光线进行有规则的折射，来改变光的行进方向，如此一来，不同的电场大小，就会形成不同颜色。</p>
-<p>因为液晶材料本身并不发光，所以在显示屏两边都设有作为光源的灯管，而在液晶显示屏背面有一块背光板和反光膜，背光板是由荧光物质组成的可以发射光线，其作用主要是提供均匀的背景光源。</p>
-<p>液晶显示的原理基于液晶的透光率随其所施电压大小而变化的特性。当光通过下偏振片后，变成线性偏振光，偏振方向与偏振片振动方向一致，与上下玻璃基板上面液晶分子排列顺序一致。当光通过液晶层时，由于受液晶折射，线性偏振光被分解为两束光。又由于这两束光传播速度不同（相位相同），因而当两束光合成后，必然使振光的振动方向发生变化。通过液晶层的光，则被逐渐扭曲。当光达到上偏振片时，其光轴振动方向被扭曲了90度，且与上偏振片的振动方向保持一致。这样，光线通过上偏振片形成亮场。加上电压以后，液晶在电场作用下取向，扭曲消失。这时，通过下偏振片的线性偏振光，在液晶层不再旋转，无法通过上偏振片而形成暗场。可见液晶本身不发光，在外光源的调制下，才能显示，在整个显示过程中，液晶起到一个电压控制的光阀作用。</p>
-<p>LCD依据驱动方式可分为静态驱动、简单矩阵驱动以及主动<br>矩阵驱动 3 种。其中简单矩阵型又可再细分扭转向列型(TN)和超扭转式向列型(STN)两种，而主动矩阵型则以薄膜式晶体管型(TFT)为主流。</p>
-<p>NW(Normally white)是指当液晶面板不施加电压时，面板是亮的画面。另外一种， 液晶面板不施加电压时，面板无法透光, 看起来是黑色的，就称之为NB(Normally black)。</p>
-<p><strong>可视角度</strong>指的是使用者能从不一样的方位清晰地看见荧幕上所有显示内容的角度。液晶显示器的可视角度左右对称，而上下则不一定对称。当背光源的入射光通过偏光板、液晶及取向膜后，输出光便具备了特定的方向特性。假如从一个非常斜的角度观看一个全白的画面，我们可能会看到黑色或是色彩失真。一般来说，上下角度要小于或等于左右角度。现在有些厂商就开发出各种广视角技术，试图改善液晶显示器的视角特性，如：IPS(In Plane Switching)、MVA(Multidomain Vertical Alignment)、TN+FILM。</p>
-<h3 id="TFT"><a href="#TFT" class="headerlink" title="TFT"></a>TFT</h3><h2 id="OLED"><a href="#OLED" class="headerlink" title="OLED"></a>OLED</h2><p>OLED是Organic Light-Emitting Diode 的简称，中文名是有机发光二极管。</p>
-<p>不同于LCD需要通过背光板照射才能显示，OLED是自发光。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/mipi/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/mipi/" class="post-title-link" itemprop="url">mipi接口</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:56:37" itemprop="dateModified" datetime="2022-06-08T17:56:37+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>MIPI (Mobile Industry Processor Interface) 是2003年由ARM, Nokia, ST ,TI等公司成立的一个联盟，目的是把手机内部的接口如摄像头、显示屏接口、射频/基带接口等标准化，从而减少手机设计的复杂程度和增加设计灵活性。</p>
-<p>MIPI联盟下面有不同的WorkGroup，分别定义了一系列的手机内部接口标准，比如摄像头接口CSI、显示接口DSI、射频接口DigRF、麦克风 /喇叭接口SLIMbus等。统一接口标准的好处是手机厂商根据需要可以从市面上灵活选择不同的芯片和模组，更改设计和功能时更加快捷方便。下图是按照 MIPI的规划下一代智能手机的内部架构。</p>
-<p><img src="/images/mipi/MIPI-Protocol-865x1024.png" alt="img"></p>
-<h2 id="MIPI规范"><a href="#MIPI规范" class="headerlink" title="MIPI规范"></a>MIPI规范</h2><p>已经完成和正在计划中的规范如下:<br><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/MIPI#cite_note-Working_Groups:_Overview-1">https://zh.wikipedia.org/wiki/MIPI#cite_note-Working_Groups:_Overview-1</a></p>
-<table>
-<thead>
-<tr>
-<th><strong>工作组</strong></th>
-<th><strong>规范名称</strong></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Camera工作组</td>
-<td>MIPI Camera Serial Interface 2 (MIPI CSI-2) v2.0 (March 2017)MIPI Camera Serial Interface 3 (MIPI CSI-3) v1.1 (March 2014)MIPI Camera Command Set (MIPI CCS) v1.0 (October 2017)</td>
-</tr>
-<tr>
-<td>Device Descriptor Block工作组</td>
-<td>暂无</td>
-</tr>
-<tr>
-<td>DigRF工作组</td>
-<td>DigRF Baseband/RF Digital Interface Specification v4 (Feb. 2014)</td>
-</tr>
-<tr>
-<td>Display工作组</td>
-<td>DBI-2DPI-2DSI-2 v1.0 (January 2016)DCS</td>
-</tr>
-<tr>
-<td>高速同步接口工作组</td>
-<td>HSI 1.0</td>
-</tr>
-<tr>
-<td>接口管理框架工作组</td>
-<td>暂无</td>
-</tr>
-<tr>
-<td>低速多点连接工作组</td>
-<td>SLIMbus v2.0 (August 2015)SoundWire v1.1 (August 2016)</td>
-</tr>
-<tr>
-<td>NAND软件工作组</td>
-<td>暂无</td>
-</tr>
-<tr>
-<td>物理层工作组</td>
-<td>C-PHY v1.2 (March 2017)D-PHY v2.1 (March 2017)M-PHY v4.1 (March 2017)</td>
-</tr>
-<tr>
-<td>软件工作组</td>
-<td>暂无</td>
-</tr>
-<tr>
-<td>系统电源管理工作组</td>
-<td>SPMI v2.0 (August 2012)</td>
-</tr>
-<tr>
-<td>检测与调试工作组</td>
-<td>暂无</td>
-</tr>
-<tr>
-<td>统一协议工作组</td>
-<td>UniPro 1 point-to-point v1.61 (October 2015)PIE</td>
-</tr>
-</tbody></table>
-<h3 id="DSI-CSI"><a href="#DSI-CSI" class="headerlink" title="DSI/CSI"></a>DSI/CSI</h3><p>MIPI是一个比较新的标准，其规范也在不断修改和改进，目前比较成熟的接口应用有DSI(显示接口)和CSI（摄像头接口）。CSI/DSI分别是指其承载的是针对Camera或Display应用，都有复杂的协议结构。以DSI为例，其协议层结构如下：</p>
-<p><img src="/images/mipi/MIPI-DSI.png" alt="img"></p>
-<p>CSI/DSI的物理层（Phy Layer）由专门的WorkGroup负责制定，其目前的标准是D-PHY。D-PHY采用1对源同步的差分时钟和1～4对差分数据线来进行数据传输。数据传输采用DDR方式，即在时钟的上下边沿都有数据传输。</p>
-<p>D-PHY的物理层支持HS(High Speed)和LP(Low Power)两种工作模式。HS模式下采用低压差分信号，功耗较大，但是可以传输很高的数据速率（数据速率为80M～1Gbps）； LP模式下采用单端信号，数据速率很低（&lt;10Mbps），但是相应的功耗也很低。两种模式的结合保证了MIPI总线在需要传输大量数据（如图像） 时可以高速传输，而在不需要大数据量传输时又能够减少功耗。</p>
-<p><img src="/images/mipi/MIPI-DPHY.png" alt="img"></p>
-<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/100476927">https://zhuanlan.zhihu.com/p/100476927</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1945,7 +1886,7 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-count">23</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
