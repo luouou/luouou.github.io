@@ -176,6 +176,715 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/01/kernel/mmu/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/03/01/kernel/mmu/" class="post-title-link" itemprop="url">内存管理单元MMU</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-03-01 18:57:32" itemprop="dateCreated datePublished" datetime="2023-03-01T18:57:32+08:00">2023-03-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>内存管理单元(MMU)的作用是控制和管理多个进程，使之能够安全的共享主内存区域，为各进程实现虚拟地址和物理地址转换、内存访问权限保护等功能，这将使得操作系统能单独为系统的每个用户进程分配独立的内存空间并保证用户空间不能访问内核空间的地址。</p>
+<p>在 32 位系统上，Linux 内核将 4G 空间分为 1G 内核空间(3<del>4G)和 3G(0</del>3G)用户空间，通过内存管理，每个进程都可以使用 3G 的用户空间。</p>
+<p><img src="/images/kernel/kernel/mmu.png" alt="mmu"></p>
+<h2 id="虚拟地址"><a href="#虚拟地址" class="headerlink" title="虚拟地址"></a>虚拟地址</h2><p><strong>逻辑地址</strong>是由程式产生的和段相关的偏移地址部分。机器语言指令中出现的内存地址，都是逻辑地址。编译器编译程序时，会为程序生成代码段和数据段，然后将所有代码放到代码段中，将所有数据放到数据段中。最后程序中的每句代码和每条数据都会有自己的逻辑地址。</p>
+<p><strong>线性地址</strong>是逻辑地址到物理地址变换之间的中间物。段中的偏移地址，加上段基地址就生成了一个线性地址。如果启用了分页机制，那么线性地址能再变换成物理地址。</p>
+<p>CPU加载程序后，会为程序分配代码段内存和数据段内存，代码段内存的基址保存在CS中，数据段内存的基址保存在DS中。</p>
+<p><strong>物理地址</strong>是CPU外部地址总线上的寻址物理内存的地址信号，是地址变换的最终结果地址。如果没有启用分页机制，物理地址等于线性地址。</p>
+<p><strong>虚拟地址与物理地址转化</strong></p>
+<p>要将一个逻辑地址转换为物理地址，需要两步：首先利用段式内存管理单元将逻辑地址转换成线性地址，再利用页式内存管理单元，把线性地址转换为物理地址。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span> <span class="type">phys_addr_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*内核虚拟地址转化为物理地址*/</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">phys_addr_t</span> <span class="title function_">virt_to_phys</span><span class="params">(<span class="type">const</span> <span class="keyword">volatile</span> <span class="type">void</span> *x)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> __virt_to_phys((<span class="type">unsigned</span> <span class="type">long</span>)(x));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*物理地址转化为内核虚拟地址*/</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> *<span class="title function_">phys_to_virt</span><span class="params">(<span class="type">phys_addr_t</span> x)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="type">void</span> *)__phys_to_virt(x);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="段式管理"><a href="#段式管理" class="headerlink" title="段式管理"></a>段式管理</h2><p>因为intel的CPU有20位的地址总线，而寄存器16位，要寻址2^20^=1M的内存空间，只能采用分段管理。线性地址 = 段基址 * 16 + 逻辑地址</p>
+<h2 id="页式管理"><a href="#页式管理" class="headerlink" title="页式管理"></a>页式管理</h2><p>CPU的页式内存管理单元负责把线性地址转换为物理地址。从管理和效率的角度出发，线性地址被分为固定长度单位的组，称为页(page)，例如一个32位的机器，线性地址最大可为4G，用4KB为一个页来划分，整个线性地址就被划分为共有2^20^个页的数组，我们称之为页目录。目录中的每一个目录项，就是对应的页的地址。这个数组有2^20^个成员，每个成员是一个地址（32位机，一个地址4字节），那么要表示这个数组，就要4MB的内存空间。为了节省空间，引入二级管理模式来组织分页单元。</p>
+<p><img src="/images/kernel/kernel/mmu_page.jpg" alt="img"></p>
+<p><strong>每个进程都有其独立的虚似内存，拥有惟一的页目录和页表</strong>，它的地址放在CPU的cr3寄存器中，是进行地址转换的开始点。每一个32位的线性地址被划分为三部分：页目录索引(10位)、页表索引(10位)、偏移(12位) 。依据以下步骤进行转换：</p>
+<ol>
+<li><p>从cr3中取出进程的页目录地址。</p>
+</li>
+<li><p>根据线性地址的页目录索引，找到页表地址。</p>
+</li>
+<li><p>根据线性地址的页表索引，在页表中找到页的起始地址。</p>
+</li>
+<li><p>将页的起始地址与线性地址中的偏移相加。</p>
+</li>
+</ol>
+<p>在二级管理模式中，页目录共有2^10^项，每项有2^10^个页表，每个页中可寻址2^12^个字节，2^10^ * 2^10^ * 2^12^ = 2^32^ = 4GB。能够表示4G的地址。同时页目录项和页表项共占空间 (2^10 * 4 + 2 ^10 *4) = 8KB，节省了空间。</p>
+<p><strong>Linux的页式内存管理</strong></p>
+<p>有些CPU，还有三级，甚至四级架构，Linux为了在更高层次提供抽像，为每个CPU提供统一的界面。提供了一个四层页管理架构，来兼容这些二级、三级、四级管理架构的CPU。这四级分别为： 页全局目录PGD、页上级目录PUD、页中间目录PMD、页表PT。 整个转换依据硬件转换原理，多了二次数组的索引。</p>
+<p><img src="/images/kernel/kernel/mmu_page2.jpg" alt="img"></p>
+<p>逻辑地址、线性地址和物理地址之间的变换过程如下图所示：</p>
+<p><img src="/images/kernel/kernel/mem_t.jpg" alt="虚拟地址、线性地址和物理地址的转换"></p>
+<h3 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h3><p>Linux采用虚拟内存管理技术，使得每个进程都有独立的进程地址空间，Linux将4GB的虚拟内存空间分成两个部分：0 ~ 3GB属于用户空间，3 ~ 4GB 属于内核空间。用户进程只能访问用户空间，只能通过系统调用访问内核空间。</p>
+<p><img src="/images/kernel/kernel/user_space.png" alt="img"></p>
+<p>用户空间(User Space) ：用户空间又包括用户的应用程序(User Applications)、C 库(C Library) 。</p>
+<p>内核空间(Kernel Space) ：内核空间又包括系统调用接口(System Call Interface)、内核(Kernel)、平台架构相关的代码(Architecture-Dependent Kernel Code) 。</p>
+<p>进程 fork(),execve(),malloc()等操作分配的内存仅仅是虚拟内存。只有当进程真正去访问地址时，才会产生缺页异常，内核才会为进程分配物理页，并建立对应的页表。</p>
+<h2 id="内核空间"><a href="#内核空间" class="headerlink" title="内核空间"></a>内核空间</h2><p>ARM处理器分为7种工作模式:</p>
+<ul>
+<li>用户模式(usr)：大多数的应用程序运行在用户模式下,当处理器运行在用户模式下时,某些被保护的系统资源是不能被访问的。</li>
+<li>快速中断模式(fiq)：用于高速数据传输或通道处理。</li>
+<li>外部中断模式(irq)：用于通用的中断处理。</li>
+<li>管理模式(svc)：操作系统使用的保护模式。</li>
+<li>数据访问终止模式(abt)：当数据或指令预取终止时进入该模式,可用于虚拟存储及存储保护。</li>
+<li>系统模式(sys)：运行具有特权的操作系统任务。</li>
+<li>未定义指令中止模式(und)：当未定义的指令执行时进入该模式,可用于支持硬件协处理器的软件仿真。</li>
+</ul>
+<p>Linux为了保护内核的安全，只使用处理器的2个模式，把系统分成了2部分。内核可进行任何操作，特权指令只能在内核态使用，从而起到保护作用。而应用程序则被禁止对硬件的直接访问和对内存的未授权访问。内核空间和用户空间使用不同的地址空间。用户空间只能通过系统调用和硬件中断转移到内核空间。</p>
+<p>Linux 中 1GB 的内核地址空间又被划分为物理内存映射区、虚拟内存分配区、高端页面映射区、专用页面映射区和系统保留映射区这几个区域。</p>
+<p>物理内存映射区是从3G开始最896MB的线性空间，物理内存顺序映射在这个区域中，虚拟地址 = 3G + 物理地址。</p>
+<p>动态内存映射区由vmalloc()分配，其线性空间连续，但物理空间不一定连续，可能处于低端内存，也可能处于高端内存。</p>
+<p>超过直接映射区896MB的那部分内存称为高端内存，内核在存取高端内存时必须将它们映射到高端页面映射区。内核空间最顶部 FIXADDR_TOP~4GB 的区域作为保留区。</p>
+<p>内核空间与用户空间的内存不能直接互访，必需借助函数 <code>copy_from_user()</code>完成用户空间到内核空间的拷贝，以及<code>copy_to_user()</code>完成内核空间到用户空间的拷贝。如果要复制的内存是简单类型，如char、int、long等，则可以使用<code>put_user()</code>和<code>get_user()</code>。宏__user 是一个指向用户空间地址的指针。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># <span class="keyword">define</span> __user  __attribute__((noderef, address_space(1)))</span></span><br><span class="line"></span><br><span class="line"><span class="type">long</span> <span class="title function_">copy_from_user</span><span class="params">(<span class="type">void</span> *to, <span class="type">const</span> <span class="type">void</span> __user *from, <span class="type">unsigned</span> <span class="type">long</span> n)</span>;</span><br><span class="line"><span class="type">long</span> <span class="title function_">copy_to_user</span><span class="params">(<span class="type">void</span> __user *to, <span class="type">const</span> <span class="type">void</span> *from, <span class="type">unsigned</span> <span class="type">long</span> n)</span>;</span><br><span class="line"></span><br><span class="line">put_user(val, <span class="type">void</span> __user *ptr); <span class="comment">/* 内核→用户 */</span></span><br><span class="line">get_user(val, <span class="type">void</span> __user *ptr); <span class="comment">/* 用户→内核 */</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="内存分配"><a href="#内存分配" class="headerlink" title="内存分配"></a>内存分配</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">kmalloc</span><span class="params">(<span class="type">size_t</span> size, <span class="type">gfp_t</span> flags)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">kfree</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *objp)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> *<span class="title function_">kzalloc</span><span class="params">(<span class="type">size_t</span> size, <span class="type">gfp_t</span> flags)</span></span><br><span class="line">&#123;    </span><br><span class="line">    <span class="keyword">return</span> kmalloc(size, flags | __GFP_ZERO);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>kmalloc在物理内存映射区域申请一个连续存储空间，保留内存原有的数据，不清零。分配的内存最小32Byte，最大128KB。flags参数：</p>
+<ul>
+<li>GFP_ATOMIC  原子性分配内存，分配内存的过程不会被高优先级进程或中断打断。若不存在空闲页，则不等待，直接返回。</li>
+<li>GFP_KERNEL  在内核空间的进程中申请内存，若不存在空闲页会引起阻塞，因此不能在中断上下文或持有自旋锁时使用。</li>
+<li>GFP_DMA  给DMA控制器分配内存（DMA要求分配虚拟地址和物理地址连续）。</li>
+</ul>
+<p>kzalloc() 会对申请到的内存内容清零。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">vmalloc</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> size)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">vfree</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *addr)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>vmalloc() 能在高端内存区分配，用来分配虚拟地址空间连续，而物理地址不一定连续的内存。常用于申请大内存空间。因为要建立新的页表，将不连续的物理内存映射成连续的虚拟内存，所以开销比较大。分配内存时则可能产生阻塞，因此不能从中断上下文调用。</p>
+<h2 id="I-O端口"><a href="#I-O端口" class="headerlink" title="I/O端口"></a>I/O端口</h2><p>设备通常会提供一组寄存器来用于控制设备、读写设备和获取设备状态，即控制寄存器、数据寄存器和状态寄存器。这些寄存器可能位于 I/O 空间，也可能位于内存空间。当位于 I/O 空间时，通常被称为 I/O 端口，端口号标识了外设的寄存器地址。位于内存空间时，对应的内存空间被称为 I/O 内存。内存空间是必须的，而 I/O 空间是可选的。</p>
+<p>I/O 端口访问的一种途径是直接使用 I/O 端口操作函数，在设备打开或驱动模块被加载时申请<br>I/O 端口区域，之后使用 inb()、outb()等进行端口访问，最后在设备关闭或驱动被卸载时释放 I/O<br>端口范围。</p>
+<img src=".img/mem/io_port.png" style="zoom:50%;" />
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> resource *<span class="title function_">request_region</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> start, <span class="type">unsigned</span> <span class="type">long</span> n, <span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">release_region</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> start, <span class="type">unsigned</span> <span class="type">long</span> n)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>request_region()函数向内核申请n个端口，这些端口从start开始，name 参数为设备的名称。如果返回NULL，则意味着申请端口失败。可以用来检查申请的资源是否可用，如果申请成功，则将其标志为已经使用，其他驱动再申请该资源时就会失败。</p>
+<p>release_region()函数用来释放申请的IO资源。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*读写字节端口(8 位宽)*/</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">char</span> <span class="title function_">inb</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">outb</span><span class="params">(<span class="type">unsigned</span> <span class="type">char</span> byte, <span class="type">unsigned</span> <span class="type">long</span> port)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*读写字端口(16 位宽)*/</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">short</span> <span class="title function_">inw</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">outw</span><span class="params">(<span class="type">unsigned</span> <span class="type">short</span> word, <span class="type">unsigned</span> <span class="type">long</span> port)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*读写长字端口(32 位宽)*/</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">inl</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">outl</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> longword, <span class="type">unsigned</span> <span class="type">long</span> port)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*读写一串字节*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">insb</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port, <span class="type">void</span> *addr, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">outsb</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port, <span class="type">void</span> *addr, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/*读写一串字*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">insw</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port, <span class="type">void</span> *addr, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">outsw</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port, <span class="type">void</span> *addr, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*读写一串长字*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">insl</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port, <span class="type">void</span> *addr, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">outsl</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port, <span class="type">void</span> *addr, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>/proc/ioports</code>显示使用request_region( )分配的IO端口的情况。</p>
+<h2 id="I-O内存"><a href="#I-O内存" class="headerlink" title="I/O内存"></a>I/O内存</h2><p>I/O 内存的访问步骤：首先是调用 request_mem_region()申请资源，接着将寄存器地址通过 ioremap()映射到内核空间虚拟地址，之后就可以通过 Linux 设备访问编程接口访问这些设备的寄存器了。访问完成后，应对 ioremap()申请的虚拟地址进行释放，并释放 release_mem_<br>region()申请的 I/O 内存资源。</p>
+<p><img src="/images/kernel/mem/io_mem.png" alt="img"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> resource *<span class="title function_">request_mem_region</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> start, <span class="type">unsigned</span> <span class="type">long</span> len, <span class="type">char</span> *name)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">release_mem_region</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> start, <span class="type">unsigned</span> <span class="type">long</span> len)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> __iomem *<span class="title function_">ioport_map</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> port, <span class="type">unsigned</span> <span class="type">int</span> size)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">ioport_unmap</span><span class="params">(<span class="type">void</span> __iomem *addr)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> __iomem *<span class="title function_">ioremap</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> physaddr, <span class="type">unsigned</span> <span class="type">long</span> size)</span>;</span><br><span class="line"><span class="type">void</span> __iomem * <span class="title function_">ioremap_nocache</span> <span class="params">(<span class="type">unsigned</span> <span class="type">long</span> offset, <span class="type">unsigned</span> <span class="type">long</span> size)</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">iounmap</span><span class="params">(<span class="keyword">volatile</span> <span class="type">void</span> __iomem *addr)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>ioremap()函数将设备所处的物理地址映射到虚拟地址。</p>
+<p>ioremap_nocache()返回一个线性地址，此时CPU可以访问设备的内存空间。<em>phys_addr</em>要映射的物理地址 ；<em>size</em>要映射资源的大小。返回的映射地址必须使用<code>iounmap</code>来释放。</p>
+<p>ioport_map()函数可以把 port 开始的 count 个连续的 I/O 端口重映射为一段内存空间，然后就可以在其返回的地址上像访问 I/O 内存一样访问这些 I/O 端口。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*读I/O内存*/</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">ioread8</span><span class="params">(<span class="type">void</span> __iomem *addr)</span>;</span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">ioread16</span><span class="params">(<span class="type">void</span> __iomem *addr)</span>;</span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">ioread32</span><span class="params">(<span class="type">void</span> __iomem *addr)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">unsigned</span> <span class="type">char</span> <span class="title function_">readb</span><span class="params">(<span class="type">const</span> <span class="keyword">volatile</span> <span class="type">void</span> __iomem *addr)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> *(<span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">char</span> __force *)addr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">unsigned</span> <span class="type">short</span> <span class="title function_">readw</span><span class="params">(<span class="type">const</span> <span class="keyword">volatile</span> <span class="type">void</span> __iomem *addr)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> le16_to_cpu(*(<span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">short</span> __force *)addr);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">readl</span><span class="params">(<span class="type">const</span> <span class="keyword">volatile</span> <span class="type">void</span> __iomem *addr)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> le32_to_cpu(*(<span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> __force *)addr);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/*写I/O内存*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">iowrite8</span><span class="params">(u8 val, <span class="type">void</span> __iomem *addr)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">iowrite8</span><span class="params">(u16 val, <span class="type">void</span> __iomem *addr)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">iowrite8</span><span class="params">(u32 val, <span class="type">void</span> __iomem *addr)</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/*读一串 I/O 内存*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">ioread8_rep</span><span class="params">(<span class="type">void</span> __iomem *addr, <span class="type">void</span> *buf, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">ioread16_rep</span><span class="params">(<span class="type">void</span> __iomem *addr, <span class="type">void</span> *buf, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">ioread32_rep</span><span class="params">(<span class="type">void</span> __iomem *addr, <span class="type">void</span> *buf, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*写一串 I/O 内存*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">iowrite8_rep</span><span class="params">(<span class="type">void</span> __iomem *addr, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">iowrite16_rep</span><span class="params">(<span class="type">void</span> __iomem *addr, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">iowrite32_rep</span><span class="params">(<span class="type">void</span> __iomem *addr, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">unsigned</span> <span class="type">long</span> count)</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/*复制 I/O 内存*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">memcpy_fromio</span><span class="params">(<span class="type">void</span> *to, <span class="type">const</span> <span class="keyword">volatile</span> <span class="type">void</span> __iomem *from, <span class="type">long</span> count)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">memcpy_toio</span><span class="params">(<span class="keyword">volatile</span> <span class="type">void</span> __iomem *to, <span class="type">const</span> <span class="type">void</span> *from, <span class="type">long</span> count)</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/*设置 I/O 内存*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">memset_io</span><span class="params">(<span class="keyword">volatile</span> <span class="type">void</span> __iomem *addr, <span class="type">unsigned</span> <span class="type">char</span> val, <span class="type">int</span> count)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>/proc/iomem</code>文件记录物理地址的分配情况，这些地址范围是通过 requset_mem_region 函数申请得到的。</p>
+<h2 id="DMA"><a href="#DMA" class="headerlink" title="DMA"></a>DMA</h2><p>DMA 是一种无需 CPU 的参与就可以让外设与系统内存之间进行双向数据传输的硬件机制。因为DMA的目的地址与Cache 所缓存的内存地址可能重叠，所以要禁止 DMA 目标地址范围内内存的Cache 功能。</p>
+<p>DMA 操作在整个常规内存区域进行，DMA 的硬件使用总线地址而非物理地址。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/01/hardware/memory/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/03/01/hardware/memory/" class="post-title-link" itemprop="url">存储器</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-03-01 18:57:32" itemprop="dateCreated datePublished" datetime="2023-03-01T18:57:32+08:00">2023-03-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="ROM"><a href="#ROM" class="headerlink" title="ROM"></a>ROM</h2><p>ROM(Read Only Memory)程序存储器，在掉电之后仍然可以保持数据，用于存储各种固化程序和数据。</p>
+<p><strong>PROM</strong> (Programmable ROM，可编程ROM)，写入时，烧录器通过高电压在芯片内永久地烧断或者建立内部连接（熔丝或反熔丝），因此只能一次编程。</p>
+<p><strong>EPROM</strong> (Erasable Programmable ROM，可擦去可编程ROM)，使用紫外线照射此类型的ROM可以抹去其中的数据。</p>
+<p><strong>EEPROM</strong> (Electrically Erasable Programmable ROM，电可擦去可编程ROM)，使用电来对其进行擦写，常用于电脑系统的BIOS。</p>
+<h2 id="RAM"><a href="#RAM" class="headerlink" title="RAM"></a>RAM</h2><p>RAM(Random Access Memory)随机访问存储器，存储单元的内容可按照需要随机取出或存入，且存取的速度与存储单元的位置无关。在掉电之后就丢失数据，主要用来存储程序中用到的变量。</p>
+<p><strong>DRAM</strong> (Dynamic RAM/DRAM)动态随机存储器，DRAM保留数据的时间很短，需要周期性地刷新。计算机内存就是DRAM的。</p>
+<p>DRAM利用MOS管的栅电容上的电荷来存储信息，存储单元存储的是0还是1取决于电容是否有电荷，有电荷代表1，无电荷代表0。由于栅极会漏电，所以每隔一定的时间就需要一个刷新机构给这些栅电容补充电荷，这个就叫动态刷新。刷新操作定期对电容进行检查，若电量大于满电量的1/2，则认为其代表1，并把电容充满电；若电量小于1/2，则认为其代表0，并把电容放电，以此来保持数据的连续性。由于它只使用一个MOS管来存信息，所以集成度可以很高，容量能够做的很大。</p>
+<p><strong>SRAM</strong> (Static Random-Access Memory)静态随机存取存储器，只要保持通电，里面储存的数据就可以一直保持，不需要动态刷新，对任何数据访问的时间都是固定的。需要与CPU时钟同步</p>
+<p>SRAM的优点是只要器件不掉电，存储内容就不丢失，工作速度快。缺点是集成度低、功耗大、价格高。CPU Cache就是这种。</p>
+<h2 id="Flash"><a href="#Flash" class="headerlink" title="Flash"></a>Flash</h2><p>Flash 存储器（FLASH EEPROM）又称闪存，快闪。它是EEPROM的一种。它结合了ROM和RAM的长处。不仅具备EEPROM的性能，还不会断电丢失数据同时可以快速读取数据。它于EEPROM的最大区别是，FLASH按扇区操作，而EEPROM按照字节操作。FLASH的电路结构较简单，同样容量占芯片面积较小，成本自然比EEPROM低，因此适合用于做程序存储器。</p>
+<p>flash是非易失存储器，可以对称为块的存储器单元块进行擦写和再编程。任何flash器件的写入操作只能在空或已擦除的单元内进行，所以在进行写入操作之前必须先执行擦除。擦除的过程就是把所有位都写为1的过程，以块为单位，块内的所有字节变为0xFF。</p>
+<h3 id="Nor-Flash"><a href="#Nor-Flash" class="headerlink" title="Nor Flash"></a>Nor Flash</h3><ul>
+<li>支持随机访问，具有XIP（eXecute In Place）特性，可以像普通ROM一样执行程序。</li>
+<li>存储的内容可以直接映射到 CPU 地址空间，不需要拷贝到 RAM 中即可被 CPU 访问。</li>
+<li>读操作快，但擦除和写操作慢。</li>
+<li>容量小，块大小范围：64~128KB。</li>
+<li>带有SRAM接口，有足够的地址引脚来寻址，可以很容易地存取其内部的每一个字节。</li>
+<li>最大擦写次数是十万次。</li>
+</ul>
+<p>Nor Flash根据数据传输的位数可以分为并行（Parallel，即地址线和数据线直接和处理器相连）和串行（SPI，即通过SPI接口和处理器相连）。早期Norflash的接口是parallel的形式，即把数据线和地址线并排与IC的管脚连接。但是后来发现不同容量的Norflash不能硬件上兼容（数据线和地址线的数量不一样），并且封装比较大，占用了较大的PCB板位置，后来逐渐被串行接口的SPI Norflash所取代，至于现在说起NOR flash都直接以SPI flash来代称。</p>
+<p>spi flash 接口定义：</p>
+<ul>
+<li>Standard SPI: CLK, /CS, DI, DO, /WP, /Hold</li>
+<li>Dual SPI: CLK, /CS, IO0, IO1, /WP, /Hold</li>
+<li>Quad SPI: CLK, /CS, IO0, IO1, IO2, IO3</li>
+</ul>
+<h3 id="Nand-Flash"><a href="#Nand-Flash" class="headerlink" title="Nand Flash"></a>Nand Flash</h3><ul>
+<li>使用串行接口传送控制、地址和数据信息。</li>
+<li>读比nor flash慢，擦除和写都快，读和写操作都采用512字节的块。</li>
+<li>容量大，块大小范围：8~64KB。</li>
+<li>每个块的最大擦写次数是一百万次。</li>
+<li>坏块是随机分布的，需要坏块处理。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="center">Nor</th>
+<th align="center">Nand</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">成本</td>
+<td align="center">单位容量较贵</td>
+<td align="center">单位容量较便宜</td>
+</tr>
+<tr>
+<td align="left">体积</td>
+<td align="center">单位容量体积更大</td>
+<td align="center">单位容量体积更小</td>
+</tr>
+<tr>
+<td align="left">寿命擦写次数</td>
+<td align="center">10万次</td>
+<td align="center">100万次</td>
+</tr>
+<tr>
+<td align="left">擦除单元</td>
+<td align="center">Sector</td>
+<td align="center">Block</td>
+</tr>
+<tr>
+<td align="left">写入单元</td>
+<td align="center">Page</td>
+<td align="center">Page</td>
+</tr>
+<tr>
+<td align="left">读取单元</td>
+<td align="center">字节</td>
+<td align="center">Page</td>
+</tr>
+<tr>
+<td align="left">擦写速度</td>
+<td align="center">较慢</td>
+<td align="center">较快</td>
+</tr>
+<tr>
+<td align="left">读取速度</td>
+<td align="center">较快</td>
+<td align="center">较慢</td>
+</tr>
+<tr>
+<td align="left">坏块</td>
+<td align="center">较少（可靠性高）</td>
+<td align="center">较多（可靠性低）</td>
+</tr>
+<tr>
+<td align="left">是否支持XIP</td>
+<td align="center">支持</td>
+<td align="center">不支持</td>
+</tr>
+</tbody></table>
+<p>由于Flash固有的电器特性，在读写数据过程中会偶然产生1位或几位数据错误，即<strong>位反转</strong>。Nand Flash发生位反转的几率要远大于Nor Flash，应采用错误探测/错误更正(EDC/ECC)算法。</p>
+<p>XIP(eXecute In Place)芯片内执行，指应用程序可以直接在flash闪存内运行，不必再把代码读到系统RAM中。flash内执行是指nor flash 不需要初始化，可以直接在flash内执行代码。但往往只执行部分代码，比如初始化RAM。</p>
+<p>NOR与NAND特性的差别，主要是由于其内部地址/数据线是否分开导致的。由于 NOR的地址线和数据线分开，它可以按字节读写数据，符合 CPU 的指令译码执行要求，所以假如 NOR上存储了代码指令， CPU 给NOR一个地址， NOR 就能向CPU 返回一个数据让 CPU 执行，中间不需要额外的处理操作。</p>
+<p>而由于 NAND 的数据和地址线共用，只能按块来读写数据，假如 NAND 上存储了代码指令， CPU 给 NAND 地址后，它无法直接返回该地址的数据，所以不符合指令译码要求。 即不支持立即执行的特性(eXecute In Place)，若代码存储在NAND上，可以先把它加载到RAM存储器上，再由CPU执行。</p>
+<h2 id="硬盘"><a href="#硬盘" class="headerlink" title="硬盘"></a>硬盘</h2><p>硬盘(Hard Disk Drive，HDD)靠磁性盘片记录二进制数据。</p>
+<p><img src="/images/hardware/disk/hdd.jpg" alt="img"></p>
+<p>硬盘片的盘面上有一层涂得很薄的磁性材料。写入数据时，通电的磁头会形成磁场，在磁性材料层上留下一个一个小磁化区，每个被磁化的区域代表二进制的1。读取数据时，磁头扫过磁化区的时候能感受到微小的磁场变化。</p>
+<p>当磁盘旋转时，磁头若保持在一个位置上，则每个磁头都会在磁盘表面划出一个圆形轨迹，这些圆形轨迹就叫做磁道(Track)。划分分区时，分区大小必须以磁道为参考，一个分区必须包含一个或多个整数磁道，不能只占半个磁道。也就是说如果磁盘有两个磁道，最多只能分成2个分区。</p>
+<p>在有多个盘片构成的盘组中，由不同盘片的面，但处于同一半径圆的多个磁道组成的一个圆柱面(Cylinder)。</p>
+<p>磁盘上的每个磁道被等分为若干个弧段，这些弧段便是硬盘的扇区(Sector)。硬盘的第一个扇区，叫做引导扇区。磁盘上数据读写的最小单位。</p>
+<p>操作系统内核中的文件管理系统会将硬盘的扇区组合成<strong>簇</strong>(Data Cluster)，操作系统会记录文件所在簇的编号(文件数据分布在哪几个扇区)，方便查找并读写。</p>
+<p>机械硬盘通过磁头读取旋转的盘片来传输数据，而盘片的转速RPM(Round Per Minute，每分钟的转数)直接决定了硬盘读取和写入数据的速度。磁盘在写入数据时，会使用磁盘缓存暂时存储数据。</p>
+<h3 id="RAID"><a href="#RAID" class="headerlink" title="RAID"></a>RAID</h3><p>RAID(独立硬盘冗余阵列，Redundant Array of Independent Disks)，简称磁盘阵列。利用虚拟化存储技术把多个硬盘组合起来，成为一个或多个硬盘阵列组，目的为提升性能或数据冗余，或是两者同时提升。</p>
+<ul>
+<li><strong>RAID0</strong></li>
+</ul>
+<p>RAID0 是一种非常简单的的方式，它将多块磁盘组合在一起形成一个大容量的存储。当我们要写数据的时候，会将数据分为N份，以独立的方式实现N块磁盘的读写，那么这N份数据会同时并发的写到磁盘中，读写性能理论上是单块磁盘的N倍。</p>
+<p>但RAID0的问题是，它并不提供数据校验或冗余备份，因此一旦某块磁盘损坏了，数据就直接丢失，无法恢复了。因此RAID0就不可能用于高要求的业务中，但可以用在对可靠性要求不高，对读写性能要求高的场景中。</p>
+<ul>
+<li><strong>RAID1</strong></li>
+</ul>
+<p>RAID1 是磁盘阵列中单位成本最高的一种方式。因为它的原理是在往磁盘写数据的时候，将同一份数据无差别的写两份到磁盘，分别写到工作磁盘和镜像磁盘，对数据做了冗余备份，但它的实际空间使用率只有50%了，是一种比较昂贵的方案。</p>
+<ul>
+<li><strong>RAID3</strong></li>
+</ul>
+<p>RAID3的方式是：将数据按照RAID0的形式，分成多份同时写入多块磁盘，但是还会另外留出一块磁盘用于写奇偶校验码，一旦某一块磁盘坏掉了，就可以利用那块校验码磁盘去恢复数据。但是由于任何数据的写入都会要去更新这块磁盘，导致这块磁盘的读写是最频繁的，也就非常的容易损坏。</p>
+<ul>
+<li><strong>RAID5</strong></li>
+</ul>
+<p>RAID5对RAID3进行了改进，是一种存储性能、数据安全、存储成本兼顾的方案。</p>
+<p>在RAID5模式中，不再需要用单独的磁盘写校验码了。它把校验码信息分布到各个磁盘上。例如，总共有N块磁盘，那么会将要写入的数据分成N份，并发的写入到N块磁盘中，同时还将数据的校验码信息也写入到这N块磁盘中，数据与对应的校验码信息必须得分开存储在不同的磁盘上。一旦某一块磁盘损坏了，就可以用剩下的数据和对应的奇偶校验码信息去恢复损坏的数据。</p>
+<p><img src="/images/hardware/disk/RAID5.jpg" alt="img"></p>
+<p>RAID5的方式，最少需要三块磁盘来组建磁盘阵列，允许最多同时坏一块磁盘。如果有两块磁盘同时损坏了，那数据就无法恢复了。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/01/fs/VFS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/03/01/fs/VFS/" class="post-title-link" itemprop="url">虚拟文件系统</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-03-01 18:57:32" itemprop="dateCreated datePublished" datetime="2023-03-01T18:57:32+08:00">2023-03-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Linux 内核支持众多的逻辑文件系统,如 Ext2、Ext3、Ext4、btrfs、NFS、VFAT 等。<br>VFS 则是 Linux 基于各种逻辑文件系统抽象出的一种内存中的文件系统,隐藏了各种硬件设<br>备细节,为用户提供统一的操作接口,使用户访问各种不同文件系统和设备时,不用区分具<br>体的逻辑文件系统。</p>
+<p>虚拟文件系统(VFS)隐藏各种了硬件的具体细节，为所有的设备提供了统一的接口，使用户访问各种不同文件系统和设备时，不用区分具体的逻辑文件系统。</p>
+<p><img src="/images/kernel/kernel/VFS.webp" alt="img"></p>
+<p>在 VFS 上面，是对诸如 open、close、read 和 write 之类的函数的一个通用 API 抽象。在 VFS 下面是文件系统抽象，它定义了上层函数的实现方式。文件系统层之下是缓冲区缓存，这个缓存层通过将数据保留一段时间。缓冲区缓存之下是设备驱动程序，它实现了特定物理设备的接口。</p>
+<p>文件系统使用超级块super block 存放文件系统相关信息，使用索引节点inode存放文件的物理信息，使用目录项dentry存放文件的逻辑信息。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/02/16/cpu/TrustZone/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/02/16/cpu/TrustZone/" class="post-title-link" itemprop="url">TrustZone</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-02-16 22:34:36" itemprop="dateCreated datePublished" datetime="2023-02-16T22:34:36+08:00">2023-02-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>TrustZone是ARM针对消费电子设备设计的一种硬件架构，其目的是为消费电子产品构建一个安全框架来抵御各种可能的攻击。</p>
+<p>TrustZone在概念上将SoC的硬件和软件资源划分为Secure World和Normal World两个世界，所有需要保密的操作在安全世界执行（如指纹识别、密码处理、数据加解密、安全认证等），其余操作在非安全世界执行（如用户操作系统、各种应用程序等），安全世界和非安全世界通过一个名为Monitor Mode的模式进行转换。</p>
+<p>实现TrustZone需要组件有：</p>
+<ul>
+<li>AMBA3 AXI总线，安全机制的基础设施。</li>
+<li>虚拟化的ARM Core，虚拟安全和非安全核。</li>
+<li>TZPC (TrustZone Protection Controller)，根据需要控制外设的安全特性。</li>
+<li>TZASC (TrustZone Address Space Controller)，对内存进行安全和非安全区域划分和保护。</li>
+<li>TZMA (TrustZone Memory Adapter)，片上ROM或RAM安全区域和非安全区域的划分和保护，可选。</li>
+<li>AXI-to-APB bridge，桥接APB总线，配合TZPC使APB总线外设支持TrustZone安全特性，可选。</li>
+</ul>
+<p><img src="/images/cpu/arm/TrusZone.png" alt="img"></p>
+<h2 id="总线设计"><a href="#总线设计" class="headerlink" title="总线设计"></a>总线设计</h2><p>AMBA3 AXI(AMBA3 Advanced eXtensible Interface)系统总线作为TrustZone的基础架构设施，提供了安全世界和非安全世界的隔离机制，确保非安全核只能访问非安全世界的系统资源，而安全核能访问所有资源。</p>
+<p>AMBA-AXI总线的扩展，增加了标志secure读和写地址线：AWPROT[1]和ARPROT[1]。</p>
+<p>TrustZone 在系统总线上针对每一个信道的读写增加了一个额外的控制信号位，这个控制位叫做Non-Secure或者NS位。所有非安全世界的主设备在操作时必须将信号的NS位置高，而NS位置高又使得其无法访问总线上安全世界的从设备，简单来说就是对非安全世界主设备发出的地址信号进行解码时在安全世界中找不到对应的从设备，从而导致操作失败。当然，非安全世界的主设备尝试访问安全世界的从设备会引发访问错误。</p>
+<p>在TrustZone出现前，ARM的外设基于AMBA2 APB (Advanced Peripheral Bus)总线协议，由于APB总线的设备不支持AXI总线的NS控制信号，所以AXI到APB总线需要AXI-to-APB bridge设备连接。AXI-to-APB bridge负责管理APB总线设备的安全事宜，其会拒绝不合理的安全请求，保证这些请求不会被转发到相应的外设。</p>
+<h2 id="处理器设计"><a href="#处理器设计" class="headerlink" title="处理器设计"></a>处理器设计</h2><p>TrustZone将每个物理核虚拟为两个核，非安全核，运行非安全世界的代码；和安全核，运行安全世界的代码。两个虚拟的核以基于时间片的方式运行，根据需要实时占用物理核，并通过Monitor Mode实现了同一CPU上两个操作系统间的切换。</p>
+<p>安全世界和非安全世界都有自己的虚拟MMU，各自管理物理地址的映射。实际上只是两个世界都有一份TTBR0、TTBR1、TTBCR寄存器，因此就会对应两个MMU表。尽管MMU有两套，但TBL缓存硬件上只有一套，因此TBL对于两个世界来说是共享的，其通过NS位来标志其每一项具体属于哪一个世界。这样在两个世界间进行切换时不再需要重新刷新TLB，提高执行效率。</p>
+<p>Cache也是两个世界共享，具体Cache数据属于哪一个世界也由其NS位指定，在世界间切换也不需要刷新Cache。</p>
+<p>在gicv2、gicv3的版本中，都增加了对安全扩展的支持:</p>
+<p>在gicv2/gicv3中，支持了安全中断，配置有如下：<br>gicv2分组</p>
+<ul>
+<li>group0：安全中断，由nFIQ驱动</li>
+<li>group1：非安全中断，由nIRQ驱动</li>
+</ul>
+<p>gicv3分组</p>
+<ul>
+<li>group0：安全中断</li>
+<li>non-secure group1：非安全中断</li>
+<li>secure group1：安全中断</li>
+</ul>
+<h2 id="隔离机制"><a href="#隔离机制" class="headerlink" title="隔离机制"></a>隔离机制</h2><p>内存隔离和保护通过总线组件TZASC和TZMA的设置来实现。</p>
+<ul>
+<li><p>TZASC (TrustZone Address Space Controller)可以把外部DDR分成多个区域，每个区域可以单独配置为安全或非安全区域，非安全世界的代码和应用只能访问非安全区域。TZASC只能用于内存设备，不适合用于配置块设备，如Nand Flash。</p>
+</li>
+<li><p>TZMA (TrustZone Memory Adapter)可以把片上ROM和SRAM隔离出安全和非安全区域。TZMA最大可以将片上存储的低2MB配置为安全区域，其余部分配置为非安全区域。大小划分上，片上安全区域可以在芯片出厂前设置为固定大小，或运行时通过TZPC动态配置。TZMA使用上有些限制，其不适用于外部内存划分，而且也只能配置一个安全区域。</p>
+</li>
+</ul>
+<p>在外设上需要TZPC (TrustZone Protection Controller) 来向APB总线上的设备提供类似AXI上的NS控制信号。由于TZPC可以在运行时动态设置，这就决定了外设的安全特性是动态变化的，例如键盘平时可以作为非安全的输入设备，在输入密码时可以配置为安全设备，只允许安全世界访问。</p>
+<h2 id="安全启动"><a href="#安全启动" class="headerlink" title="安全启动"></a>安全启动</h2><p>系统上电复位后，先从安全世界开始执行。安全世界会对非安全世界的bootloader进行验证，确保非安全世界执行的代码经过授权而没有被篡改过。然后非安全世界的bootloader会加载非安全世界的OS，完成整个系统的启动。下一级的安全依赖于上一级的验证，逐级的验证构成了整个系统的信任链。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/02/16/cpu/armv7_reg/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/02/16/cpu/armv7_reg/" class="post-title-link" itemprop="url">ARMv7 寄存器</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-02-16 22:34:36" itemprop="dateCreated datePublished" datetime="2023-02-16T22:34:36+08:00">2023-02-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index"><span itemprop="name">cpu</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="/images/cpu/arm/armv7_reg.jpg" alt="img"></p>
+<h2 id="通用寄存器"><a href="#通用寄存器" class="headerlink" title="通用寄存器"></a>通用寄存器</h2><p>通用寄存器包括R0-R15，均为32位寄存器，可以分为3类：</p>
+<p><img src="/images/cpu/arm/armv7_reg.png" alt="img"></p>
+<p><strong>未分组寄存器(R0-R7)</strong></p>
+<p>在所有运行模式下，未分组寄存器都指向同一个物理寄存器。在中断或异常处理进行异常模式转换时，由于不同的处理器运行模式均使用相同的物理寄存器，所以可能造成寄存器中数据的破坏。</p>
+<p><strong>分组寄存器(R8-R14)</strong></p>
+<p>对于分组寄存器，他们每次所访问的物理寄存器都与当前的处理器运行模式相关。</p>
+<p>R13堆栈指针寄存器SP，保存堆栈的栈顶地址，用户也可以使用其他寄存器存放堆栈指针，但在Thumb指令集下，某些指令强制要求使用R13存放堆栈指针。</p>
+<p>R14链接寄存器LR（Link Register），保存调用子程序的返回地址。当执行子程序时，R14可得到R15（PC）的备份，执行完子程序后，又将R14的值复制回PC。</p>
+<p><strong>程序计数器PC（R15）</strong></p>
+<p>程序计数器（PC），在ARM状态下，位[1:0]为0，位[31:2]用于保存PC；在Thumb状态下,位[0]为0，位[31:1]用于保存PC。</p>
+<p>由于ARM体系结构采用了多级流水线技术，对于ARM指令集而言，PC总是指向当前指令的下两条指令的地址，即PC的值为当前指令的地址值加8个字节。</p>
+<h2 id="状态寄存器"><a href="#状态寄存器" class="headerlink" title="状态寄存器"></a>状态寄存器</h2><ul>
+<li>CPSR（Current Program Status Register）当前程序状态寄存器1个。</li>
+<li>SPSR（Saved Progarm Status Register）备份程序状态寄存器6个，用于异常发生时保存CPSR的值，异常退出时恢复CPSR。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/02/16/kernel/kernel_make/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/02/16/kernel/kernel_make/" class="post-title-link" itemprop="url">kernel make and menuconfig</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-02-16 22:34:36" itemprop="dateCreated datePublished" datetime="2023-02-16T22:34:36+08:00">2023-02-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>指定交叉工具和平台。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm defconfig</span><br><span class="line">make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm menuconfig</span><br></pre></td></tr></table></figure>
+
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><ul>
+<li>屏蔽编译信息</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make &gt; /dev/null</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>使用<code>make -j&lt;n&gt;</code>参数加速编译</p>
+</li>
+<li><p>指定编译某些模块</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make M=drivers/i2c/ modules</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用 verbose 模式，将每一步执行的命令都打印出来，并重定向到一个文件中去，这样以后可以方便地查找模块之间的依赖关系。</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make V=1 &gt; ~/bak.txt</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用 ccache 提高编译速度，使用 ccache时，需要更改源码树根目录下面的 Makefile 文件，在 CC 和 HOSTCC 变量的定义前添加 ccache。<a target="_blank" rel="noopener" href="http://ccache.samba.org/">ccache主页</a>。</li>
+</ul>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CC = ccache <span class="variable">$(CROSS_COMPILE)</span>gcc</span><br><span class="line">HOSTCC = ccache gcc</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/kernel/kernel/vmlinux.bmp" alt="img"></p>
+<h2 id="编译文档"><a href="#编译文档" class="headerlink" title="编译文档"></a>编译文档</h2><p>使用下面的一些命令可以在 Documentation/DocBook/目录下，生成一些文档。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">make htmldocs //生成 HTML 文件</span><br><span class="line">make pdfdocs  //生成 PDF 文件</span><br><span class="line">make psdocs   //生成 Postscript 文件</span><br><span class="line">make mandocs  //生成 Kernel API 手册</span><br><span class="line">make installmandocs //将 Kernel API 手册页安装到 man 程序能够找到的目录中</span><br></pre></td></tr></table></figure>
+
+<h2 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h2><p>1.缺少libncurses5-dev</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make menuconfig requires the ncurses libraries.</span><br></pre></td></tr></table></figure>
+
+<p>2.没有安装u-boot-tools</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkimage command not found – U-Boot images will not be built</span><br></pre></td></tr></table></figure>
+
+<p>3.源文件编译生成的.o文件和模块目标文件xxx.o重名。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">module license &#x27;unspecified&#x27; taints kernel.</span><br><span class="line">Disabling lock debugging due to kernel taint</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/02/16/tool/gcc-name/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -631,648 +1340,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/12/11/algo/backtrack/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/12/11/algo/backtrack/" class="post-title-link" itemprop="url">回溯算法</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-12-11 18:28:30 / 修改时间：19:03:45" itemprop="dateCreated datePublished" datetime="2022-12-11T18:28:30+08:00">2022-12-11</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>回溯算法是从一条路往前走，能进则进，走不通就退回，换一条路再试，实际 上就是一个决策树的遍历过程。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">backtrack</span><span class="params">(参数)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (终止条件) &#123;</span><br><span class="line">        存放结果;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> 选择 in 选择列表 &#123;</span><br><span class="line">        做选择</span><br><span class="line">        backtrack(路径, 选择列表); <span class="comment">// 路径就是已经做出的选择</span></span><br><span class="line">        回溯撤销选择</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="组合问题"><a href="#组合问题" class="headerlink" title="组合问题"></a>组合问题</h2><p>给定2个整数n和k，返回范围[1,n]中所有可能的k的个数从小到大顺序的组合<br>输入：n = 4, k = 2<br>输出：[[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]]</p>
-<p><img src="/images/code/algo/backtrack.png" alt="img"></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line">vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; res;</span><br><span class="line"><span class="type">int</span> target;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">backtrack</span><span class="params">(<span class="type">const</span> vector&lt;<span class="type">int</span>&gt; &amp;nums, vector&lt;<span class="type">int</span>&gt; &amp;tmp, <span class="type">int</span> start)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it : tmp) &#123;</span><br><span class="line">        cout &lt;&lt; it &lt;&lt; <span class="string">&quot; -&gt; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (tmp.<span class="built_in">size</span>() == target) &#123;</span><br><span class="line">        res.<span class="built_in">push_back</span>(tmp);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = start; i &lt; nums.<span class="built_in">size</span>(); ++i) &#123;</span><br><span class="line">        tmp.<span class="built_in">push_back</span>(nums[i]);</span><br><span class="line">        <span class="built_in">backtrack</span>(nums, tmp, i+<span class="number">1</span>);</span><br><span class="line">        tmp.<span class="built_in">pop_back</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; nums = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>&#125;;</span><br><span class="line">    target = <span class="number">2</span>;</span><br><span class="line">    <span class="comment">// target = 3;</span></span><br><span class="line"></span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; tmp;</span><br><span class="line">    <span class="built_in">backtrack</span>(nums, tmp, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> vec : res) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span> it : vec) &#123;</span><br><span class="line">            cout &lt;&lt; it &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        cout &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/12/05/algo/Greedy/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/12/05/algo/Greedy/" class="post-title-link" itemprop="url">贪心算法</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-05 22:14:25" itemprop="dateCreated datePublished" datetime="2022-12-05T22:14:25+08:00">2022-12-05</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-11 18:25:29" itemprop="dateModified" datetime="2022-12-11T18:25:29+08:00">2022-12-11</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>贪心算法是指在对问题求解时，总是做出局部最优的选择，通过每一步贪心选择，最终可得到问题的一个整体最优解。</p>
-<p>贪心算法和动态规划对比：</p>
-<ul>
-<li>贪心算法的每一次操作都对结果产生直接影响，而动态规划则不是。</li>
-<li>贪心算法对每个子问题的解决方案都做出选择，不能回退；动态规划则会根据以前的选择结果对当前进行选择，有回退功能。</li>
-<li>动态规划主要运用于二维或三维问题，而贪心一般是一维问题。</li>
-</ul>
-<h2 id="区间调度问题"><a href="#区间调度问题" class="headerlink" title="区间调度问题"></a>区间调度问题</h2><p>给定多个形如[start, end]的闭区间，请计算出最多有多少个互不相交的区间。</p>
-<ol>
-<li>从排序后的区间中选出end最小的区间x</li>
-<li>把所有与x区间相交的区间删除</li>
-<li>重复步骤1和2，直到最后一个区间。</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;algorithm&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">interval</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> start;</span><br><span class="line">        <span class="type">int</span> end;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// vector&lt;struct interval&gt; vec = &#123;&#123;1, 3&#125;, &#123;4, 6&#125;, &#123;2, 4&#125;&#125;;</span></span><br><span class="line">    vector&lt;<span class="keyword">struct</span> interval&gt; vec = &#123;&#123;<span class="number">1</span>, <span class="number">3</span>&#125;, &#123;<span class="number">4</span>, <span class="number">5</span>&#125;, &#123;<span class="number">7</span>, <span class="number">8</span>&#125;&#125;;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it : vec) &#123;</span><br><span class="line">        cout &lt;&lt; it.start &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; it.end &lt;&lt; it.end;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">sort</span>(vec.<span class="built_in">begin</span>(), vec.<span class="built_in">end</span>(), [] (<span class="keyword">struct</span> interval a, <span class="keyword">struct</span> interval b) &#123; <span class="keyword">return</span> a.end &lt; b.end; &#125;);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it : vec) &#123;</span><br><span class="line">        cout &lt;&lt; it.start &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; it.end;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> cnt = <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> end = vec[<span class="number">0</span>].end;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; vec.<span class="built_in">size</span>(); ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; vec[i].start &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; vec[i].end &lt;&lt; <span class="string">&quot; ==&gt; &quot;</span> &lt;&lt; end &lt;&lt; endl;</span><br><span class="line">        <span class="keyword">if</span> (vec[i].start &gt; end) &#123;</span><br><span class="line">            cnt++;</span><br><span class="line">            end = vec[i].end;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; cnt &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="跳跃游戏II"><a href="#跳跃游戏II" class="headerlink" title="跳跃游戏II"></a>跳跃游戏II</h2><p>给定一个非负整数数组，你最初位于数组的第一个位置。数组中的每个元素代表你在该位置可以跳跃的最大长度。你的目标是使用最少的跳跃次数到达数组的最后一个位置。</p>
-<p>输入: [2,3,1,1,4]<br>输出: 2<br>解释: 跳到最后一个位置的最小跳跃数是 2。从下标为 0 跳到下标为 1 的位置，跳 1 步，然后跳 3 步到达数组的最后一个位置。</p>
-<ol>
-<li><p>从后往前选择，先找到一个可以一步跳到结尾的位置n，如果有多个，就选择距离结尾最远的那个n-1。然后找到可以跳到n-1处的最远的地方n-2。依次类推，最终找到开头位置。</p>
-</li>
-<li><p>从前往后选择，在当前位置可以跳的步数范围内，选择下一跳可以跳到的最远的那个步数，来决定当前跳多少步。</p>
-</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> step = <span class="number">0</span>;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; nums = &#123;<span class="number">2</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">4</span>&#125;;</span><br><span class="line">    <span class="comment">// vector&lt;int&gt; nums = &#123;2, 3, 1, 1, 4&#125;;</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> cur = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (cur &lt; nums.<span class="built_in">size</span>() - <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="type">int</span> max = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> distance = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= nums[cur]; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (nums[cur+i] &gt;= max) &#123;</span><br><span class="line">                max = nums[cur+i];</span><br><span class="line">                distance = i;</span><br><span class="line">            &#125;</span><br><span class="line">            cout &lt;&lt; cur &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; i &lt;&lt; <span class="string">&quot; --&gt; &quot;</span> &lt;&lt; nums[cur+i] &lt;&lt; endl;</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        cur += distance;</span><br><span class="line">        step++;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;index = &quot;</span> &lt;&lt; cur &lt;&lt; <span class="string">&quot;, step = &quot;</span> &lt;&lt; step &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; step &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/12/04/algo/SlideWindow/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/12/04/algo/SlideWindow/" class="post-title-link" itemprop="url">滑动窗口</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-12-04 22:30:17" itemprop="dateCreated datePublished" datetime="2022-12-04T22:30:17+08:00">2022-12-04</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-07 22:57:06" itemprop="dateModified" datetime="2022-12-07T22:57:06+08:00">2022-12-07</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>滑动窗口就是维护一个窗口(队列/数组)，通过双指针同向移动不断滑动，然后更新答案，主要用来处理连续问题。</p>
-<p><strong>固定窗口大小</strong></p>
-<ol>
-<li>left 初始化为 0，初始化 right，使得 right - left + 1 等于窗口大小。</li>
-<li>同时移动 left 和 right，判断窗口内的连续元素是否满足限定条件。</li>
-<li>如果满足，再判断是否需要更新最优解，如果不满足，则继续。</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 固定窗口大小为 k</span></span><br><span class="line"><span class="comment">// 在 s 中寻找窗口大小为 k 时的所包含最大元音字母个数</span></span><br><span class="line">string s;</span><br><span class="line">window window;</span><br><span class="line"><span class="type">int</span> right = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">while</span>(right &lt; s.<span class="built_in">size</span>()) &#123;</span><br><span class="line">    window.<span class="built_in">add</span>(s[right]);</span><br><span class="line">    right++;</span><br><span class="line">    <span class="comment">// 如果符合要求，说明窗口构造完成，</span></span><br><span class="line">    <span class="keyword">if</span> (right&gt;=k) &#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment">// 把 right -k 位置元素从窗口里面移除</span></span><br><span class="line">        window.<span class="built_in">remove</span>(s[right -k]);</span><br><span class="line">        left++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> result;</span><br></pre></td></tr></table></figure>
-
-<p><strong>可变窗口大小</strong></p>
-<ol>
-<li>left 和 right 都初始化为 0。</li>
-<li>right 指针剃每向右移动一步，就判断窗口内的连续元素是否满足限定条件。</li>
-<li>如果满足，再判断是否需要更新最优解，通过移动 left 指针收缩窗口。 如果不满足，则继续。</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//构建窗口window容器保存窗口内元素，可以采用数组、hashset、hashmap等</span></span><br><span class="line">window window;</span><br><span class="line"><span class="comment">//保存最优结果、最大或最小等</span></span><br><span class="line"><span class="type">int</span> result = defaltValue;</span><br><span class="line"><span class="comment">//构造窗口的左右边界指针</span></span><br><span class="line"><span class="type">int</span> left = <span class="number">0</span>, right = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">while</span>(right &lt; s.<span class="built_in">size</span>()) &#123;</span><br><span class="line">    <span class="comment">// 增大窗口</span></span><br><span class="line">    window.<span class="built_in">add</span>(s[right]);</span><br><span class="line">    <span class="comment">// 如果符合要求，说明窗口构造完成，移动 left 缩小窗口</span></span><br><span class="line">    <span class="keyword">while</span> (window 符合要求) &#123;</span><br><span class="line">        <span class="comment">// 如果这个窗口的条件更优，则更新result</span></span><br><span class="line">        result = <span class="built_in">maxOrMin</span>(result, window);</span><br><span class="line">        <span class="comment">//移出左指针元素</span></span><br><span class="line">        window.<span class="built_in">remove</span>(s[left]);</span><br><span class="line">        left++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    right++;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> result;</span><br></pre></td></tr></table></figure>
-
-<h2 id="长度最小的子数组"><a href="#长度最小的子数组" class="headerlink" title="长度最小的子数组"></a>长度最小的子数组</h2><p>给定一个含有 n 个正整数的数组和一个正整数 s ，找出该数组中满足其和≥ s的长度最小的连续子数组。如果不存在符合条件的连续子数组，返回 0。</p>
-<p>输入: s = 7, nums = [2,3,1,2,4,3]<br>输出: 2<br>解释: 子数组 [4,3] 是该条件下的长度最小的连续子数组。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt; nums = &#123;<span class="number">2</span>,<span class="number">3</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">4</span>,<span class="number">3</span>&#125;;</span><br><span class="line"><span class="type">int</span> target;</span><br><span class="line">cin &gt;&gt; target;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> res = INT16_MAX;</span><br><span class="line"><span class="type">int</span> sum = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> left = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> right = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (right &lt; nums.<span class="built_in">size</span>()) &#123;</span><br><span class="line">    sum += nums[right];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (sum &gt;= target) &#123;</span><br><span class="line">        res = <span class="built_in">MIN</span>(res, right - left + <span class="number">1</span>);</span><br><span class="line">        sum -= nums[left];</span><br><span class="line">        left++;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;---- &quot;</span> &lt;&lt; left &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; right &lt;&lt; <span class="string">&quot; res = &quot;</span> &lt;&lt; res &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; left &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; right &lt;&lt; <span class="string">&quot;   sum = &quot;</span> &lt;&lt; sum &lt;&lt; endl;</span><br><span class="line">    right++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">cout &lt;&lt; (res == INT16_MAX ? <span class="number">0</span> : res) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
-
-<h2 id="最小覆盖子串"><a href="#最小覆盖子串" class="headerlink" title="最小覆盖子串"></a>最小覆盖子串</h2><p>给定一个字符串 s 、一个字符串 t ，返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 “” 。</p>
-<p>输入：s = “ADOBECODEBANC”, t = “ABC”<br>输出：”BANC”</p>
-<p><img src="/images/code/algo/slide-window.gif" alt="img"></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">Check</span><span class="params">(unordered_map&lt;<span class="type">char</span>, <span class="type">int</span>&gt; &amp;window, <span class="type">const</span> unordered_map&lt;<span class="type">char</span>, <span class="type">int</span>&gt; &amp;target)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it : target) &#123;</span><br><span class="line">        <span class="comment">// cout &lt;&lt; &quot;        &quot; &lt;&lt; it.first &lt;&lt; &quot; : &quot; &lt;&lt; window[it.first] &lt;&lt; &quot;, &quot; &lt;&lt; it.second &lt;&lt; endl;</span></span><br><span class="line">        <span class="keyword">if</span> (window[it.first] &lt; it.second) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    string s = <span class="string">&quot;ADOBECODEBANC&quot;</span>;</span><br><span class="line">    string t = <span class="string">&quot;ABC&quot;</span>;</span><br><span class="line">    unordered_map&lt;<span class="type">char</span>, <span class="type">int</span>&gt; window;</span><br><span class="line">    unordered_map&lt;<span class="type">char</span>, <span class="type">int</span>&gt; target;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">char</span> c : t) &#123;</span><br><span class="line">        target[c]++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> right = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> left = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> start;</span><br><span class="line">    <span class="type">int</span> len = UINT16_MAX;</span><br><span class="line">    <span class="keyword">while</span> (right &lt; s.<span class="built_in">length</span>()) &#123;</span><br><span class="line">        window[s[right]]++;</span><br><span class="line">        <span class="comment">// cout &lt;&lt; &quot;    &quot; &lt;&lt; left &lt;&lt; &quot;, &quot; &lt;&lt; right &lt;&lt; &quot; &quot; &lt;&lt; s[right] &lt;&lt; endl;</span></span><br><span class="line">        <span class="keyword">while</span> (<span class="built_in">Check</span>(window, target)) &#123;</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;    &quot;</span> &lt;&lt; left &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; right &lt;&lt; endl;</span><br><span class="line">            <span class="keyword">if</span> (right - left + <span class="number">1</span> &lt; len) &#123;</span><br><span class="line">                start = left;</span><br><span class="line">                len = right - left + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            window[s[left]]--;</span><br><span class="line">            left++;</span><br><span class="line">        &#125;</span><br><span class="line">        right++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; s &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; t &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; s.<span class="built_in">substr</span>(start, len) &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/11/19/net/mac/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/11/19/net/mac/" class="post-title-link" itemprop="url">MAC</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-11-19 15:08:35 / 修改时间：15:15:55" itemprop="dateCreated datePublished" datetime="2022-11-19T15:08:35+08:00">2022-11-19</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/net/" itemprop="url" rel="index"><span itemprop="name">net</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="MAC"><a href="#MAC" class="headerlink" title="MAC"></a>MAC</h2><p>MAC(Medium Access Control)媒体访问控制，控制在往媒体上发送数据的先后，防止发生混乱。</p>
-<p>MAC 地址共有 48 bit，用来唯一标识设备，在网卡生产时写入 ROM 里的，网卡驱动程序读取并分配给 MAC模块。通过 ARP 可以查询目标路由器的 MAC 地址。</p>
-<table>
-<thead>
-<tr>
-<th align="center">bit</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">1</td>
-<td>0 单播地址<br/>1 多播地址</td>
-</tr>
-<tr>
-<td align="center">2</td>
-<td>0 全局地址<br/>1 本地地址</td>
-</tr>
-<tr>
-<td align="center">3-24</td>
-<td>厂商识别码</td>
-</tr>
-<tr>
-<td align="center">25-48</td>
-<td>网卡唯一标识</td>
-</tr>
-</tbody></table>
-<p>MAC 头部是以太网使用的头部，它包含了接收方和发送方的 MAC 地址等信息，其作用就是将包送达路由器。</p>
-<p><img src="/images/net/tcpip/mac_head.png" alt="img"></p>
-<h2 id="网卡"><a href="#网卡" class="headerlink" title="网卡"></a>网卡</h2><p>网卡驱动从 IP 模块获取包之后，会将其复制到网卡内的缓冲区中，然后向MAC 模块发送发送包的命令。MAC 模块会将包从缓冲区中取出，并在开头加上报头和起始帧分界符，在末尾加上用于检测错误的帧校验序列。再将数字信息按每个比特转换成电信号，然后由 PHY信号收发模块发送出去。</p>
-<p><img src="/images/net/tcpip/pack.png" alt="img"></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">修改MAC地址</span></span><br><span class="line">ifconfig eth0 hw ether 12:34:56:78:90:12</span><br></pre></td></tr></table></figure>
-
-<h2 id="交换机"><a href="#交换机" class="headerlink" title="交换机"></a>交换机</h2><p>交换机将网络包原样转发到目的地，交换机根据 MAC 地址表查找 MAC 地址，然后将信号发送到相应的端口。交换机的 MAC 地址表主要包含两个信息:设备的 MAC 地址，和该设备连接在交换机的端口。</p>
-<p>交换机工作在全双工模式。</p>
-<p><img src="/images/net/switch.png" alt="img"></p>
-<p>交换机会自行更新或删除地址表中的记录，当收到包时会将发送方 MAC 地址以及其输入端口的号码写入MAC 地址表中，当端口上的设备长时间不工作，就会删除记录。</p>
-<p>计算机的网卡本身具有 MAC 地址，并通过核对收到的包的接收方 MAC 地址判断是不是发给自己的，如果不是发给自己的则丢弃。相对地，交换机的端口不具有 MAC 地址的端口，故不会核对接收方 MAC 地址，而是直接接收所有的包并存放到缓冲区中。</p>
-<h2 id="集线器"><a href="#集线器" class="headerlink" title="集线器"></a>集线器</h2><p>集线器工作在物理层，会将收到的数据广播给其它端口。集线器里有一张以太网协议的表，根据以太网头部中记录的目的地信息查出相应的传输方向，在子网中将网络包传输到下一个转发设备。</p>
-<p>集线器的接口中有一个 MDI/MDI-X 切换开关，MDI 就是对 RJ-45 接口和信号收发模块进行直连接线，而 MDI-X 则是交叉接线。</p>
-<p>集线器工作在半双工模式。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/10/30/algo/dynamic/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/10/30/algo/dynamic/" class="post-title-link" itemprop="url">动态规划</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-10-30 19:29:01" itemprop="dateCreated datePublished" datetime="2022-10-30T19:29:01+08:00">2022-10-30</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-05 22:06:02" itemprop="dateModified" datetime="2022-12-05T22:06:02+08:00">2022-12-05</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>动态规划的核心思想就是穷举求最值，如果暴力穷举的话效率会极其低下，需要「备忘录」或者「DP table」来优化穷举过程，避免不必要的计算。其中带备忘录的递归解法叫做「自顶向下」，动态规划叫做「自底向上」。</p>
-<p>动态规划问题的特征：</p>
-<ol>
-<li>存在重复子问题，子问题相互独立。</li>
-<li>具备最优子结构，可通过子问题的最优解得到原问题的最优解。</li>
-<li>无后效性：某阶段状态一旦确定，就不受之后阶段的决策影响。</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> 状态<span class="number">1</span> in 状态<span class="number">1</span>的所有取值：</span><br><span class="line">    <span class="keyword">for</span> 状态<span class="number">2</span> in 状态<span class="number">2</span>的所有取值：</span><br><span class="line">        <span class="keyword">for</span> ...</span><br><span class="line">            dp[状态<span class="number">1</span>][状态<span class="number">2</span>][...] = 择优(选择<span class="number">1</span>，选择<span class="number">2.</span>..)</span><br></pre></td></tr></table></figure>
-
-<h2 id="菲波那切数列"><a href="#菲波那切数列" class="headerlink" title="菲波那切数列"></a>菲波那切数列</h2><p>斐波那契数列又称黄金分割数列、因数学家列昂纳多·斐波那契以兔子繁殖为例子而引入，又称为兔子数列。在数学上，斐波纳契数列以如下被以递归的方法定义：F(0)=0, F(1)=1, F(n)=F(n-1)+F(n-2)（n&gt;=2，n∈N*）。</p>
-<p>暴力递归</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">fibonacci</span><span class="params">(<span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (n &lt; <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> fibonacci(n - <span class="number">1</span>) + fibonacci(n - <span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>带备忘录的递归解法(自顶向下，通过备忘录剪枝)</p>
-<p><img src="/images/code/algo/fib_memo.png" alt="img"></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">fibonacci_memo</span><span class="params">(vector&lt;<span class="type">int</span>&gt; &amp;memo, <span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (n &lt; <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (memo[n] == <span class="number">-1</span>) &#123;</span><br><span class="line">        memo[n] = <span class="built_in">fibonacci_memo</span>(memo, n - <span class="number">1</span>) + <span class="built_in">fibonacci_memo</span>(memo, n - <span class="number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> memo[n];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">fibonacciMemo</span><span class="params">(<span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">memo</span><span class="params">(n+<span class="number">1</span>, <span class="number">-1</span>)</span></span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">fibonacci_memo</span>(memo, n);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>dp 数组的迭代解法（自底向上，使用循环迭代）</p>
-<p><img src="/images/code/algo/fib_dp.png" alt="img"></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">fibonacci_dp</span><span class="params">(<span class="type">int</span> n)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">dp</span><span class="params">(n + <span class="number">1</span>, <span class="number">0</span>)</span></span>;</span><br><span class="line">    dp[<span class="number">0</span>] = dp[<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">2</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        dp[i] = dp[i - <span class="number">1</span>] + dp[i - <span class="number">2</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> dp[n];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="凑零钱问题"><a href="#凑零钱问题" class="headerlink" title="凑零钱问题"></a>凑零钱问题</h2><p>有k种面值的硬币，面值分别为c1, c2 … ck，每种硬币的数量无限，再给一个总金额amount，问你最少需要几枚硬币凑出这个金额，如果不可能凑出，算法返回 -1 。</p>
-<p>凑零钱问题符合最优子结构，比如求 amount = 11 时的最少硬币数（原问题），如果知道凑出 amount = 10 的最少硬币数（子问题），只需把子问题的答案加一（再选一枚面值为 1 的硬币）就是原问题的答案。</p>
-<ol>
-<li><p>先确定「状态」，也就是原问题和子问题中变化的变量。由于硬币数量无限，所以唯一的状态就是目标金额amount。</p>
-</li>
-<li><p>然后确定dp数组的定义：函数 dp(n)表示，当前的目标金额是n，至少需要dp(n)个硬币凑出该金额。</p>
-</li>
-<li><p>然后确定「选择」并择优，也就是对于每个状态，可以做出什么选择改变当前状态。无论当前的目标金额是多少，选择就是从面额列表coins中选择一个硬币，然后目标金额就会减少。</p>
-</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">def <span class="title">coinChange</span><span class="params">(coins: List[<span class="type">int</span>], amount: <span class="type">int</span>)</span>:</span></span><br><span class="line"><span class="function">    # 定义：要凑出金额 n，至少要 dp(n) 个硬币</span></span><br><span class="line"><span class="function">    def dp(n):</span></span><br><span class="line"><span class="function">        # 做选择，需要硬币最少的那个结果就是答案</span></span><br><span class="line"><span class="function">        for coin in coins:</span></span><br><span class="line"><span class="function">            res =</span> <span class="built_in">min</span>(res, <span class="number">1</span> + <span class="built_in">dp</span>(n - coin))</span><br><span class="line">        <span class="keyword">return</span> res</span><br><span class="line">    # 我们要求目标金额是 amount</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">dp</span>(amount)</span><br></pre></td></tr></table></figure>
-
-<ol start="4">
-<li>最后明确 base case，显然目标金额为 0 时，所需硬币数量为 0；当目标金额小于 0 时，无解，返回 -1。</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">def <span class="title">coinChange</span><span class="params">(coins: List[<span class="type">int</span>], amount: <span class="type">int</span>)</span>:</span></span><br><span class="line"><span class="function">    def dp(n):</span></span><br><span class="line"><span class="function">        # base case</span></span><br><span class="line"><span class="function">        if n =</span>= <span class="number">0</span>: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        <span class="keyword">if</span> n &lt; <span class="number">0</span>: <span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line">        # 求最小值，所以初始化为正无穷</span><br><span class="line">        res = <span class="built_in">float</span>(<span class="string">&#x27;INF&#x27;</span>)</span><br><span class="line">        <span class="keyword">for</span> coin in coins:</span><br><span class="line">            subproblem = <span class="built_in">dp</span>(n - coin)</span><br><span class="line">            # 子问题无解，跳过</span><br><span class="line">            <span class="keyword">if</span> subproblem == <span class="number">-1</span>: <span class="keyword">continue</span></span><br><span class="line">            res = <span class="built_in">min</span>(res, <span class="number">1</span> + subproblem)</span><br><span class="line">        <span class="keyword">return</span> res <span class="keyword">if</span> res != <span class="built_in">float</span>(<span class="string">&#x27;INF&#x27;</span>) <span class="keyword">else</span> <span class="number">-1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">dp</span>(amount)</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/code/algo/coin.png" alt="img"></p>
-<p>带备忘录的递归</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">def <span class="title">coinChange</span><span class="params">(coins: List[<span class="type">int</span>], amount: <span class="type">int</span>)</span>:</span></span><br><span class="line"><span class="function">    # 备忘录</span></span><br><span class="line"><span class="function">    memo =</span> <span class="built_in">dict</span>()</span><br><span class="line">    <span class="function">def <span class="title">dp</span><span class="params">(n)</span>:</span></span><br><span class="line"><span class="function">        # 查备忘录，避免重复计算</span></span><br><span class="line"><span class="function">        if n in memo: return memo[n]</span></span><br><span class="line"><span class="function">        if n =</span>= <span class="number">0</span>: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        <span class="keyword">if</span> n &lt; <span class="number">0</span>: <span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line">        res = <span class="built_in">float</span>(<span class="string">&#x27;INF&#x27;</span>)</span><br><span class="line">        <span class="keyword">for</span> coin in coins:</span><br><span class="line">            subproblem = <span class="built_in">dp</span>(n - coin)</span><br><span class="line">            <span class="keyword">if</span> subproblem == <span class="number">-1</span>: <span class="keyword">continue</span></span><br><span class="line">            res = <span class="built_in">min</span>(res, <span class="number">1</span> + subproblem)</span><br><span class="line">        # 记入备忘录</span><br><span class="line">        memo[n] = res <span class="keyword">if</span> res != <span class="built_in">float</span>(<span class="string">&#x27;INF&#x27;</span>) <span class="keyword">else</span> <span class="number">-1</span></span><br><span class="line">        <span class="keyword">return</span> memo[n]</span><br><span class="line">      </span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">dp</span>(amount)</span><br></pre></td></tr></table></figure>
-
-<p>dp 数组迭代解法</p>
-<p><img src="/images/code/algo/coin_dp.png" alt="img"></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">coinChange</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; coins, <span class="type">int</span> amount)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 数组大小为 amount + 1，初始值也为 amount + 1</span></span><br><span class="line">    <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">dp</span><span class="params">(amount + <span class="number">1</span>, amount + <span class="number">1</span>)</span></span>;</span><br><span class="line">    <span class="comment">// base case</span></span><br><span class="line">    dp[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt; dp.<span class="built_in">size</span>(); i++) &#123;</span><br><span class="line">        <span class="comment">// 内层 for 在求所有子问题 + 1 的最小值</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> coin : coins) &#123;</span><br><span class="line">            <span class="comment">// 子问题无解，跳过</span></span><br><span class="line">            <span class="keyword">if</span> (i - coin &lt; <span class="number">0</span>) <span class="keyword">continue</span>;</span><br><span class="line">            dp[i] = <span class="built_in">min</span>(dp[i], <span class="number">1</span> + dp[i - coin]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> (dp[amount] == amount + <span class="number">1</span>) ? <span class="number">-1</span> : dp[amount];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="01背包问题"><a href="#01背包问题" class="headerlink" title="01背包问题"></a>01背包问题</h2><p>有一个可装载重量为 W 的背包和 N 个物品，每个物品有重量和价值两个属性。其中第 i 个物品的重量为 wt[i]，价值为 val[i]，现在让你用这个背包装物品，最多能装的价值是多少？</p>
-<p>明确两点，「状态」和「选择」。</p>
-<ol>
-<li><p>明确状态，状态有两个，就是「背包的容量」和「可选择的物品」。</p>
-</li>
-<li><p>明确选择，就是「装进背包」或者「不装进背包」。</p>
-</li>
-<li><p>明确 dp 数组的定义：对于前 i 个物品，当前背包的容量为 w，这种情况下可以装的最大价值是 dp[i][w]。</p>
-</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i in [<span class="number">1.</span>.N]:</span><br><span class="line">    <span class="keyword">for</span> w in [<span class="number">1.</span>.W]:</span><br><span class="line">        dp[i][w] = <span class="built_in">max</span>(</span><br><span class="line">            dp[i<span class="number">-1</span>][w],  <span class="comment">// 不把物品 i 装进背包</span></span><br><span class="line">            dp[i<span class="number">-1</span>][w - wt[i<span class="number">-1</span>]] + val[i<span class="number">-1</span>]  <span class="comment">// 把物品 i 装进背包</span></span><br><span class="line">        )</span><br><span class="line"><span class="keyword">return</span> dp[N][W]</span><br></pre></td></tr></table></figure>
-
-<ol start="4">
-<li>明确base case，就是 dp[0][..] = dp[..][0] = 0，因为没有物品或者背包没有空间的时候，能装的最大价值就是 0。</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">knapsack</span><span class="params">(<span class="type">int</span> W, <span class="type">int</span> N, vector&lt;<span class="type">int</span>&gt;&amp; wt, vector&lt;<span class="type">int</span>&gt;&amp; val)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// base case 已初始化</span></span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">dp</span>(N + <span class="number">1</span>, <span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(W + <span class="number">1</span>, <span class="number">0</span>));</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> w = <span class="number">1</span>; w &lt;= W; w++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (w - wt[i<span class="number">-1</span>] &lt; <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="comment">// 这种情况下只能选择不装入背包</span></span><br><span class="line">                dp[i][w] = dp[i - <span class="number">1</span>][w];</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 装入或者不装入背包，择优</span></span><br><span class="line">                dp[i][w] = <span class="built_in">max</span>(dp[i - <span class="number">1</span>][w - wt[i<span class="number">-1</span>]] + val[i<span class="number">-1</span>], </span><br><span class="line">                               dp[i - <span class="number">1</span>][w]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> dp[N][W];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="子集背包问题"><a href="#子集背包问题" class="headerlink" title="子集背包问题"></a>子集背包问题</h2><p>给定一个只包含正整数的非空数组。是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。</p>
-<ol>
-<li><p>明确「状态」和「选择」，状态就是「背包的容量」和「可选择的物品」，选择就是「装进背包」或者「不装进背包」。</p>
-</li>
-<li><p>明确dp数组的定义，dp[i][j] = x表示：对于前i个物品，当前背包的容量为j时，若x为true，则说明可以恰好将背包装满，若x为false，则说明不能恰好将背包装满。根据这个定义，我们想求的最终答案就是dp[N][sum/2]。</p>
-</li>
-<li><p>base case 就是dp[..][0] = true和dp[0][..] = false，因为背包没有空间的时候，就相当于装满了，而当没有物品可选择的时候，肯定没办法装满背包。</p>
-</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">canPartition</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> sum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> num : nums)</span><br><span class="line">        sum += num;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 和为奇数时，不可能划分成两个和相等的集合</span></span><br><span class="line">    <span class="keyword">if</span> (sum % <span class="number">2</span> != <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> n = nums.<span class="built_in">size</span>();</span><br><span class="line">    sum = sum / <span class="number">2</span>;</span><br><span class="line">    vector&lt;vector&lt;<span class="type">bool</span>&gt;&gt; <span class="built_in">dp</span>(n + <span class="number">1</span>, <span class="built_in">vector</span>&lt;<span class="type">bool</span>&gt;(sum + <span class="number">1</span>, <span class="literal">false</span>));</span><br><span class="line">    <span class="comment">// base case</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= n; i++)</span><br><span class="line">        dp[i][<span class="number">0</span>] = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">1</span>; j &lt;= sum; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (j &lt; nums[i - <span class="number">1</span>]) &#123;</span><br><span class="line">               <span class="comment">// 背包容量不足，不能装入第 i 个物品</span></span><br><span class="line">                dp[i][j] = dp[i - <span class="number">1</span>][j]; </span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 装入或不装入背包</span></span><br><span class="line">                dp[i][j] = dp[i - <span class="number">1</span>][j] | dp[i - <span class="number">1</span>][j-nums[i<span class="number">-1</span>]];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> dp[n][sum];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>注意到dp[i][j]都是通过上一行dp[i-1][..]转移过来的，之前的数据都不会再使用了。所以可以进行状态压缩，将二维dp数组压缩为一维，节约空间复杂度：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">canPartition</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> sum = <span class="number">0</span>, n = nums.<span class="built_in">size</span>();</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> num : nums)</span><br><span class="line">        sum += num;</span><br><span class="line">    <span class="keyword">if</span> (sum % <span class="number">2</span> != <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    sum = sum / <span class="number">2</span>;</span><br><span class="line">    <span class="function">vector&lt;<span class="type">bool</span>&gt; <span class="title">dp</span><span class="params">(sum + <span class="number">1</span>, <span class="literal">false</span>)</span></span>;</span><br><span class="line">    <span class="comment">// base case</span></span><br><span class="line">    dp[<span class="number">0</span>] = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) </span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = sum; j &gt;= <span class="number">0</span>; j--) </span><br><span class="line">            <span class="keyword">if</span> (j - nums[i] &gt;= <span class="number">0</span>) </span><br><span class="line">                dp[j] = dp[j] || dp[j - nums[i]];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> dp[sum];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="完全背包问题"><a href="#完全背包问题" class="headerlink" title="完全背包问题"></a>完全背包问题</h2><p>有一个背包，最大容量为amount，有一系列物品coins，每个物品的重量为coins[i]，每个物品的数量无限。请问有多少种方法，能够把背包恰好装满？</p>
-<ol>
-<li><p>明确「状态」和「选择」，状态就是「背包的容量」和「可选择的物品」，选择就是「装进背包」或者「不装进背包」。</p>
-</li>
-<li><p>明确 dp[i][j]数组的定义：若只使用前i个物品，当背包容量为j时，有dp[i][j]种方法可以装满背包。</p>
-</li>
-<li><p>base case 为dp[0][..] = 0， dp[..][0] = 1。因为如果不使用任何硬币面值，就无法凑出任何金额；如果凑出的目标金额为 0，那么不用装就满了。</p>
-</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">change</span><span class="params">(<span class="type">int</span> amount, <span class="type">int</span>[] coins)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> n = coins.length;</span><br><span class="line">    <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="type">int</span>[n + <span class="number">1</span>][amount + <span class="number">1</span>];</span><br><span class="line">    <span class="comment">// base case</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= n; i++) </span><br><span class="line">        dp[i][<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">1</span>; j &lt;= amount; j++)</span><br><span class="line">            <span class="keyword">if</span> (j &gt;= coins[i<span class="number">-1</span>])</span><br><span class="line">                <span class="comment">//把这第i个物品装入背包，装入第i种商品后还可以再继续装入第i种商品。</span></span><br><span class="line">                dp[i][j] = dp[i - <span class="number">1</span>][j] + dp[i][j - coins[i<span class="number">-1</span>]]; </span><br><span class="line">            <span class="keyword">else</span> </span><br><span class="line">                dp[i][j] = dp[i - <span class="number">1</span>][j]; <span class="comment">//不把这第i个物品装入背包</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> dp[n][amount];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>通过观察可以发现，dp数组的转移只和dp[i][..]和dp[i-1][..]有关，所以可以压缩状态，进一步降低算法的空间复杂度：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">change</span><span class="params">(<span class="type">int</span> amount, <span class="type">int</span>[] coins)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> n = coins.length;</span><br><span class="line">    <span class="type">int</span>[] dp = <span class="keyword">new</span> <span class="type">int</span>[amount + <span class="number">1</span>];</span><br><span class="line">    dp[<span class="number">0</span>] = <span class="number">1</span>; <span class="comment">// base case</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">1</span>; j &lt;= amount; j++)</span><br><span class="line">            <span class="keyword">if</span> (j - coins[i] &gt;= <span class="number">0</span>)</span><br><span class="line">                dp[j] = dp[j] + dp[j-coins[i]];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> dp[amount];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/25/algo/heap/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/25/algo/heap/" class="post-title-link" itemprop="url">堆</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-25 21:32:48" itemprop="dateCreated datePublished" datetime="2022-09-25T21:32:48+08:00">2022-09-25</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-17 10:35:18" itemprop="dateModified" datetime="2022-12-17T10:35:18+08:00">2022-12-17</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>堆是一种完全二叉树，每个节点的值都大于等于（或小于等于）其子树节点的值。</p>
-<ul>
-<li>对于每个节点的值都大于等于子树中每个节点值的堆叫<strong>大顶堆</strong>，</li>
-<li>对于每个节点的值都小于等于子树中每个节点值的堆叫<strong>小顶堆</strong>。</li>
-</ul>
-<p>堆比较适合用数组来存储。</p>
-<p><img src="/images/code/algo/heap/heap.png" alt="heap"></p>
-<p>堆典型应用场景：实现优先队列、求 Top N 、求中位数。</p>
-<h2 id="堆化"><a href="#堆化" class="headerlink" title="堆化"></a>堆化</h2><p>堆的元素变动后，不符合堆定义的话，就需要进行调整，让其重新满足堆的特性，这个过程叫作堆化。堆化就是顺着节点所在的路径，向上或者向下进行对比，然后交换。</p>
-<p><strong>插入元素</strong></p>
-<p>插入的元素直接放到堆的最后，从下往上堆化，让新插入的节点与父节点对比大小，如果不满足子节点小于等于父节点的大小关系，就互换两个节点。一直重复这个过程，直到比对到根节点。</p>
-<p><img src="/images/code/algo/heap/add.png" alt="堆化"></p>
-<p><strong>删除堆顶元素</strong></p>
-<p>删除堆顶元素后，就需要把第二大的元素放到堆顶，然后再迭代地删除第二大节点，以此类推，直到叶子节点被删除，但这样操作完成后的堆不再满足完全二叉树的特性。</p>
-<p><img src="/images/code/algo/heap/del1.png" alt="堆化"></p>
-<p>正确做法是先把最后一个节点放到堆顶，然后从上往下的堆化。</p>
-<p><img src="/images/code/algo/heap/del2.png" alt="堆化"></p>
-<p>一个包含 $n$ 个节点的完全二叉树高度小于 $log_{2}n$，堆化的时间复杂度跟树的高度成正比等于 $O(log\ n)$。</p>
-<h2 id="建堆"><a href="#建堆" class="headerlink" title="建堆"></a>建堆</h2><p>建堆就是将数组原地建成一个堆，从后往前处理数组，找到第一个非叶子节点，然后依次从上往下堆化，堆化过程只要比较和交换数组元素。</p>
-<p><img src="/images/code/algo/heap/create.png" alt="建堆"></p>
-<h2 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h2><p>建堆后，如果是个大顶堆，那么排序步骤如下：</p>
-<ol>
-<li><p>取堆顶元素，与数组下标最后的元素交换位置，因为就是堆顶就是最大的元素，这样就排好了最大元素。</p>
-</li>
-<li><p>堆顶元素移除后发生堆化，将剩下的n−1个元素重新构建成堆。</p>
-</li>
-<li><p>再取堆顶的元素，交换至下标为 $n−1$ 的位置，一直重复这个过程，直到最后堆中只剩下标为 $1$ 的一个元素。</p>
-</li>
-</ol>
-<p><img src="/images/code/algo/heap/sort.png" alt="排序"></p>
-<p>堆排序是原地排序算法。堆排序包括建堆和排序两个操作，建堆过程的时间复杂度是 $O(n)$，排序过程的时间复杂度是 $O(nlog \  n)$，所以，堆排序整体的时间复杂度是 $O(nlog \  n)$。</p>
-<p>堆排序不是稳定的排序算法，因为在排序的过程，存在将堆的最后一个节点跟堆顶节点互换的操作，所以就有可能改变值相同数据的原始相对顺序。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1342,7 +1409,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">225</span>
+          <span class="site-state-item-count">226</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

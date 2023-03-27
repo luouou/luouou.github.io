@@ -176,6 +176,105 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/cpp/jsoncpp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/cpp/jsoncpp/" class="post-title-link" itemprop="url">JsonCpp</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-09 19:51:44" itemprop="dateModified" datetime="2022-06-09T19:51:44+08:00">2022-06-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>JsonCpp 中所有对象、类名都在 namespace Json 中，只需要包含 json/json.h 即可。JsonCpp 主要包含三个类:</p>
+<ul>
+<li><p>Json::Value：表示json对象或数组，支持的类型有int, double, string, object, array等。其包含节点的类型判断(isNull, isBool, isInt, isArray, isMember, isValidIndex等)，类型获取(type)，类型转换(asInt, asString等)，节点获取(get, [])，节点比较(重载&lt;, &lt;=, &gt;, &gt;=, ==, !=)，节点操作(compare, swap, removeMember, removeindex, append等)等函数。</p>
+</li>
+<li><p>Json::Reader：将文件流或字符串解析到Json::Value中，主要使用parse函数。Json::Reader的构造函数还允许用户使用特性Features来自定义Json的严格等级。</p>
+</li>
+<li><p>Json::Writer：将Json::Value转换成字符串流，Writer类是一个纯虚类，并不能直接使用。在此我们使用 Json::Writer 的子类：Json::FastWriter(将数据写入一行, 没有格式)，Json::StyledWriter(按json格式化输出, 易于阅读)。</p>
+</li>
+</ul>
+<h2 id="解析json属性"><a href="#解析json属性" class="headerlink" title="解析json属性"></a>解析json属性</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;aaa&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;age&quot;</span><span class="punctuation">:</span> <span class="number">16</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ifstream ifs;</span><br><span class="line">Json::Reader reader;</span><br><span class="line">Json::Value root;</span><br><span class="line"></span><br><span class="line">ifs.<span class="built_in">open</span>(<span class="string">&quot;conf.json&quot;</span>);</span><br><span class="line">reader.<span class="built_in">parse</span>(ifs, root, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">cout &lt;&lt; <span class="string">&quot;name: &quot;</span> &lt;&lt; root[<span class="string">&quot;name&quot;</span>].<span class="built_in">asString</span>() &lt;&lt; endl;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;age: &quot;</span> &lt;&lt; root[<span class="string">&quot;age&quot;</span>].<span class="built_in">asInt</span>() &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<h2 id="解析json对象"><a href="#解析json对象" class="headerlink" title="解析json对象"></a>解析json对象</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;param&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;job&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;worker&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;income&quot;</span> <span class="punctuation">:</span> <span class="number">1000</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ifstream ifs;</span><br><span class="line">Json::Reader reader;</span><br><span class="line">Json::Value root;</span><br><span class="line"></span><br><span class="line">ifs.<span class="built_in">open</span>(<span class="string">&quot;conf.json&quot;</span>);</span><br><span class="line">reader.<span class="built_in">parse</span>(ifs, root, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">Json::Value param = root[<span class="string">&quot;param&quot;</span>];</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;job: &quot;</span> &lt;&lt; param[<span class="string">&quot;job&quot;</span>].<span class="built_in">asString</span>() &lt;&lt; endl;</span><br><span class="line">cout &lt;&lt; <span class="string">&quot;income: &quot;</span> &lt;&lt; param[<span class="string">&quot;income&quot;</span>].<span class="built_in">asInt</span>() &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<h2 id="解析json数组"><a href="#解析json数组" class="headerlink" title="解析json数组"></a>解析json数组</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;files&quot;</span> <span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;./a.txt&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;./jsontest.cpp&quot;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ifstream ifs;</span><br><span class="line">Json::Reader reader;</span><br><span class="line">Json::Value root;</span><br><span class="line"></span><br><span class="line">ifs.<span class="built_in">open</span>(<span class="string">&quot;conf.json&quot;</span>);</span><br><span class="line">reader.<span class="built_in">parse</span>(ifs, root, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">Json::Value files = root[<span class="string">&quot;files&quot;</span>];</span><br><span class="line"><span class="keyword">for</span> (<span class="type">unsigned</span> <span class="type">int</span> i = <span class="number">0</span>; i &lt; files.<span class="built_in">size</span>(); ++i) &#123;</span><br><span class="line">    cout &lt;&lt; files[i].<span class="built_in">asString</span>() &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="封装json属性"><a href="#封装json属性" class="headerlink" title="封装json属性"></a>封装json属性</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Json::Value root;</span><br><span class="line">Json::FastWriter writer;</span><br><span class="line">root[<span class="string">&quot;name&quot;</span>] = <span class="string">&quot;tony&quot;</span>;</span><br><span class="line">root[<span class="string">&quot;age&quot;</span>] = <span class="number">19</span>;</span><br><span class="line"></span><br><span class="line">cout &lt;&lt; writer.<span class="built_in">write</span>(root) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<h2 id="封装json对象"><a href="#封装json对象" class="headerlink" title="封装json对象"></a>封装json对象</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Json::Value root;</span><br><span class="line">Json::FastWriter writer;</span><br><span class="line">Json::Value param;</span><br><span class="line">param[<span class="string">&quot;job&quot;</span>] = <span class="string">&quot;worker&quot;</span>;</span><br><span class="line">param[<span class="string">&quot;income&quot;</span>] = <span class="number">21</span>;</span><br><span class="line">root[<span class="string">&quot;param&quot;</span>] = param;</span><br><span class="line"></span><br><span class="line">cout &lt;&lt; writer.<span class="built_in">write</span>(root) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<h2 id="封装json数组"><a href="#封装json数组" class="headerlink" title="封装json数组"></a>封装json数组</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Json::Value root;</span><br><span class="line">Json::FastWriter writer;</span><br><span class="line">Json::Value files;</span><br><span class="line"></span><br><span class="line">files[<span class="number">0</span>] = <span class="string">&quot;./a.txt&quot;</span>;</span><br><span class="line">files[<span class="number">1</span>] = <span class="string">&quot;.jsontest.c&quot;</span>;</span><br><span class="line"></span><br><span class="line">Json::Value link;</span><br><span class="line">link[<span class="string">&quot;src&quot;</span>] = <span class="string">&quot;b_link&quot;</span>;</span><br><span class="line">link[<span class="string">&quot;dest&quot;</span>] = <span class="string">&quot;b.exe&quot;</span>;</span><br><span class="line">files.<span class="built_in">append</span>(link);</span><br><span class="line"></span><br><span class="line">root[<span class="string">&quot;files&quot;</span>] = files;</span><br><span class="line"></span><br><span class="line">cout &lt;&lt; writer.<span class="built_in">write</span>(root) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/sched/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1295,96 +1394,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/sysfs/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/kernel/sysfs/" class="post-title-link" itemprop="url">sysfs</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="sysfs"><a href="#sysfs" class="headerlink" title="sysfs"></a>sysfs</h2><p>sysfs 是一个基于内存的虚拟文件系统，作用是将内核信息以文件的方式提供给用户程序使用。它把连接在系统上的设备和总线组织成为一个分级的文件，供用户空间存取；向用户空间导出内核数据结构以及它们的属性，以展示设备驱动模型中各组件的层次关系。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">/sys/</span><br><span class="line">├── block     包含系统中发现的块设备;</span><br><span class="line">├── bus       包含内核注册的总线;</span><br><span class="line">├── class     包含注册到内核的设备类;</span><br><span class="line">├── bus       按总线类型分类</span><br><span class="line">│   ├── i2c</span><br><span class="line">│   │   ├── drivers</span><br><span class="line">│   │   └── devices   包含总线下的所有设备</span><br><span class="line">│   │       ├──i2c-0 -&gt; ../../../devices/pci0000:00/0000:00:02.0/i2c-0/</span><br><span class="line">│   │       └──i2c-1 -&gt; ../../../devices/pci0000:00/0000:00:02.0/i2c-1/</span><br><span class="line">│   ├── pci</span><br><span class="line">│   ├── spi</span><br><span class="line">│   ├── usb</span><br><span class="line">├── class          按设备功能分类的设备模型</span><br><span class="line">│   ├── block</span><br><span class="line">│   ├── bluetooth</span><br><span class="line">│   ├── dma</span><br><span class="line">│   ├── gpio</span><br><span class="line">│   ├── i2c-adapter</span><br><span class="line">│   ├── i2c-dev</span><br><span class="line">│   ├── input</span><br><span class="line">│   ├── misc</span><br><span class="line">│   ├── phy</span><br><span class="line">│   ├── pwm</span><br><span class="line">│   ├── rtc</span><br><span class="line">│   ├── tty</span><br><span class="line">├── dev         按字符设备和块设备的major:minor指向真实设备(sys/devices)的链接</span><br><span class="line">│   ├── block</span><br><span class="line">│   └── char</span><br><span class="line">├── devices     含系统所有的设备，并根据设备挂接的总线类型组织成层次结构;</span><br><span class="line">├── firmware</span><br><span class="line">│   ├── acpi</span><br><span class="line">│   ├── dmi</span><br><span class="line">│   └── memmap</span><br><span class="line">├── fs</span><br><span class="line">├── hypervisor</span><br><span class="line">├── kernel      内核所有可调整参数位置</span><br><span class="line">├── module      所有驱动模块的模块参数等信息</span><br><span class="line">└── power       系统电源选项</span><br></pre></td></tr></table></figure>
-
-<h2 id="kobject"><a href="#kobject" class="headerlink" title="kobject"></a>kobject</h2><p>总线、驱动和设备都对应sysfs 中的一个目录，实际上都算是kobject 的派生类，device 结构体直接包含了 kobject kobj 成员，而 bus_type和 device_driver 则透过 subsys_private、driver_private 间接包含了 kobject。每一个注册的kobject对象都对应 sysfs中的一个目录。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">kobject</span> &#123;</span></span><br><span class="line">   <span class="type">const</span> <span class="type">char</span>      *name;</span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span>   <span class="title">entry</span>;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">kobject</span>      *<span class="title">parent</span>;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">kset</span>      *<span class="title">kset</span>;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">kobj_type</span>   *<span class="title">ktype</span>;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">sysfs_dirent</span>   *<span class="title">sd</span>;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">kref</span>      <span class="title">kref</span>;</span></span><br><span class="line">   <span class="type">unsigned</span> <span class="type">int</span> state_initialized:<span class="number">1</span>;</span><br><span class="line">   <span class="type">unsigned</span> <span class="type">int</span> state_in_sysfs:<span class="number">1</span>;</span><br><span class="line">   <span class="type">unsigned</span> <span class="type">int</span> state_add_uevent_sent:<span class="number">1</span>;</span><br><span class="line">   <span class="type">unsigned</span> <span class="type">int</span> state_remove_uevent_sent:<span class="number">1</span>;</span><br><span class="line">   <span class="type">unsigned</span> <span class="type">int</span> uevent_suppress:<span class="number">1</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>kobj_type 是/sys/下的属性文件，代表kobject 的属性，release()函数在 kobject 的引用计数为0时会被调用。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">kobj_type</span> &#123;</span></span><br><span class="line">   <span class="type">void</span> (*release)(<span class="keyword">struct</span> kobject *kobj);</span><br><span class="line">   <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">sysfs_ops</span> *<span class="title">sysfs_ops</span>;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">attribute</span> **<span class="title">default_attrs</span>;</span>   <span class="comment">// 属性数组</span></span><br><span class="line">   <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">kobj_ns_type_operations</span> *(*<span class="title">child_ns_type</span>)(<span class="keyword">struct</span> <span class="title">kobject</span> *<span class="title">kobj</span>);</span></span><br><span class="line">   <span class="type">const</span> <span class="type">void</span> *(*namespace)(<span class="keyword">struct</span> kobject *kobj);</span><br><span class="line">   <span class="type">void</span> (*get_ownership)(<span class="keyword">struct</span> kobject *kobj, <span class="type">kuid_t</span> *uid, <span class="type">kgid_t</span> *gid);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>sysfs_ops 包含对文件读写的函数指针，代表对属性文件的文件操作。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sysfs_ops</span> &#123;</span></span><br><span class="line">   <span class="type">ssize_t</span> (*show)(<span class="keyword">struct</span> kobject *, <span class="keyword">struct</span> attribute *, <span class="type">char</span> *);</span><br><span class="line">   <span class="type">ssize_t</span> (*store)(<span class="keyword">struct</span> kobject *, <span class="keyword">struct</span> attribute *, <span class="type">const</span> <span class="type">char</span> *, <span class="type">size_t</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<h2 id="kset"><a href="#kset" class="headerlink" title="kset"></a>kset</h2><p>kset 是具有相同类型的 kobject 集合。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">kset</span> &#123;</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">list</span>;</span></span><br><span class="line">   <span class="type">spinlock_t</span> list_lock;</span><br><span class="line">   <span class="class"><span class="keyword">struct</span> <span class="title">kobject</span> <span class="title">kobj</span>;</span></span><br><span class="line">   <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">kset_uevent_ops</span> *<span class="title">uevent_ops</span>;</span>  <span class="comment">// 热插拔事件</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>当驱动程序将 kobject 注册到设备驱动模型时，也就是调用 kobject_add()和 kobject_del()函数时，会产生热插拔事件，内核会根据 kobject 的 kset 指针找到所属的 kset 结构体，执行 uevent_ops 中的热插拔函数。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">kset_uevent_ops</span> &#123;</span></span><br><span class="line">   <span class="type">int</span> (* <span class="type">const</span> filter)(<span class="keyword">struct</span> kset *kset, <span class="keyword">struct</span> kobject *kobj);  <span class="comment">// 事件过滤，如果返回 0，将不传递事件到用户空间</span></span><br><span class="line">   <span class="type">const</span> <span class="type">char</span> *(* <span class="type">const</span> name)(<span class="keyword">struct</span> kset *kset, <span class="keyword">struct</span> kobject *kobj);  <span class="comment">// 返回子系统的名字</span></span><br><span class="line">   <span class="type">int</span> (* <span class="type">const</span> uevent)(<span class="keyword">struct</span> kset *kset, <span class="keyword">struct</span> kobject *kobj,</span><br><span class="line">            <span class="keyword">struct</span> kobj_uevent_env *env);  <span class="comment">// 将用户空间需要的参数添加到环境变量中</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1454,7 +1463,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">225</span>
+          <span class="site-state-item-count">226</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

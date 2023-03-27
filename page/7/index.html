@@ -176,6 +176,339 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/kernel/watchdog/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/04/kernel/watchdog/" class="post-title-link" itemprop="url">watchdog device</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/device/" itemprop="url" rel="index"><span itemprop="name">device</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <ul>
+<li>watchdog_dev.c</li>
+<li>watchdog_core.c</li>
+<li>wdt.c</li>
+</ul>
+<p>内核配置<code>CONFIG_WATCHDOG_NOWAYOUT</code>选项表示看门狗一旦开启就无法被停止，可设置nowayout模块参数。</p>
+<p>如果驱动支持”Magic Close”，除非在关闭看门狗前，魔幻字符’V’发送到/dev/watchdog，否则不能停止看门狗。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/fs/busybox/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/04/fs/busybox/" class="post-title-link" itemprop="url">BusyBox</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/rootfs/" itemprop="url" rel="index"><span itemprop="name">rootfs</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a target="_blank" rel="noopener" href="https://busybox.net/downloads/">下载地址</a></p>
+<p><a target="_blank" rel="noopener" href="https://salsa.debian.org/installer-team/busybox">https://salsa.debian.org/installer-team/busybox</a></p>
+<p>修改顶层Makefile，修改交叉编译器和芯片平台：</p>
+<blockquote>
+<p>CROSS_COMPILE=arm-none-linux-gnueabi- ARCH=arm</p>
+</blockquote>
+<p><code>make defconfig</code>，busybox提供了3种配置：defconfig (缺省配置)、allyesconfig（最大配置）、 allnoconfig（最小配置）。</p>
+<p><code>make menuconfig</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Busybox Settings  ---&gt;</span><br><span class="line">    Build Options  ---&gt;</span><br><span class="line">        [*]Build shared libbusybox</span><br><span class="line">        [ ] Build BusyBox as a static binary (no shared libs) (NEW)</span><br><span class="line"></span><br><span class="line">    (arm-anykav200-linux-uclibcgnueabi-) Cross compiler prefix 　//设置编译器</span><br><span class="line">        </span><br><span class="line">    Installation Options (&quot;make install&quot; behavior)  ---&gt;</span><br><span class="line">        (../rootfs) Destination path for &#x27;make install&#x27;   // 设置编译生成文件的存放路径</span><br><span class="line">        What kind of applet links to install (as soft-links)  ---&gt;　//设置生成后的命令是指向busybox的软链接</span><br><span class="line">  </span><br><span class="line">  Busybox Library Tuning  ---&gt;</span><br><span class="line">      (255) History size </span><br><span class="line">      [*]   History saving (NEW)   // 支持历史记录</span><br><span class="line">      [*]   Tab completion (NEW)   // 支持Tab补全操作</span><br></pre></td></tr></table></figure>
+
+<p><code>make; make install</code></p>
+<p>添加相应的库，用<code>readelf -d busybox</code>，查看依赖的库，将交叉编译环境下sysroot/lib目录下库拷贝到/lib。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/fs/fs/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/04/fs/fs/" class="post-title-link" itemprop="url">fs基础知识</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/filesystem/" itemprop="url" rel="index"><span itemprop="name">filesystem</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><strong>扇区</strong>(sector)硬盘的读写基本单位。通常是 512 字节，可以使用 <code>fdisk -l</code> 命令查看扇区大小。</p>
+<p>扇区是磁盘物理层面的概念，操作系统是不直接与扇区交互的，而是与多个连续扇区组成的磁盘块交互。由于扇区是物理层面的概念，所以无法在系统中进行大小的更改。</p>
+<p><strong>磁盘块</strong>(IO Block)文件系统读写数据的最小单位，也叫磁盘簇。扇区是磁盘最小的物理存储单元，操作系统将相邻的扇区组合在一起，形成一个块，对块进行管理。块是2的指数倍的扇区大小，但必须小于页的大小。磁盘块是操作系统所使用的逻辑概念，而非磁盘的物理概念。磁盘块的大小可以通过命令 <code>stat /boot</code> 查看，一般是 4K。</p>
+<p>为了更好地管理磁盘空间和更高效地从硬盘读取数据，操作系统规定一个磁盘块中只能放置一个文件，因此文件所占用的空间，只能是磁盘块的整数倍。</p>
+<p>操作系统不能对磁盘扇区直接寻址操写，主要原因是扇区数量庞大，因此才将多个连续扇区组合一起操作。磁盘块的大小是可以通过 <code>blockdev</code> 命令更改的。</p>
+<p><strong>页</strong>(page)内存的最小存储单位。页的大小通常为磁盘块大小的 2^n 倍，可以通过命令 getconf PAGE_SIZE 来获取页的大小。</p>
+<h2 id="super-block"><a href="#super-block" class="headerlink" title="super block"></a>super block</h2><h2 id="inode"><a href="#inode" class="headerlink" title="inode"></a>inode</h2><p>文件通过inode来访问，inode使用唯一的数值进行标识，称为inode编号。一个inode存储文件关联的元数据，如修改时间，所有者，类型，长度以及文件的数据地址。inode既是unix文件系统在磁盘上实际物理对象，也是linux内中的数据结构的概念实体。</p>
+<p>目录存储文件名和inode编号的映射，内核根据文件名获取inode编号，然后根据编号找到对应的inode。</p>
+<h2 id="dentry"><a href="#dentry" class="headerlink" title="dentry"></a>dentry</h2><h2 id="file"><a href="#file" class="headerlink" title="file"></a>file</h2><h3 id="硬链接"><a href="#硬链接" class="headerlink" title="硬链接"></a>硬链接</h3><p>硬链接允许多个路径名指向相同的数据，为了保证每个文件在所有的链接都移除之后才彻底删除文件，每个inode还包括一个链接计数来跟踪文件系统中指向该文件的硬链接数目，当路径名解除链接，计数减1，当它为0时，与inode关联的数据才真正从文件系统中删除。</p>
+<p>软链接有自己的inode和包含被链接文件完整路径名的数据块，意味着可以跨文件系统创建链接。相比硬链接，因需要解析2个文件：符号链接和被链接的文件，故开销更大。</p>
+<p>super block对象用于描述挂载文件系统的元信息，即文件系统控制块；inode对象就是存储一个文件的通用信息，如时间戳、所对应的数据块位置等；dentry对象存储一个文件的目录项的链接信息，也就是文件的路径名，因为一个文件可能有多个链接。以上三者都是由文件系统各自实现并以特定格式持久化存储在硬盘上的。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/fs/rootfs/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/09/04/fs/rootfs/" class="post-title-link" itemprop="url">rootfs of file system</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-04 20:23:47" itemprop="dateCreated datePublished" datetime="2022-09-04T20:23:47+08:00">2022-09-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/rootfs/" itemprop="url" rel="index"><span itemprop="name">rootfs</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="flash文件系统"><a href="#flash文件系统" class="headerlink" title="flash文件系统"></a>flash文件系统</h2><p>flash芯片可以被划分为多个分区，各分区可以采用不同的文件系统。flash文件系统是基于MTD驱动层的，MTD(Memory Technology Device,存储技术设备)为底层硬件(闪存)和上层(文件系统)之间提供一个统一的抽象接口，专门针对各种非易失性存储器设计，因而对Flash有更好的支持、管理和基于扇区的擦除、读/写操作接口。</p>
+<h3 id="jffs"><a href="#jffs" class="headerlink" title="jffs"></a>jffs</h3><p>JFFS文件系统最早是由瑞典Axis Communications公司基于Linux2.0的内核为嵌入式系统开发的文件系统。JFFS2是RedHat公司基于JFFS开发的闪存文件系 统，最初是针对RedHat公司的嵌入式产品eCos开发的嵌入式文件系统，所以JFFS2也可以用在Linux, uCLinux中。</p>
+<p>Jffs2: 日志闪存文件系统版本2 (Journalling Flash FileSystem v2)</p>
+<p>主要用于NOR型闪存，基于MTD驱动层，特点是：<strong>可读写</strong>的、支持数据压缩的、基于哈希表的日志型文件系统，并提供了崩溃/掉电安全保护，提供“写平衡”支持等。缺点主要是当文件系统已满或接近满时，因为垃圾收集的关系而使jffs2的运行速度大大放慢。</p>
+<p>目前jffs3正在开发中。关于jffs系列文件系统的使用详细文档，可参考MTD补丁包中mtd-jffs-HOWTO.txt。</p>
+<p><em>jffsx不适合用于NAND闪存</em>主要是因为NAND闪存的容量一般较大，这样导致jffs为维护日志节点所占用的内存空间迅速增大，另 外，jffsx文件系统在挂载时需要扫描整个FLASH的内容，以找出所有的日志节点，建立文件结构，对于大容量的NAND闪存会耗费大量时间。</p>
+<h4 id="mkfs-jffs2"><a href="#mkfs-jffs2" class="headerlink" title="mkfs.jffs2"></a>mkfs.jffs2</h4><p>直接安装<code>mkfs.jffs2</code>工具：sudo apt-get install mtd-utils，或编译源码。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install liblzo2-2 libuuid1 zlib1g liblzo2-dev uuid-dev libacl1-dev  zlib1g-dev</span><br><span class="line">./configure --prefix=/home/luo_u/usr</span><br><span class="line">make </span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+
+<p><em>使用说明</em>:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">./mkfs.jffs2 -v -d rootfs/ -l -s 256 -e 4096 -m none -o root.jffs2</span><br><span class="line"></span><br><span class="line">-p, --pad[=SIZE]        使用0xff填充文件系统到指定大小，不指定则只填充完最后一个擦除块</span><br><span class="line">-r, -d, --root=DIR      使用指定的目录内容构建文件系统</span><br><span class="line">-s, --pagesize=SIZE     使用指定的页大小（最大数据节点大小） (default: 4KiB)</span><br><span class="line">-e, --eraseblock=SIZE   指定擦除块的大小 (default: 64KiB)</span><br><span class="line">-c, --cleanmarker=SIZE  擦除标记的大小 (default 12)</span><br><span class="line">-m, --compr-mode=MODE   选择压缩模式(default: priortiry)</span><br><span class="line">-x, --disable-compressor=COMPRESSOR_NAME  禁用指定的压缩算法</span><br><span class="line">-X, --enable-compressor=COMPRESSOR_NAME   启用指定的压缩算法</span><br><span class="line">-y, --compressor-priority=PRIORITY:COMPRESSOR_NAME  设置压缩算法的优先级</span><br><span class="line">-L, --list-compressors  列出可用的压缩算法</span><br><span class="line">-t, --test-compression  测试压缩算法</span><br><span class="line">-n, --no-cleanmarkers   不添加擦除标记到擦除块</span><br><span class="line">-o, --output=FILE       指定输出镜像文件名称</span><br><span class="line">-l, --little-endian     创建一个小端的文件系统</span><br><span class="line">-b, --big-endian        创建一个大端的文件系统</span><br><span class="line">-q, --squash            压缩权限和设置所有文件的拥有者为root</span><br><span class="line">-U, --squash-uids       设置所有文件的拥有者为root</span><br><span class="line">-P, --squash-perms      压缩所有文件的权限</span><br><span class="line">-v  可视操作</span><br></pre></td></tr></table></figure>
+
+<p><em>挂载分区</em>:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount -t jffs2 /dev/mtdblock1 /mnt</span><br></pre></td></tr></table></figure>
+
+<h3 id="yaffs"><a href="#yaffs" class="headerlink" title="yaffs"></a>yaffs</h3><p>yaffs/yaffs2(Yet Another Flash File System)是专为嵌入式系统使用NAND型闪存而设计的一种日志型文件系统。与jffs2相比，它减少了一些功能(例如不支持数 据压缩)，所以速度更快，挂载时间很短，对内存的占用较小。另外，它还是跨平台的文件系统，除了Linux和eCos，还支持WinCE, pSOS和ThreadX等。</p>
+<p>yaffs/yaffs2自带NAND芯片的驱动，并且为嵌入式系统提供了直接访问文件系统的API，用户可以不使用Linux中的MTD与VFS，直接对文件系统操作。当然，yaffs也可与MTD驱动程序配合使用。</p>
+<p>yaffs与yaffs2的主要区别在于，前者仅支持小页(512 Bytes) NAND闪存，后者则可支持大页(2KB) NAND闪存。同时，yaffs2在内存空间占用、垃圾回收速度、读/写速度等方面均有大幅提升。</p>
+<p><a target="_blank" rel="noopener" href="https://yaffs.net/documents/how-yaffs-works">https://yaffs.net/documents/how-yaffs-works</a></p>
+<h3 id="cramfs"><a href="#cramfs" class="headerlink" title="cramfs"></a>cramfs</h3><p>Cramfs(Compressed ROM File System)是Linux的创始人 Linus Torvalds参与开发的一种只读的压缩文件系统。它也基于MTD驱动程序。</p>
+<p>在cramfs文件系统中，每一页(4KB)被单独压缩，可以随机页访问，其压缩比高达2:1,为嵌入式系统节省大量的Flash存储空间，使系统可通过更低容量的FLASH存储相同的文件，从而降低系统成本。</p>
+<p>Cramfs文件系统以压缩方式存储，在运行时解压缩，所以不支持应用程序以XIP方式运行，所有的应用程序要求被拷到RAM里去运行，但这并 不代表比Ramfs需求的RAM空间要大一点，因为Cramfs是采用分页压缩的方式存放档案，在读取档案时，不会一下子就耗用过多的内存空间，只针对目 前实际读取的部分分配内存，尚没有读取的部分不分配内存空间，当我们读取的档案不在内存时，Cramfs文件系统自动计算压缩后的资料所存的位置，再即时 解压缩到RAM中。</p>
+<p>另外，它的速度快，效率高，其只读的特点有利于保护文件系统免受破坏，提高了系统的可靠性。由于以上特性，Cramfs在嵌入式系统中应用广泛。但是它的<strong>只读</strong>属性同时又是它的一大缺陷，使得用户无法对其内容对进扩充。Cramfs映像通常是放在Flash中，但是也能放在别的文件系统里，使用loopback 设备可以把它安装别的文件系统里。</p>
+<p>单个文件大小不能超过16MB、文件系统大小略大于256MB（最后一个文件允许超过256MB空间范围，即文件系统总大小不超过272MB）。CramFS的gid只保存8位，mkcramfs会简单的将gid截断保留最后8位。CramFS支持硬链接，但是被硬链接的文件引用计数不会增加。CramFS文件没有时间戳，所有文件的创建/访问时间戳都是1970年1月1日 0:00:00 GMT。CramFS的镜像只支持被同样字节对齐方式的机器创建和挂载使用，页面大小只支持4KB。</p>
+<h3 id="romfs"><a href="#romfs" class="headerlink" title="romfs"></a>romfs</h3><p>传统型的Romfs文件系统是一种简单的、紧凑的、只读的文件系统，不支持动态擦写保存，按顺序存放数据，因而支持应用程序以 XIP(eXecute In Place，片内运行)方式运行，在系统运行时，节省RAM空间。uClinux系统通常采用Romfs文件系统。<br>　　<br>其他文件系统：fat/fat32也可用于实际嵌入式系统的扩展存储器(例如PDA, Smartphone, 数码相机等的SD卡)，这主要是为了更好的与最流行的Windows桌面操作系统相兼容。ext2也可以作为嵌入式Linux的文件系统，不过将它用于 FLASH闪存会有诸多弊端。</p>
+<h3 id="squashfs"><a href="#squashfs" class="headerlink" title="squashfs"></a>squashfs</h3><p>SquashFS [1]  是一套基于Linux内核使用的压缩<strong>只读</strong>文件系统。该文件系统能够压缩系统内的文档,inode以及目录，文件最大支持2^64字节。<br>-　Squashfs 4.2 : 最新的版本，并适用于2.6.29版本以后的Linux内核。<br>-　Squashfs 4.1 : 支持XZ压缩，并适用于2.6.29版本以后的Linux内核。<br>-　Squashfs 3.4 : 该版本是3.X的最后一个版本，并适用于2.6.29版本之前的内核。</p>
+<p>安装<code>mksquashfs</code>工具：sudo apt-get install squashfs-tools</p>
+<p><em>使用说明</em></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mksquashfs rootfs/usr usr.sqsh4 -noappend -comp xz</span><br></pre></td></tr></table></figure>
+
+<p><em>挂载分区</em></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount -t squashfs /dev/mtdblock6 /usr</span><br></pre></td></tr></table></figure>
+
+<h3 id="RAM文件系统"><a href="#RAM文件系统" class="headerlink" title="RAM文件系统"></a>RAM文件系统</h3><h4 id="ramdisk"><a href="#ramdisk" class="headerlink" title="ramdisk"></a>ramdisk</h4><p>Ramdisk是将一部分固定大小的内存当作分区来使用。它并非一个实际的文件系统，而是一种将实际的文件系统装入内存的机制，并且可以作为根文件系统。将一些经常被访问而又不会更改的文件(如只读的根文件系统)通过Ramdisk放在内存中，可以明显地提高系统的性能。</p>
+<p>在Linux的启动阶段，initrd提供了一套机制，可以将内核映像和根文件系统一起载入内存。</p>
+<h4 id="ramfs-tmpfs"><a href="#ramfs-tmpfs" class="headerlink" title="ramfs/tmpfs"></a>ramfs/tmpfs</h4><p>Ramfs是Linus Torvalds开发的一种基于内存的文件系统，工作于虚拟文件系统(VFS)层，不能格式化，可以创建多个，在创建时可以指定其最大能使用的内存大 小。(实际上，VFS本质上可看成一种内存文件系统，它统一了文件在内核中的表示方式，并对磁盘文件系统进行缓冲。)</p>
+<p>Ramfs/tmpfs文件系统把所有的文件都放在RAM中，所以读/写操作发生在RAM中，可以用ramfs/tmpfs来存储一些临时性或经常要修改的数据，例如/tmp和/var目录，这样既避免了对Flash存储器的读写损耗，也提高了数据读写速度。</p>
+<p>Ramfs/tmpfs相对于传统的Ramdisk的不同之处主要在于：不能格式化，文件系统大小可随所含文件内容大小变化。</p>
+<p>Tmpfs的一个缺点是当系统重新引导时会丢失所有数据。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/algo/algorithm/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -774,180 +1107,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/27/tool/sublime/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/08/27/tool/sublime/" class="post-title-link" itemprop="url">Sublime Text插件与配置</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-08-27 17:09:51" itemprop="dateCreated datePublished" datetime="2022-08-27T17:09:51+08:00">2022-08-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-17 10:32:00" itemprop="dateModified" datetime="2022-12-17T10:32:00+08:00">2022-12-17</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/tool/" itemprop="url" rel="index"><span itemprop="name">tool</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;auto_complete&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;auto_complete_commit_on_tab&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;auto_complete_with_fields&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;color_scheme&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Packages/Color Scheme - Default/Mariana.sublime-color-scheme&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;theme&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Default.sublime-theme&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_face&quot;</span><span class="punctuation">:</span> <span class="string">&quot;JetBrains Mono&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_face1&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Consolas&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_face2&quot;</span><span class="punctuation">:</span> <span class="string">&quot;DejaVu Sans Mono&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_options&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;gray_antialias&quot;</span><span class="punctuation">,</span> <span class="string">&quot;gdi&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;default_encoding&quot;</span><span class="punctuation">:</span> <span class="string">&quot;UTF-8&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;default_line_ending&quot;</span><span class="punctuation">:</span> <span class="string">&quot;unix&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;font_size&quot;</span><span class="punctuation">:</span> <span class="number">18</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;tab_size&quot;</span><span class="punctuation">:</span> <span class="number">4</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;translate_tabs_to_spaces&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;highlight_line&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;update_check&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;vintage_ctrl_keys&quot;</span><span class="punctuation">:</span> <span class="keyword">false</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;vintage_start_in_command_mode&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;word_wrap&quot;</span><span class="punctuation">:</span> <span class="keyword">true</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;rulers&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="number">100</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;ignored_packages&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;Package Control&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;ignored_packages_bak&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;Vintage&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;file_exclude_patterns&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;*.pyc&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.pyo&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.exe&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.dll&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.obj&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.o&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.a&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.lib&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.so&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.dylib&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.ncb&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.sdf&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.suo&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.pdb&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.idb&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.DS_Store&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.class&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.psd&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.db&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.sublime-workspace&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.ko.*&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.mod.*&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.o.*&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;a.out&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.order&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.ko&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*.symvers&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;*_test&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;folder_exclude_patterns&quot;</span><span class="punctuation">:</span></span><br><span class="line">    <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;.svn&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.git&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.hg&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;CVS&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.tags&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.tmp*&quot;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="快捷键"><a href="#快捷键" class="headerlink" title="快捷键"></a>快捷键</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;navigate_to_definition&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;keys&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;alt+t&quot;</span><span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line"></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;jump_prev&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;keys&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;alt+b&quot;</span><span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line"></span><br><span class="line">    <span class="punctuation">&#123;</span> </span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;alignment&quot;</span><span class="punctuation">,</span> </span><br><span class="line">        <span class="attr">&quot;keys&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;ctrl+shift+a&quot;</span><span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
-
-<p>配置鼠标操作，点击Preferences-&gt;Browse Packages进入Packages目录，然后打开User目录，查看User目录里面有没有Default (Windows).sublime-mousemap文件，如果没有则创建一个。</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;button&quot;</span><span class="punctuation">:</span> <span class="string">&quot;button1&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;count&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;press_command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;drag_select&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;modifiers&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;alt&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;navigate_to_definition&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;button&quot;</span><span class="punctuation">:</span> <span class="string">&quot;button2&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;count&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;modifiers&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;alt&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;jump_prev&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="package-control"><a href="#package-control" class="headerlink" title="package control"></a>package control</h2><h3 id="CMake"><a href="#CMake" class="headerlink" title="CMake"></a>CMake</h3><h3 id="All-Autocomplete"><a href="#All-Autocomplete" class="headerlink" title="All Autocomplete"></a>All Autocomplete</h3><h3 id="Emmet"><a href="#Emmet" class="headerlink" title="Emmet"></a>Emmet</h3><h3 id="Color-Highlight"><a href="#Color-Highlight" class="headerlink" title="Color Highlight"></a>Color Highlight</h3><h3 id="Higlighter"><a href="#Higlighter" class="headerlink" title="Higlighter"></a>Higlighter</h3><h3 id="WordHighlight"><a href="#WordHighlight" class="headerlink" title="WordHighlight"></a>WordHighlight</h3><h3 id="Block-Cursor-Everywhere"><a href="#Block-Cursor-Everywhere" class="headerlink" title="Block Cursor Everywhere"></a>Block Cursor Everywhere</h3><h3 id="BracketHighlighter"><a href="#BracketHighlighter" class="headerlink" title="BracketHighlighter"></a>BracketHighlighter</h3><h3 id="Side-Bar"><a href="#Side-Bar" class="headerlink" title="Side Bar"></a>Side Bar</h3><h3 id="DocBlockr"><a href="#DocBlockr" class="headerlink" title="DocBlockr"></a>DocBlockr</h3><h3 id="CTags"><a href="#CTags" class="headerlink" title="CTags"></a>CTags</h3><ol>
-<li>安装ctags，设置环境变量。</li>
-<li>在Preferences菜单中打开Package settings-&gt;ctags-&gt;settings-user和settings-default<br>把default中的配置全部复制到user中，然后改一下command配置项，为ctags的可执行文件路径</li>
-<li>工程目录执行<code>ctags -R -f .tags</code></li>
-<li>设置键盘快捷键</li>
-</ol>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;navigate_to_definition&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;keys&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;alt+t&quot;</span><span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;jump_prev&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;keys&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;alt+b&quot;</span><span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
-
-<p>5.设置鼠标快捷键</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;button&quot;</span><span class="punctuation">:</span> <span class="string">&quot;button1&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;count&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;press_command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;drag_select&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;modifiers&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;ctrl&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;navigate_to_definition&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;button&quot;</span><span class="punctuation">:</span> <span class="string">&quot;button2&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;count&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;modifiers&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;ctrl&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;jump_prev&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="File-Header"><a href="#File-Header" class="headerlink" title="File Header"></a>File Header</h3><p>1.设置默认信息键值对，Preferences -&gt; Pacakge Settings -&gt; File Header -&gt; Setting User</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;Default&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;_author&quot;</span><span class="punctuation">:</span> <span class="string">&quot;luo_u&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;_email&quot;</span><span class="punctuation">:</span> <span class="string">&quot;luo_u@qq.com&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;_desc&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<p>2.更改模板文件，进入SublimeText 插件安装目录，Preferences -&gt; Browse Packages-&gt;File Header -&gt; template -&gt; header，有大量的.tmpl 文件。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * @Description:    </span></span><br><span class="line"><span class="comment"> * @Author: &#123;&#123;author&#125;&#125;</span></span><br><span class="line"><span class="comment"> * @Date: &#123;&#123;create_time&#125;&#125;</span></span><br><span class="line"><span class="comment"> * @LastEditor: &#123;&#123;last_modified_by&#125;&#125;</span></span><br><span class="line"><span class="comment"> * @LastEditTime: &#123;&#123;last_modified_time&#125;&#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="Terminal"><a href="#Terminal" class="headerlink" title="Terminal"></a>Terminal</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;terminal&quot;</span><span class="punctuation">:</span> <span class="string">&quot;D:\\Git\\git-bash.exe&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;parameters&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;env&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="Alignment"><a href="#Alignment" class="headerlink" title="Alignment"></a>Alignment</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;keys&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;ctrl+shift+a&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span> <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="string">&quot;alignment&quot;</span> <span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="Snippets"><a href="#Snippets" class="headerlink" title="Snippets"></a>Snippets</h2><p>打开Tools-&gt;New snippet创建代码段</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">snippet</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">content</span>&gt;</span>&lt;![CDATA[</span><br><span class="line">/******************************************************************</span><br><span class="line">  * @file    $TM_FILENAME</span><br><span class="line">  * @brief   $1</span><br><span class="line">  * @author  $&#123;2:luo_u&#125;</span><br><span class="line">  * @date    $3</span><br><span class="line">******************************************************************/</span><br><span class="line">]]&gt;<span class="tag">&lt;/<span class="name">content</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Set a tabTrigger to define how to trigger the snippet --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">tabTrigger</span>&gt;</span>hand<span class="tag">&lt;/<span class="name">tabTrigger</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Set a scope to limit where the snippet will trigger --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">scope</span>&gt;</span>source.c<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Optional: Description to show in the menu --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">description</span>&gt;</span>c file hand<span class="tag">&lt;/<span class="name">description</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">snippet</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>content</code>其中必须包含<code>&lt;![CDATA[…]]&gt;</code>,否则无法工作, [..]中写你自己的代码片段</li>
-<li><code>tabTrigger</code>用来引发代码片段的字符或者字符串</li>
-<li><code>scope</code>表示你的代码片段会在那种语言环境下激活</li>
-<li><code>description</code> 展示代码片段的描述，默认使用代码片段的文件名作为描述</li>
-</ul>
-<h3 id="Snippet环境变量"><a href="#Snippet环境变量" class="headerlink" title="Snippet环境变量"></a>Snippet环境变量</h3><table>
-<thead>
-<tr>
-<th><strong>环境变量名</strong></th>
-<th><strong>描述</strong></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>$PARAM1 .. $PARAMn</td>
-<td>Arguments passed to the <code>insert_snippet</code> command.</td>
-</tr>
-<tr>
-<td>$SELECTION</td>
-<td>The text that was selected when the snippet was triggered.</td>
-</tr>
-<tr>
-<td>$TM_CURRENT_LINE</td>
-<td>Content of the cursor’s line when the snippet was triggered.</td>
-</tr>
-<tr>
-<td>$TM_CURRENT_WORD</td>
-<td>Word under the cursor when the snippet was triggered.</td>
-</tr>
-<tr>
-<td>$TM_DIRECTORY</td>
-<td>Directory name of the file being edited. (since 3154)</td>
-</tr>
-<tr>
-<td>$TM_FILENAME</td>
-<td>用户文件名</td>
-</tr>
-<tr>
-<td>$TM_FILEPATH</td>
-<td>用户的用户名</td>
-</tr>
-<tr>
-<td>$TM_FULLNAME</td>
-<td>用户的用户名</td>
-</tr>
-<tr>
-<td>$TM_LINE_INDEX</td>
-<td>插入多少列, 默认为0</td>
-</tr>
-<tr>
-<td>$TM_LINE_NUMBER</td>
-<td>一个snippet插入多少行</td>
-</tr>
-<tr>
-<td>$TM_SELECTED_TEXT</td>
-<td>An alias for $SELECTION.</td>
-</tr>
-<tr>
-<td>$TM_SCOPE</td>
-<td>The scope of the beginning of each selected region. (since 3154)</td>
-</tr>
-<tr>
-<td>$TM_SOFT_TABS</td>
-<td>如果设置translate_tabs_to_spaces : true 则为Yes</td>
-</tr>
-<tr>
-<td>$TM_TAB_SIZE</td>
-<td>每个Tab包含几个空格</td>
-</tr>
-</tbody></table>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/27/tool/vscode/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1057,383 +1216,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/27/c/mem-manage/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/08/27/c/mem-manage/" class="post-title-link" itemprop="url">c语言内存管理</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-08-27 17:09:51" itemprop="dateCreated datePublished" datetime="2022-08-27T17:09:51+08:00">2022-08-27</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="大小端"><a href="#大小端" class="headerlink" title="大小端"></a>大小端</h2><p>大端和小端表示多字节值的哪一端存储在该值的起始地址处，指的是字节在内存中存储时的排列规则，而不是数据中的位的排列规则，不管是大端还是小端，计算机在内存中存放数据的顺序都是从低地址到高地址，不同的是在低字节还是高字节处先取数据。</p>
-<p><strong>大端(Big-Endian)</strong></p>
-<p>就是把数值0x123456的高位字节放在内存的低位地址上，把数值的低位字节放在内存的高位地址上。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">低地址 -----&gt; 高地址</span><br><span class="line">0x12 | 0x34 | 0x56</span><br></pre></td></tr></table></figure>
-
-<p><strong>小端(Little-Endian)</strong></p>
-<p>就是把数值0x123456的高位字节放在高位的地址上，低位字节放在低位地址上。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">低地址 -----&gt; 高地址</span><br><span class="line">0x56 | 0x34 | 0x12</span><br></pre></td></tr></table></figure>
-
-<p>由于不同架构的CPU处理多个字节数据的顺序不一样，产生了大小端之分。主机字节序是多样的，ARM既可以工作在大端，也可以工作在小端。网络统一为大端模式，还专门有网络字节序和主机字节序之间的转换接口(ntohs、htons、ntohl、htonl)。</p>
-<p>小端模式强制转换类型时不需要调整字节内容，直接截取低字节即可。大端模式由于符号位为第一个字节，很方便判断正负。</p>
-<p><strong>判断大小端</strong></p>
-<ol>
-<li>通过强制类型转换截断</li>
-</ol>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">BOOL <span class="title function_">IsBigEndian</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">   <span class="type">short</span> a = <span class="number">0x1234</span>;</span><br><span class="line">   <span class="type">char</span> b = *(<span class="type">char</span>*)&amp;a;</span><br><span class="line">   <span class="keyword">if</span>(<span class="number">0x12</span> == b)</span><br><span class="line">   &#123;</span><br><span class="line">       <span class="keyword">return</span> TRUE;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"> <span class="keyword">return</span> FALSE;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li>利用联合体共享内存的特性，截取低地址部分</li>
-</ol>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">BOOL <span class="title function_">IsBigEndian</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="class"><span class="keyword">union</span> <span class="title">NUM</span></span></span><br><span class="line"><span class="class">  &#123;</span></span><br><span class="line">      <span class="type">short</span>  a;</span><br><span class="line">      <span class="type">char</span> b;</span><br><span class="line">  &#125;num;</span><br><span class="line"></span><br><span class="line">  num.a = <span class="number">0x1234</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span>(<span class="number">0x12</span> == num.b)</span><br><span class="line">  &#123;</span><br><span class="line">      <span class="keyword">return</span> TRUE;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> FALSE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="字节对齐"><a href="#字节对齐" class="headerlink" title="字节对齐"></a>字节对齐</h2><p>字节对齐的作用在于提高CPU访问内存的效率，同时字节的合理分布可以节省存储空间。如果一个变量的内存地址正好位于它长度的整数倍，则称做自然对齐。访问未对齐的内存，处理器需要作两次内存访问；而对齐的内存访问仅需要一次访问。</p>
-<p>对齐访问也可能是硬件的特殊要求。不同平台和架构的CPU对存储空间的处理不同，有些平台从偶地址开始读数据，如果一个int型变量存放在偶地址开始的地址，那么一个读周期就可以读出这32bit，而如果存放在奇地址开始的地方，就需要2个读周期，并对两次读出的结果的高低字节进行拼凑才能得到该32bit数据。同时并不是所有的平台都能够访问任意地址上的任意数据，有些硬件平台只能够访问对齐的地址，否则就会出现硬件异常错误。</p>
-<p>数组按照基本数据类型对齐，第一个对齐了后面的自然也就对齐了。联合体按其包含的长度最大的数据类型对齐。结构体中每个数据类型都要对齐，规则为：</p>
-<ol>
-<li>结构体变量的起始地址能够被其最宽的成员大小整除。</li>
-<li>结构体第一个成员在偏移0的位置，之后的每个成员相对于起始位置必须是当前成员大小的整数倍。</li>
-<li>结构体内所有数据成员各自对齐后，结构体本身还要进行一次内存对齐，保证整个结构体占用内存大小是结构体内最大数据成员的最小整数倍。</li>
-</ol>
-<p><strong>#pragma pack()</strong></p>
-<p>可以使用<code>#pragma pack(n)</code>预编译指令来设定变量以n字节对齐方式。n字节对齐就是说变量存放的起始地址的偏移量有两种情况：</p>
-<ul>
-<li>如果n大于等于该变量所占用的字节数，那么偏移量必须满足默认的对齐方式；</li>
-<li>如果n小于该变量的类型所占用的字节数，那么偏移量为n的倍数，不用满足默认的对齐方式。</li>
-</ul>
-<p>结构的总大小也有约束条件，分两种情况：如果n大于所有成员变量类型所占用的字节数，那么结构的总大小必须为占用空间最大的变量占用的空间数的倍数；否则必须为n的倍数。</p>
-<p><code>#pragma pack()</code> 取消自定义对齐方式，恢复默认方式。</p>
-<h2 id="位域"><a href="#位域" class="headerlink" title="位域"></a>位域</h2><p>有些信息在存储时，并不需要占用一个完整的字节，而只需占几个或一个二进制位。位域是把一个字节中的二进位划分为几个不同的区域，并说明每个区域的位数。每个域有一个域名，允许在程序中按域名进行操作。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> 位域结构名</span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    类型说明符 位域名:位域长度</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Data</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">int</span> a:<span class="number">8</span>;</span><br><span class="line">    <span class="type">int</span> b:<span class="number">2</span>;</span><br><span class="line">    <span class="type">int</span> c:<span class="number">4</span>;</span><br><span class="line">    <span class="type">int</span>  :<span class="number">2</span>; <span class="comment">/*空域*/</span></span><br><span class="line">&#125;data;</span><br><span class="line"><span class="comment">/* data共占2个字节，其中位域a占8位，位域b占2位，位域c占4位 */</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>位域的长度不能大于一个字节，一个位域必须存储在同一个字节中，不能跨两个字节。</li>
-<li>位域可以没有位域名，叫空域，这时它只用来作填充或调整位置，空域是不能使用的。</li>
-<li>给位域赋值不能超过该位域的允许范围。</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/21/c/process/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/08/21/c/process/" class="post-title-link" itemprop="url">linux process in user</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-08-21 09:49:47" itemprop="dateCreated datePublished" datetime="2022-08-21T09:49:47+08:00">2022-08-21</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>进程是系统进行资源分配和调度的单位。从系统的角度看是通过进程控制块来描述的，进程控制块包含了进程的描述信息、控制信息以及资源信息。进程控制块中的每一项都是一个 task_struct 结构，在 include/linux/sched.h中定义的。</p>
-<ul>
-<li>0号进程是idle，系统创建的一个进程，运行在内核态，完成加载系统后，演变为进程调度scheduler。</li>
-<li>1号进程是init，所有用户进程的父进程。</li>
-<li>2号进程是kthreadd，所有kernel thread的父进程，由idle通过kernel_thread创建，并始终运行在内核空间, 负责所有内核线程的调度和管理。</li>
-</ul>
-<p>进程根据它的生命周期可以划分成 3 种状态：</p>
-<ul>
-<li>执行态:该进程正在运行，即进程正在占用 CPU。</li>
-<li>就绪态:进程已经具备执行的一切条件，正在等待分配 CPU 的处理时间片。</li>
-<li>等待态:进程不能使用 CPU，若等待事件发生(等待的资源分配到)则可将其唤醒。</li>
-</ul>
-<p><img src="/images/linux/process/status.jpeg" alt="进程状态转换"></p>
-<h2 id="进程空间"><a href="#进程空间" class="headerlink" title="进程空间"></a>进程空间</h2><p><img src="/images/linux/process/mem.jpeg" alt="进程空间"></p>
-<ul>
-<li><p>未初始化数据段(.bss)：Block Storage Start，存放未初始化或初始化为0的全局变量，未初始化的静态变量。bss段的变量只占用运行时的内存空间，而不占用文件空间。在程序开始执行之前，内核将此段初始化为0。.bss段占据的大小存放在ELF文件格式中的段表(Section Table)中，段表存放了各个段的各种信息，比如段的名字、段的类型、段在elf文件中的偏移、段的大小等信息。同时符号存放在符号表.symtab中。</p>
-</li>
-<li><p>初始化数据段(.data)：存放初始化非0的全局变量，初始化的静态变量。既占用运行时的内存空间，又占用文件空间。</p>
-</li>
-<li><p>代码段：只读，包含程序代码（.init和.text）和只读数据（.rodata），存储机器码序列、全局常量、代码、字符串常量。</p>
-</li>
-<li><p>栈：从高地址往低地址向下增长，存放局部变量、局部常量、函数参数、返回值、函数调用时返回地址、调用者的环境信息。</p>
-</li>
-<li><p>堆：从低地址往高低至增长，动态分配的内存。</p>
-</li>
-</ul>
-<p>可以用<code>cat /proc/self/maps</code>查看程序运行时空间的分配情况，每个区间都有4个属性：</p>
-<ul>
-<li>r  表示可以读取;</li>
-<li>w  表示可以修改;</li>
-<li>x  表示可以执行;</li>
-<li>p/s 表示是否为共享内存;</li>
-</ul>
-<p><code>size</code>命令可以查看可执行文件的正文段、数据段和 b s s段的长度(单位:字节)。</p>
-<p>数据段和代码段分离，数据和指令被映射到两个虚拟内存区域，数据段对进程来说可读写，代码段是只读，这样可以防止程序的指令被改写。现代CPU缓存一般被设计成数据缓存和指令缓存分离，分开对CPU缓存命中率有好处。代码段是可以共享的，数据段是私有的，当运行多个程序的副本时，只需要保存一份代码段。</p>
-<p>栈容易溢出是因为栈内存有限，递归次数多了，局部数据占用的内存直到整个递归结束才会被释放，很容易就导致栈溢出。</p>
-<h2 id="pid"><a href="#pid" class="headerlink" title="pid"></a>pid</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpid</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getppid</span><span class="params">(<span class="type">void</span>)</span></span><br></pre></td></tr></table></figure>
-
-<p>getpid返回调用进程的进程号，Linux 内核限制进程号&lt;= 32767。任何进程都可使用符号链接/proc/self 来访问其自己的/proc/pid/ 目录。</p>
-<p>getppid返回目前进程的父进程的进程号。可通过查看/proc/pid/status 的PPid字段，可以获知每个进程的父进程。</p>
-<h2 id="fork"><a href="#fork" class="headerlink" title="fork()"></a>fork()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">fork</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">vfork</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>fork创建的新进程被称为子进程。该函数被调用一次，但返回两次，可通过返回值来区分父、子进程，在父进程中返回新创建子进程的进程pid，而在子进程中则返回 0，子进程可调用getpid()以获取自身的进程 ID，调用getppid()以获取父进程ID。</p>
-<p>子进程从父进程处继承了整个进程的地址空间,包括进程上下文、代码段、进程堆栈、内存信息、打开的文件描述符、信号控制设定、进程优先级、进程组号、当前工作目录、根目录、资源限制、环境变量、标准IO的缓存数据和控制终端等，而子进程所独有的只有它的进程号、资源使用和计时器等。这两个进程将执行相同的程序文本段，但却各自拥有不同的栈段、数据段以及堆段拷贝。子进程的栈、数据以及栈段开始时是对父进程内存相应各部分的完全复制，每个进程均可修改各自的栈数据、以及堆段中的变量，而并不影响另一进程。子进程的tms_utime、tms_stime、tms_cutime以及tms_ustime设置为0，子进程不继承父进程设置的锁。</p>
-<p>vfork用于创建一个新进程，但并不将父进程的地址空间完全复制到子进程中，因为子进程会立即调用exec或exit，不会存访该地址空间。不过在子进程调用exec或exit之前，它在父进程的空间中运行。vfork保证子进程先运行，在它调用exec或exit之后父进程才可能被调度运行(如果调用这两个函数之前子进程依赖于父进程，会导致死锁)。</p>
-<p>当子进程退出时，其父进程没有调用 wait() 系统调用回收他的进程描述符信息，该进程就会继续停留在系统的进程表中，占用内核资源，称为<strong>僵尸进程</strong>。预防僵尸进程的方法:</p>
-<ul>
-<li>父进程注册<code>signal(SIGCHLD, SIG_IGN)</code>通知内核父进程忽略SIGCHLD信号，由内核回收。</li>
-<li>父进程调用 wait()/waitpid() 函数等待子进程结束</li>
-<li>父进程用signal注册信号处理函数，在信号处理函数中调用 wait()/waitpid() 函数等待子进程退出。</li>
-<li>连续调用两次fork，使紧跟的子进程退出，其孙子进程成为一个孤儿进程，交给init进程托管。</li>
-</ul>
-<h2 id="exit"><a href="#exit" class="headerlink" title="exit()"></a>exit()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> _exit(<span class="type">int</span> status);</span><br><span class="line"><span class="type">void</span> <span class="title function_">exit</span><span class="params">(<span class="type">int</span> status)</span></span><br></pre></td></tr></table></figure>
-
-<p>终止进程的，清除包括 PCB 在内的各种数据结构。区别在于 exit()函数会清理 I/O 缓冲，检查文件的打开情况，把文件缓冲区中的内容写回文件。</p>
-<h2 id="atexit"><a href="#atexit" class="headerlink" title="atexit()"></a>atexit()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">atexit</span><span class="params">(<span class="type">void</span> (*function)(<span class="type">void</span>))</span>;</span><br></pre></td></tr></table></figure>
-
-<p>在进程终止后，以登记的相反顺序调用注册的终止处理函数。</p>
-<h2 id="abort"><a href="#abort" class="headerlink" title="abort()"></a>abort()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">abort</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>abort()可以产生SIGABRT信号，当进程发生越界访问或除0时。</p>
-<h2 id="wait-waitpid"><a href="#wait-waitpid" class="headerlink" title="wait() waitpid()"></a>wait() waitpid()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/wait.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">wait</span><span class="params">(<span class="type">int</span> *status)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">waitpid</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">int</span> *status, <span class="type">int</span> options)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>wait()使其调用者阻塞，直到一个子进程终止，并返回其进程号,如果该父进程没有子进程或者他的子进程已经结束，则立即返回。</p>
-<p>waitpid的pid参数：</p>
-<ul>
-<li><code>&gt;0</code>  只等待进程ID等于pid 的子进程，只要子进程还没结束，就会一直等下去；</li>
-<li><code>-1</code>  等待任何一个子进程退出，和wait()一样；</li>
-<li><code>=0</code>  等待其组ID相同的任一子进程；</li>
-<li><code>&lt;-1</code> 等待其组ID等于pid的绝对值的任一子进程；</li>
-</ul>
-<p>waitpid的options参数：</p>
-<ul>
-<li>WNOHANG   若由pid指定的子进程不立即可用，则不阻塞并返回0；</li>
-<li>WUNTRACED 若实现某支持作业控制，则由pid指定的任一子进程状态已暂停，且其状态自暂停以来还未报告过，则返回其状态；</li>
-<li>0 同wait阻塞父进程，等待子进程退出；</li>
-</ul>
-<p>如果不关心终止状态，可将该status参数指定为NULL，可用宏检查status的状态。</p>
-<p><img src="/images/linux/process/wait_status.png" alt="wait_status"></p>
-<p>如果一个进程希望等待一个子进程终止，则它必须调用wait函数。如果一个进程要等待其父进程终止，则可使用下列形式的循环:</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span>(getppid() != <span class="number">1</span>)</span><br><span class="line">    sleep(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
-
-<h2 id="execl"><a href="#execl" class="headerlink" title="execl()"></a>execl()</h2><p>exec函数并不创建新进程，只是用另一个新程序替换了当前进程的正文、数据、堆和栈段，且两个进程的PID相同。例如：在shell命令行执行ps命令，实际上是shell进程调用fork复制一个新的子进程，在利用exec系统调用将新产生的子进程完全替换成ps进程。exec系列函数底层其实都是通过调用execve函数实现的。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="type">char</span> **environ;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">execl</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">const</span> <span class="type">char</span> *arg, ... (<span class="type">char</span> *)<span class="literal">NULL</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execlp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">const</span> <span class="type">char</span> *arg, ... (<span class="type">char</span> *)<span class="literal">NULL</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execle</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">const</span> <span class="type">char</span> *arg, ... (<span class="type">char</span> *)<span class="literal">NULL</span>, <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">char</span> *<span class="type">const</span> argv[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execvp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">char</span> *<span class="type">const</span> argv[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execvpe</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">char</span> *<span class="type">const</span> argv[], <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execve</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">char</span> *<span class="type">const</span> argv[], <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>带 l 的exec函数表示命令的参数以可变参数的形式给出，且以一个NULL结束。</li>
-<li>带 p 的exec函数表示第一个参数只要是进程名即可，它会在环境变量当中查找命令。</li>
-<li>带 v 的exec函数表示命令的参数以字符串数组形式给出，且最后一个元素也必须是NULL。</li>
-<li>带 e 的exec函数表示将envp数组的内容作为环境变量传递给替换的进程。</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> *<span class="type">const</span> envp[] = &#123;<span class="string">&quot;AA=11&quot;</span>, <span class="string">&quot;BB=22&quot;</span>, (<span class="type">char</span> *)<span class="literal">NULL</span>&#125;;</span><br><span class="line">    execle(<span class="string">&quot;./hello&quot;</span>, <span class="string">&quot;hello&quot;</span>, (<span class="type">char</span> *)<span class="literal">NULL</span>, envp);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">char</span> **environ;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[], <span class="type">char</span> *envp[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span>(*envp != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="built_in">puts</span>(*(envp++));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i=<span class="number">0</span> ; environ[i] != <span class="literal">NULL</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">puts</span>(environ[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="system"><a href="#system" class="headerlink" title="system()"></a>system()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">system</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *command)</span>;</span><br></pre></td></tr></table></figure>
-
-<h2 id="进程时间"><a href="#进程时间" class="headerlink" title="进程时间"></a>进程时间</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/times.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tms</span> &#123;</span></span><br><span class="line">   <span class="type">clock_t</span> tms_utime;  <span class="comment">/* user time */</span></span><br><span class="line">   <span class="type">clock_t</span> tms_stime;  <span class="comment">/* system time */</span></span><br><span class="line">   <span class="type">clock_t</span> tms_cutime; <span class="comment">/* user time of children */</span></span><br><span class="line">   <span class="type">clock_t</span> tms_cstime; <span class="comment">/* system time of children */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">clock_t</span> <span class="title function_">times</span><span class="params">(<span class="keyword">struct</span> tms *buf)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>获取进程的系统CPU时间和用户CPU时间，返回当时的系统时钟计数。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/tool/shell-if/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/08/13/tool/shell-if/" class="post-title-link" itemprop="url">shell if 条件判断</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-08-13 21:56:51" itemprop="dateCreated datePublished" datetime="2022-08-13T21:56:51+08:00">2022-08-13</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/shell/" itemprop="url" rel="index"><span itemprop="name">shell</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if [ command ]; then</span><br><span class="line"></span><br><span class="line">elif [ command ]; then</span><br><span class="line"></span><br><span class="line">else</span><br><span class="line"></span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
-
-<p><em>注意</em>：</p>
-<p>1、[ ]表示条件测试，要注意在’[‘后面和’]’前面都必须要有空格。</p>
-<p>2、在shell中，then和fi是分开的语句。如果要在同一行里面输入，则需要用分号将他们隔开。</p>
-<p>3、if判断中对于变量的处理，需要加引号，以免一些不必要的错误。没有加双引号会在一些含空格等的字符串变量判断的时候产生错误。比如<code>[ -n &quot;$var&quot; ]</code>，如果var为空会出错。</p>
-<p>4、不支持浮点值。</p>
-<p>5、如果只单独使用&gt;或者&lt;号，系统会认为是输出或者输入重定向，虽然结果显示正确，但是其实是错误的，因此要对这些符号进行转义。</p>
-<p>6、运行if语句中的命令所产生的错误信息默认仍然出现在脚本的输出结果中。</p>
-<p>7、使用-z或者-n来检查长度的时候，没有定义的变量也为0。</p>
-<p>8、空变量和没有初始化的变量可能会对shell脚本测试产生灾难性的影响，因此在不确定变量的内容的时候，在测试前使用-n或者-z测试一下。</p>
-<p>9、? 变量包含了之前执行命令的退出状态（最近完成的前台进程），可以用于检测退出状态。</p>
-<h2 id="文件-目录判断"><a href="#文件-目录判断" class="headerlink" title="文件/目录判断"></a>文件/目录判断</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[ -b FILE ] 如果 FILE 存在且是一个块特殊文件则为真。</span><br><span class="line">[ -c FILE ] 如果 FILE 存在且是一个字特殊文件则为真。</span><br><span class="line">[ -d DIR ]  如果 FILE 存在且是一个目录则为真。</span><br><span class="line">[ -e FILE ] 如果 FILE 存在则为真。</span><br><span class="line">[ -f FILE ] 如果 FILE 存在且是一个普通文件则为真。</span><br><span class="line">[ -g FILE ] 如果 FILE 存在且已经设置了SGID则为真。</span><br><span class="line">[ -k FILE ] 如果 FILE 存在且已经设置了粘制位则为真。</span><br><span class="line">[ -p FILE ] 如果 FILE 存在且是一个名字管道(F如果O)则为真。</span><br><span class="line">[ -r FILE ] 如果 FILE 存在且是可读的则为真。</span><br><span class="line">[ -s FILE ] 如果 FILE 存在且大小不为0则为真。</span><br><span class="line">[ -t FD ]   如果文件描述符 FD 打开且指向一个终端则为真。</span><br><span class="line">[ -u FILE ] 如果 FILE 存在且设置了SUID (set user ID)则为真。</span><br><span class="line">[ -w FILE ] 如果 FILE存在且是可写的则为真。</span><br><span class="line">[ -x FILE ] 如果 FILE 存在且是可执行的则为真。</span><br><span class="line">[ -O FILE ] 如果 FILE 存在且属有效用户ID则为真。</span><br><span class="line">[ -G FILE ] 如果 FILE 存在且属有效用户组则为真。</span><br><span class="line">[ -L FILE ] 如果 FILE 存在且是一个符号连接则为真。</span><br><span class="line">[ -N FILE ] 如果 FILE 存在 and has been mod如果ied since it was last read则为真。</span><br><span class="line">[ -S FILE ] 如果 FILE 存在且是一个套接字则为真。</span><br><span class="line">[ FILE1 -nt FILE2 ] 如果 FILE1 比 FILE2 新，则为真。</span><br><span class="line">[ FILE1 -ot FILE2 ] 如果 FILE1 比 FILE2 要老, 或者 FILE2 存在且 FILE1 不存在则为真。</span><br><span class="line">[ FILE1 -ef FILE2 ] 如果 FILE1 和 FILE2 指向相同的设备和节点号则为真。</span><br></pre></td></tr></table></figure>
-
-<h2 id="字符串判断"><a href="#字符串判断" class="headerlink" title="字符串判断"></a>字符串判断</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[ -z STRING ] 判断是否为空</span><br><span class="line">[ -n STRING ] 判断是否为非空</span><br><span class="line">[ STRING1 ]　 如果字符串不为空则为真</span><br><span class="line">[ STRING1 = STRING2 ]  如果两个字符串相同则为真</span><br><span class="line">[ STRING1 == STRING2 ] 如果两个字符串相同则返回为真</span><br><span class="line">[ STRING1 != STRING2 ] 如果字符串不相同则为真</span><br><span class="line">[ STRING1 &lt; STRING2 ]  如果 “STRING1”字典排序在“STRING2”前面则返回为真。</span><br><span class="line">[ STRING1 &gt; STRING2 ]  如果 “STRING1”字典排序在“STRING2”后面则返回为真。</span><br></pre></td></tr></table></figure>
-
-<p><strong>比较两个字符串是否相等的办法</strong></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if [ &quot;$test&quot;x = &quot;test&quot;x ]; then</span><br><span class="line"></span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
-
-<ol>
-<li>使用单个等号，等号两边各有一个空格。</li>
-<li>注意到”$test”x最后的x，这是特意安排的，因为当$test为空的时候，上面的表达式就变成了x = testx，显然是不相等的。而如果没有这个x，表达式就会报错：”[: =: unary operator expected”。</li>
-</ol>
-<p><strong>==的功能在<code>[[]]</code>和<code>[]</code>中的行为是不同的</strong></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[[ \$a == z* ]]      # 如果$a以&quot;z&quot;开头(模式匹配)那么将为true</span><br><span class="line">[[ \$a == &quot;z*&quot; ]]    # 如果$a等于z*(字符匹配),那么结果为true</span><br><span class="line">[ \$a == z* ]        # File globbing 和word splitting将会发生</span><br><span class="line">[ &quot;\$a&quot; == &quot;z&quot; ]     # 如果$a等于z(字符匹配),那么结果为true</span><br></pre></td></tr></table></figure>
-
-<h2 id="数值判断"><a href="#数值判断" class="headerlink" title="数值判断"></a>数值判断</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">INT1 -eq INT2           INT1和INT2两数相等为真</span><br><span class="line">INT1 -ne INT2           INT1和INT2两数不等为真</span><br><span class="line">INT1 -gt INT2           INT1大于INT1为真</span><br><span class="line">INT1 -ge INT2           INT1大于等于INT2为真</span><br><span class="line">INT1 -lt INT2           INT1小于INT2为真</span><br><span class="line">INT1 -le INT2           INT1小于等于INT2为真</span><br></pre></td></tr></table></figure>
-
-<h2 id="逻辑判断"><a href="#逻辑判断" class="headerlink" title="逻辑判断"></a>逻辑判断</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ ! EXPR ]         逻辑非，如果 EXPR 是false则返回为真。</span><br><span class="line">[ EXPR1 -a EXPR2 ] 逻辑与，如果 EXPR1 and EXPR2 全真则返回为真。</span><br><span class="line">[ EXPR1 -o EXPR2 ] 逻辑或，如果 EXPR1 或者 EXPR2 为真则返回为真。</span><br><span class="line">[ ] || [ ]         用OR来合并两个条件</span><br><span class="line">[ ] &amp;&amp; [ ]         用AND来合并两个条件</span><br></pre></td></tr></table></figure>
-
-<h2 id="其他判断"><a href="#其他判断" class="headerlink" title="其他判断"></a>其他判断</h2><p>[ -t FD ] 如果文件描述符 FD （默认值为1）打开且指向一个终端则返回为真<br>[ -o optionname ] 如果shell选项optionname开启则返回为真</p>
-<h2 id="IF高级特性"><a href="#IF高级特性" class="headerlink" title="IF高级特性"></a>IF高级特性</h2><p>双圆括号<code>(( ))</code>：表示数学表达式，比判断命令提供更多的数学符号，而且在双圆括号里面的’&gt;’,’&lt;’号不需要转义。</p>
-<p>双方括号<code>[[ ]]</code>：表示高级字符串处理函数，使用标准的字符串比较，还可以使用匹配模式，从而定义与字符串相匹配的正则表达式。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1503,7 +1285,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">225</span>
+          <span class="site-state-item-count">226</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

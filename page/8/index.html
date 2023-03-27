@@ -176,6 +176,383 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/27/c/mem-manage/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/08/27/c/mem-manage/" class="post-title-link" itemprop="url">c语言内存管理</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-08-27 17:09:51" itemprop="dateCreated datePublished" datetime="2022-08-27T17:09:51+08:00">2022-08-27</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/c%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">c语言</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="大小端"><a href="#大小端" class="headerlink" title="大小端"></a>大小端</h2><p>大端和小端表示多字节值的哪一端存储在该值的起始地址处，指的是字节在内存中存储时的排列规则，而不是数据中的位的排列规则，不管是大端还是小端，计算机在内存中存放数据的顺序都是从低地址到高地址，不同的是在低字节还是高字节处先取数据。</p>
+<p><strong>大端(Big-Endian)</strong></p>
+<p>就是把数值0x123456的高位字节放在内存的低位地址上，把数值的低位字节放在内存的高位地址上。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">低地址 -----&gt; 高地址</span><br><span class="line">0x12 | 0x34 | 0x56</span><br></pre></td></tr></table></figure>
+
+<p><strong>小端(Little-Endian)</strong></p>
+<p>就是把数值0x123456的高位字节放在高位的地址上，低位字节放在低位地址上。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">低地址 -----&gt; 高地址</span><br><span class="line">0x56 | 0x34 | 0x12</span><br></pre></td></tr></table></figure>
+
+<p>由于不同架构的CPU处理多个字节数据的顺序不一样，产生了大小端之分。主机字节序是多样的，ARM既可以工作在大端，也可以工作在小端。网络统一为大端模式，还专门有网络字节序和主机字节序之间的转换接口(ntohs、htons、ntohl、htonl)。</p>
+<p>小端模式强制转换类型时不需要调整字节内容，直接截取低字节即可。大端模式由于符号位为第一个字节，很方便判断正负。</p>
+<p><strong>判断大小端</strong></p>
+<ol>
+<li>通过强制类型转换截断</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">BOOL <span class="title function_">IsBigEndian</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">   <span class="type">short</span> a = <span class="number">0x1234</span>;</span><br><span class="line">   <span class="type">char</span> b = *(<span class="type">char</span>*)&amp;a;</span><br><span class="line">   <span class="keyword">if</span>(<span class="number">0x12</span> == b)</span><br><span class="line">   &#123;</span><br><span class="line">       <span class="keyword">return</span> TRUE;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"> <span class="keyword">return</span> FALSE;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>利用联合体共享内存的特性，截取低地址部分</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">BOOL <span class="title function_">IsBigEndian</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="class"><span class="keyword">union</span> <span class="title">NUM</span></span></span><br><span class="line"><span class="class">  &#123;</span></span><br><span class="line">      <span class="type">short</span>  a;</span><br><span class="line">      <span class="type">char</span> b;</span><br><span class="line">  &#125;num;</span><br><span class="line"></span><br><span class="line">  num.a = <span class="number">0x1234</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span>(<span class="number">0x12</span> == num.b)</span><br><span class="line">  &#123;</span><br><span class="line">      <span class="keyword">return</span> TRUE;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> FALSE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="字节对齐"><a href="#字节对齐" class="headerlink" title="字节对齐"></a>字节对齐</h2><p>字节对齐的作用在于提高CPU访问内存的效率，同时字节的合理分布可以节省存储空间。如果一个变量的内存地址正好位于它长度的整数倍，则称做自然对齐。访问未对齐的内存，处理器需要作两次内存访问；而对齐的内存访问仅需要一次访问。</p>
+<p>对齐访问也可能是硬件的特殊要求。不同平台和架构的CPU对存储空间的处理不同，有些平台从偶地址开始读数据，如果一个int型变量存放在偶地址开始的地址，那么一个读周期就可以读出这32bit，而如果存放在奇地址开始的地方，就需要2个读周期，并对两次读出的结果的高低字节进行拼凑才能得到该32bit数据。同时并不是所有的平台都能够访问任意地址上的任意数据，有些硬件平台只能够访问对齐的地址，否则就会出现硬件异常错误。</p>
+<p>数组按照基本数据类型对齐，第一个对齐了后面的自然也就对齐了。联合体按其包含的长度最大的数据类型对齐。结构体中每个数据类型都要对齐，规则为：</p>
+<ol>
+<li>结构体变量的起始地址能够被其最宽的成员大小整除。</li>
+<li>结构体第一个成员在偏移0的位置，之后的每个成员相对于起始位置必须是当前成员大小的整数倍。</li>
+<li>结构体内所有数据成员各自对齐后，结构体本身还要进行一次内存对齐，保证整个结构体占用内存大小是结构体内最大数据成员的最小整数倍。</li>
+</ol>
+<p><strong>#pragma pack()</strong></p>
+<p>可以使用<code>#pragma pack(n)</code>预编译指令来设定变量以n字节对齐方式。n字节对齐就是说变量存放的起始地址的偏移量有两种情况：</p>
+<ul>
+<li>如果n大于等于该变量所占用的字节数，那么偏移量必须满足默认的对齐方式；</li>
+<li>如果n小于该变量的类型所占用的字节数，那么偏移量为n的倍数，不用满足默认的对齐方式。</li>
+</ul>
+<p>结构的总大小也有约束条件，分两种情况：如果n大于所有成员变量类型所占用的字节数，那么结构的总大小必须为占用空间最大的变量占用的空间数的倍数；否则必须为n的倍数。</p>
+<p><code>#pragma pack()</code> 取消自定义对齐方式，恢复默认方式。</p>
+<h2 id="位域"><a href="#位域" class="headerlink" title="位域"></a>位域</h2><p>有些信息在存储时，并不需要占用一个完整的字节，而只需占几个或一个二进制位。位域是把一个字节中的二进位划分为几个不同的区域，并说明每个区域的位数。每个域有一个域名，允许在程序中按域名进行操作。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> 位域结构名</span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    类型说明符 位域名:位域长度</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Data</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">int</span> a:<span class="number">8</span>;</span><br><span class="line">    <span class="type">int</span> b:<span class="number">2</span>;</span><br><span class="line">    <span class="type">int</span> c:<span class="number">4</span>;</span><br><span class="line">    <span class="type">int</span>  :<span class="number">2</span>; <span class="comment">/*空域*/</span></span><br><span class="line">&#125;data;</span><br><span class="line"><span class="comment">/* data共占2个字节，其中位域a占8位，位域b占2位，位域c占4位 */</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>位域的长度不能大于一个字节，一个位域必须存储在同一个字节中，不能跨两个字节。</li>
+<li>位域可以没有位域名，叫空域，这时它只用来作填充或调整位置，空域是不能使用的。</li>
+<li>给位域赋值不能超过该位域的允许范围。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/21/c/process/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/08/21/c/process/" class="post-title-link" itemprop="url">linux process in user</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-08-21 09:49:47" itemprop="dateCreated datePublished" datetime="2022-08-21T09:49:47+08:00">2022-08-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>进程是系统进行资源分配和调度的单位。从系统的角度看是通过进程控制块来描述的，进程控制块包含了进程的描述信息、控制信息以及资源信息。进程控制块中的每一项都是一个 task_struct 结构，在 include/linux/sched.h中定义的。</p>
+<ul>
+<li>0号进程是idle，系统创建的一个进程，运行在内核态，完成加载系统后，演变为进程调度scheduler。</li>
+<li>1号进程是init，所有用户进程的父进程。</li>
+<li>2号进程是kthreadd，所有kernel thread的父进程，由idle通过kernel_thread创建，并始终运行在内核空间, 负责所有内核线程的调度和管理。</li>
+</ul>
+<p>进程根据它的生命周期可以划分成 3 种状态：</p>
+<ul>
+<li>执行态:该进程正在运行，即进程正在占用 CPU。</li>
+<li>就绪态:进程已经具备执行的一切条件，正在等待分配 CPU 的处理时间片。</li>
+<li>等待态:进程不能使用 CPU，若等待事件发生(等待的资源分配到)则可将其唤醒。</li>
+</ul>
+<p><img src="/images/linux/process/status.jpeg" alt="进程状态转换"></p>
+<h2 id="进程空间"><a href="#进程空间" class="headerlink" title="进程空间"></a>进程空间</h2><p><img src="/images/linux/process/mem.jpeg" alt="进程空间"></p>
+<ul>
+<li><p>未初始化数据段(.bss)：Block Storage Start，存放未初始化或初始化为0的全局变量，未初始化的静态变量。bss段的变量只占用运行时的内存空间，而不占用文件空间。在程序开始执行之前，内核将此段初始化为0。.bss段占据的大小存放在ELF文件格式中的段表(Section Table)中，段表存放了各个段的各种信息，比如段的名字、段的类型、段在elf文件中的偏移、段的大小等信息。同时符号存放在符号表.symtab中。</p>
+</li>
+<li><p>初始化数据段(.data)：存放初始化非0的全局变量，初始化的静态变量。既占用运行时的内存空间，又占用文件空间。</p>
+</li>
+<li><p>代码段：只读，包含程序代码（.init和.text）和只读数据（.rodata），存储机器码序列、全局常量、代码、字符串常量。</p>
+</li>
+<li><p>栈：从高地址往低地址向下增长，存放局部变量、局部常量、函数参数、返回值、函数调用时返回地址、调用者的环境信息。</p>
+</li>
+<li><p>堆：从低地址往高低至增长，动态分配的内存。</p>
+</li>
+</ul>
+<p>可以用<code>cat /proc/self/maps</code>查看程序运行时空间的分配情况，每个区间都有4个属性：</p>
+<ul>
+<li>r  表示可以读取;</li>
+<li>w  表示可以修改;</li>
+<li>x  表示可以执行;</li>
+<li>p/s 表示是否为共享内存;</li>
+</ul>
+<p><code>size</code>命令可以查看可执行文件的正文段、数据段和 b s s段的长度(单位:字节)。</p>
+<p>数据段和代码段分离，数据和指令被映射到两个虚拟内存区域，数据段对进程来说可读写，代码段是只读，这样可以防止程序的指令被改写。现代CPU缓存一般被设计成数据缓存和指令缓存分离，分开对CPU缓存命中率有好处。代码段是可以共享的，数据段是私有的，当运行多个程序的副本时，只需要保存一份代码段。</p>
+<p>栈容易溢出是因为栈内存有限，递归次数多了，局部数据占用的内存直到整个递归结束才会被释放，很容易就导致栈溢出。</p>
+<h2 id="pid"><a href="#pid" class="headerlink" title="pid"></a>pid</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpid</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getppid</span><span class="params">(<span class="type">void</span>)</span></span><br></pre></td></tr></table></figure>
+
+<p>getpid返回调用进程的进程号，Linux 内核限制进程号&lt;= 32767。任何进程都可使用符号链接/proc/self 来访问其自己的/proc/pid/ 目录。</p>
+<p>getppid返回目前进程的父进程的进程号。可通过查看/proc/pid/status 的PPid字段，可以获知每个进程的父进程。</p>
+<h2 id="fork"><a href="#fork" class="headerlink" title="fork()"></a>fork()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">fork</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">vfork</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>fork创建的新进程被称为子进程。该函数被调用一次，但返回两次，可通过返回值来区分父、子进程，在父进程中返回新创建子进程的进程pid，而在子进程中则返回 0，子进程可调用getpid()以获取自身的进程 ID，调用getppid()以获取父进程ID。</p>
+<p>子进程从父进程处继承了整个进程的地址空间,包括进程上下文、代码段、进程堆栈、内存信息、打开的文件描述符、信号控制设定、进程优先级、进程组号、当前工作目录、根目录、资源限制、环境变量、标准IO的缓存数据和控制终端等，而子进程所独有的只有它的进程号、资源使用和计时器等。这两个进程将执行相同的程序文本段，但却各自拥有不同的栈段、数据段以及堆段拷贝。子进程的栈、数据以及栈段开始时是对父进程内存相应各部分的完全复制，每个进程均可修改各自的栈数据、以及堆段中的变量，而并不影响另一进程。子进程的tms_utime、tms_stime、tms_cutime以及tms_ustime设置为0，子进程不继承父进程设置的锁。</p>
+<p>vfork用于创建一个新进程，但并不将父进程的地址空间完全复制到子进程中，因为子进程会立即调用exec或exit，不会存访该地址空间。不过在子进程调用exec或exit之前，它在父进程的空间中运行。vfork保证子进程先运行，在它调用exec或exit之后父进程才可能被调度运行(如果调用这两个函数之前子进程依赖于父进程，会导致死锁)。</p>
+<p>当子进程退出时，其父进程没有调用 wait() 系统调用回收他的进程描述符信息，该进程就会继续停留在系统的进程表中，占用内核资源，称为<strong>僵尸进程</strong>。预防僵尸进程的方法:</p>
+<ul>
+<li>父进程注册<code>signal(SIGCHLD, SIG_IGN)</code>通知内核父进程忽略SIGCHLD信号，由内核回收。</li>
+<li>父进程调用 wait()/waitpid() 函数等待子进程结束</li>
+<li>父进程用signal注册信号处理函数，在信号处理函数中调用 wait()/waitpid() 函数等待子进程退出。</li>
+<li>连续调用两次fork，使紧跟的子进程退出，其孙子进程成为一个孤儿进程，交给init进程托管。</li>
+</ul>
+<h2 id="exit"><a href="#exit" class="headerlink" title="exit()"></a>exit()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> _exit(<span class="type">int</span> status);</span><br><span class="line"><span class="type">void</span> <span class="title function_">exit</span><span class="params">(<span class="type">int</span> status)</span></span><br></pre></td></tr></table></figure>
+
+<p>终止进程的，清除包括 PCB 在内的各种数据结构。区别在于 exit()函数会清理 I/O 缓冲，检查文件的打开情况，把文件缓冲区中的内容写回文件。</p>
+<h2 id="atexit"><a href="#atexit" class="headerlink" title="atexit()"></a>atexit()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">atexit</span><span class="params">(<span class="type">void</span> (*function)(<span class="type">void</span>))</span>;</span><br></pre></td></tr></table></figure>
+
+<p>在进程终止后，以登记的相反顺序调用注册的终止处理函数。</p>
+<h2 id="abort"><a href="#abort" class="headerlink" title="abort()"></a>abort()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">abort</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>abort()可以产生SIGABRT信号，当进程发生越界访问或除0时。</p>
+<h2 id="wait-waitpid"><a href="#wait-waitpid" class="headerlink" title="wait() waitpid()"></a>wait() waitpid()</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/wait.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">wait</span><span class="params">(<span class="type">int</span> *status)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">waitpid</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">int</span> *status, <span class="type">int</span> options)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>wait()使其调用者阻塞，直到一个子进程终止，并返回其进程号,如果该父进程没有子进程或者他的子进程已经结束，则立即返回。</p>
+<p>waitpid的pid参数：</p>
+<ul>
+<li><code>&gt;0</code>  只等待进程ID等于pid 的子进程，只要子进程还没结束，就会一直等下去；</li>
+<li><code>-1</code>  等待任何一个子进程退出，和wait()一样；</li>
+<li><code>=0</code>  等待其组ID相同的任一子进程；</li>
+<li><code>&lt;-1</code> 等待其组ID等于pid的绝对值的任一子进程；</li>
+</ul>
+<p>waitpid的options参数：</p>
+<ul>
+<li>WNOHANG   若由pid指定的子进程不立即可用，则不阻塞并返回0；</li>
+<li>WUNTRACED 若实现某支持作业控制，则由pid指定的任一子进程状态已暂停，且其状态自暂停以来还未报告过，则返回其状态；</li>
+<li>0 同wait阻塞父进程，等待子进程退出；</li>
+</ul>
+<p>如果不关心终止状态，可将该status参数指定为NULL，可用宏检查status的状态。</p>
+<p><img src="/images/linux/process/wait_status.png" alt="wait_status"></p>
+<p>如果一个进程希望等待一个子进程终止，则它必须调用wait函数。如果一个进程要等待其父进程终止，则可使用下列形式的循环:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span>(getppid() != <span class="number">1</span>)</span><br><span class="line">    sleep(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="execl"><a href="#execl" class="headerlink" title="execl()"></a>execl()</h2><p>exec函数并不创建新进程，只是用另一个新程序替换了当前进程的正文、数据、堆和栈段，且两个进程的PID相同。例如：在shell命令行执行ps命令，实际上是shell进程调用fork复制一个新的子进程，在利用exec系统调用将新产生的子进程完全替换成ps进程。exec系列函数底层其实都是通过调用execve函数实现的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="type">char</span> **environ;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">execl</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">const</span> <span class="type">char</span> *arg, ... (<span class="type">char</span> *)<span class="literal">NULL</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execlp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">const</span> <span class="type">char</span> *arg, ... (<span class="type">char</span> *)<span class="literal">NULL</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execle</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">const</span> <span class="type">char</span> *arg, ... (<span class="type">char</span> *)<span class="literal">NULL</span>, <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">char</span> *<span class="type">const</span> argv[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execvp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">char</span> *<span class="type">const</span> argv[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execvpe</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">char</span> *<span class="type">const</span> argv[], <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execve</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">char</span> *<span class="type">const</span> argv[], <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>带 l 的exec函数表示命令的参数以可变参数的形式给出，且以一个NULL结束。</li>
+<li>带 p 的exec函数表示第一个参数只要是进程名即可，它会在环境变量当中查找命令。</li>
+<li>带 v 的exec函数表示命令的参数以字符串数组形式给出，且最后一个元素也必须是NULL。</li>
+<li>带 e 的exec函数表示将envp数组的内容作为环境变量传递给替换的进程。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> *<span class="type">const</span> envp[] = &#123;<span class="string">&quot;AA=11&quot;</span>, <span class="string">&quot;BB=22&quot;</span>, (<span class="type">char</span> *)<span class="literal">NULL</span>&#125;;</span><br><span class="line">    execle(<span class="string">&quot;./hello&quot;</span>, <span class="string">&quot;hello&quot;</span>, (<span class="type">char</span> *)<span class="literal">NULL</span>, envp);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">char</span> **environ;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[], <span class="type">char</span> *envp[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span>(*envp != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="built_in">puts</span>(*(envp++));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i=<span class="number">0</span> ; environ[i] != <span class="literal">NULL</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">puts</span>(environ[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="system"><a href="#system" class="headerlink" title="system()"></a>system()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">system</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *command)</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="进程时间"><a href="#进程时间" class="headerlink" title="进程时间"></a>进程时间</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/times.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tms</span> &#123;</span></span><br><span class="line">   <span class="type">clock_t</span> tms_utime;  <span class="comment">/* user time */</span></span><br><span class="line">   <span class="type">clock_t</span> tms_stime;  <span class="comment">/* system time */</span></span><br><span class="line">   <span class="type">clock_t</span> tms_cutime; <span class="comment">/* user time of children */</span></span><br><span class="line">   <span class="type">clock_t</span> tms_cstime; <span class="comment">/* system time of children */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">clock_t</span> <span class="title function_">times</span><span class="params">(<span class="keyword">struct</span> tms *buf)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>获取进程的系统CPU时间和用户CPU时间，返回当时的系统时钟计数。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/tool/shell-if/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/08/13/tool/shell-if/" class="post-title-link" itemprop="url">shell if 条件判断</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-08-13 21:56:51" itemprop="dateCreated datePublished" datetime="2022-08-13T21:56:51+08:00">2022-08-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/shell/" itemprop="url" rel="index"><span itemprop="name">shell</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if [ command ]; then</span><br><span class="line"></span><br><span class="line">elif [ command ]; then</span><br><span class="line"></span><br><span class="line">else</span><br><span class="line"></span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<p><em>注意</em>：</p>
+<p>1、[ ]表示条件测试，要注意在’[‘后面和’]’前面都必须要有空格。</p>
+<p>2、在shell中，then和fi是分开的语句。如果要在同一行里面输入，则需要用分号将他们隔开。</p>
+<p>3、if判断中对于变量的处理，需要加引号，以免一些不必要的错误。没有加双引号会在一些含空格等的字符串变量判断的时候产生错误。比如<code>[ -n &quot;$var&quot; ]</code>，如果var为空会出错。</p>
+<p>4、不支持浮点值。</p>
+<p>5、如果只单独使用&gt;或者&lt;号，系统会认为是输出或者输入重定向，虽然结果显示正确，但是其实是错误的，因此要对这些符号进行转义。</p>
+<p>6、运行if语句中的命令所产生的错误信息默认仍然出现在脚本的输出结果中。</p>
+<p>7、使用-z或者-n来检查长度的时候，没有定义的变量也为0。</p>
+<p>8、空变量和没有初始化的变量可能会对shell脚本测试产生灾难性的影响，因此在不确定变量的内容的时候，在测试前使用-n或者-z测试一下。</p>
+<p>9、? 变量包含了之前执行命令的退出状态（最近完成的前台进程），可以用于检测退出状态。</p>
+<h2 id="文件-目录判断"><a href="#文件-目录判断" class="headerlink" title="文件/目录判断"></a>文件/目录判断</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[ -b FILE ] 如果 FILE 存在且是一个块特殊文件则为真。</span><br><span class="line">[ -c FILE ] 如果 FILE 存在且是一个字特殊文件则为真。</span><br><span class="line">[ -d DIR ]  如果 FILE 存在且是一个目录则为真。</span><br><span class="line">[ -e FILE ] 如果 FILE 存在则为真。</span><br><span class="line">[ -f FILE ] 如果 FILE 存在且是一个普通文件则为真。</span><br><span class="line">[ -g FILE ] 如果 FILE 存在且已经设置了SGID则为真。</span><br><span class="line">[ -k FILE ] 如果 FILE 存在且已经设置了粘制位则为真。</span><br><span class="line">[ -p FILE ] 如果 FILE 存在且是一个名字管道(F如果O)则为真。</span><br><span class="line">[ -r FILE ] 如果 FILE 存在且是可读的则为真。</span><br><span class="line">[ -s FILE ] 如果 FILE 存在且大小不为0则为真。</span><br><span class="line">[ -t FD ]   如果文件描述符 FD 打开且指向一个终端则为真。</span><br><span class="line">[ -u FILE ] 如果 FILE 存在且设置了SUID (set user ID)则为真。</span><br><span class="line">[ -w FILE ] 如果 FILE存在且是可写的则为真。</span><br><span class="line">[ -x FILE ] 如果 FILE 存在且是可执行的则为真。</span><br><span class="line">[ -O FILE ] 如果 FILE 存在且属有效用户ID则为真。</span><br><span class="line">[ -G FILE ] 如果 FILE 存在且属有效用户组则为真。</span><br><span class="line">[ -L FILE ] 如果 FILE 存在且是一个符号连接则为真。</span><br><span class="line">[ -N FILE ] 如果 FILE 存在 and has been mod如果ied since it was last read则为真。</span><br><span class="line">[ -S FILE ] 如果 FILE 存在且是一个套接字则为真。</span><br><span class="line">[ FILE1 -nt FILE2 ] 如果 FILE1 比 FILE2 新，则为真。</span><br><span class="line">[ FILE1 -ot FILE2 ] 如果 FILE1 比 FILE2 要老, 或者 FILE2 存在且 FILE1 不存在则为真。</span><br><span class="line">[ FILE1 -ef FILE2 ] 如果 FILE1 和 FILE2 指向相同的设备和节点号则为真。</span><br></pre></td></tr></table></figure>
+
+<h2 id="字符串判断"><a href="#字符串判断" class="headerlink" title="字符串判断"></a>字符串判断</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[ -z STRING ] 判断是否为空</span><br><span class="line">[ -n STRING ] 判断是否为非空</span><br><span class="line">[ STRING1 ]　 如果字符串不为空则为真</span><br><span class="line">[ STRING1 = STRING2 ]  如果两个字符串相同则为真</span><br><span class="line">[ STRING1 == STRING2 ] 如果两个字符串相同则返回为真</span><br><span class="line">[ STRING1 != STRING2 ] 如果字符串不相同则为真</span><br><span class="line">[ STRING1 &lt; STRING2 ]  如果 “STRING1”字典排序在“STRING2”前面则返回为真。</span><br><span class="line">[ STRING1 &gt; STRING2 ]  如果 “STRING1”字典排序在“STRING2”后面则返回为真。</span><br></pre></td></tr></table></figure>
+
+<p><strong>比较两个字符串是否相等的办法</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if [ &quot;$test&quot;x = &quot;test&quot;x ]; then</span><br><span class="line"></span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>使用单个等号，等号两边各有一个空格。</li>
+<li>注意到”$test”x最后的x，这是特意安排的，因为当$test为空的时候，上面的表达式就变成了x = testx，显然是不相等的。而如果没有这个x，表达式就会报错：”[: =: unary operator expected”。</li>
+</ol>
+<p><strong>==的功能在<code>[[]]</code>和<code>[]</code>中的行为是不同的</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[[ \$a == z* ]]      # 如果$a以&quot;z&quot;开头(模式匹配)那么将为true</span><br><span class="line">[[ \$a == &quot;z*&quot; ]]    # 如果$a等于z*(字符匹配),那么结果为true</span><br><span class="line">[ \$a == z* ]        # File globbing 和word splitting将会发生</span><br><span class="line">[ &quot;\$a&quot; == &quot;z&quot; ]     # 如果$a等于z(字符匹配),那么结果为true</span><br></pre></td></tr></table></figure>
+
+<h2 id="数值判断"><a href="#数值判断" class="headerlink" title="数值判断"></a>数值判断</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">INT1 -eq INT2           INT1和INT2两数相等为真</span><br><span class="line">INT1 -ne INT2           INT1和INT2两数不等为真</span><br><span class="line">INT1 -gt INT2           INT1大于INT1为真</span><br><span class="line">INT1 -ge INT2           INT1大于等于INT2为真</span><br><span class="line">INT1 -lt INT2           INT1小于INT2为真</span><br><span class="line">INT1 -le INT2           INT1小于等于INT2为真</span><br></pre></td></tr></table></figure>
+
+<h2 id="逻辑判断"><a href="#逻辑判断" class="headerlink" title="逻辑判断"></a>逻辑判断</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ ! EXPR ]         逻辑非，如果 EXPR 是false则返回为真。</span><br><span class="line">[ EXPR1 -a EXPR2 ] 逻辑与，如果 EXPR1 and EXPR2 全真则返回为真。</span><br><span class="line">[ EXPR1 -o EXPR2 ] 逻辑或，如果 EXPR1 或者 EXPR2 为真则返回为真。</span><br><span class="line">[ ] || [ ]         用OR来合并两个条件</span><br><span class="line">[ ] &amp;&amp; [ ]         用AND来合并两个条件</span><br></pre></td></tr></table></figure>
+
+<h2 id="其他判断"><a href="#其他判断" class="headerlink" title="其他判断"></a>其他判断</h2><p>[ -t FD ] 如果文件描述符 FD （默认值为1）打开且指向一个终端则返回为真<br>[ -o optionname ] 如果shell选项optionname开启则返回为真</p>
+<h2 id="IF高级特性"><a href="#IF高级特性" class="headerlink" title="IF高级特性"></a>IF高级特性</h2><p>双圆括号<code>(( ))</code>：表示数学表达式，比判断命令提供更多的数学符号，而且在双圆括号里面的’&gt;’,’&lt;’号不需要转义。</p>
+<p>双方括号<code>[[ ]]</code>：表示高级字符串处理函数，使用标准的字符串比较，还可以使用匹配模式，从而定义与字符串相匹配的正则表达式。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/13/c/daemon/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1188,228 +1565,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/07/14/cpp/c++98/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/07/14/cpp/c++98/" class="post-title-link" itemprop="url">C++98</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-07-14 20:13:02" itemprop="dateCreated datePublished" datetime="2022-07-14T20:13:02+08:00">2022-07-14</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="命名空间"><a href="#命名空间" class="headerlink" title="命名空间"></a>命名空间</h2><p>名称空间是给代码限定使用空间，有助于降低命名冲突的风险。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line">using <span class="built_in">std</span>::<span class="built_in">cout</span>;</span><br><span class="line">using <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;Hello World&quot;</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="extern-“C”"><a href="#extern-“C”" class="headerlink" title="extern “C”"></a>extern “C”</h2><p>由于c语言和C++的符号修饰方式不同，函数用extern “C”声明，告诉编译器对此函数使用c语言的方式来处理，则此函数的符号就是按c语言方式生成的，可以避免 C++ 因符号修饰导致代码不能和c语言库中的符号进行链接的问题。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifdef</span> __cplusplus</span></span><br><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> &#123;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> __cplusplus</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
-
-<h2 id="默认参数"><a href="#默认参数" class="headerlink" title="默认参数"></a>默认参数</h2><p>在定义函数时给参数一个缺省値，在使用函数时，如果函数调用时没有传递参数，就使用默认参数。</p>
-<ol>
-<li>如果某个参数是默认参数，那么它后面的参数必须都是默认参数。</li>
-<li>默认参数只能放到函数声明或定义两者之一，如果放在函数定义中，那就只能在当前文件中调用该函数。</li>
-<li>在多态中，重载的函数不要使用默认参数，因为默认参数是静态绑定，虚函数是动态绑定。</li>
-</ol>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">setNum</span><span class="params">(<span class="type">int</span> n = <span class="number">4</span>)</span></span>&#123;</span><br><span class="line">    <span class="keyword">this</span>-&gt;num = n;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p>引用只能绑定对象，不能是字面值。引用的类型要和初始化的类型一致。</p>
-<p>引用与指针的区别：</p>
-<ul>
-<li>不存在空引用。引用必须连接到一块合法的内存。</li>
-<li>一旦引用被初始化为一个对象，就不能被指向到另一个对象。指针可以在任何时候指向到另一个对象。</li>
-<li>引用必须在创建时被初始化。指针可以在任何时间被初始化。</li>
-</ul>
-<p>引用作为函数返回值时，不能返回局部数据的引用，因为当函数调用完成后局部数据就会被销毁，C++ 编译器检测到该行为时也会给出警告。</p>
-<h2 id="new"><a href="#new" class="headerlink" title="new"></a>new</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> *p = <span class="keyword">new</span> <span class="type">int</span>;  <span class="comment">//分配1个int型的内存空间</span></span><br><span class="line"><span class="keyword">delete</span> p;  <span class="comment">//释放内存</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> *p = <span class="keyword">new</span> <span class="type">int</span>[<span class="number">10</span>];  <span class="comment">//分配10个int型的内存空间</span></span><br><span class="line"><span class="keyword">delete</span>[] p;</span><br><span class="line"></span><br><span class="line"><span class="comment">// placement new</span></span><br><span class="line">p2 = <span class="built_in">new</span>(p) <span class="built_in">int</span>();  <span class="comment">// 在p所指向的内存分配一个int对象</span></span><br></pre></td></tr></table></figure>
-
-<p>new和delete不是库函数，而是 c++的运算符。new 是在堆区分配内存，必须手动释放。为了避免内存泄露，new 和 delete、new[] 和 delete[] 操作符应该配对使用。new和delete会自动调用构造函数和析构函数。</p>
-<p>使用 new 在堆上生成对象，其过程分为两阶段：第一阶段，使用 new 在堆上寻找可用内存，分配给对象；第二阶段，调用构造函数生成对象。将 new 运算符重载为私有，那么第一阶段就无法完成，也就不能够在堆上构造对象了。</p>
-<h2 id="RTTI"><a href="#RTTI" class="headerlink" title="RTTI"></a>RTTI</h2><p><strong>typeid</strong></p>
-<p>typeid 运算符返回一个表达式的类型信息。对于基本数据类型，类型信息指数据的类型。对于类类型的数据，类型信息是指对象所属的类、所包含的成员、所在的继承关系等。经常被用来判断两个类型是否相等。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">typeid</span>(ClassA) == <span class="built_in">typeid</span>(object)</span><br></pre></td></tr></table></figure>
-
-<p>typeid 会把获取到的类型信息保存到一个 type_info 类型的对象里面，并返回该对象的常引用，当需要具体的类型信息时，可以通过成员函数来提取。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">type_info</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">type_info</span>();</span><br><span class="line">    <span class="type">int</span> <span class="keyword">operator</span>==(<span class="type">const</span> type_info&amp; rhs) <span class="type">const</span>;</span><br><span class="line">    <span class="type">int</span> <span class="keyword">operator</span>!=(<span class="type">const</span> type_info&amp; rhs) <span class="type">const</span>;</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">before</span><span class="params">(<span class="type">const</span> type_info&amp; rhs)</span> <span class="type">const</span></span>;</span><br><span class="line">    <span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">name</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">    <span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">raw_name</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">void</span> *_m_data;</span><br><span class="line">    <span class="type">char</span> _m_d_name[<span class="number">1</span>];</span><br><span class="line">    <span class="built_in">type_info</span>(<span class="type">const</span> type_info&amp; rhs);</span><br><span class="line">    type_info&amp; <span class="keyword">operator</span>=(<span class="type">const</span> type_info&amp; rhs);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>为了减小编译后文件的体积，编译器不会为所有的类型创建 type_info 对象，一个类型不管使用了多少次，编译器都只为它创建一个type_info 对象，所有 typeid 都返回这个对象的引用。不过有一种特殊情况，就是带虚函数的类（包括继承来的），不管有没有使用 typeid 运算符，编译器都会为带虚函数的类创建 type_info 对象。</p>
-<p><strong>decltype</strong></p>
-<p>decltype()返回操作数的数据类型。</p>
-<h2 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h2><ul>
-<li><code>const_cast</code>  去掉表达式的const或volatile属性</li>
-<li><code>static_cast</code>  基本类型静态显式转换</li>
-<li><code>dynamic_cast</code>  多态类之间转换，运行时检查类型安全，转换失败返回NULL，使用时需要检查返回値。</li>
-<li><code>reinterpret_cast</code>  将任何指针转换为任何其他指针类型，对二进制重新解释类型，比如指针转整型，取地址値。</li>
-</ul>
-<h2 id="RAII"><a href="#RAII" class="headerlink" title="RAII"></a>RAII</h2><p>RAII(Resource Acquisition Is Initialization)是 C++ 所特有的资源管理方式。RAII 依托栈和析构函数，来对所有的资源，包括堆内存在内进行管理。有了RAII使得 C++ 不需要类似于 Java 那样的垃圾收集方法，也能有效地对内存进行管理。</p>
-<p>内存管理器的操作：</p>
-<ol>
-<li>让内存管理器分配一个某个大小的内存块</li>
-<li>让内存管理器释放一个之前分配的内存块让内存管理器进行垃圾收集操作，</li>
-<li>寻找不再使用的内存块并予以释放</li>
-</ol>
-<p>C++ 通常会做上面的操作 1 和 2。Java 会做上面的操作 1 和 3。而 Python 会做上面的操作 1、2、3。这是语言的特性和实现方式决定的。</p>
-<h2 id="bitset"><a href="#bitset" class="headerlink" title="bitset"></a>bitset</h2><p>bitset是用于处理位标志的类，它提供了一些位操作的函数和运算符。</p>
-<table>
-<thead>
-<tr>
-<th align="center">运算符/函数</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">&lt;&lt;</td>
-<td>将位序列的文本表示插入到输出流中</td>
-</tr>
-<tr>
-<td align="center">&gt;&gt;</td>
-<td>将一个字符串插入到 bitset 对象中</td>
-</tr>
-<tr>
-<td align="center">&amp;</td>
-<td>按位与</td>
-</tr>
-<tr>
-<td align="center">|</td>
-<td>按位或</td>
-</tr>
-<tr>
-<td align="center">^</td>
-<td>按位异或</td>
-</tr>
-<tr>
-<td align="center">~</td>
-<td>按位取反</td>
-</tr>
-<tr>
-<td align="center">&gt;&gt;=</td>
-<td>按位右移</td>
-</tr>
-<tr>
-<td align="center">&lt;&lt;=</td>
-<td>按位左移</td>
-</tr>
-<tr>
-<td align="center">[N]</td>
-<td>返回指向位序列中第N位的引用</td>
-</tr>
-<tr>
-<td align="center">set()</td>
-<td>所有位都设置为 1</td>
-</tr>
-<tr>
-<td align="center">set (N, val=1)</td>
-<td>将第 N 位设置为 val 指定的值(默认为 1)</td>
-</tr>
-<tr>
-<td align="center">reset()</td>
-<td>所有位都重置为 0</td>
-</tr>
-<tr>
-<td align="center">reset (N)</td>
-<td>将N位清除</td>
-</tr>
-<tr>
-<td align="center">filp()</td>
-<td>将位序列中的所有位取反</td>
-</tr>
-<tr>
-<td align="center">size()</td>
-<td>返回序列中的位数</td>
-</tr>
-<tr>
-<td align="center">count()</td>
-<td>返回序列中值为 1 的位数</td>
-</tr>
-</tbody></table>
-<h2 id="restrict"><a href="#restrict" class="headerlink" title="restrict"></a>restrict</h2><p>restrict是c99标准引入的，它用于限定和约束指针，表明指针是访问一个数据对象的唯一且初始的方式，而不能通过其它指针来修改，这样可以帮助编译器会优化代码。restrict修饰的指针主要用于函数形参，说明指针参数不指向同一数据，或指向由malloc()分配的内存空间。</p>
-<h2 id="register"><a href="#register" class="headerlink" title="register"></a>register</h2><p>用register声明的变量是寄存器变量存放在CPU的寄存器里的。运算速度快，因为不是存放在内存，所以不能取地址。只能用于局部变量和函数形参。</p>
-<h2 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h2><p>volatile 关键字是一种类型修饰符，用它声明的类型变量表示可以被某些编译器未知的因素（操作系统、硬件、其它线程等）更改，告诉编译器不应对这样的对象进行优化。volatile 关键字声明的变量，每次访问时都必须从内存中取出值。没有被 volatile 修饰的变量，可能由于编译器的优化，从 CPU 寄存器中取值<br>const 可以是 volatile（只读的状态寄存器）；指针可以是 volatile（指向一段内存地址）。</p>
-<h2 id="struct"><a href="#struct" class="headerlink" title="struct"></a>struct</h2><p>在c++中结构体中的成员默认都是 public 属性，默认是 public 继承，且不能使用模块。</p>
-<h2 id="union"><a href="#union" class="headerlink" title="union"></a>union</h2><p>联合（union）是一种节省空间的特殊的类，一个 union 可以有多个数据成员，但是在任意时刻只有一个数据成员可以有值，当某个成员被赋值后其他成员变为未定义状态。联合有如下特点：</p>
-<ul>
-<li>默认访问控制符为 public</li>
-<li>可以含有构造函数、析构函数</li>
-<li>不能含有引用类型的成员</li>
-<li>不能继承自其他类，不能作为基类</li>
-<li>不能含有虚函数</li>
-<li>匿名 union 在定义所在作用域可直接访问 union 成员</li>
-<li>匿名 union 不能包含 protected 成员或 private 成员</li>
-<li>全局匿名联合必须是static的</li>
-</ul>
-<h2 id="inline"><a href="#inline" class="headerlink" title="inline"></a>inline</h2><p>内联函数在编译时，编译器会把该函数的代码副本放置在每个调用该函数的地方。内联函数只是对编译器的建议，是否对函数内联，决定权在于编译器。</p>
-<h2 id="explicit"><a href="#explicit" class="headerlink" title="explicit"></a>explicit</h2><p><code>explicit</code>关键字用于修饰类的单参数构造函数，限定此构造函数只能显示初始化当前类，防止其它类对象通过隐式转换作为参数传入。无参构造函数和多参构造函数本身就是显示调用，加了没意义。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">People</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">   <span class="comment">//  People(int num) &#123;&#125;</span></span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">People</span><span class="params">(<span class="type">int</span> name)</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    People a1 = <span class="built_in">People</span>(<span class="number">1</span>);</span><br><span class="line">    People a2 = <span class="number">2</span>; <span class="comment">// 没有报错，正常应该 error: conversion from ‘int’ to non-scalar type ‘People</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="pair"><a href="#pair" class="headerlink" title="pair"></a>pair</h2><p>pair将一对值(T1和T2)组合成一个值。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;utility&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;tuple&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">pair&lt;<span class="type">int</span>, string&gt; <span class="title">p1</span><span class="params">(<span class="number">3</span>, <span class="string">&quot;aaa&quot;</span>)</span></span>;</span><br><span class="line">    pair&lt;<span class="type">int</span>, string&gt; p2 = <span class="built_in">make_pair</span>(<span class="number">6</span>, <span class="string">&quot;nnn&quot;</span>);</span><br><span class="line">    pair&lt;<span class="type">int</span>, string&gt; p3;</span><br><span class="line"></span><br><span class="line">    p3.first = <span class="number">8</span>;</span><br><span class="line">    p3.second = <span class="string">&quot;rrr&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> num;</span><br><span class="line">    string name;</span><br><span class="line">    <span class="built_in">tie</span>(num, name) = p1;</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; p1.first &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; p1.second &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; p2.first &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; p2.second &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; p3.first &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; p3.second &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; num &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; name &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="原始字符串"><a href="#原始字符串" class="headerlink" title="原始字符串"></a>原始字符串</h2><h2 id="完美转发"><a href="#完美转发" class="headerlink" title="完美转发"></a>完美转发</h2><p>函数模板里调用另一个函数模板时，最外层的函数模板参数通常是万能引用，传递一个右值到外层，再转给内层时参数变成了左值，原参数属性丢失了。</p>
-<p><strong>引用折叠</strong></p>
-<ul>
-<li>引用的引用折叠成左值引用(<code>X&amp; &amp;</code>、<code>X&amp; &amp;&amp;</code>、<code>X&amp;&amp; &amp;</code> 折叠成 <code>X&amp;</code>)</li>
-<li>右值引用的右值引用，折叠成右值引用(<code>X&amp;&amp; &amp;&amp;</code> 折叠成 <code>X&amp;&amp;</code>)</li>
-</ul>
-<p><strong>万能引用</strong></p>
-<p>即可以绑定到左值引用，也可以绑定到右值引用，并且不能保持左右值的const属性的函数模板参数。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">Func</span><span class="params">(T&amp;&amp; v)</span></span>;</span><br></pre></td></tr></table></figure>
-
-<h2 id="std-ref"><a href="#std-ref" class="headerlink" title="std::ref"></a>std::ref</h2><p>可以在模板传参时传入引用，对于std::bind 或 std::thread，可以显式通过std::ref来绑定引用进行传参。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/net/tcpdump/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1594,151 +1749,6 @@ tcpdump ip multicast
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/cmd/wc/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/26/cmd/wc/" class="post-title-link" itemprop="url">wc</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-06-26 15:56:04 / 修改时间：15:59:10" itemprop="dateCreated datePublished" datetime="2022-06-26T15:56:04+08:00">2022-06-26</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cmd/" itemprop="url" rel="index"><span itemprop="name">cmd</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>wc命令统计指定文件中的字节数、字数、行数，并将统计结果显示输出。利用wc指令我们可以计算文件的Byte数、字数或是列数，若不指定文件名称，或是所给予的文件名为“-”，则wc指令会从标准输入设备读取数据。wc同时也给出所指定文件的总统计数。</p>
-<h2 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wc(选项)(参数)</span><br><span class="line">wc [选项]... [文件]...</span><br><span class="line">wc [选项]... --files0-from=F</span><br></pre></td></tr></table></figure>
-
-<h2 id="选项"><a href="#选项" class="headerlink" title="选项"></a>选项</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-c # 统计字节数，或--bytes或——chars：只显示Bytes数；。</span><br><span class="line">-l # 统计行数，或——lines：只显示列数；。</span><br><span class="line">-m # 统计字符数。这个标志不能与 -c 标志一起使用。</span><br><span class="line">-w # 统计字数，或——words：只显示字数。一个字被定义为由空白、跳格或换行字符分隔的字符串。</span><br><span class="line">-L # 打印最长行的长度。</span><br><span class="line">-help     # 显示帮助信息</span><br><span class="line">--version # 显示版本信息</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/26/cmd/watch/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/26/cmd/watch/" class="post-title-link" itemprop="url">watch</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-06-26 15:56:04 / 修改时间：15:59:10" itemprop="dateCreated datePublished" datetime="2022-06-26T15:56:04+08:00">2022-06-26</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cmd/" itemprop="url" rel="index"><span itemprop="name">cmd</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>watch - execute a program periodically, showing output fullscreen，以周期性的方式执行给定的指令，指令输出以全屏方式显示。</p>
-<p>watch可以帮你监测一个命令的运行结果。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch [options] command</span><br></pre></td></tr></table></figure>
-
-<h3 id="选项"><a href="#选项" class="headerlink" title="选项"></a>选项</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-n # 或--interval  watch缺省每2秒运行一下程序，可以用-n或-interval来指定间隔的时间。</span><br><span class="line">-d # 或--differences  用-d或--differences 选项watch 会高亮显示变化的区域。 而-d=cumulative选项会把变动过的地方(不管最近的那次有没有变动)都高亮显示出来。</span><br><span class="line">-t # 或-no-title  会关闭watch命令在顶部的时间间隔,命令，当前时间的输出。</span><br><span class="line">-h, --help # 查看帮助文档</span><br></pre></td></tr></table></figure>
-
-<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">watch -n 1 -d netstat -ant       # 命令：每隔一秒高亮显示网络链接数的变化情况</span><br><span class="line">watch -n 1 -d &#x27;pstree|grep http&#x27; # 每隔一秒高亮显示http链接数的变化情况。 后面接的命令若带有管道符，需要加&#x27;&#x27;将命令区域归整。</span><br><span class="line">watch &#x27;netstat -an | grep:21 | \ grep&lt;模拟攻击客户机的IP&gt;| wc -l&#x27; # 实时查看模拟攻击客户机建立起来的连接数</span><br><span class="line">watch -d &#x27;ls -l|grep scf&#x27;       # 监测当前目录中 scf&#x27; 的文件的变化</span><br><span class="line">watch -n 10 &#x27;cat /proc/loadavg&#x27; # 10秒一次输出系统的平均负载</span><br><span class="line">watch uptime</span><br><span class="line">watch -t uptime</span><br><span class="line">watch -d -n 1 netstat -ntlp</span><br><span class="line">watch -d &#x27;ls -l | fgrep goface&#x27;     # 监测goface的文件</span><br><span class="line">watch -t -differences=cumulative uptime</span><br><span class="line">watch -n 60 from            # 监控mail</span><br><span class="line">watch -n 1 &quot;df -i;df&quot;       # 监测磁盘inode和block数目变化情况</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1808,7 +1818,7 @@ tcpdump ip multicast
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">225</span>
+          <span class="site-state-item-count">226</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

@@ -176,6 +176,317 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/kernel/kernel_arch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ubun2">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nullptr">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/07/kernel/kernel_arch/" class="post-title-link" itemprop="url">Linux Kernel Architecture</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-10-06 16:10:49" itemprop="dateModified" datetime="2022-10-06T16:10:49+08:00">2022-10-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Linux的内核是一种宏内核，主要有以下特征：</p>
+<ul>
+<li>支持动态加载内核模块</li>
+<li>支持对称多处理（SMP）</li>
+<li>支持抢占，允许内核运行的任务有优先执行的能力</li>
+<li>不区分线程和进程</li>
+</ul>
+<h2 id="linux系统结构"><a href="#linux系统结构" class="headerlink" title="linux系统结构"></a>linux系统结构</h2><img src="/images/kernel/kernel/linux_arch.jpeg" alt="Unix/Linux系统分层结构" style="zoom: 33%;" />
+
+<p><img src="/images/kernel/kernel/linux-arch.webp" alt="Linux系统层次结构"></p>
+<p>最上面是用户空间，这是用户应用程序执行的地方。用户空间之下是内核空间，GNU C Library （glibc）也位于这里，它提供了连接内核的系统调用接口，还提供了在用户空间应用程序和内核之间进行转换的机制。</p>
+<p>Linux 内核可以进一步划分成三层，最上面是系统调用接口，之下是内核代码，是与处理器体系结构无关的通用代码，最下面是依赖于特定处理器体系结构的代码，称为 BSP（Board Support Package）。</p>
+<h2 id="内核架构"><a href="#内核架构" class="headerlink" title="内核架构"></a>内核架构</h2><p><img src="/images/kernel/kernel/kernel_struct.webp" alt="linux内核架构"></p>
+<p>Linux内核的主要组件有：系统调用接口、进程调度、内存管理、虚拟文件系统、网络协议栈、进程间通信、设备驱动程序和硬件架构的相关代码。</p>
+<p>LXR (Linux Cross Reference)是一个内核的源代码浏览工具，<a target="_blank" rel="noopener" href="http://lxr.linux.no/%E3%80%82">http://lxr.linux.no/。</a></p>
+<p><img src="/images/kernel/kernel/linux_kernel_map.svg" alt="Linux kernel map"></p>
+<p><a target="_blank" rel="noopener" href="https://makelinux.github.io/kernel/map/">https://makelinux.github.io/kernel/map/</a></p>
+<h3 id="目录详解"><a href="#目录详解" class="headerlink" title="目录详解"></a>目录详解</h3><table>
+<thead>
+<tr>
+<th align="left">目录 / 文件名</th>
+<th align="left">源码功能简介</th>
+</tr>
+</thead>
+</table>
+<table>
+<thead>
+<tr>
+<th><strong>目录</strong></th>
+<th><strong>说明</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>arch</td>
+<td>特定体系结构的代码</td>
+</tr>
+<tr>
+<td>block</td>
+<td>块设备I/O层</td>
+</tr>
+<tr>
+<td>crypo</td>
+<td>加密API</td>
+</tr>
+<tr>
+<td>certs</td>
+<td>与证书相关。</td>
+</tr>
+<tr>
+<td>Documentation</td>
+<td>内核源码文档</td>
+</tr>
+<tr>
+<td>drivers</td>
+<td>设备驱动程序</td>
+</tr>
+<tr>
+<td>firmware</td>
+<td>使用某些驱动程序而需要的设备固件</td>
+</tr>
+<tr>
+<td>fs</td>
+<td>VFS和各种文件系统</td>
+</tr>
+<tr>
+<td>include</td>
+<td>内核头文件</td>
+</tr>
+<tr>
+<td>init</td>
+<td>内核引导和初始化</td>
+</tr>
+<tr>
+<td>ipc</td>
+<td>进程间通信代码</td>
+</tr>
+<tr>
+<td>kernel</td>
+<td>核心子系统，如调度程序</td>
+</tr>
+<tr>
+<td>lib</td>
+<td>同样内核函数</td>
+</tr>
+<tr>
+<td>mm</td>
+<td>内存管理子系统和VM</td>
+</tr>
+<tr>
+<td>net</td>
+<td>网络子系统</td>
+</tr>
+<tr>
+<td>samples</td>
+<td>示例，示范代码</td>
+</tr>
+<tr>
+<td>scripts</td>
+<td>编译内核所用的脚本</td>
+</tr>
+<tr>
+<td>security</td>
+<td>Linux 安全模块</td>
+</tr>
+<tr>
+<td>sound</td>
+<td>语音子系统</td>
+</tr>
+<tr>
+<td>usr</td>
+<td>早期用户空间代码（所谓的initramfs）</td>
+</tr>
+<tr>
+<td>tools</td>
+<td>在Linux开发中有用的工具</td>
+</tr>
+<tr>
+<td>virt</td>
+<td>虚拟化基础结构</td>
+</tr>
+<tr>
+<td>COPYING</td>
+<td>许可和授权信息。</td>
+</tr>
+<tr>
+<td>CREDITS</td>
+<td>贡献者列表。</td>
+</tr>
+</tbody></table>
+<h2 id="drivers目录"><a href="#drivers目录" class="headerlink" title="drivers目录"></a>drivers目录</h2><p><strong>accessibility</strong>  这些驱动提供支持一些辅助设备。在Linux 3.9.4中，这个文件夹中只有一个驱动就是盲文设备驱动。</p>
+<p><strong>acpi</strong>  高级配置和电源接口（ACPI : Advanced Configuration and Power Interface）驱动用来管理电源使用。</p>
+<p><strong>amba</strong>  高级微控制器总线架构（AMBA : Advanced Microcontroller Bus Architecture）是与片上系统（SoC）的管理和互连的协议。SoC是一块包含许多或所有必要的计算机组件的芯片。这里的AMBA驱动让内核能够运行在这上面。</p>
+<p><strong>ata</strong>  该目录包含PATA和SATA设备的驱动程序。串行ATA（SATA）是一种连接主机总线适配器到像硬盘那样的存储器的计算机总线接口。并行ATA（PATA）用于连接存储设备，如硬盘驱动器，软盘驱动器，光盘驱动器的标准。PATA就是我们所说的IDE。</p>
+<p><strong>atm</strong>  异步通信模式(ATM : Asynchronous Transfer Mode)是一种通信标准。这里有各种接到PCI桥的驱动(他们连接到PCI总线)和以太网控制器(控制以太网通信的集成电路芯片)。</p>
+<p><strong>auxdisplay</strong>  这个文件夹提供了三个驱动。LCD 帧缓存（framebuffer）驱动、LCD控制器驱动和一个LCD驱动。这些驱动用于管理液晶显示器 —— 液晶显示器会在按压时显示波纹。注意:按压会损害屏幕,所以请不要用力戳LCD显示屏。</p>
+<p><strong>base</strong>  这是个重要的目录包含了固件、系统总线、虚拟化能力等基本的驱动。</p>
+<p><strong>bcma</strong>  这些驱动用于使用基于AMBA协议的总线。AMBA是由博通公司开发。</p>
+<p><strong>block</strong>  这些驱动提供对块设备的支持，像软驱、SCSI磁带、TCP网络块设备等等。</p>
+<p><strong>bluetooth</strong>  蓝牙是一种安全的无线个人区域网络标准(PANs)。蓝牙驱动就在这个文件夹，它允许系统使用各种蓝牙设备。例如，一个蓝牙鼠标不用电缆，并且计算机有一个电子狗(小型USB接收器)。Linux系统必须能够知道进入电子狗的信号，否则蓝牙设备无法工作。</p>
+<p><strong>bus</strong>  这个目录包含了三个驱动。一个转换ocp接口协议到scp协议。一个是设备间的互联驱动，第三个是用于处理互联中的错误处理。</p>
+<p><strong>cdrom</strong>  这个目录包含两个驱动。一个是cd-rom，包括DVD和CD的读写。第二个是gd-rom(只读GB光盘)，GD光盘是1.2GB容量的光盘，这像一个更大的CD或者更小的DVD。GD通常用于世嘉游戏机中。</p>
+<p><strong>char</strong>  字符设备驱动就在这里。字符设备每次传输数据传输一个字符。这个文件夹里的驱动包括打印机、PS3闪存驱动、东芝SMM驱动和随机数发生器驱动等。</p>
+<p><strong>clk</strong>  这些驱动用于系统时钟。</p>
+<p><strong>clocksource</strong>  这些驱动用于作为定时器的时钟。</p>
+<p><strong>connector</strong>  这些驱动使内核知道当进程fork并使用proc连接器更改UID(用户ID)、GID(组ID)和SID(会话ID)。内核需要知道什么时候进程fork(CPU中运行多个任务)并执行。否则,内核可能会低效管理资源。</p>
+<p><strong>cpufreq</strong>  这些驱动改变CPU的电源能耗。</p>
+<p><strong>cpuidle</strong>  这些驱动用来管理空闲的CPU。一些系统使用多个CPU，其中一个驱动可以让这些CPU负载相当。</p>
+<p><strong>crypto</strong>  这些驱动提供加密功能。</p>
+<p><strong>dca</strong>  直接缓存访问（DCA ： Direct Cache Access）驱动允许内核访问CPU缓存。CPU缓存就像CPU内置的RAM。CPU缓存的速度比RAM更快。然而,CPU缓存的容量比RAM小得多。CPU在这个缓存系统上存储了最重要的和执行的代码。</p>
+<p><strong>devfreq</strong>  这个驱动程序提供了一个通用的动态电压和频率调整(DVFS ： Generic Dynamic Voltage and Frequency Scaling)框架，可以根据需要改变CPU频率来节约能源。这就是所谓的CPU节能。</p>
+<p><strong>dio</strong>  数字输入/输出（DIO ：Digital Input/Output）总线驱动允许内核可以使用DIO总线。</p>
+<p><strong>dma</strong>  直接内存访问(DMA)驱动允许设备无需CPU直接访问内存。这减少了CPU的负载。</p>
+<p><strong>edac</strong>  错误检测和校正（ Error Detection And Correction）驱动帮助减少和纠正错误。</p>
+<p><strong>eisa</strong>  扩展工业标准结构总线（Extended Industry Standard Architecture）驱动提供内核对EISA总线的支持。</p>
+<p><strong>extcon</strong>  外部连接器（EXTernal CONnectors）驱动用于检测设备插入时的变化。例如，extcon会检测用户是否插入了USB驱动器。</p>
+<p><strong>firewire</strong>  这些驱动用于控制苹果制造的类似于USB的火线设备。</p>
+<p><strong>firmware</strong>  这些驱动用于和像BIOS(计算机的基本输入输出系统固件)这样的设备的固件通信。BIOS用于启动操作系统和控制硬件与设备的固件。一些BIOS允许用户超频CPU。超频是使CPU运行在一个更快的速度。CPU速度以MHz(百万赫兹)或GHz衡量。一个3.7 GHz的CPU的的速度明显快于一个700Mhz的处理器。</p>
+<p><strong>gpio</strong>  通用输入/输出(GPIO ：General Purpose Input/Output)是可由用户控制行为的芯片的管脚。这里的驱动就是控制GPIO。</p>
+<p><strong>gpu</strong>  这些驱动控制VGA、GPU和直接渲染管理(DRM ：Direct Rendering Manager )。VGA是640*480的模拟计算机显示器或是简化的分辨率标准。GPU是图形处理器。DRM是一个Unix渲染系统。</p>
+<p><strong>hid</strong>  这驱动用于对USB人机界面设备的支持。</p>
+<p><strong>hsi</strong>  这个驱动用于内核访问像Nokia N900这样的蜂窝式调制解调器。</p>
+<p><strong>hv</strong>  这个驱动用于提供Linux中的键值对(KVP ：Key Value Pair)功能。</p>
+<p><strong>hwmon</strong>  硬件监控驱动用于内核读取硬件传感器上的信息。比如，CPU上有个温度传感器。那么内核就可以追踪温度的变化并相应地调节风扇的速度。</p>
+<p><strong>hwspinlock</strong>  硬件转锁驱动允许系统同时使用两个或者更多的处理器，或使用一个处理器上的两个或更多的核心。</p>
+<p><strong>i2c</strong>  I2C驱动可以使计算机用I2C协议处理主板上的低速外设。系统管理总线(SMBus ：System Management Bus)驱动管理SMBus,这是一种用于轻量级通信的two-wire总线。</p>
+<p><strong>ide</strong>  这些驱动用来处理像CDROM和硬盘这些PATA/IDE设备。</p>
+<p><strong>idle</strong>  这个驱动用来管理Intel处理器的空闲功能。</p>
+<p><strong>iio</strong>  工业I/O核心驱动程序用来处理数模转换器或模数转换器。</p>
+<p><strong>infiniband</strong>  Infiniband是在企业数据中心和一些超级计算机中使用的一种高性能的端口。这个目录中的驱动用来支持Infiniband硬件。</p>
+<p><strong>input</strong>  这里包含了很多驱动，这些驱动都用于输入处理，包括游戏杆、鼠标、键盘、游戏端口（旧式的游戏杆接口）、遥控器、触控、耳麦按钮和许多其他的驱动。如今的操纵杆使用USB端口，但是在上世纪80、90年代，操纵杆是插在游戏端口的。</p>
+<p><strong>iommu</strong>  输入/输出内存管理单元(IOMMU ：Input/Output Memory Management Unit)驱动用来管理内存管理单元中的IOMMU。IOMMU连接DMA IO总线到内存上。IOMMU是设备在没有CPU帮助下直接访问内存的桥梁。这有助于减少处理器的负载。</p>
+<p><strong>ipack</strong>  Ipack代表的是IndustryPack。 这个驱动是一个虚拟总线,允许在载体和夹板之间操作。</p>
+<p><strong>irqchip</strong>  这些驱动程序允许硬件的中断请求(IRQ)发送到处理器，暂时挂起一个正在运行的程序而去运行一个特殊的程序（称为一个中断处理程序）。</p>
+<p><strong>isdn</strong>  这些驱动用于支持综合业务数字网(ISDN)，这是用于同步数字传输语音、视频、数据和其他网络服务使用传统电话网络的电路的通信标准。</p>
+<p><strong>leds</strong>  用于LED的驱动。</p>
+<p><strong>lguest</strong>  lguest用于管理客户机系统的中断。中断是CPU被重要任务打断的硬件或软件信号。CPU接着给硬件或软件一些处理资源。</p>
+<p><strong>macintosh</strong>  苹果设备的驱动在这个文件夹里。</p>
+<p><strong>mailbox</strong>  这个文件夹(pl320-pci)中的驱动用于管理邮箱系统的连接。</p>
+<p><strong>md</strong>  多设备驱动用于支持磁盘阵列，一种多块硬盘间共享或复制数据的系统。</p>
+<p><strong>media</strong>  媒体驱动提供了对收音机、调谐器、视频捕捉卡、DVB标准的数字电视等等的支持。驱动还提供了对不同通过USB或火线端口插入的多媒体设备的支持。</p>
+<p><strong>memory</strong>  支持内存的重要驱动。</p>
+<p><strong>memstick</strong>  这个驱动用于支持Sony记忆棒。</p>
+<p><strong>message</strong>  这些驱动用于运行LSI Fusion MPT(一种消息传递技术)固件的LSI PCI芯片/适配器。LSI大规模集成，这代表每片芯片上集成了几万晶体管、</p>
+<p><strong>mfd</strong>  多用途设备(MFD)驱动提供了对可以提供诸如电子邮件、传真、复印机、扫描仪、打印机功能的多用途设备的支持。这里的驱动还给MFD设备提供了一个通用多媒体通信端口(MCP)层。</p>
+<p><strong>misc</strong>  这个目录包含了不适合在其他目录的各种驱动。就像光线传感器驱动。</p>
+<p><strong>mmc</strong>  MMC卡驱动用于处理用于MMC标准的闪存卡。</p>
+<p><strong>mtd</strong>  内存技术设备(MTD ：Memory technology devices)驱动程序用于Linux和闪存的交互，这就就像一层闪存转换层。其他块设备和字符设备的驱动程序不会以闪存设备的操作方式来做映射。尽管USB记忆卡和SD卡是闪存设备，但它们不使用这个驱动，因为他们隐藏在系统的块设备接口后。这个驱动用于新型闪存设备的通用闪存驱动器驱动。</p>
+<p><strong>net</strong>  网络驱动提供像AppleTalk、TCP和其他的网络协议。这些驱动也提供对调制解调器、USB 2.0的网络设备、和射频设备的支持。</p>
+<p><strong>nfc</strong>  这个驱动是德州仪器的共享传输层之间的接口和NCI核心。</p>
+<p><strong>ntb</strong>  不透明的桥接驱动提供了在PCIe系统的不透明桥接。PCIe是一种高速扩展总线标准。</p>
+<p><strong>nubus</strong>  NuBus是一种32位并行计算总线。用于支持苹果设备。</p>
+<p><strong>of</strong>  此驱动程序提供设备树中创建、访问和解释程序的OF助手。</p>
+<p><strong>oprofile</strong>  这个驱动用于从驱动到用户空间进程(运行在用户态下的应用)评测整个系统。这帮助开发人员找到性能问题—-性能分析机制-是用于 Linux 的若干种评测和性能监控工具中的一种</p>
+<p><strong>parisc</strong>  这些驱动用于HP生产的PA-RISC架构设备。PA-RISC是一种特殊指令集的处理器。</p>
+<p><strong>parport</strong>  并口驱动提供了Linux下的并口支持。</p>
+<p><strong>pci</strong>  这些驱动提供了PCI总线服务。</p>
+<p><strong>pcmcia</strong>  这些是笔记本的pc卡驱动</p>
+<p><strong>pinctrl</strong>  这些驱动用来处理引脚控制设备。引脚控制器可以禁用或启用I/O设备。</p>
+<p><strong>platform</strong> 这个文件夹包含了不同的计算机平台的驱动像Acer、Dell、Toshiba、IBM、Intel、Chrombooks等等。</p>
+<p><strong>pnp</strong>  即插即用驱动允许用户在插入一个像USB的设备后可以立即使用而不必手动配置设备。</p>
+<p><strong>power</strong>  电源驱动使内核可以测量电池电量，检测充电器和进行电源管理。</p>
+<p><strong>pps</strong>  Pulse-Per-Second驱动用来控制电流脉冲速率。这用于计时。</p>
+<p><strong>ps3</strong>  这是Sony的游戏控制台驱动- PlayStation3。</p>
+<p><strong>ptp</strong>  图片传输协议(PTP)驱动支持一种从数码相机中传输图片的协议。</p>
+<p><strong>pwm</strong>  脉宽调制(PWM)驱动用于控制设备的电流脉冲。主要用于控制像CPU风扇。</p>
+<p><strong>rapidio</strong>  RapidIO驱动用于管理RapidIO架构，它是一种高性能分组交换，用于电路板上交互芯片的交互技术，也用于互相使用底板的电路板。</p>
+<p><strong>regulator</strong>  校准驱动用于校准电流、温度、或其他可能系统存在的校准硬件。—-用于控制系统中某些设备的电压电流供应</p>
+<p><strong>remoteproc</strong>  这些驱动用来管理远程处理器。</p>
+<p><strong>rpmsg</strong>  这个驱动用来控制支持大量驱动的远程处理器通讯总线(rpmsg)。这些总线提供消息传递设施,促进客户端驱动程序编写自己的连接协议消息。—-该基础架构允许主处理器上的 Linux 操作系统管理远程处理器上远程软件环境的生命周期和通信-用于在 AMP 环境中的操作系统之间实现 IPC 的 rpmsg 组件和 API</p>
+<p><strong>rtc</strong>  实时时钟(RTC)驱动使内核可以读取时钟。</p>
+<p><strong>s390</strong>  用于31/32位的大型机架构的驱动。</p>
+<p><strong>sbus</strong>  用于管理基于SPARC的总线驱动。</p>
+<p><strong>scsi</strong>  允许内核使用SCSI标准外围设备。例如,Linux将在与SCSI硬件传输数据时使用SCSI驱动。</p>
+<p><strong>sfi</strong> 简单固件接口(SFI)驱动允许固件发送信息表给操作系统。这些表的数据称为SFI表。</p>
+<p><strong>sh</strong>  该驱动用于支持SuperHway总线。</p>
+<p><strong>sn</strong>  该驱动用于支持IOC3串口。</p>
+<p><strong>spi</strong>  这些驱动处理串行设备接口总线(SPI)，它是一个在在全双工下运行的同步串行数据链路标准,。全双工是指两个设备可以同一时间同时发送和接收信息。双工指的是双向通信。设备在主/从模式下通信(取决于设备配置)。</p>
+<p><strong>ssb</strong>  ssb(Sonics Silicon Backplane)驱动提供对在不同芯片和嵌入式设备上使用的迷你总线的支持。</p>
+<p><strong>staging</strong>  该目录含有许多子目录。这里所有的驱动还需要在加入主内核前经过更多的开发工作。</p>
+<p><strong>target</strong>  SCSI设备驱动</p>
+<p><strong>tc</strong>  这些驱动用于TURBOchannel，TURBOchannel是数字设备公司开发的32位开放总线。这主要用于DEC工作站。</p>
+<p><strong>thermal</strong>  thermal驱动使CPU保持较低温度。—Linux温控框架</p>
+<p><strong>tty</strong>  tty驱动用于管理物理终端连接。</p>
+<p><strong>uio</strong>  该驱动允许用户编译运行在用户空间而不是内核空间的驱动。这使用户驱动不会导致内核崩溃。—–运行在用户空间的IO技术</p>
+<p><strong>usb</strong>  USB设备允许内核使用USB端口。闪存驱动和记忆卡已经包含了固件和控制器,所以这些驱动程序允许内核使用USB接口和与USB设备。</p>
+<p><strong>uwb</strong>  Ultra-WideBand驱动用来管理短距离，高带宽通信的超低功耗的射频设备</p>
+<p><strong>vfio</strong>  允许设备访问用户空间的VFIO驱动。用户态驱动框架。</p>
+<p><strong>vhost</strong>  这是用于宿主内核中的virtio服务器驱动。用于虚拟化中。</p>
+<p><strong>video</strong>  这是用来管理显卡和监视器的视频驱动。</p>
+<p><strong>virt</strong>  这些驱动用来虚拟化。</p>
+<p><strong>virtio</strong>  这个驱动用来在虚拟PCI设备上使用virtio设备。用于虚拟化中。</p>
+<p><strong>vlynq</strong>  这个驱动控制着由德州仪器开发的专有接口。这些都是宽带产品，像WLAN和调制解调器，VOIP处理器，音频和数字媒体信号处理芯片。</p>
+<p><strong>vme</strong>  WMEbus最初是为摩托罗拉68000系列处理器开发的总线标准</p>
+<p><strong>w1</strong>  这些驱动用来控制one-wire总线。</p>
+<p><strong>watchdog</strong>  该驱动管理看门狗定时器，这是一个可以用来检测和恢复异常的定时器。</p>
+<p><strong>xen</strong>  该驱动是Xen管理程序系统。这是个允许用户运行多个操作系统在一台计算机的软件或硬件。这意味着xen的代码将允许用户在同一时间的一台计算机上运行两个或更多的Linux系统。用户也可以在Linux上运行Windows、Solaris、FreeBSD、或其他操作系统。</p>
+<p><strong>zorro</strong>  该驱动提供Zorro Amiga总线支持。</p>
+<p>Documentation/CodingStyle 文件描 述 了 Linux 内 核 对 编 码 风 格 的 要 求，内 核 下 的scripts/checkpatch.pl 脚本可以检查代码风格。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/lcd/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1636,188 +1947,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/07/hardware/diode/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/07/hardware/diode/" class="post-title-link" itemprop="url">二极管参数</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-07 16:05:44" itemprop="dateCreated datePublished" datetime="2022-06-07T16:05:44+08:00">2022-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-08 17:21:31" itemprop="dateModified" datetime="2022-06-08T17:21:31+08:00">2022-06-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="常规参数"><a href="#常规参数" class="headerlink" title="常规参数"></a>常规参数</h3><ul>
-<li><strong>正向导通压降</strong></li>
-</ul>
-<p>压降：二极管的电流流过负载以后相对于同一参考点的电势（电位）变化称为电压降，简称压降。</p>
-<p>导通压降：二极管开始导通时对应的电压。</p>
-<p>正向特性：在二极管外加正向电压时，在正向特性的起始部分，正向电压很小，不足以克服PN结内电场的阻挡作用，正向电流几乎为零。当正向电压大到足以克服PN结电场时，二极管正向导通，电流随电压增大而迅速上升。</p>
-<p>反向特性：外加反向电压不超过一定范围时，通过二极管的电流是少数载流子漂移运动所形成反向电流。由于反向电流很小，二极管处于截止状态。反向电压增大到一定程度后，二极管反向击穿。</p>
-<p><img src="https://mmbiz.qpic.cn/mmbiz_png/ewiaKibzhXCHPUoeYgxyMhPTaIb3eDgrZk45v8aXXoyHQFJzOFxsD6dlX5tS0N9pnSKSvMUapO88vPM7AkAe5X7w/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="img"></p>
-<ul>
-<li><strong>正向导通压降与导通电流的关系</strong></li>
-</ul>
-<p>在二极管两端加正向偏置电压时，其内部电场区域变窄，可以有较大的正向扩散电流通过PN结。只有当正向电压达到某一数值(这一数值称为“门槛电压”，锗管约为0.2V，硅管约为0.6V)以后，二极管才能真正导通。但二极管的导通压降是恒定不变的吗?它与正向扩散电流又存在什么样的关系?通过下图1的测试电路在常温下对型号为SM360A的二极管进行导通电流与导通压降的关系测试，可得到如图2所示的曲线关系：正向导通压降与导通电流成正比，其浮动压差为0.2V。从轻载导通电流到额定导通电流的压差虽仅为0.2V，但对于功率二极管来说它不仅影响效率也影响二极管的温升，所以在价格条件允许下，尽量选择导通压降小、额定工作电流较实际电流高一倍的二极管。</p>
-<p><img src="https://mmbiz.qpic.cn/mmbiz_jpg/ewiaKibzhXCHPUoeYgxyMhPTaIb3eDgrZkt1qDGpibE7o3uMEAmbxHjNEnSUJdfPtibiaorfW589WicrHqibV2K9wN97w/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="二极管导通压降测试电路"></p>
-<p><img src="https://mmbiz.qpic.cn/mmbiz_png/ewiaKibzhXCHPUoeYgxyMhPTaIb3eDgrZkV1ibwvm5JYmzWcFADEI1gW1VHwib0tYXwfGbDxPQUKn84hvsOFNAyp6A/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="导通压降与导通电流关系"></p>
-<ul>
-<li><strong>正向导通压降与环境的温度的关系</strong></li>
-</ul>
-<p>在我们开发产品的过程中，高低温环境对电子元器件的影响才是产品稳定工作的最大障碍。环境温度对绝大部分电子元器件的影响无疑是巨大的，二极管当然也不例外，在高低温环境下通过对SM360A的实测数据表1与图3的关系曲线可知道：二极管的导通压降与环境温度成反比。在环境温度为-45℃时虽导通压降最大，却不影响二极管的稳定性，但在环境温度为75℃时，外壳温度却已超过了数据手册给出的125℃，则该二极管在75℃时就必须降额使用。这也是为什么开关电源在某一个高温点需要降额使用的因素之一。</p>
-<p><img src="https://mmbiz.qpic.cn/mmbiz_png/ewiaKibzhXCHPUoeYgxyMhPTaIb3eDgrZkZ4lic7M3Y3AdqNV1icQQo0XshwZ0yKZ6CLTZttnadD6jRVsibp4EI2ImQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="导通压降与导通电流测试数据"></p>
-<p><img src="https://mmbiz.qpic.cn/mmbiz_jpg/ewiaKibzhXCHPUoeYgxyMhPTaIb3eDgrZkibMhpkDI5dcqVGMviaOGgChmvSu9kXYd8PZqfpO8C5X1owAPTNZV3Oiaw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="导通压降与环境温度关系曲线"></p>
-<ul>
-<li><strong>最大整流电流IF</strong></li>
-</ul>
-<p>是指二极管长期连续工作时，允许通过的最大正向平均电流值，其值与PN结面积及外部散热条件等有关。因为电流通过管子时会使管芯发热，温度上升，温度超过容许限度（硅管为141左右，锗管为90左右）时，就会使管芯过热而损坏。所以在规定散热条件下，二极管使用中不要超过二极管最大整流电流值。例如，常用的IN4001－4007型锗二极管的额定正向工作电流为1A。</p>
-<ul>
-<li><strong>最高反向工作电压Udrm</strong></li>
-</ul>
-<p>加在二极管两端的反向电压高到一定值时，会将管子击穿，失去单向导电能力。为了保证使用安全，规定了最高反向工作电压值。例如，IN4001二极管反向耐压为50V，IN4007反向耐压为1000V。</p>
-<ul>
-<li><strong>反向电流Idrm</strong></li>
-</ul>
-<p>反向电流是指二极管在常温（25℃）和最高反向电压作用下，流过二极管的反向电流。反向电流越小，管子的单方向导电性能越好。值得注意的是反向电流与温度有着密切的关系，大约温度每升高10℃，反向电流增大一倍。例如2AP1型锗二极管，在25℃时反向电流若为250uA，温度升高到35℃，反向电流将上升到500uA，依此类推，在75℃时，它的反向电流已达8mA，不仅失去了单方向导电特性，还会使管子过热而损坏。又如，2CP10型硅二极管，25℃时反向电流仅为5uA，温度升高到75℃时，反向电流也不过160uA。故硅二极管比锗二极管在高温下具有较好的稳定性。</p>
-<p>外加反向电压不超过一定范围时，通过二极管的电流是少数载流子漂移运动所形成反向电流。由于反向电流很小，二极管处于截止状态。这个反向电流又称为反向饱和电流或漏电流，二极管的反向饱和电流受温度影响很大。</p>
-<p>一般硅管的反向电流比锗管小得多，小功率硅管的反向饱和电流在nA数量级，小功率锗管在μA数量级。温度升高时，半导体受热激发，少数载流子数目增加，反向饱和电流也随之增加。</p>
-<p>二极管漏电流与反向电压的关系</p>
-<p>在二极管两端加反向电压时，其内部电场区域变宽，有较少的漂移电流通过PN结，形成我们所说的漏电流。漏电流也是评估二极管性能的重要参数，二极管漏电流过大不仅使其自身温升高，对于功率电路来说也会影响其效率，不同反向电压下的漏电流是不同的，关系如图4所示：反向电压愈大，漏电流越大，在常温下肖特基管的漏电流可忽略。</p>
-<p><img src="https://mmbiz.qpic.cn/mmbiz_jpg/ewiaKibzhXCHPUoeYgxyMhPTaIb3eDgrZkkIWySV60Xq8vNcObvDWy33UUKLxNiaLicrNOCmgibWhX2u1ZAjgpUsnpw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="反向电压与漏电流关系曲线"></p>
-<p>二极管漏电流与环境温度的关系</p>
-<p>其实对二极管漏电流影响最大的还是环境温度，下图5是在额定反压下测试的关系曲线，从中可以看出：温度越高，漏电流越大。在75℃后成直线上升，该点的漏电流是导致二极管外壳在额定电流下达到125℃的两大因素之一，只有通过降额反向电压和正向导通电流才能降低二极管的工作温度。</p>
-<p><img src="https://mmbiz.qpic.cn/mmbiz_jpg/ewiaKibzhXCHPUoeYgxyMhPTaIb3eDgrZk2C3xjuEd0PKlI8KicqunibJgOVDyfqcFOAWrMjko8yfQbib7f8YcJ3FlA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="漏电流与环境温度关系曲线"></p>
-<ul>
-<li><strong>电压温度系数αuz</strong></li>
-</ul>
-<p>αuz指温度每升高一摄氏度时的稳定电压的相对变化量。uz为6v左右的稳压二极管的温度稳定性较好</p>
-<h3 id="极限参数"><a href="#极限参数" class="headerlink" title="极限参数"></a>极限参数</h3><ul>
-<li><strong>最大反向峰值电压VRM</strong></li>
-</ul>
-<p>即使没有反向电流,只要不断地提高反向电压,迟早会使二极管损坏。这种能加上的反向电压,不是瞬时电压,而是反复加上的正反向电压。因给整流器加的是交流电压,它的最大值是规定的重要因子。</p>
-<ul>
-<li><strong>最大直流反向电压VR</strong></li>
-</ul>
-<p>上述最大反向峰值电压是反复加上的峰值电压,VR是连续加直流电压时的值。用于直流电路,最大直流反向电压对于确定允许值和上限值是很重要的。</p>
-<ul>
-<li><strong>最大浪涌电流Isurge</strong></li>
-</ul>
-<p>允许流过的过量的正向电流。它不是正常电流,而是瞬间电流,这个值相当大。</p>
-<ul>
-<li><strong>最大平均整流电流IO</strong></li>
-</ul>
-<p>在半波整流电路中,流过负载电阻的平均整流电流的最大值。这是设计时非常重要的值。</p>
-<ul>
-<li><strong>最大交流输入电压VI</strong></li>
-</ul>
-<p>在半波整流电路(电阻负荷)上加的正弦交流电压的有效值。这也是选择整流器时非常重要的参数。最大峰值正向电流IFM 正向流过的最大电流值,这也是设计整流电路时的重要参数。</p>
-<ul>
-<li><strong>最大功率P</strong></li>
-</ul>
-<p>二极管中有电流流过,就会吸热,而使自身温度升高。最大功率P为功率的最大值。具体讲就是加在二极管两端的电压乘以流过的电流。这个极限参数对稳压二极管,可变电阻二极管显得特别重要。</p>
-<ul>
-<li><strong>反向电流IR</strong></li>
-</ul>
-<p>一般说来,二极管中没有反向电流流过,实际上,加一定的反向电压,总会有电流流过,这就是反向电流。不用说,好的二极管,反向电流较小。</p>
-<ul>
-<li><strong>反向恢复时间tre</strong></li>
-</ul>
-<p>指在规定的负载、正向电流及最大反向瞬态电压下的反向恢复时间。从正向电压变成反向电压时,理想情况是电流能瞬时截止,实际上,一般要延迟一点点时间。决定电流截止延时的量,就是反向恢复时间。虽然它直接影响二极管的开关速度,但不一定说这个值小就好。</p>
-<ul>
-<li><strong>IF— 最大平均整流电流</strong></li>
-</ul>
-<p>指二极管工作时允许通过的最大正向平均电流。该电流由PN结的结面积和散热条件决定。使用时应注意通过二极管的平均电流不能大于此值，并要满足散热条件。例如1N4000系列二极管的IF为1A。</p>
-<ul>
-<li><strong>VR— 最大反向工作电压</strong></li>
-</ul>
-<p>指二极管两端允许施加的最大反向电压。若大于此值，则反向电流(IR)剧增，二极管的单向导电性被破坏，从而引起反向击穿。通常取反向击穿电压(VB)的一半作为(VR)。例如1N4001的VR为50V，1N4007的VR为1OOOV.</p>
-<ul>
-<li><p><strong>IR— 反向电流。</strong><br>指二极管未击穿时反向电流值。温度对IR的影响很大。例如1N4000系列二极管在100°C条件IR应小于500uA;在25°C时IR应小于5uA。</p>
-</li>
-<li><p><strong>VR— 击穿电压。</strong></p>
-</li>
-</ul>
-<p>指二极管反向伏安特性曲线急剧弯曲点的电压值。反向为软特性时，则指给定反向漏电流条件下的电压值。</p>
-<h3 id="交流参数"><a href="#交流参数" class="headerlink" title="交流参数"></a>交流参数</h3><ul>
-<li><strong>CO— 零偏压电容。</strong></li>
-</ul>
-<p>指二极管两端电压为零时，扩散电容及结电容的容量之和。值得注意的，由于制造工艺的限制，即使同一型号的二极管其参数的离散性也很大。手册中给出的参数往往是一个范围，若测试条件改变，则相应的参数也会发生变化，例如在25°C时测得1N5200系列硅塑封整流二极管的IR小于1OuA，而在 100°C时IR则变为小于500uA。</p>
-<p>我们知道二极管具有容易从P型向N型半导体通过电流,而在相反方向不易通过的的特性。这两种特性合起来就产生了电容器的作用,即蓄积电荷的作用。蓄积有电荷,当然要放电。放电可以在任何方向进行。而二极管只在一个方向有电流流过这种说法,严格来说是不成立的。这种情况在高频时就明显表现出来。因此,二极管的极电容以小为好。</p>
-<ul>
-<li><strong>动态电阻Rd</strong></li>
-</ul>
-<p>二极管特性曲线静态工作点Q附近电压的变化与相应电流的变化量之比。</p>
-<ul>
-<li><strong>最高工作频率Fm</strong></li>
-</ul>
-<p>Fm是二极管工作的上限频率。因二极管与PN结一样，其结电容由势垒电容组成。所以Fm的值主要取决于PN结结电容的大小。若是超过此值。则单向导电性将受影响。</p>
-<ul>
-<li><strong>二极管反向恢复时间</strong></li>
-</ul>
-<p>如图6所示，二极管的反向恢复时间为电流通过零点由正向转换成反向，再由反向转换到规定低值的时间间隔，实际上是释放二极管在正向导通期间向PN结的扩散电容中储存的电荷。反向恢复时间决定了二极管能在多高频率的连续脉冲下做开关使用，如果反向脉冲的持续时间比反向恢复时间短，则二极管在正向、反向均可导通就起不到开关的作用。PN结中储存的电荷量与反向电压共同决定了反向恢复时间，而在高频脉冲下不但会使其损耗加重，也会引起较大的电磁干扰。所以知道二极管的反向恢复时间正确选择二极管和合理设计电路是必要的，选择二极管时应尽量选择PN结电容小、反向恢复时间短的，但大多数厂家都不提供该参数数据。</p>
-<p><img src="https://mmbiz.qpic.cn/mmbiz_png/ewiaKibzhXCHPUoeYgxyMhPTaIb3eDgrZkxqBM8wAn7vicNLsDcantI8m8Via5cQicpLkX8PHibWQMDt8XRf9n0M15bA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="二极管恢复时间示意图"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1887,7 +2016,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">225</span>
+          <span class="site-state-item-count">226</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
