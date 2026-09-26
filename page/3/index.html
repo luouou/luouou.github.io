@@ -21,11 +21,11 @@
   </script>
 
   <meta property="og:type" content="website">
-<meta property="og:title" content="nullptr">
+<meta property="og:title" content="luo_u Clog">
 <meta property="og:url" content="http://example.com/page/3/index.html">
-<meta property="og:site_name" content="nullptr">
+<meta property="og:site_name" content="luo_u Clog">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:author" content="ubun2">
+<meta property="article:author" content="luo_u">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="http://example.com/page/3/">
@@ -40,7 +40,7 @@
   };
 </script>
 
-  <title>nullptr</title>
+  <title>luo_u Clog</title>
   
 
 
@@ -92,11 +92,11 @@
     <div>
       <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">nullptr</span>
+        <span class="site-title">luo_u Clog</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
-        <p class="site-subtitle">吾生也有涯 而知也无涯</p>
+        <p class="site-subtitle">luo_u 的数字花园</p>
   </div>
 
   <div class="site-nav-right">
@@ -176,16 +176,96 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/01/kernel/mmu/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/01/kernel/module_makefile/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
+      <meta itemprop="name" content="luo_u">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
+      <meta itemprop="name" content="luo_u Clog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/03/01/kernel/module_makefile/" class="post-title-link" itemprop="url">make module</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-03-01 18:57:32" itemprop="dateCreated datePublished" datetime="2023-03-01T18:57:32+08:00">2023-03-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>编译一个模块需要内核源码（已经编译过的）和当前模块的Makefile文件。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$(info KERNELRELEASE: <span class="variable">$(KERNELRELEASE)</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ifeq</span> (<span class="variable">$(KERNELRELEASE)</span>,)</span><br><span class="line">KERNEL_DIR ?= /lib/modules/<span class="variable">$(<span class="built_in">shell</span> uname -r)</span>/build</span><br><span class="line"></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">	obj-m += hello.o</span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"></span><br><span class="line"><span class="section">all:</span></span><br><span class="line">	<span class="variable">$(MAKE)</span> -C <span class="variable">$(KERNEL_DIR)</span> M=<span class="variable">$(PWD)</span> modules</span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	@find ./ \</span><br><span class="line">		\( -name &#x27;*.[oas]&#x27; -o -name &#x27;.*.cmd&#x27; -o -name &#x27;*.symvers&#x27;\</span><br><span class="line">		-o -name &#x27;.*.d&#x27; -o -name &#x27;.*.tmp&#x27; -o -name &#x27;*.mod.c&#x27; \</span><br><span class="line">		-o -name &#x27;*.symtypes&#x27; -o -name &#x27;modules.order&#x27; \</span><br><span class="line">		-o -name modules.builtin -o -name &#x27;.tmp_*.o.*&#x27; \</span><br><span class="line">		-o -name &#x27;*.gcno&#x27; -o -name tags -o -name &#x27;.tags*&#x27; \</span><br><span class="line">		 \) -type f -print | xargs rm -f</span><br><span class="line"></span><br><span class="line">	@find ./ \</span><br><span class="line">		\( -name .tmp_versions \) -type d -print | xargs rm -rf</span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="keyword">.PHONY</span>: clean all</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>先判断<code>KERNELRELEASE</code>环境变量是否为空，该变量的値在进入内核源码目录后，会设置为内核版本号。</li>
+<li>执行<code>-C $(KERNEL_DIR)</code>选项，进入内核源码目录。</li>
+<li>根据选项<code>M=$(PWD)</code>，编译器会回到模块当前目录，再次执行Makefile文件，此时<code>KERNELRELEASE</code>环境变量已经有値了，生成hello.o中间文件。</li>
+<li>运行MODPOST程序，生成hello.mod.c文件。</li>
+<li>最后链接生成hello.ko。</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">KERNELRELEASE: </span><br><span class="line">make -C /lib/modules/4.10.0-38-generic/build M=/home/luo_u/CodeHub/dev/test modules</span><br><span class="line">make[1]: Entering directory &#x27;/usr/src/linux-headers-4.10.0-38-generic&#x27;</span><br><span class="line">KERNELRELEASE: 4.10.0-38-generic</span><br><span class="line">  CC [M]  /home/luo_u/CodeHub/dev/test/hello.o</span><br><span class="line">  Building modules, stage 2.</span><br><span class="line">KERNELRELEASE: 4.10.0-38-generic</span><br><span class="line">  MODPOST 1 modules</span><br><span class="line">  CC      /home/luo_u/CodeHub/dev/test/hello.mod.o</span><br><span class="line">  LD [M]  /home/luo_u/CodeHub/dev/test/hello.ko</span><br><span class="line">make[1]: Leaving directory &#x27;/usr/src/linux-headers-4.10.0-38-generic&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>加载模块，后在/sys/module/hello/目录和/proc/modules文件就可以看到模块信息了。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">lsmod | grep hello</span></span><br><span class="line">hello                  16384  0</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">cat</span> /proc/modules | grep hello</span></span><br><span class="line">hello 16384 0 - Live 0x0000000000000000 (OE)</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">ls</span> /sys/module/hello/</span></span><br><span class="line">coresize  holders  initsize  initstate  notes  refcnt  sections  srcversion  taint  uevent</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/01/kernel/mmu/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="luo_u">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="luo_u Clog">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -331,278 +411,16 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/01/hardware/memory/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/03/01/hardware/memory/" class="post-title-link" itemprop="url">存储器</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-03-01 18:57:32" itemprop="dateCreated datePublished" datetime="2023-03-01T18:57:32+08:00">2023-03-01</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hardware/" itemprop="url" rel="index"><span itemprop="name">hardware</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="ROM"><a href="#ROM" class="headerlink" title="ROM"></a>ROM</h2><p>ROM(Read Only Memory)程序存储器，在掉电之后仍然可以保持数据，用于存储各种固化程序和数据。</p>
-<p><strong>PROM</strong> (Programmable ROM，可编程ROM)，写入时，烧录器通过高电压在芯片内永久地烧断或者建立内部连接（熔丝或反熔丝），因此只能一次编程。</p>
-<p><strong>EPROM</strong> (Erasable Programmable ROM，可擦去可编程ROM)，使用紫外线照射此类型的ROM可以抹去其中的数据。</p>
-<p><strong>EEPROM</strong> (Electrically Erasable Programmable ROM，电可擦去可编程ROM)，使用电来对其进行擦写，常用于电脑系统的BIOS。</p>
-<h2 id="RAM"><a href="#RAM" class="headerlink" title="RAM"></a>RAM</h2><p>RAM(Random Access Memory)随机访问存储器，存储单元的内容可按照需要随机取出或存入，且存取的速度与存储单元的位置无关。在掉电之后就丢失数据，主要用来存储程序中用到的变量。</p>
-<p><strong>DRAM</strong> (Dynamic RAM/DRAM)动态随机存储器，DRAM保留数据的时间很短，需要周期性地刷新。计算机内存就是DRAM的。</p>
-<p>DRAM利用MOS管的栅电容上的电荷来存储信息，存储单元存储的是0还是1取决于电容是否有电荷，有电荷代表1，无电荷代表0。由于栅极会漏电，所以每隔一定的时间就需要一个刷新机构给这些栅电容补充电荷，这个就叫动态刷新。刷新操作定期对电容进行检查，若电量大于满电量的1/2，则认为其代表1，并把电容充满电；若电量小于1/2，则认为其代表0，并把电容放电，以此来保持数据的连续性。由于它只使用一个MOS管来存信息，所以集成度可以很高，容量能够做的很大。</p>
-<p><strong>SRAM</strong> (Static Random-Access Memory)静态随机存取存储器，只要保持通电，里面储存的数据就可以一直保持，不需要动态刷新，对任何数据访问的时间都是固定的。需要与CPU时钟同步</p>
-<p>SRAM的优点是只要器件不掉电，存储内容就不丢失，工作速度快。缺点是集成度低、功耗大、价格高。CPU Cache就是这种。</p>
-<h2 id="Flash"><a href="#Flash" class="headerlink" title="Flash"></a>Flash</h2><p>Flash 存储器（FLASH EEPROM）又称闪存，快闪。它是EEPROM的一种。它结合了ROM和RAM的长处。不仅具备EEPROM的性能，还不会断电丢失数据同时可以快速读取数据。它于EEPROM的最大区别是，FLASH按扇区操作，而EEPROM按照字节操作。FLASH的电路结构较简单，同样容量占芯片面积较小，成本自然比EEPROM低，因此适合用于做程序存储器。</p>
-<p>flash是非易失存储器，可以对称为块的存储器单元块进行擦写和再编程。任何flash器件的写入操作只能在空或已擦除的单元内进行，所以在进行写入操作之前必须先执行擦除。擦除的过程就是把所有位都写为1的过程，以块为单位，块内的所有字节变为0xFF。</p>
-<h3 id="Nor-Flash"><a href="#Nor-Flash" class="headerlink" title="Nor Flash"></a>Nor Flash</h3><ul>
-<li>支持随机访问，具有XIP（eXecute In Place）特性，可以像普通ROM一样执行程序。</li>
-<li>存储的内容可以直接映射到 CPU 地址空间，不需要拷贝到 RAM 中即可被 CPU 访问。</li>
-<li>读操作快，但擦除和写操作慢。</li>
-<li>容量小，块大小范围：64~128KB。</li>
-<li>带有SRAM接口，有足够的地址引脚来寻址，可以很容易地存取其内部的每一个字节。</li>
-<li>最大擦写次数是十万次。</li>
-</ul>
-<p>Nor Flash根据数据传输的位数可以分为并行（Parallel，即地址线和数据线直接和处理器相连）和串行（SPI，即通过SPI接口和处理器相连）。早期Norflash的接口是parallel的形式，即把数据线和地址线并排与IC的管脚连接。但是后来发现不同容量的Norflash不能硬件上兼容（数据线和地址线的数量不一样），并且封装比较大，占用了较大的PCB板位置，后来逐渐被串行接口的SPI Norflash所取代，至于现在说起NOR flash都直接以SPI flash来代称。</p>
-<p>spi flash 接口定义：</p>
-<ul>
-<li>Standard SPI: CLK, /CS, DI, DO, /WP, /Hold</li>
-<li>Dual SPI: CLK, /CS, IO0, IO1, /WP, /Hold</li>
-<li>Quad SPI: CLK, /CS, IO0, IO1, IO2, IO3</li>
-</ul>
-<h3 id="Nand-Flash"><a href="#Nand-Flash" class="headerlink" title="Nand Flash"></a>Nand Flash</h3><ul>
-<li>使用串行接口传送控制、地址和数据信息。</li>
-<li>读比nor flash慢，擦除和写都快，读和写操作都采用512字节的块。</li>
-<li>容量大，块大小范围：8~64KB。</li>
-<li>每个块的最大擦写次数是一百万次。</li>
-<li>坏块是随机分布的，需要坏块处理。</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th align="left"></th>
-<th align="center">Nor</th>
-<th align="center">Nand</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">成本</td>
-<td align="center">单位容量较贵</td>
-<td align="center">单位容量较便宜</td>
-</tr>
-<tr>
-<td align="left">体积</td>
-<td align="center">单位容量体积更大</td>
-<td align="center">单位容量体积更小</td>
-</tr>
-<tr>
-<td align="left">寿命擦写次数</td>
-<td align="center">10万次</td>
-<td align="center">100万次</td>
-</tr>
-<tr>
-<td align="left">擦除单元</td>
-<td align="center">Sector</td>
-<td align="center">Block</td>
-</tr>
-<tr>
-<td align="left">写入单元</td>
-<td align="center">Page</td>
-<td align="center">Page</td>
-</tr>
-<tr>
-<td align="left">读取单元</td>
-<td align="center">字节</td>
-<td align="center">Page</td>
-</tr>
-<tr>
-<td align="left">擦写速度</td>
-<td align="center">较慢</td>
-<td align="center">较快</td>
-</tr>
-<tr>
-<td align="left">读取速度</td>
-<td align="center">较快</td>
-<td align="center">较慢</td>
-</tr>
-<tr>
-<td align="left">坏块</td>
-<td align="center">较少（可靠性高）</td>
-<td align="center">较多（可靠性低）</td>
-</tr>
-<tr>
-<td align="left">是否支持XIP</td>
-<td align="center">支持</td>
-<td align="center">不支持</td>
-</tr>
-</tbody></table>
-<p>由于Flash固有的电器特性，在读写数据过程中会偶然产生1位或几位数据错误，即<strong>位反转</strong>。Nand Flash发生位反转的几率要远大于Nor Flash，应采用错误探测/错误更正(EDC/ECC)算法。</p>
-<p>XIP(eXecute In Place)芯片内执行，指应用程序可以直接在flash闪存内运行，不必再把代码读到系统RAM中。flash内执行是指nor flash 不需要初始化，可以直接在flash内执行代码。但往往只执行部分代码，比如初始化RAM。</p>
-<p>NOR与NAND特性的差别，主要是由于其内部地址/数据线是否分开导致的。由于 NOR的地址线和数据线分开，它可以按字节读写数据，符合 CPU 的指令译码执行要求，所以假如 NOR上存储了代码指令， CPU 给NOR一个地址， NOR 就能向CPU 返回一个数据让 CPU 执行，中间不需要额外的处理操作。</p>
-<p>而由于 NAND 的数据和地址线共用，只能按块来读写数据，假如 NAND 上存储了代码指令， CPU 给 NAND 地址后，它无法直接返回该地址的数据，所以不符合指令译码要求。 即不支持立即执行的特性(eXecute In Place)，若代码存储在NAND上，可以先把它加载到RAM存储器上，再由CPU执行。</p>
-<h2 id="硬盘"><a href="#硬盘" class="headerlink" title="硬盘"></a>硬盘</h2><p>硬盘(Hard Disk Drive，HDD)靠磁性盘片记录二进制数据。</p>
-<p><img src="/images/hardware/disk/hdd.jpg" alt="img"></p>
-<p>硬盘片的盘面上有一层涂得很薄的磁性材料。写入数据时，通电的磁头会形成磁场，在磁性材料层上留下一个一个小磁化区，每个被磁化的区域代表二进制的1。读取数据时，磁头扫过磁化区的时候能感受到微小的磁场变化。</p>
-<p>当磁盘旋转时，磁头若保持在一个位置上，则每个磁头都会在磁盘表面划出一个圆形轨迹，这些圆形轨迹就叫做磁道(Track)。划分分区时，分区大小必须以磁道为参考，一个分区必须包含一个或多个整数磁道，不能只占半个磁道。也就是说如果磁盘有两个磁道，最多只能分成2个分区。</p>
-<p>在有多个盘片构成的盘组中，由不同盘片的面，但处于同一半径圆的多个磁道组成的一个圆柱面(Cylinder)。</p>
-<p>磁盘上的每个磁道被等分为若干个弧段，这些弧段便是硬盘的扇区(Sector)。硬盘的第一个扇区，叫做引导扇区。磁盘上数据读写的最小单位。</p>
-<p>操作系统内核中的文件管理系统会将硬盘的扇区组合成<strong>簇</strong>(Data Cluster)，操作系统会记录文件所在簇的编号(文件数据分布在哪几个扇区)，方便查找并读写。</p>
-<p>机械硬盘通过磁头读取旋转的盘片来传输数据，而盘片的转速RPM(Round Per Minute，每分钟的转数)直接决定了硬盘读取和写入数据的速度。磁盘在写入数据时，会使用磁盘缓存暂时存储数据。</p>
-<h3 id="RAID"><a href="#RAID" class="headerlink" title="RAID"></a>RAID</h3><p>RAID(独立硬盘冗余阵列，Redundant Array of Independent Disks)，简称磁盘阵列。利用虚拟化存储技术把多个硬盘组合起来，成为一个或多个硬盘阵列组，目的为提升性能或数据冗余，或是两者同时提升。</p>
-<ul>
-<li><strong>RAID0</strong></li>
-</ul>
-<p>RAID0 是一种非常简单的的方式，它将多块磁盘组合在一起形成一个大容量的存储。当我们要写数据的时候，会将数据分为N份，以独立的方式实现N块磁盘的读写，那么这N份数据会同时并发的写到磁盘中，读写性能理论上是单块磁盘的N倍。</p>
-<p>但RAID0的问题是，它并不提供数据校验或冗余备份，因此一旦某块磁盘损坏了，数据就直接丢失，无法恢复了。因此RAID0就不可能用于高要求的业务中，但可以用在对可靠性要求不高，对读写性能要求高的场景中。</p>
-<ul>
-<li><strong>RAID1</strong></li>
-</ul>
-<p>RAID1 是磁盘阵列中单位成本最高的一种方式。因为它的原理是在往磁盘写数据的时候，将同一份数据无差别的写两份到磁盘，分别写到工作磁盘和镜像磁盘，对数据做了冗余备份，但它的实际空间使用率只有50%了，是一种比较昂贵的方案。</p>
-<ul>
-<li><strong>RAID3</strong></li>
-</ul>
-<p>RAID3的方式是：将数据按照RAID0的形式，分成多份同时写入多块磁盘，但是还会另外留出一块磁盘用于写奇偶校验码，一旦某一块磁盘坏掉了，就可以利用那块校验码磁盘去恢复数据。但是由于任何数据的写入都会要去更新这块磁盘，导致这块磁盘的读写是最频繁的，也就非常的容易损坏。</p>
-<ul>
-<li><strong>RAID5</strong></li>
-</ul>
-<p>RAID5对RAID3进行了改进，是一种存储性能、数据安全、存储成本兼顾的方案。</p>
-<p>在RAID5模式中，不再需要用单独的磁盘写校验码了。它把校验码信息分布到各个磁盘上。例如，总共有N块磁盘，那么会将要写入的数据分成N份，并发的写入到N块磁盘中，同时还将数据的校验码信息也写入到这N块磁盘中，数据与对应的校验码信息必须得分开存储在不同的磁盘上。一旦某一块磁盘损坏了，就可以用剩下的数据和对应的奇偶校验码信息去恢复损坏的数据。</p>
-<p><img src="/images/hardware/disk/RAID5.jpg" alt="img"></p>
-<p>RAID5的方式，最少需要三块磁盘来组建磁盘阵列，允许最多同时坏一块磁盘。如果有两块磁盘同时损坏了，那数据就无法恢复了。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/01/fs/VFS/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/03/01/fs/VFS/" class="post-title-link" itemprop="url">虚拟文件系统</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-03-01 18:57:32" itemprop="dateCreated datePublished" datetime="2023-03-01T18:57:32+08:00">2023-03-01</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Linux 内核支持众多的逻辑文件系统,如 Ext2、Ext3、Ext4、btrfs、NFS、VFAT 等。<br>VFS 则是 Linux 基于各种逻辑文件系统抽象出的一种内存中的文件系统,隐藏了各种硬件设<br>备细节,为用户提供统一的操作接口,使用户访问各种不同文件系统和设备时,不用区分具<br>体的逻辑文件系统。</p>
-<p>虚拟文件系统(VFS)隐藏各种了硬件的具体细节，为所有的设备提供了统一的接口，使用户访问各种不同文件系统和设备时，不用区分具体的逻辑文件系统。</p>
-<p><img src="/images/kernel/kernel/VFS.webp" alt="img"></p>
-<p>在 VFS 上面，是对诸如 open、close、read 和 write 之类的函数的一个通用 API 抽象。在 VFS 下面是文件系统抽象，它定义了上层函数的实现方式。文件系统层之下是缓冲区缓存，这个缓存层通过将数据保留一段时间。缓冲区缓存之下是设备驱动程序，它实现了特定物理设备的接口。</p>
-<p>文件系统使用超级块super block 存放文件系统相关信息，使用索引节点inode存放文件的物理信息，使用目录项dentry存放文件的逻辑信息。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/02/16/cpu/TrustZone/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
+      <meta itemprop="name" content="luo_u">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
+      <meta itemprop="name" content="luo_u Clog">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -703,12 +521,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
+      <meta itemprop="name" content="luo_u">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
+      <meta itemprop="name" content="luo_u Clog">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -785,12 +603,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
+      <meta itemprop="name" content="luo_u">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
+      <meta itemprop="name" content="luo_u Clog">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -889,12 +707,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
+      <meta itemprop="name" content="luo_u">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
+      <meta itemprop="name" content="luo_u Clog">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -1029,12 +847,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
+      <meta itemprop="name" content="luo_u">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
+      <meta itemprop="name" content="luo_u Clog">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -1123,12 +941,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
+      <meta itemprop="name" content="luo_u">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
+      <meta itemprop="name" content="luo_u Clog">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -1254,12 +1072,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="ubun2">
+      <meta itemprop="name" content="luo_u">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nullptr">
+      <meta itemprop="name" content="luo_u Clog">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -1340,11 +1158,84 @@
   
   
 
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/12/11/algo/backtrack/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="luo_u">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="luo_u Clog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/12/11/algo/backtrack/" class="post-title-link" itemprop="url">回溯算法</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-12-11 18:28:30 / 修改时间：19:03:45" itemprop="dateCreated datePublished" datetime="2022-12-11T18:28:30+08:00">2022-12-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>回溯算法是从一条路往前走，能进则进，走不通就退回，换一条路再试，实际 上就是一个决策树的遍历过程。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">backtrack</span><span class="params">(参数)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (终止条件) &#123;</span><br><span class="line">        存放结果;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> 选择 in 选择列表 &#123;</span><br><span class="line">        做选择</span><br><span class="line">        backtrack(路径, 选择列表); <span class="comment">// 路径就是已经做出的选择</span></span><br><span class="line">        回溯撤销选择</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="组合问题"><a href="#组合问题" class="headerlink" title="组合问题"></a>组合问题</h2><p>给定2个整数n和k，返回范围[1,n]中所有可能的k的个数从小到大顺序的组合<br>输入：n = 4, k = 2<br>输出：[[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]]</p>
+<p><img src="/images/code/algo/backtrack.png" alt="img"></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line">vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; res;</span><br><span class="line"><span class="type">int</span> target;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">backtrack</span><span class="params">(<span class="type">const</span> vector&lt;<span class="type">int</span>&gt; &amp;nums, vector&lt;<span class="type">int</span>&gt; &amp;tmp, <span class="type">int</span> start)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it : tmp) &#123;</span><br><span class="line">        cout &lt;&lt; it &lt;&lt; <span class="string">&quot; -&gt; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (tmp.<span class="built_in">size</span>() == target) &#123;</span><br><span class="line">        res.<span class="built_in">push_back</span>(tmp);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = start; i &lt; nums.<span class="built_in">size</span>(); ++i) &#123;</span><br><span class="line">        tmp.<span class="built_in">push_back</span>(nums[i]);</span><br><span class="line">        <span class="built_in">backtrack</span>(nums, tmp, i+<span class="number">1</span>);</span><br><span class="line">        tmp.<span class="built_in">pop_back</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; nums = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>&#125;;</span><br><span class="line">    target = <span class="number">2</span>;</span><br><span class="line">    <span class="comment">// target = 3;</span></span><br><span class="line"></span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; tmp;</span><br><span class="line">    <span class="built_in">backtrack</span>(nums, tmp, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> vec : res) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span> it : vec) &#123;</span><br><span class="line">            cout &lt;&lt; it &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        cout &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
   </div>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1402,27 +1293,27 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">ubun2</p>
+  <p class="site-author-name" itemprop="name">luo_u</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">226</span>
+          <span class="site-state-item-count">183</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">21</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1447,11 +1338,11 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2026</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">ubun2</span>
+  <span class="author" itemprop="copyrightHolder">luo_u</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v5.4.2
   </div>
